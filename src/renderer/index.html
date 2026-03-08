@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>GW2 Buildsite Desktop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              slatebrand: {
+                950: "#05070d",
+                900: "#0a1020",
+                800: "#111a31",
+              },
+              mint: {
+                400: "#56d3a8",
+                500: "#25bc94",
+              },
+              skybrand: {
+                400: "#4fa8ff",
+                500: "#2f86f6",
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="h-screen overflow-hidden bg-slatebrand-950 text-slate-100 antialiased">
+    <header id="titlebar" class="app-drag fixed inset-x-0 top-0 z-40 h-10 border-b border-slate-700/70 bg-slatebrand-900/95 backdrop-blur">
+      <div class="flex h-full items-center justify-between px-3">
+        <div class="flex items-center gap-2 text-xs font-medium tracking-wide text-slate-300">
+          <span class="inline-block h-2 w-2 rounded-full bg-mint-500"></span>
+          <span>GW2 Buildsite Desktop</span>
+        </div>
+        <div class="no-drag flex items-center gap-1">
+          <button id="winMin" class="h-7 w-9 rounded-md text-slate-300 hover:bg-slate-700/70">-</button>
+          <button id="winMax" class="h-7 w-9 rounded-md text-slate-300 hover:bg-slate-700/70">+</button>
+          <button id="winClose" class="h-7 w-9 rounded-md text-slate-300 hover:bg-rose-600/80">x</button>
+        </div>
+      </div>
+    </header>
+
+    <section id="setupGate" class="fixed inset-x-0 bottom-0 top-10 z-50 hidden bg-slatebrand-950/95 p-5"></section>
+    <div class="grid h-full grid-cols-1 pt-10 lg:grid-cols-[390px_1fr]">
+      <aside class="overflow-y-auto border-r border-slate-800 bg-slatebrand-900/70 p-4">
+        <section class="mb-3 rounded-xl border border-slate-700/70 bg-slatebrand-800/80 p-3">
+          <h1 class="text-lg font-semibold">Buildsite Desktop</h1>
+          <p class="mb-3 text-sm text-slate-300">Sync, sort, search, and publish builds to your GitHub fork.</p>
+          <div id="authRow" class="flex items-center gap-2 text-sm"></div>
+        </section>
+
+        <section class="mb-3 rounded-xl border border-slate-700/70 bg-slatebrand-800/80 p-3">
+          <h2 class="mb-2 text-base font-semibold">First-Time Setup</h2>
+          <div id="onboarding" class="grid gap-2"></div>
+        </section>
+
+        <section class="mb-3 rounded-xl border border-slate-700/70 bg-slatebrand-800/80 p-3">
+          <h2 class="mb-2 text-base font-semibold">Add Build</h2>
+          <form id="buildForm" class="grid gap-2">
+            <label class="grid gap-1 text-xs text-slate-300">Title <input class="w-full rounded-lg border border-slate-600 bg-slatebrand-900 px-3 py-2 text-sm outline-none ring-skybrand-500 placeholder:text-slate-500 focus:ring-2" name="title" required maxlength="120" /></label>
+            <label class="grid gap-1 text-xs text-slate-300">Profession <input class="w-full rounded-lg border border-slate-600 bg-slatebrand-900 px-3 py-2 text-sm outline-none ring-skybrand-500 placeholder:text-slate-500 focus:ring-2" name="profession" maxlength="40" /></label>
+            <label class="grid gap-1 text-xs text-slate-300">Build URL <input class="w-full rounded-lg border border-slate-600 bg-slatebrand-900 px-3 py-2 text-sm outline-none ring-skybrand-500 placeholder:text-slate-500 focus:ring-2" name="buildUrl" placeholder="https://..." /></label>
+            <label class="grid gap-1 text-xs text-slate-300">Tags (comma separated) <input class="w-full rounded-lg border border-slate-600 bg-slatebrand-900 px-3 py-2 text-sm outline-none ring-skybrand-500 placeholder:text-slate-500 focus:ring-2" name="tags" /></label>
+            <label class="grid gap-1 text-xs text-slate-300">Notes <textarea class="w-full rounded-lg border border-slate-600 bg-slatebrand-900 px-3 py-2 text-sm outline-none ring-skybrand-500 placeholder:text-slate-500 focus:ring-2" name="notes" rows="4"></textarea></label>
+            <button class="w-full rounded-lg bg-skybrand-500 px-3 py-2 text-sm font-medium text-white transition hover:bg-skybrand-400" type="submit">Save Build</button>
+          </form>
+        </section>
+
+        <section class="rounded-xl border border-slate-700/70 bg-slatebrand-800/80 p-3">
+          <div class="mb-2 flex items-center gap-2">
+            <h2 class="mr-auto text-base font-semibold">My Builds</h2>
+            <select id="sortBy" title="Sort builds" class="rounded-lg border border-slate-600 bg-slatebrand-900 px-2 py-1 text-xs">
+              <option value="updated">Updated</option>
+              <option value="created">Created</option>
+              <option value="title">Title</option>
+              <option value="profession">Profession</option>
+            </select>
+          </div>
+          <input id="search" class="w-full rounded-lg border border-slate-600 bg-slatebrand-900 px-3 py-2 text-sm outline-none ring-skybrand-500 placeholder:text-slate-500 focus:ring-2" placeholder="Search title, tags, notes..." />
+          <div id="buildList" class="mt-2 grid gap-2"></div>
+        </section>
+      </aside>
+
+      <main class="h-full bg-slatebrand-950 p-3">
+        <iframe id="buildsiteFrame" title="Buildsite" class="h-full w-full rounded-xl border border-slate-700 bg-white"></iframe>
+      </main>
+    </div>
+    <script src="./renderer.js"></script>
+  </body>
+</html>
