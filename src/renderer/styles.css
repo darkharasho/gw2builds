@@ -1132,9 +1132,110 @@ label {
   padding: 8px 12px;
 }
 
-.skills-bar {
+.skills-bar__weapon-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.skills-bar__weapon-row {
   display: flex;
   align-items: center;
+  gap: 6px;
+}
+
+.weapon-swap-btn {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(190, 155, 50, 0.55);
+  background: radial-gradient(circle at 42% 36%, rgba(50, 42, 14, 0.92) 0%, rgba(14, 11, 4, 0.96) 70%);
+  color: rgba(200, 165, 60, 0.55);
+  cursor: pointer;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+}
+
+.weapon-swap-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.weapon-swap-btn:not(:disabled) {
+  border-color: rgba(210, 175, 70, 0.85);
+  color: rgba(220, 185, 75, 0.95);
+  box-shadow: 0 0 6px rgba(180, 140, 40, 0.35), inset 0 1px 0 rgba(255, 220, 100, 0.12);
+}
+
+.weapon-swap-btn:not(:disabled):hover {
+  border-color: rgba(255, 215, 100, 1);
+  color: #ffe06a;
+  box-shadow: 0 0 12px rgba(210, 170, 50, 0.6), inset 0 1px 0 rgba(255, 230, 120, 0.2);
+}
+
+.weapon-swap-btn--active {
+  border-color: rgba(100, 200, 255, 0.85) !important;
+  color: rgba(120, 210, 255, 0.95) !important;
+  box-shadow: 0 0 8px rgba(80, 180, 240, 0.45), inset 0 1px 0 rgba(150, 220, 255, 0.15) !important;
+}
+
+.weapon-swap-btn svg {
+  width: 16px;
+  height: 13px;
+}
+
+.profession-mechanics-bar {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding-left: 40px; /* align over weapon icons, past swap button (34px + 6px gap) */
+}
+
+.skill-icon--profession {
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(210, 180, 80, 0.5);
+  border-radius: 4px;
+  background: rgba(2, 8, 16, 0.7);
+  padding: 0;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.skill-icon--profession img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.skill-icon--profession:hover {
+  border-color: rgba(255, 220, 100, 0.85);
+  box-shadow: 0 0 8px rgba(255, 200, 50, 0.4);
+}
+
+.skill-icon--profession-active {
+  border-color: rgba(255, 210, 60, 0.9);
+  box-shadow: 0 0 8px rgba(255, 190, 30, 0.5);
+}
+
+.skill-icon--profession-empty {
+  opacity: 0.25;
+  border-style: dashed;
+  cursor: default;
+  pointer-events: none;
+}
+
+.skills-bar {
+  display: flex;
+  align-items: flex-end;
   justify-content: center;
   gap: 12px;
 }
@@ -1204,8 +1305,11 @@ label {
 }
 
 .skill-icon--weapon {
-  opacity: 0.3;
   cursor: default;
+}
+
+.skill-icon--weapon.skill-icon--empty {
+  opacity: 0.3;
   background: rgba(2, 8, 16, 0.5);
   border-style: dashed;
 }
@@ -1356,6 +1460,14 @@ label {
   height: 56px;
   border-radius: 10px;
   border: 1px solid #3f5f95;
+}
+
+.detail-card__icon-placeholder {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  border: 1px solid #3f5f95;
+  background: rgba(11, 18, 36, 0.5);
 }
 
 .detail-card h3 {
@@ -1587,6 +1699,9 @@ label {
   padding: 0;
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-left: 1px solid rgba(80, 132, 163, 0.2);
   border-right: 1px solid rgba(80, 132, 163, 0.2);
 }
@@ -1613,13 +1728,12 @@ label {
 }
 
 .equip-concept-art {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top center;
+  width: 60%;
+  height: auto;
+  max-height: 70%;
+  object-fit: contain;
   display: block;
   opacity: 0.85;
-  min-height: 300px;
 }
 
 .equip-col--right {

@@ -163,6 +163,8 @@ function wireEvents() {
     closeCustomSelect();
   });
 
+  document.addEventListener("scroll", () => closeCustomSelect(), { capture: true, passive: true });
+
   // Workspace menu toggle
   el.workspaceBtn.addEventListener("click", (event) => {
     event.stopPropagation();
@@ -348,6 +350,7 @@ async function getCatalog(professionId) {
     specializationById: new Map((raw.specializations || []).map((entry) => [Number(entry.id), entry])),
     traitById: new Map((raw.traits || []).map((entry) => [Number(entry.id), entry])),
     skillById: new Map((raw.skills || []).map((entry) => [Number(entry.id), entry])),
+    weaponSkillById: new Map((raw.weaponSkills || []).map((entry) => [Number(entry.id), entry])),
   };
   state.catalogCache.set(professionId, catalog);
 
@@ -876,6 +879,7 @@ const SLOT_WEIGHTS = {
   ring2:      { p: 126, s: 85 },
   accessory1: { p: 110, s: 74 },
   accessory2: { p: 110, s: 74 },
+  breather:   { p: 60,  s: 43  },
   aquatic1:   { p: 215, s: 154 },
   aquatic2:   { p: 215, s: 154 },
 };
@@ -895,26 +899,27 @@ const EQUIP_WEAPON_SETS = [
 ];
 
 const _RW = "https://render.guildwars2.com/file";
+const _WK = "https://wiki.guildwars2.com/images";
 const GW2_WEAPONS = [
-  { id: "axe",        label: "Axe",        hand: "main",    icon: `${_RW}/B13970797CB3ED515913ECC855EC697AC30D4EF1/66723.png` },
-  { id: "dagger",     label: "Dagger",      hand: "either",  icon: `${_RW}/4C630DEC23FB5D92D60F00F4330B6891FDD5C858/66724.png` },
-  { id: "mace",       label: "Mace",        hand: "either",  icon: `${_RW}/0A4FEE0807022155A961E23AD31BC3CFD62D5674/66737.png` },
-  { id: "pistol",     label: "Pistol",      hand: "either",  icon: `${_RW}/3B0702BD5B1956056D037604FB0707140B2C21B9/66738.png` },
-  { id: "sword",      label: "Sword",       hand: "main",    icon: `${_RW}/F5250BCB0AA66105730CAA97E21FD62E9E1F1DB4/66744.png` },
-  { id: "scepter",    label: "Scepter",     hand: "main",    icon: `${_RW}/F6DAAD0C2CA7B7AB3EBAB419EA03CA123CDD57F9/66740.png` },
-  { id: "focus",      label: "Focus",       hand: "off",     icon: `${_RW}/920324A8CC464AC205D62208E75C70CF7FE6A492/63483.png` },
-  { id: "shield",     label: "Shield",      hand: "off",     icon: `${_RW}/ED77E5309C046F0E4C2CBDDC064AE5CAE01B7D79/66741.png` },
-  { id: "torch",      label: "Torch",       hand: "off",     icon: `${_RW}/0DBB98F2690B1A744E49CAD4E5BE940D661299B1/63131.png` },
-  { id: "warhorn",    label: "Warhorn",     hand: "off",     icon: `${_RW}/365E2BE425E494E30CDAF9099D1C39B2FA37331C/66751.png` },
-  { id: "greatsword", label: "Greatsword",  hand: "two",     icon: `${_RW}/F420E407B7FE087204E10619B140E440FF3FEDF7/63052.png` },
-  { id: "hammer",     label: "Hammer",      hand: "two",     icon: `${_RW}/9F2A3E0B0459DECE750DD093742720B1F49E9F9A/66735.png` },
-  { id: "longbow",    label: "Longbow",     hand: "two",     icon: `${_RW}/2060A7375FF7047DEBA8B937E905B541910A71BD/66736.png` },
-  { id: "rifle",      label: "Rifle",       hand: "two",     icon: `${_RW}/1ABCE2FD2BB41590BC1A6654624305A39CBC1626/66739.png` },
-  { id: "shortbow",   label: "Short Bow",   hand: "two",     icon: `${_RW}/F5BDB6EACB072894E577079D6457F40C72927E08/66742.png` },
-  { id: "staff",      label: "Staff",       hand: "two",     icon: `${_RW}/6426AC91389A582D7A0F02F641DDDAD6F8F87F4F/66497.png` },
-  { id: "harpoon",    label: "Harpoon Gun", hand: "aquatic", icon: `${_RW}/DCAD6461D629BBB5417CD8B6170E7CE27EB4DEF8/65195.png` },
-  { id: "spear",      label: "Spear",       hand: "aquatic", icon: `${_RW}/935CD7A5037BB9F3C46E0D770D2DD9730ED74A18/62495.png` },
-  { id: "trident",    label: "Trident",     hand: "aquatic", icon: `${_RW}/B8F4F953BC20F7A7FE9FF7459FD5534F0608730F/574969.png` },
+  { id: "axe",        label: "Axe",        hand: "main",    icon: `${_WK}/b/b5/Bandit_Cleaver.png` },
+  { id: "dagger",     label: "Dagger",      hand: "either",  icon: `${_WK}/a/ac/Bandit_Shiv.png` },
+  { id: "mace",       label: "Mace",        hand: "either",  icon: `${_WK}/b/b3/Bandit_Mallet.png` },
+  { id: "pistol",     label: "Pistol",      hand: "either",  icon: `${_WK}/f/f3/Bandit_Revolver.png` },
+  { id: "sword",      label: "Sword",       hand: "main",    icon: `${_WK}/e/e1/Bandit_Slicer.png` },
+  { id: "scepter",    label: "Scepter",     hand: "main",    icon: `${_WK}/9/95/Bandit_Baton.png` },
+  { id: "focus",      label: "Focus",       hand: "off",     icon: `${_WK}/d/da/Bandit_Focus.png` },
+  { id: "shield",     label: "Shield",      hand: "off",     icon: `${_WK}/7/7c/Bandit_Ward.png` },
+  { id: "torch",      label: "Torch",       hand: "off",     icon: `${_WK}/7/7e/Bandit_Torch.png` },
+  { id: "warhorn",    label: "Warhorn",     hand: "off",     icon: `${_WK}/3/31/Bandit_Bugle.png` },
+  { id: "greatsword", label: "Greatsword",  hand: "two",     icon: `${_WK}/0/0b/Bandit_Sunderer.png` },
+  { id: "hammer",     label: "Hammer",      hand: "two",     icon: `${_WK}/f/fb/Bandit_Demolisher.png` },
+  { id: "longbow",    label: "Longbow",     hand: "two",     icon: `${_WK}/2/2d/Bandit_Longbow.png` },
+  { id: "rifle",      label: "Rifle",       hand: "two",     icon: `${_WK}/3/37/Bandit_Musket.png` },
+  { id: "shortbow",   label: "Short Bow",   hand: "two",     icon: `${_WK}/2/2f/Bandit_Short_Bow.png` },
+  { id: "staff",      label: "Staff",       hand: "two",     icon: `${_WK}/9/98/Bandit_Spire.png` },
+  { id: "harpoon",    label: "Harpoon Gun", hand: "aquatic", icon: `${_WK}/2/20/Bandit_Harpoon_Gun.png` },
+  { id: "spear",      label: "Spear",       hand: "two",     icon: `${_WK}/c/c9/Bandit_Spear.png` },
+  { id: "trident",    label: "Trident",     hand: "aquatic", icon: `${_WK}/6/66/Bandit_Trident.png` },
 ];
 
 const EQUIP_TRINKET_SLOTS = [
@@ -927,8 +932,9 @@ const EQUIP_TRINKET_SLOTS = [
 ];
 
 const EQUIP_UNDERWATER_SLOTS = [
-  { key: "aquatic1", label: "Aquatic 1", icon: null },
-  { key: "aquatic2", label: "Aquatic 2", icon: null },
+  { key: "breather", label: "Breather",  icon: "Head_slot.png" },
+  { key: "aquatic1", label: "Weapon 1",  hand: "aquatic" },
+  { key: "aquatic2", label: "Weapon 2",  hand: "aquatic" },
 ];
 
 const PROFESSION_WEIGHT = {
@@ -1034,7 +1040,31 @@ const GW2_RELICS = [
   { label: "Relic of the Zephyrite",      icon: "https://render.guildwars2.com/file/070E32046C250E32DA76F2CBDFC504D6C0AB0344/3122379.png" },
 ];
 
-const _WK = "https://wiki.guildwars2.com/images";
+const GW2_FOOD = [
+  { id: 91734, label: "Peppercorn-Crusted Sous-Vide Steak",            icon: `${_RW}/EBFB0A55087C48E905D4ED9E6BE549DA6D9560F4/2191071.png`, buff: "-10% Incoming Damage | +100 Power | +70 Ferocity" },
+  { id: 91805, label: "Cilantro Lime Sous-Vide Steak",                 icon: `${_RW}/D2C00407A3FFE06251BDE9DC13525FE167ABA3E6/2191069.png`, buff: "66% Chance to Life Steal on Crit | +100 Power | +70 Precision" },
+  { id: 41569, label: "Bowl of Sweet and Spicy Butternut Squash Soup", icon: `${_RW}/FD0A2497B8C711A73AE9A6020118A895091E68E5/561719.png`,   buff: "+100 Power | +70 Ferocity" },
+  { id: 12469, label: "Plate of Truffle Steak Dinner",                 icon: `${_RW}/67CFD9FD4B17A44CC4EC99C2DF276CF0A46C7B0D/433658.png`,   buff: "+200 Power for 30s on Kill | +70 Ferocity" },
+  { id: 12485, label: "Bowl of Fancy Potato and Leek Soup",            icon: `${_RW}/AD7A1D7FAEE6E6F3AA9061CFDC90A418633DDD5C/433672.png`,   buff: "+100 Precision | +70 Condition Damage" },
+  { id: 86997, label: "Plate of Beef Rendang",                         icon: `${_RW}/ED54F2CA2B6AEAE258C90A20BB213E60956CDD13/1947191.png`,  buff: "+100 Condition Damage | +70 Expertise" },
+  { id: 96578, label: "Plate of Kimchi Pancakes",                      icon: `${_RW}/D64959DDB9D89E6A4FE321EC2965B6C72B557575/2594835.png`,  buff: "+15% Increased Bleeding Duration | +70 Condition Damage" },
+  { id: 91703, label: "Mint-Pear Cured Meat Flatbread",                icon: `${_RW}/F56EAF0DD0CFF41CE402282E37F20F4D22501358/2191048.png`,  buff: "+10% Outgoing Healing | +100 Condition Damage | +70 Expertise" },
+  { id: 91784, label: "Clove-Spiced Pear and Cured Meat Flatbread",    icon: `${_RW}/CE437DB26797C84F9127C9D190720311EB614512/2191047.png`,  buff: "-20% Incoming Condition Duration | +100 Condition Damage | +70 Expertise" },
+  { id: 91727, label: "Mint and Veggie Flatbread",                     icon: `${_RW}/FCB44856734BE45744C8B10509CF710BBBE13C7B/2191027.png`,  buff: "+10% Outgoing Healing | +100 Expertise | +70 Condition Damage" },
+  { id: 68634, label: "Delicious Rice Ball",                           icon: `${_RW}/3FF95B9A7DA10501B9BA5AB7FEB24BFF65357B24/1341426.png`,  buff: "+100 Healing Power | +10% Outgoing Healing" },
+  { id: 91758, label: "Eggs Benedict with Mint-Parsley Sauce",         icon: `${_RW}/247DFE7FA45A2DF9B24E5515C3BDB96D28ED213B/2191053.png`,  buff: "+10% Outgoing Healing | +100 Concentration | +70 Expertise" },
+  { id: 91690, label: "Bowl of Fruit Salad with Mint Garnish",         icon: `${_RW}/1D44545301F3BB1C046898EA08D5906EB369DD0A/2191059.png`,  buff: "+10% Outgoing Healing | +100 Healing Power | +70 Concentration" },
+  { id: 12471, label: "Bowl of Seaweed Salad",                         icon: `${_RW}/0D442C30D4E29832725800E22990BA111D05E0BE/219455.png`,    buff: "60% to Gain Swiftness on Kill | +5% Damage While Moving" },
+];
+
+const GW2_UTILITY = [
+  { id: 78305, label: "Superior Sharpening Stone",  icon: `${_RW}/91AC9F70D30C5E3E22635DF4F30CAFA1F6F803A0/219361.png`, buff: "Gain Power Equal to 3% of Your Precision | Gain Power Equal to 6% of Your Ferocity" },
+  { id: 67530, label: "Furious Sharpening Stone",   icon: `${_RW}/91AC9F70D30C5E3E22635DF4F30CAFA1F6F803A0/219361.png`, buff: "Gain Power Equal to 3% of Your Precision | Gain Ferocity Equal to 3% of Your Precision" },
+  { id: 67531, label: "Bountiful Sharpening Stone", icon: `${_RW}/91AC9F70D30C5E3E22635DF4F30CAFA1F6F803A0/219361.png`, buff: "Gain Power Equal to 6% of Your Healing Power | Gain Power Equal to 8% of Your Concentration" },
+  { id: 67528, label: "Bountiful Maintenance Oil",  icon: `${_RW}/BA57FF7A052FFE37669F97A815BD28089FCFF0AD/219367.png`, buff: "Gain 0.6% Healing to Allies per 100 Healing Power | Gain 0.8% per 100 Concentration" },
+  { id: 67529, label: "Furious Maintenance Oil",    icon: `${_RW}/BA57FF7A052FFE37669F97A815BD28089FCFF0AD/219367.png`, buff: "Gain Concentration Equal to 3% of Your Precision | Gain Healing Power Equal to 3% of Your Precision" },
+];
+
 const PROFESSION_CONCEPT_ART = {
   Elementalist: `${_WK}/5/5e/Elementalist_04_concept_art.png`,
   Mesmer:       `${_WK}/4/4a/Mesmer_04_concept_art.png`,
@@ -1097,6 +1127,27 @@ function computeEquipmentStats() {
       }
     }
   }
+
+  // Food flat stat contributions (+N StatName patterns)
+  const foodLabel = state.editor.equipment?.food;
+  if (foodLabel) {
+    const foodDef = GW2_FOOD.find((f) => f.label === foodLabel);
+    if (foodDef) {
+      const foodStatMap = {
+        "Condition Damage": "ConditionDamage", "Healing Power": "HealingPower",
+        "Power": "Power", "Precision": "Precision", "Toughness": "Toughness",
+        "Vitality": "Vitality", "Ferocity": "Ferocity",
+        "Concentration": "Concentration", "Expertise": "Expertise",
+      };
+      const re = /\+(\d+)\s+(Condition Damage|Healing Power|Power|Precision|Toughness|Vitality|Ferocity|Concentration|Expertise)/g;
+      let m;
+      while ((m = re.exec(foodDef.buff)) !== null) {
+        const key = foodStatMap[m[2]];
+        if (key) totals[key] = (totals[key] || 0) + Number(m[1]);
+      }
+    }
+  }
+
   return totals;
 }
 
@@ -1221,7 +1272,7 @@ function renderEquipmentPanel() {
     const imgSrc = legendaryUrl
       ? legendaryUrl
       : slotDef.icon
-        ? `https://wiki.guildwars2.com/wiki/Special:FilePath/${slotDef.icon}`
+        ? (slotDef.icon.startsWith("https://") ? slotDef.icon : `https://wiki.guildwars2.com/wiki/Special:FilePath/${slotDef.icon}`)
         : null;
     if (imgSrc) {
       const img = document.createElement("img");
@@ -1274,8 +1325,12 @@ function renderEquipmentPanel() {
   function makeWeaponSlot(slotDef) {
     const isOffhand = slotDef.hand === "off";
     const mainhandKey = slotDef.key.replace("offhand", "mainhand");
-    const mainhoodWeapon = GW2_WEAPONS.find((w) => w.id === weapons[mainhandKey]);
-    const lockedByTwoHanded = isOffhand && mainhoodWeapon?.hand === "two";
+    const mainhandWeaponId = weapons[mainhandKey] || "";
+    const mainhandProfFlags = (state.activeCatalog?.professionWeapons?.[mainhandWeaponId]?.flags) || [];
+    const lockedByTwoHanded = isOffhand && (
+      mainhandProfFlags.includes("TwoHand") ||
+      GW2_WEAPONS.find((w) => w.id === mainhandWeaponId)?.hand === "two"
+    );
 
     const currentWeapon = weapons[slotDef.key] || "";
     const currentCombo = slots[slotDef.key] || "";
@@ -1292,14 +1347,12 @@ function renderEquipmentPanel() {
 
     const iconDiv = document.createElement("div");
     iconDiv.className = "equip-slot__icon equip-slot__icon--weapon" + (currentWeapon ? " equip-slot__icon--filled" : "");
-    if (weaponDef) {
-      const img = document.createElement("img");
-      img.src = weaponDef.icon;
-      img.alt = weaponDef.label;
-      img.draggable = false;
-      img.addEventListener("error", () => { img.remove(); });
-      iconDiv.append(img);
-    }
+    const img = document.createElement("img");
+    img.src = weaponDef ? weaponDef.icon : "https://wiki.guildwars2.com/images/d/de/Sword_slot.png";
+    img.alt = weaponDef ? weaponDef.label : slotDef.label;
+    img.draggable = false;
+    img.addEventListener("error", () => img.remove());
+    iconDiv.append(img);
     const weaponNameSpan = document.createElement("span");
     weaponNameSpan.className = "equip-weapon-name" + (currentWeapon ? "" : " equip-weapon-name--empty");
     weaponNameSpan.textContent = lockedByTwoHanded
@@ -1337,26 +1390,39 @@ function renderEquipmentPanel() {
     });
 
     if (!lockedByTwoHanded) {
-      // Filter weapons for this slot type
-      const allowedHands = isOffhand ? ["off", "either"] : ["main", "either", "two"];
+      // Filter weapons for this slot type, restricted to what this profession can equip
+      const profWeapons = state.activeCatalog?.professionWeapons || {};
       const weaponItems = [
         { value: "", label: "— Empty —", subtitle: "" },
-        ...GW2_WEAPONS.filter((w) => allowedHands.includes(w.hand))
-          .map((w) => ({ value: w.id, label: w.label, subtitle: w.hand === "two" ? "Two-handed" : "", icon: w.icon })),
+        ...GW2_WEAPONS.filter((w) => {
+          if (w.hand === "aquatic") return false; // aquatic weapons belong in the underwater section
+          const wData = profWeapons[w.id];
+          if (!wData) return false;
+          // Elite spec weapons are now usable by all specs (GW2 balance change)
+          if (isOffhand) return wData.flags.includes("Offhand");
+          return wData.flags.includes("Mainhand") || wData.flags.includes("TwoHand");
+        }).map((w) => {
+          const flags = profWeapons[w.id]?.flags || [];
+          const subtitle = flags.includes("TwoHand") ? "Two-handed"
+            : flags.includes("Mainhand") && flags.includes("Offhand") ? "Main / Off Hand"
+            : "";
+          return { value: w.id, label: w.label, subtitle, icon: w.icon };
+        }),
       ];
       weaponBtn.addEventListener("click", () => {
         openSlotPicker(weaponBtn, currentWeapon, (newVal) => {
           if (!equip.weapons) equip.weapons = {};
           equip.weapons[slotDef.key] = newVal || "";
           // If two-handed selected for mainhand, clear the offhand weapon
-          const newWeaponDef = GW2_WEAPONS.find((w) => w.id === newVal);
-          if (newWeaponDef?.hand === "two") {
+          const newFlags = profWeapons[newVal]?.flags || [];
+          if (newFlags.includes("TwoHand")) {
             const ofKey = slotDef.key.replace("mainhand", "offhand");
             equip.weapons[ofKey] = "";
             equip.slots[ofKey] = "";
           }
           markEditorChanged();
           renderEquipmentPanel();
+          renderSkills();
         }, { items: weaponItems, searchPlaceholder: "Search weapons…" });
       });
 
@@ -1368,6 +1434,70 @@ function renderEquipmentPanel() {
         });
       });
     }
+
+    return wrapper;
+  }
+
+  function makeAquaticWeaponSlot(slotDef) {
+    const currentWeapon = weapons[slotDef.key] || "";
+    const currentCombo = slots[slotDef.key] || "";
+    const weaponDef = GW2_WEAPONS.find((w) => w.id === currentWeapon);
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "equip-slot equip-slot--weapon";
+
+    const weaponBtn = document.createElement("button");
+    weaponBtn.type = "button";
+    weaponBtn.className = "equip-weapon-type-btn";
+
+    const iconDiv = document.createElement("div");
+    iconDiv.className = "equip-slot__icon equip-slot__icon--weapon" + (currentWeapon ? " equip-slot__icon--filled" : "");
+    {
+      const img = document.createElement("img");
+      img.src = weaponDef ? weaponDef.icon : `${_WK}/3/3f/Aquatic_weapon_slot.png`;
+      img.alt = weaponDef ? weaponDef.label : slotDef.label;
+      img.draggable = false;
+      img.addEventListener("error", () => img.remove());
+      iconDiv.append(img);
+    }
+    const weaponNameSpan = document.createElement("span");
+    weaponNameSpan.className = "equip-weapon-name" + (currentWeapon ? "" : " equip-weapon-name--empty");
+    weaponNameSpan.textContent = weaponDef?.label || slotDef.label;
+    weaponBtn.append(iconDiv, weaponNameSpan);
+
+    const statBtn = document.createElement("button");
+    statBtn.type = "button";
+    statBtn.className = "equip-stat-pick-btn" + (currentCombo ? "" : " equip-stat-pick-btn--empty");
+    if (currentCombo) {
+      const combo = STAT_COMBOS.find((c) => c.label === currentCombo);
+      statBtn.innerHTML = `<span class="equip-slot__combo-name">${escapeHtml(currentCombo)}</span>${combo ? `<span class="equip-slot__combo-stats">${combo.stats.join(" · ")}</span>` : ""}`;
+    } else {
+      statBtn.textContent = "Select stats…";
+    }
+
+    wrapper.append(weaponBtn, statBtn);
+
+    const aquaticItems = [
+      { value: "", label: "— Empty —" },
+      ...GW2_WEAPONS.filter((w) => w.hand === "aquatic").map((w) => ({
+        value: w.id, label: w.label, icon: w.icon,
+      })),
+    ];
+    weaponBtn.addEventListener("click", () => {
+      openSlotPicker(weaponBtn, currentWeapon, (newVal) => {
+        if (!equip.weapons) equip.weapons = {};
+        equip.weapons[slotDef.key] = newVal || "";
+        markEditorChanged();
+        renderEquipmentPanel();
+      }, { items: aquaticItems, searchPlaceholder: "Search aquatic weapons…" });
+    });
+    statBtn.addEventListener("click", () => {
+      openSlotPicker(statBtn, currentCombo, (newVal) => {
+        equip.slots[slotDef.key] = newVal || "";
+        markEditorChanged();
+        renderEquipmentPanel();
+      });
+    });
 
     return wrapper;
   }
@@ -1436,10 +1566,110 @@ function renderEquipmentPanel() {
 
   // Consumables
   const consumeSection = makeSection("Consumables");
-  consumeSection.append(
-    makeTextInput("Food", equip.food, "Peppercorn-Crusted Sous-Vide Steak", (v) => { equip.food = v; markEditorChanged(); }),
-    makeTextInput("Utility", equip.utility, "Superior Sharpening Stone", (v) => { equip.utility = v; markEditorChanged(); }),
-  );
+
+  const foodItems = [
+    { value: "", label: "— None —" },
+    ...GW2_FOOD.map((f) => ({ value: f.label, label: f.label, icon: f.icon, subtitle: f.buff.replace(/\|/g, "·") })),
+  ];
+
+  function makeFoodSlot() {
+    const currentFood = equip.food || "";
+    const foodDef = GW2_FOOD.find((f) => f.label === currentFood);
+    const wrapper = document.createElement("div");
+    wrapper.className = "equip-slot equip-slot--compact";
+    wrapper.setAttribute("role", "button");
+    wrapper.tabIndex = 0;
+
+    const iconDiv = document.createElement("div");
+    iconDiv.className = "equip-slot__icon equip-slot__icon--weapon" + (currentFood ? " equip-slot__icon--filled" : "");
+    const img = document.createElement("img");
+    img.src = foodDef ? foodDef.icon : `${_WK}/6/6b/Nourishment.png`;
+    img.alt = foodDef ? foodDef.label : "Food";
+    img.draggable = false;
+    img.addEventListener("error", () => img.remove());
+    iconDiv.append(img);
+
+    const info = document.createElement("div");
+    info.className = "equip-slot__info";
+    const labelEl = document.createElement("div");
+    labelEl.className = "equip-slot__label";
+    labelEl.textContent = "Food";
+    const valueEl = document.createElement("div");
+    valueEl.className = "equip-slot__combo-name" + (currentFood ? "" : " equip-slot__value--empty");
+    valueEl.style.fontSize = "10px";
+    valueEl.textContent = currentFood || "Select…";
+    info.append(labelEl, valueEl);
+    wrapper.append(iconDiv, info);
+
+    const doOpen = () => openSlotPicker(wrapper, currentFood, (newVal) => {
+      equip.food = newVal || "";
+      markEditorChanged();
+      renderEquipmentPanel();
+    }, { items: foodItems, searchPlaceholder: "Search food…" });
+    wrapper.addEventListener("click", doOpen);
+    wrapper.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); doOpen(); } });
+
+    bindHoverPreview(wrapper, "equip-food", () => {
+      const fDef = GW2_FOOD.find((f) => f.label === (equip.food || ""));
+      if (!fDef) return null;
+      return { name: fDef.label, icon: fDef.icon, description: fDef.buff.split(" | ").join("\n") };
+    });
+
+    return wrapper;
+  }
+
+  const utilityItems = [
+    { value: "", label: "— None —" },
+    ...GW2_UTILITY.map((u) => ({ value: u.label, label: u.label, icon: u.icon, subtitle: u.buff.replace(/\|/g, "·") })),
+  ];
+
+  function makeUtilitySlot() {
+    const currentUtility = equip.utility || "";
+    const utilityDef = GW2_UTILITY.find((u) => u.label === currentUtility);
+    const wrapper = document.createElement("div");
+    wrapper.className = "equip-slot equip-slot--compact";
+    wrapper.setAttribute("role", "button");
+    wrapper.tabIndex = 0;
+
+    const iconDiv = document.createElement("div");
+    iconDiv.className = "equip-slot__icon equip-slot__icon--weapon" + (currentUtility ? " equip-slot__icon--filled" : "");
+    const img = document.createElement("img");
+    img.src = utilityDef ? utilityDef.icon : `${_WK}/d/d6/Enhancement.png`;
+    img.alt = utilityDef ? utilityDef.label : "Utility";
+    img.draggable = false;
+    img.addEventListener("error", () => img.remove());
+    iconDiv.append(img);
+
+    const info = document.createElement("div");
+    info.className = "equip-slot__info";
+    const labelEl = document.createElement("div");
+    labelEl.className = "equip-slot__label";
+    labelEl.textContent = "Utility";
+    const valueEl = document.createElement("div");
+    valueEl.className = "equip-slot__combo-name" + (currentUtility ? "" : " equip-slot__value--empty");
+    valueEl.style.fontSize = "10px";
+    valueEl.textContent = currentUtility || "Select…";
+    info.append(labelEl, valueEl);
+    wrapper.append(iconDiv, info);
+
+    const doOpen = () => openSlotPicker(wrapper, currentUtility, (newVal) => {
+      equip.utility = newVal || "";
+      markEditorChanged();
+      renderEquipmentPanel();
+    }, { items: utilityItems, searchPlaceholder: "Search utility…" });
+    wrapper.addEventListener("click", doOpen);
+    wrapper.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); doOpen(); } });
+
+    bindHoverPreview(wrapper, "equip-utility", () => {
+      const uDef = GW2_UTILITY.find((u) => u.label === (equip.utility || ""));
+      if (!uDef) return null;
+      return { name: uDef.label, icon: uDef.icon, description: uDef.buff.split(" | ").join("\n") };
+    });
+
+    return wrapper;
+  }
+
+  consumeSection.append(makeFoodSlot(), makeUtilitySlot());
   leftCol.append(consumeSection);
 
   // Notes
@@ -1532,14 +1762,14 @@ function renderEquipmentPanel() {
 
     const iconDiv = document.createElement("div");
     iconDiv.className = "equip-slot__icon equip-slot__icon--weapon" + (currentRelic ? " equip-slot__icon--filled" : "");
-    if (relicDef) {
-      const img = document.createElement("img");
-      img.src = relicDef.icon;
-      img.alt = relicDef.label;
-      img.draggable = false;
-      img.addEventListener("error", () => img.remove());
-      iconDiv.append(img);
-    }
+    const img = document.createElement("img");
+    img.src = relicDef
+      ? relicDef.icon
+      : "https://wiki.guildwars2.com/wiki/Special:FilePath/Relic_slot.png";
+    img.alt = relicDef ? relicDef.label : "Relic";
+    img.draggable = false;
+    img.addEventListener("error", () => img.remove());
+    iconDiv.append(img);
 
     const info = document.createElement("div");
     info.className = "equip-slot__info";
@@ -1595,7 +1825,9 @@ function renderEquipmentPanel() {
 
   // Underwater
   const underwaterSection = makeSection("Underwater");
-  for (const slotDef of EQUIP_UNDERWATER_SLOTS) underwaterSection.append(makeSlot(slotDef));
+  for (const slotDef of EQUIP_UNDERWATER_SLOTS) {
+    underwaterSection.append(slotDef.hand === "aquatic" ? makeAquaticWeaponSlot(slotDef) : makeSlot(slotDef));
+  }
   rightCol.append(underwaterSection);
 
   // Center: profession concept art
@@ -1968,6 +2200,7 @@ function makeSkillSlot(slot, catalog, options, utilitySelection) {
         state.editor.skills[slot.key][slot.index] = nextId;
       }
       enforceEditorConsistency();
+      state.editor.activeKit = 0; // clear kit view when utility selection changes
       markEditorChanged({ updateBuildList: true });
       renderSkills();
       const nextSkill = options[resolveSkillSlotType(slot)]?.find((skill) => Number(skill.id) === nextId) || null;
@@ -1993,6 +2226,63 @@ function makeSkillSlot(slot, catalog, options, utilitySelection) {
   return slotEl;
 }
 
+function parseWeaponSlotNum(slotStr) {
+  const m = /Weapon_(\d)/.exec(slotStr || "");
+  return m ? parseInt(m[1], 10) : 0;
+}
+
+function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "") {
+  const profWeapons = catalog?.professionWeapons || {};
+  const weaponSkillById = catalog?.weaponSkillById || new Map();
+  const slots = [null, null, null, null, null];
+
+  const mhId = (weapons.mainhand || "").toLowerCase();
+  const ohId = (weapons.offhand || "").toLowerCase();
+  const mhData = profWeapons[mhId];
+  const isTwoHanded = mhData?.flags?.includes("TwoHand") ?? false;
+
+  // Collect all refs to determine available attunements
+  const allRefs = [
+    ...(mhData?.skills || []),
+    ...(!isTwoHanded && ohId ? (profWeapons[ohId]?.skills || []) : []),
+  ];
+  const availableAttunements = [...new Set(allRefs.map((r) => r.attunement).filter(Boolean))];
+  // Pick the effective attunement: prefer the stored one, fall back to first available
+  const effectiveAttunement = availableAttunements.includes(activeAttunement)
+    ? activeAttunement
+    : (availableAttunements[0] || "");
+
+  function matches(ref) {
+    if (!ref.attunement) return true;
+    return ref.attunement === effectiveAttunement;
+  }
+
+  if (mhData) {
+    for (const ref of mhData.skills) {
+      if (!matches(ref)) continue;
+      const n = parseWeaponSlotNum(ref.slot);
+      if (n >= 1 && n <= 5) {
+        const skill = weaponSkillById.get(ref.id);
+        if (skill && !slots[n - 1]) slots[n - 1] = skill;
+      }
+    }
+  }
+  if (!isTwoHanded && ohId) {
+    const ohData = profWeapons[ohId];
+    if (ohData) {
+      for (const ref of ohData.skills) {
+        if (!matches(ref)) continue;
+        const n = parseWeaponSlotNum(ref.slot);
+        if (n >= 4 && n <= 5) {
+          const skill = weaponSkillById.get(ref.id);
+          if (skill && !slots[n - 1]) slots[n - 1] = skill;
+        }
+      }
+    }
+  }
+  return slots;
+}
+
 function renderSkills() {
   const catalog = state.activeCatalog;
   el.skillsHost.innerHTML = "";
@@ -2006,19 +2296,279 @@ function renderSkills() {
   const bar = document.createElement("div");
   bar.className = "skills-bar";
 
-  // Left: 5 blank weapon skill slots
+  const activeAttunement = state.editor.activeAttunement || "";
+  const activeKit = Number(state.editor.activeKit) || 0;
+  const activeWeaponSet = Number(state.editor.activeWeaponSet) || 1;
+  const equippedWeapons = state.editor.equipment?.weapons || {};
+
+  const mhKey = activeWeaponSet === 2 ? "mainhand2" : "mainhand1";
+  const ohKey = activeWeaponSet === 2 ? "offhand2" : "offhand1";
+  const hasWeaponSet2 = !!(equippedWeapons.mainhand2 || equippedWeapons.offhand2);
+
+  // Resolve weapon skills: kit bundle overrides equipped weapon
+  const kitSrcSkill = activeKit ? catalog.skillById.get(activeKit) : null;
+  const weaponSkills = kitSrcSkill?.bundleSkills?.length
+    ? kitSrcSkill.bundleSkills.slice(0, 5).map((id) => catalog.skillById.get(id) || null)
+    : getEquippedWeaponSkills(catalog, {
+        mainhand: equippedWeapons[mhKey] || "",
+        offhand: equippedWeapons[ohKey] || "",
+      }, activeAttunement);
+
   const weaponGroup = document.createElement("div");
   weaponGroup.className = "skill-group skill-group--weapons";
   for (let i = 0; i < 5; i++) {
+    const skill = weaponSkills[i];
     const slotEl = document.createElement("div");
     slotEl.className = "skill-slot skill-slot--weapon";
     const iconBtn = document.createElement("button");
     iconBtn.type = "button";
-    iconBtn.className = "skill-icon-large skill-icon--weapon";
+    iconBtn.className = "skill-icon-large skill-icon--weapon" + (skill ? "" : " skill-icon--empty");
     iconBtn.disabled = true;
-    weaponGroup.append(slotEl);
+    if (skill?.icon) {
+      iconBtn.innerHTML = `<img src="${escapeHtml(skill.icon)}" alt="${escapeHtml(skill.name || "")}" />`;
+      iconBtn.title = skill.name || "";
+      bindHoverPreview(iconBtn, "skill", () => skill);
+    }
     slotEl.append(iconBtn);
+    weaponGroup.append(slotEl);
   }
+
+  // Build mechanic slot descriptors: { skill, sourceId, isStatic }
+  // isStatic = true means the slot is a fixed profession mechanic (not toolbelt-derived), so kit toggling doesn't apply
+  const isToolbelt = catalog.skills.some((s) => s.toolbeltSkill > 0);
+
+  // For attunement highlight (non-toolbelt professions like Elementalist)
+  const allWeaponRefs = [
+    ...(catalog.professionWeapons?.[equippedWeapons.mainhand1 || ""]?.skills || []),
+    ...(catalog.professionWeapons?.[equippedWeapons.offhand1 || ""]?.skills || []),
+  ];
+  const weaponHasAttunements = allWeaponRefs.some((r) => r.attunement);
+  const availableAttunements = [...new Set(allWeaponRefs.map((r) => r.attunement).filter(Boolean))];
+  const effectiveAttunement = availableAttunements.includes(activeAttunement)
+    ? activeAttunement : (availableAttunements[0] || "");
+
+  // Each slot descriptor: { skill, sourceId, isStatic, isSelectable, morphIndex? }
+  let mechSlots;
+
+  // Find selected elite spec
+  const eliteSpecEntry = (state.editor.specializations || [])
+    .find((e) => catalog.specializationById.get(Number(e?.specializationId))?.elite);
+  const eliteSpecId = Number(eliteSpecEntry?.specializationId) || 0;
+
+  // Collect elite spec's static profession mechanic skills (type "Profession", not "Toolbelt").
+  // Deduplicate by slot: some skills have multiple contextual variants at the same slot
+  // (e.g. Scrapper's "Function Gyro" has 3 toggle-phase variants, Mechanist's F4 has
+  // "Crash Down / Mech Support / Recall Mech"). Keep only the first occurrence per slot.
+  const eliteSpecOptionsRaw = (options.profession || []).filter((s) =>
+    Number(s.specialization) === eliteSpecId && (s.type || "").toLowerCase() !== "toolbelt"
+  );
+  const seenSlot = new Set();
+  const eliteSpecOptions = eliteSpecOptionsRaw.filter((s) => {
+    if (seenSlot.has(s.slot)) return false;
+    seenSlot.add(s.slot);
+    return true;
+  });
+
+  // "Locked" placeholder slots indicate player-selectable morph slots (Amalgam F2–F4).
+  // All other unique slots are fixed static mechanics.
+  const morphSlotSkills = eliteSpecOptions.filter((s) => s.name.toLowerCase() === "locked");
+  const eliteFixedSkills = eliteSpecOptions.filter((s) => s.name.toLowerCase() !== "locked");
+
+  const eliteOverridesToolbelt = isToolbelt && eliteSpecId > 0 &&
+    eliteSpecOptions.some((s) => s.slot === "Profession_1");
+  const isSelectablePool = isToolbelt && morphSlotSkills.length > 0;
+
+  if (eliteOverridesToolbelt) {
+    // Mechanist: F1-F3 are trait-gated mech commands; F4 is Crash Down/Recall toggle.
+    // For each tier slot (Profession_1/2/3), use the skill granted by the selected major trait.
+    // Fall back to the first available skill in that slot if no trait is selected.
+    const mechSpecEntry = (state.editor.specializations || [])
+      .find((e) => Number(e?.specializationId) === eliteSpecId);
+    const selectedMajorTraitIds = new Set(
+      (mechSpecEntry?.majorTraits || []).map(Number).filter(Boolean)
+    );
+
+    mechSlots = [];
+    for (const tier of [1, 2, 3]) {
+      const slot = `Profession_${tier}`;
+      const traitsForTier = catalog.traits.filter(
+        (t) => t.specialization === eliteSpecId && t.tier === tier
+      );
+      const selectedTrait = traitsForTier.find((t) => selectedMajorTraitIds.has(t.id));
+      let skill = null;
+      let mechIconOverride = "";
+      if (selectedTrait) {
+        const skillId = selectedTrait.traitSkillIds[0];
+        skill = catalog.skillById.get(skillId) || null;
+        // If skill is missing or has no icon, use the icon embedded in the trait data
+        if (skillId && (!skill || !skill.icon)) {
+          mechIconOverride = (selectedTrait.traitSkillIcons || {})[skillId] || "";
+        }
+      }
+      if (!skill) {
+        // Try skills tagged with the elite spec first, then any unspecced Profession_N skill
+        skill = eliteSpecOptions.find((s) => s.slot === slot)
+          || (options.profession || []).find((s) => s.slot === slot)
+          || null;
+      }
+      mechSlots.push({ skill, sourceId: 0, isStatic: true, isSelectable: false, mechIconOverride });
+    }
+    // F4: Crash Down (first Profession_4 entry)
+    const f4 = eliteFixedSkills.find((s) => s.slot === "Profession_4");
+    if (f4) mechSlots.push({ skill: f4, sourceId: 0, isStatic: true, isSelectable: false });
+  } else if (isSelectablePool) {
+    // Amalgam: F1 = heal toolbelt; F2–F4 = "Locked" morph slots (player-selectable); F5 = Evolve
+    const healSrc = catalog.skillById.get(Number(state.editor.skills?.healId) || 0);
+    const healToolbelt = healSrc?.toolbeltSkill ? (catalog.skillById.get(healSrc.toolbeltSkill) || null) : null;
+    const morphIds = Array.isArray(state.editor.morphSkillIds)
+      ? state.editor.morphSkillIds.map(Number) : [0, 0, 0];
+
+    mechSlots = [
+      { skill: healToolbelt, sourceId: Number(state.editor.skills?.healId) || 0, isStatic: false, isSelectable: false },
+      ...morphSlotSkills.map((lockedSkill, morphIndex) => ({
+        // Show "Locked" placeholder icon; replace with selected morph skill once pool is available
+        // Show the selected morph skill if one is chosen; fall back to "Locked" placeholder
+        skill: morphIds[morphIndex] ? (catalog.skillById.get(morphIds[morphIndex]) || lockedSkill) : lockedSkill,
+        sourceId: morphIds[morphIndex] || 0,
+        isStatic: false,
+        isSelectable: true,
+        morphIndex,
+      })),
+    ];
+    // Append fixed elite skills (Evolve at Profession_5)
+    for (const skill of eliteFixedSkills) {
+      mechSlots.push({ skill, sourceId: 0, isStatic: true, isSelectable: false });
+    }
+  } else if (isToolbelt) {
+    // Base Engineer / Scrapper / Holosmith: F1–F4 from toolbelt, optional elite F5
+    const toolbeltSourceIds = [
+      Number(state.editor.skills?.healId) || 0,
+      Number(utilitySelection[0]) || 0,
+      Number(utilitySelection[1]) || 0,
+      Number(utilitySelection[2]) || 0,
+    ];
+    mechSlots = toolbeltSourceIds.map((id) => {
+      const src = catalog.skillById.get(id);
+      const fskill = src?.toolbeltSkill ? (catalog.skillById.get(src.toolbeltSkill) || null) : null;
+      return { skill: fskill, sourceId: id, isStatic: false, isSelectable: false };
+    });
+    // Fixed F5 from elite spec (Scrapper → Function Gyro, Holosmith → Photon Forge)
+    const staticF5 = eliteFixedSkills.find((s) => s.slot === "Profession_5");
+    if (staticF5) mechSlots.push({ skill: staticF5, sourceId: 0, isStatic: true, isSelectable: false });
+  } else {
+    // Elementalist, Guardian, etc.: all static Profession_* slot skills
+    mechSlots = (options.profession || []).map((skill) => ({ skill, sourceId: 0, isStatic: true, isSelectable: false }));
+  }
+
+  const weaponCol = document.createElement("div");
+  weaponCol.className = "skills-bar__weapon-col";
+
+  if (mechSlots.length > 0 && mechSlots.some((s) => s.skill || s.isSelectable)) {
+    const mechBar = document.createElement("div");
+    mechBar.className = "profession-mechanics-bar";
+
+    for (const { skill, sourceId, isStatic, isSelectable, morphIndex, mechIconOverride } of mechSlots) {
+      const slotEl = document.createElement("div");
+      slotEl.className = "skill-slot";
+      const iconBtn = document.createElement("button");
+      iconBtn.type = "button";
+
+      let isActive = false;
+      if (isSelectable) {
+        // Amalgam morph slot — always interactive, never "active" in the attunement/kit sense
+      } else if (!isStatic && isToolbelt) {
+        const srcSkill = catalog.skillById.get(sourceId);
+        isActive = (srcSkill?.bundleSkills?.length ?? 0) > 0 && activeKit === sourceId;
+      } else if (isStatic && !isToolbelt) {
+        const attunementMatch = /^(\w+)\s+Attunement\b/i.exec(skill?.name || "");
+        const skillAttunement = attunementMatch ? attunementMatch[1] : "";
+        isActive = weaponHasAttunements && !!skillAttunement && skillAttunement === effectiveAttunement;
+      }
+
+      iconBtn.className = "skill-icon--profession"
+        + (isActive ? " skill-icon--profession-active" : "")
+        + (!skill ? " skill-icon--profession-empty" : "");
+      iconBtn.title = skill?.name || (isSelectable ? "Choose morph skill…" : "");
+      const displayIcon = skill?.icon || mechIconOverride || "";
+      if (displayIcon) {
+        iconBtn.innerHTML = `<img src="${escapeHtml(displayIcon)}" alt="${escapeHtml(skill?.name || "")}" />`;
+      }
+      if (skill) bindHoverPreview(iconBtn, "skill", () => skill);
+
+      if (isSelectable) {
+        iconBtn.addEventListener("click", () => {
+          const otherSelectedIds = new Set(
+            (state.editor.morphSkillIds || [])
+              .map((id, i) => (i !== morphIndex ? Number(id) : 0))
+              .filter(Boolean)
+          );
+          // Morph pool: all Profession-type skills for the elite spec that aren't "Locked"/"Evolve"
+          const allMorphPool = catalog.skills.filter(
+            (s) => s.specialization === eliteSpecId &&
+              (s.type || "").toLowerCase() === "profession" &&
+              s.name.toLowerCase() !== "locked" &&
+              s.name.toLowerCase() !== "evolve"
+          );
+          const morphItems = [
+            { value: "", label: "— None —" },
+            ...allMorphPool
+              .filter((s) => !otherSelectedIds.has(s.id))
+              .map((s) => ({ value: String(s.id), label: s.name, icon: s.icon })),
+          ];
+          openSlotPicker(iconBtn, String(sourceId || ""), (newVal) => {
+            if (!state.editor.morphSkillIds) state.editor.morphSkillIds = [0, 0, 0];
+            state.editor.morphSkillIds[morphIndex] = Number(newVal) || 0;
+            markEditorChanged();
+            renderSkills();
+          }, { items: morphItems, searchPlaceholder: "Choose morph skill…" });
+          if (skill) selectDetail("skill", skill);
+        });
+      } else {
+        iconBtn.addEventListener("click", () => {
+          if (!isStatic && isToolbelt) {
+            const srcSkill = catalog.skillById.get(sourceId);
+            if ((srcSkill?.bundleSkills?.length ?? 0) > 0) {
+              state.editor.activeKit = activeKit === sourceId ? 0 : sourceId;
+              renderSkills();
+            }
+          } else if (isStatic && !isToolbelt) {
+            const attunementMatch = /^(\w+)\s+Attunement\b/i.exec(skill?.name || "");
+            const skillAttunement = attunementMatch ? attunementMatch[1] : "";
+            if (skillAttunement) {
+              state.editor.activeAttunement = skillAttunement;
+              renderSkills();
+            }
+          }
+          if (skill) selectDetail("skill", skill);
+        });
+      }
+
+      slotEl.append(iconBtn);
+      mechBar.append(slotEl);
+    }
+    weaponCol.append(mechBar);
+  }
+
+  const swapBtn = document.createElement("button");
+  swapBtn.type = "button";
+  swapBtn.className = "weapon-swap-btn" + (activeWeaponSet === 2 ? " weapon-swap-btn--active" : "");
+  swapBtn.disabled = !hasWeaponSet2;
+  swapBtn.title = hasWeaponSet2
+    ? `Switch to weapon set ${activeWeaponSet === 1 ? 2 : 1}`
+    : "No second weapon set equipped";
+  swapBtn.innerHTML = `<svg viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <polyline points="2,3.5 13,3.5"/><polyline points="10,1 13,3.5 10,6"/>
+    <polyline points="16,10.5 5,10.5"/><polyline points="8,8 5,10.5 8,13"/>
+  </svg>`;
+  swapBtn.addEventListener("click", () => {
+    state.editor.activeWeaponSet = activeWeaponSet === 1 ? 2 : 1;
+    renderSkills();
+  });
+
+  const weaponRow = document.createElement("div");
+  weaponRow.className = "skills-bar__weapon-row";
+  weaponRow.append(swapBtn, weaponGroup);
+  weaponCol.append(weaponRow);
 
   // Center: health orb
   const profession = state.editor.profession || "";
@@ -2047,7 +2597,7 @@ function renderSkills() {
     utilityGroup.append(makeSkillSlot(slot, catalog, options, utilitySelection));
   }
 
-  bar.append(weaponGroup, orbEl, utilityGroup);
+  bar.append(weaponCol, orbEl, utilityGroup);
   el.skillsHost.append(bar);
 }
 
@@ -2078,7 +2628,9 @@ function renderDetailPanel() {
   el.detailHost.innerHTML = `
     <article class="detail-card">
       <header>
-        ${detail.icon ? `<img src="${escapeHtml(detail.icon)}" alt="${escapeHtml(detail.title)}" />` : ""}
+        ${detail.icon
+          ? `<img src="${escapeHtml(detail.icon)}" alt="${escapeHtml(detail.title)}" onerror="this.onerror=null;${detail.iconFallback ? `this.src='${escapeHtml(detail.iconFallback)}'` : "this.style.visibility='hidden'"}" />`
+          : `<div class="detail-card__icon-placeholder"></div>`}
         <div>
           <h3>${escapeHtml(detail.title)}</h3>
           <p>${escapeHtml(detail.kindLabel)}</p>
@@ -2244,6 +2796,7 @@ async function selectDetail(kind, entity) {
     kindLabel: kind === "trait" ? "Trait" : "Skill",
     title: entity.name || "Unknown",
     icon: entity.icon || "",
+    iconFallback: entity.iconFallback || "",
     description: entity.description || "",
     facts: Array.isArray(entity.facts) ? entity.facts : [],
     wiki: { loading: true, summary: "", url: "" },
@@ -2302,6 +2855,20 @@ function getSkillOptionsByType(catalog, specializationSelections) {
     return !lockSpec || selectedSpecIds.has(lockSpec);
   });
 
+  // Profession mechanic skills (F1–F5): slot is "Profession_1" ... "Profession_5"
+  // Include unspecced ones plus those locked to a selected spec.
+  const profMechanics = allSkills
+    .filter((skill) => /^Profession_\d/.test(skill.slot || ""))
+    .filter((skill) => {
+      const lockSpec = Number(skill.specialization) || 0;
+      return !lockSpec || selectedSpecIds.has(lockSpec);
+    })
+    .sort((a, b) => {
+      const na = parseInt((a.slot || "").replace("Profession_", ""), 10) || 0;
+      const nb = parseInt((b.slot || "").replace("Profession_", ""), 10) || 0;
+      return na - nb;
+    });
+
   return {
     heal: filtered
       .filter((skill) => (skill.type || "").toLowerCase() === "heal")
@@ -2312,6 +2879,7 @@ function getSkillOptionsByType(catalog, specializationSelections) {
     elite: filtered
       .filter((skill) => (skill.type || "").toLowerCase() === "elite")
       .sort((a, b) => a.name.localeCompare(b.name)),
+    profession: profMechanics,
   };
 }
 
@@ -2615,6 +3183,7 @@ function parseBuildImportPayload(text) {
         ring2: String(source.equipment?.slots?.ring2 || ""),
         accessory1: String(source.equipment?.slots?.accessory1 || ""),
         accessory2: String(source.equipment?.slots?.accessory2 || ""),
+        breather: String(source.equipment?.slots?.breather || ""),
         aquatic1: String(source.equipment?.slots?.aquatic1 || ""),
         aquatic2: String(source.equipment?.slots?.aquatic2 || ""),
       },
@@ -2721,6 +3290,7 @@ async function loadBuildIntoEditor(build, options = {}) {
         ring2: String(build.equipment?.slots?.ring2 || ""),
         accessory1: String(build.equipment?.slots?.accessory1 || ""),
         accessory2: String(build.equipment?.slots?.accessory2 || ""),
+        breather: String(build.equipment?.slots?.breather || ""),
         aquatic1: String(build.equipment?.slots?.aquatic1 || ""),
         aquatic2: String(build.equipment?.slots?.aquatic2 || ""),
       },
@@ -2842,6 +3412,7 @@ function serializeEditorToBuild() {
         ring2: String(state.editor.equipment.slots?.ring2 || ""),
         accessory1: String(state.editor.equipment.slots?.accessory1 || ""),
         accessory2: String(state.editor.equipment.slots?.accessory2 || ""),
+        breather: String(state.editor.equipment.slots?.breather || ""),
         aquatic1: String(state.editor.equipment.slots?.aquatic1 || ""),
         aquatic2: String(state.editor.equipment.slots?.aquatic2 || ""),
       },
@@ -2995,7 +3566,7 @@ function createEmptyEditor(profession = "") {
         head: "", shoulders: "", chest: "", hands: "", legs: "", feet: "",
         mainhand1: "", offhand1: "", mainhand2: "", offhand2: "",
         back: "", amulet: "", ring1: "", ring2: "", accessory1: "", accessory2: "",
-        aquatic1: "", aquatic2: "",
+        breather: "", aquatic1: "", aquatic2: "",
       },
       weapons: {
         mainhand1: "", offhand1: "", mainhand2: "", offhand2: "", aquatic1: "", aquatic2: "",
@@ -3007,6 +3578,10 @@ function createEmptyEditor(profession = "") {
       utilityIds: [0, 0, 0],
       eliteId: 0,
     },
+    activeAttunement: "",
+    activeKit: 0,
+    activeWeaponSet: 1,
+    morphSkillIds: [0, 0, 0],
   };
 }
 

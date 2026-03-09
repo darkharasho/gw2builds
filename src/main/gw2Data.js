@@ -38,8 +38,157 @@ async function getProfessionCatalog(professionId, lang = "en") {
   );
   const traits = await fetchGw2ByIds("traits", traitIds, lang);
 
+  // Build a map of skill ID → reference metadata from the profession endpoint.
+  // The profession.skills entries carry slot/specialization/type for how the profession
+  // uses each skill. Some skills (e.g. Mechanist's Jade Mech F1-F3) have no slot or
+  // specialization set in /v2/skills itself — the profession reference is authoritative.
+  const profSkillRefs = new Map(
+    (profession.skills || [])
+      .filter((entry) => entry?.id)
+      .map((entry) => [Number(entry.id), {
+        slot: entry.slot || "",
+        specialization: Number(entry.specialization) || 0,
+        type: entry.type || "",
+      }])
+  );
+
+  // Build trait-skill specialization tag map early so it can be applied to profession skills.
+  // Skills embedded in elite spec major traits (e.g. Mechanist's Jade Mech F1-F3) should
+  // inherit that elite spec's specialization ID, even when the profession or skills API omits it.
+  // Include skills WITH a slot set — those are already in profession.skills and need the
+  // specialization tag applied there. Skills WITHOUT a slot will be fetched separately below.
+  const eliteSpecIdSet = new Set(specializations.filter((s) => s.elite).map((s) => Number(s.id)));
+  const traitSkillTagMap = new Map(); // skillId → {slot, specialization, type}
+  for (const trait of traits) {
+    const specId = Number(trait.specialization) || 0;
+    if (!eliteSpecIdSet.has(specId)) continue;
+    const tier = Number(trait.tier) || 0;
+    if (!tier || !Array.isArray(trait.skills)) continue;
+    for (const ts of trait.skills) {
+      const skillId = Number(ts?.id);
+      if (!skillId) continue;
+      // Don't overwrite a more specific existing entry
+      if (!traitSkillTagMap.has(skillId)) {
+        traitSkillTagMap.set(skillId, {
+          slot: ts.slot || `Profession_${tier}`,
+          specialization: specId,
+          type: "Profession",
+        });
+      }
+    }
+  }
+
   const professionSkillIds = dedupeNumbers((profession.skills || []).map((entry) => entry?.id));
-  const skills = await fetchGw2ByIds("skills", professionSkillIds, lang);
+  const weaponSkillIds = dedupeNumbers(
+    Object.values(profession.weapons || {}).flatMap((w) => (w.skills || []).map((s) => s?.id))
+  );
+  const [professionSkillsRawApi, weaponSkillsRaw] = await Promise.all([
+    fetchGw2ByIds("skills", professionSkillIds, lang),
+    fetchGw2ByIds("skills", weaponSkillIds, lang),
+  ]);
+
+  // Merge profession reference metadata into fetched skill objects.
+  // Prefer the reference's slot/specialization/type over the skill's own values.
+  // Also apply traitSkillTagMap specialization as a fallback for elite spec skills whose
+  // specialization the profession API leaves unset (e.g. Mechanist's mech command variants).
+  const professionSkillsRaw = professionSkillsRawApi.map((skill) => {
+    const ref = profSkillRefs.get(skill.id);
+    const traitTag = traitSkillTagMap.get(skill.id);
+    return {
+      ...skill,
+      slot: ref?.slot || skill.slot || "",
+      specialization: ref?.specialization || traitTag?.specialization || skill.specialization || 0,
+      type: ref?.type || skill.type || "",
+    };
+  });
+
+  // Second pass: fetch toolbelt skills + bundle (kit weapon) skills referenced by profession skills
+  const extraSkillIds = dedupeNumbers([
+    ...professionSkillsRaw.flatMap((s) => [
+      s.toolbelt_skill,
+      ...(Array.isArray(s.bundle_skills) ? s.bundle_skills : []),
+    ]).filter(Boolean),
+  ]);
+  const extraSkillsRaw = extraSkillIds.length ? await fetchGw2ByIds("skills", extraSkillIds, lang) : [];
+
+  // Third pass: fetch morph pool skills for specs with "Locked" profession slots (e.g. Amalgam F2–F4).
+  // The GW2 profession endpoint only lists "Locked" placeholder skills for these slots; the actual
+  // selectable morph skills are not listed there. We find them by fetching all skill IDs from the
+  // API, filtering to the ID range of the known Locked skills, and keeping those with matching
+  // specialization + type="Profession" that are not "Locked"/"Evolve" placeholders.
+  const lockedSkills = professionSkillsRaw.filter(
+    (s) => s.name === "Locked" && s.type === "Profession" && s.specialization
+  );
+  let morphPoolSkillsRaw = [];
+  if (lockedSkills.length > 0) {
+    const lockedSpecId = lockedSkills[0].specialization;
+    const lockedIds = lockedSkills.map((s) => s.id);
+    const idMin = Math.min(...lockedIds) - 1000;
+    const idMax = Math.max(...lockedIds) + 1000;
+    const allSkillIds = await fetchCachedJson(
+      `allSkillIds:${lang}`,
+      `${GW2_API_ROOT}/skills?lang=${encodeURIComponent(lang)}`,
+      1000 * 60 * 60 * 24
+    );
+    const alreadyFetched = new Set([...professionSkillsRaw, ...extraSkillsRaw].map((s) => s.id));
+    const candidateIds = (Array.isArray(allSkillIds) ? allSkillIds : []).filter(
+      (id) => id >= idMin && id <= idMax && !alreadyFetched.has(id)
+    );
+    if (candidateIds.length > 0) {
+      const candidateSkills = await fetchGw2ByIds("skills", candidateIds, lang);
+      // Morph pool skills have no type/slot/specialization set in the GW2 API — they are
+      // identified solely by their description starting with "Morph." Tag them with the
+      // locked spec's ID and type="Profession" so the renderer can find them.
+      morphPoolSkillsRaw = candidateSkills
+        .filter((s) => (s.description || "").startsWith("Morph."))
+        .map((s) => ({ ...s, specialization: lockedSpecId, type: "Profession" }));
+    }
+  }
+
+  // Fourth pass: fetch any trait-tagged skills not yet in the catalog.
+  // traitSkillTagMap was already built above; here we fetch the remaining IDs
+  // (those not already covered by profession skills, toolbelt/bundle skills, or morph pool).
+  const alreadyFetchedIds = new Set([
+    ...professionSkillsRaw.map((s) => s.id),
+    ...extraSkillsRaw.map((s) => s.id),
+    ...morphPoolSkillsRaw.map((s) => s.id),
+  ]);
+  const traitSkillIdsToFetch = [...traitSkillTagMap.keys()].filter((id) => !alreadyFetchedIds.has(id));
+  const traitSkillsRaw = traitSkillIdsToFetch.length
+    ? (await fetchGw2ByIds("skills", traitSkillIdsToFetch, lang)).map((skill) => {
+        const tag = traitSkillTagMap.get(skill.id);
+        return tag ? { ...skill, slot: tag.slot, specialization: tag.specialization, type: tag.type } : skill;
+      })
+    : [];
+
+  function mapSkill(skill) {
+    return {
+      id: skill.id,
+      name: skill.name || "",
+      icon: skill.icon || "",
+      description: skill.description || "",
+      slot: skill.slot || "",
+      type: skill.type || "",
+      specialization: Number(skill.specialization) || 0,
+      professions: Array.isArray(skill.professions) ? skill.professions : [],
+      weaponType: skill.weapon_type || "",
+      categories: Array.isArray(skill.categories) ? skill.categories : [],
+      facts: Array.isArray(skill.facts) ? skill.facts : [],
+      toolbeltSkill: Number(skill.toolbelt_skill) || 0,
+      bundleSkills: Array.isArray(skill.bundle_skills)
+        ? skill.bundle_skills.map(Number).filter(Boolean)
+        : [],
+    };
+  }
+
+  const skills = [...professionSkillsRaw, ...extraSkillsRaw, ...morphPoolSkillsRaw, ...traitSkillsRaw];
+
+  // Normalize GW2 API weapon type keys (e.g. "ShortBow") to our lowercase IDs (e.g. "shortbow")
+  // Special case: "HarpoonGun" → "harpoon"
+  function normalizeWeaponKey(apiKey) {
+    if (apiKey === "HarpoonGun") return "harpoon";
+    return apiKey.toLowerCase();
+  }
 
   return {
     profession: {
@@ -61,7 +210,10 @@ async function getProfessionCatalog(professionId, lang = "en") {
     traits: traits.map((trait) => ({
       id: trait.id,
       name: trait.name || "",
-      icon: buildWikiFilePath(`${trait.name || ""}.png`) || trait.icon || "",
+      // Skip wiki path for names containing colons — MediaWiki treats ":" as a namespace
+      // separator, so "Mech Frame: Conductive Alloys.png" resolves to nothing on the wiki,
+      // causing a failed load + onerror fallback blink. Use the render URL directly instead.
+      icon: (!(trait.name || "").includes(":") && buildWikiFilePath(`${trait.name || ""}.png`)) || trait.icon || "",
       iconFallback: trait.icon || "",
       description: trait.description || "",
       tier: Number(trait.tier) || 0,
@@ -69,18 +221,39 @@ async function getProfessionCatalog(professionId, lang = "en") {
       slot: trait.slot || "",
       specialization: Number(trait.specialization) || 0,
       facts: Array.isArray(trait.facts) ? trait.facts : [],
+      traitSkillIds: Array.isArray(trait.skills)
+        ? trait.skills.map((s) => Number(s?.id)).filter(Boolean)
+        : [],
+      traitSkillIcons: Array.isArray(trait.skills)
+        ? Object.fromEntries(
+            trait.skills
+              .filter((s) => s?.id && s?.icon)
+              .map((s) => [Number(s.id), String(s.icon)])
+          )
+        : {},
     })),
-    skills: skills.map((skill) => ({
+    skills: skills.map(mapSkill),
+    professionWeapons: Object.fromEntries(
+      Object.entries(profession.weapons || {}).map(([apiKey, wData]) => [
+        normalizeWeaponKey(apiKey),
+        {
+          flags: Array.isArray(wData.flags) ? wData.flags : [],
+          specialization: Number(wData.specialization) || 0,
+          skills: (wData.skills || []).map((s) => ({
+            id: Number(s.id) || 0,
+            slot: s.slot || "",
+            offhand: s.offhand || "",
+            attunement: s.attunement || "",
+          })),
+        },
+      ])
+    ),
+    weaponSkills: weaponSkillsRaw.map((skill) => ({
       id: skill.id,
       name: skill.name || "",
       icon: skill.icon || "",
       description: skill.description || "",
       slot: skill.slot || "",
-      type: skill.type || "",
-      specialization: Number(skill.specialization) || 0,
-      professions: Array.isArray(skill.professions) ? skill.professions : [],
-      weaponType: skill.weapon_type || "",
-      categories: Array.isArray(skill.categories) ? skill.categories : [],
       facts: Array.isArray(skill.facts) ? skill.facts : [],
     })),
     updatedAt: new Date().toISOString(),
