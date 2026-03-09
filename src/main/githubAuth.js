@@ -1,12 +1,12 @@
 const { shell } = require("electron");
 
 const GITHUB_API = "https://github.com";
-const UA = "gw2-buildsite-desktop";
+const UA = "gw2builds-desktop";
 
 async function requestDeviceCode(clientId) {
   const body = new URLSearchParams({
     client_id: clientId,
-    scope: "repo read:user",
+    scope: "repo read:user read:org workflow",
   });
 
   const res = await fetch(`${GITHUB_API}/login/device/code`, {

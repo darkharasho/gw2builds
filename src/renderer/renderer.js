@@ -1,25 +1,60 @@
 const state = {
   user: null,
-  builds: [],
-  query: "",
-  sortBy: "updated",
   onboarding: null,
+  targets: [],
+  selectedTarget: null,
+  pagesPoll: {
+    active: false,
+    status: "",
+    error: null,
+  },
   loginFlow: {
     pending: false,
     beginData: null,
     waitingForApproval: false,
   },
+  builds: [],
+  professions: [],
+  activePage: "editor",
+  buildSearch: "",
+  skillSearch: "",
+  catalogCache: new Map(),
+  activeCatalog: null,
+  editor: createEmptyEditor(),
+  editorBaselineSignature: "",
+  editorDirty: false,
+  detail: null,
+  wikiCache: new Map(),
+  openCustomSelect: null,
 };
 
 const el = {
   setupGate: document.querySelector("#setupGate"),
   authRow: document.querySelector("#authRow"),
   onboarding: document.querySelector("#onboarding"),
-  buildForm: document.querySelector("#buildForm"),
+  workspaceBtn: document.querySelector("#workspaceBtn"),
+  workspaceMenu: document.querySelector("#workspaceMenu"),
+  subnav: document.querySelector("#subnav"),
+  appLayout: document.querySelector(".app-layout"),
   buildList: document.querySelector("#buildList"),
-  search: document.querySelector("#search"),
-  sortBy: document.querySelector("#sortBy"),
-  frame: document.querySelector("#buildsiteFrame"),
+  buildSearch: document.querySelector("#buildSearch"),
+  editorTitle: document.querySelector("#editorTitle"),
+  professionSelect: document.querySelector("#professionSelect"),
+  tagsInput: document.querySelector("#tagsInput"),
+  equipmentPanel: document.querySelector("#equipmentPanel"),
+  newBuildBtn: document.querySelector("#newBuildBtn"),
+  saveBuildBtn: document.querySelector("#saveBuildBtn"),
+  duplicateBuildBtn: document.querySelector("#duplicateBuildBtn"),
+  copyBuildBtn: document.querySelector("#copyBuildBtn"),
+  pasteBuildBtn: document.querySelector("#pasteBuildBtn"),
+  editorDirtyBadge: document.querySelector("#editorDirtyBadge"),
+  buildSummary: document.querySelector("#buildSummary"),
+  publishSiteBtn: document.querySelector("#publishSiteBtn"),
+  specializationsHost: document.querySelector("#specializationsHost"),
+  skillsHost: document.querySelector("#skillsHost"),
+  detailHost: document.querySelector("#detailHost"),
+  publishStatus: document.querySelector("#publishStatus"),
+  hoverPreview: document.querySelector("#hoverPreview"),
   winMin: document.querySelector("#winMin"),
   winMax: document.querySelector("#winMax"),
   winClose: document.querySelector("#winClose"),
@@ -29,45 +64,217 @@ const el = {
 init().catch((err) => showError(err));
 
 async function init() {
-  const [config, builds] = await Promise.all([window.desktopApi.getConfig(), window.desktopApi.listBuilds()]);
-  state.builds = Array.isArray(builds) ? builds : [];
-  el.frame.src = config.buildSiteUrl;
-  await refreshOnboardingStatus();
+  wireWindowControls();
   wireEvents();
+
+  const [builds, professions] = await Promise.all([
+    window.desktopApi.listBuilds(),
+    window.desktopApi.listProfessions(),
+  ]);
+  state.builds = Array.isArray(builds) ? builds : [];
+  state.professions = Array.isArray(professions) ? professions : [];
+  await refreshOnboardingStatus();
+
+  if (state.builds.length) {
+    await loadBuildIntoEditor(state.builds[0], { captureBaseline: true });
+  } else if (state.professions.length) {
+    state.editor = createEmptyEditor(state.professions[0].id);
+    await setProfession(state.professions[0].id, { preserveSelections: false });
+    captureEditorBaseline();
+  }
+
   await refreshWindowControls();
   render();
 }
 
 function wireEvents() {
-  wireWindowControls();
+  el.editorTitle.addEventListener("input", () => {
+    state.editor.title = String(el.editorTitle.value || "");
+    markEditorChanged({ updateBuildList: true });
+  });
 
-  el.buildForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const fd = new FormData(el.buildForm);
-    const payload = {
-      title: String(fd.get("title") || ""),
-      profession: String(fd.get("profession") || ""),
-      buildUrl: String(fd.get("buildUrl") || ""),
-      tags: String(fd.get("tags") || "")
-        .split(",")
-        .map((x) => x.trim())
-        .filter(Boolean),
-      notes: String(fd.get("notes") || ""),
-    };
-    await window.desktopApi.saveBuild(payload);
-    el.buildForm.reset();
+  el.tagsInput.addEventListener("input", () => {
+    state.editor.tagsText = String(el.tagsInput.value || "");
+    markEditorChanged();
+  });
+
+  el.newBuildBtn.addEventListener("click", async () => {
+    await startNewBuild();
+  });
+
+  el.saveBuildBtn.addEventListener("click", async () => {
+    await saveCurrentBuild();
+  });
+
+  el.duplicateBuildBtn.addEventListener("click", async () => {
+    await duplicateCurrentBuild();
+  });
+
+  el.copyBuildBtn.addEventListener("click", async () => {
+    await copyBuildJsonToClipboard();
+  });
+
+  el.pasteBuildBtn.addEventListener("click", async () => {
+    await importBuildJsonFromClipboard();
+  });
+
+  el.publishSiteBtn.addEventListener("click", async () => {
+    try {
+      if (!state.user) {
+        throw new Error("Log in and complete setup before publishing.");
+      }
+      setPublishStatus("Publishing static site to GitHub...");
+      await window.desktopApi.publishSite();
+      await runPagesBuildPoll();
+      await refreshOnboardingStatus();
+      setPublishStatus(`Publish triggered. Pages URL: ${state.onboarding?.pagesUrl || "pending"}`);
+      render();
+    } catch (err) {
+      showError(err);
+    }
+  });
+
+  el.buildSearch.addEventListener("input", () => {
+    state.buildSearch = String(el.buildSearch.value || "").trim().toLowerCase();
+    renderBuildList();
+  });
+
+
+  window.addEventListener("keydown", async (event) => {
+    if (event.key === "Escape") {
+      closeCustomSelect();
+      hideHoverPreview();
+      return;
+    }
+    const key = String(event.key || "").toLowerCase();
+    const modifier = event.ctrlKey || event.metaKey;
+    if (!modifier) return;
+    if (key === "s") {
+      event.preventDefault();
+      await saveCurrentBuild();
+    } else if (key === "d") {
+      event.preventDefault();
+      await duplicateCurrentBuild();
+    }
+  });
+
+  document.addEventListener("pointerdown", (event) => {
+    if (event.target.closest(".cselect")) return;
+    closeCustomSelect();
+  });
+
+  // Workspace menu toggle
+  el.workspaceBtn.addEventListener("click", (event) => {
+    event.stopPropagation();
+    el.workspaceMenu.classList.toggle("hidden");
+  });
+
+  document.addEventListener("pointerdown", (event) => {
+    if (!el.workspaceMenu.classList.contains("hidden") &&
+        !el.workspaceMenu.contains(event.target) &&
+        event.target !== el.workspaceBtn) {
+      el.workspaceMenu.classList.add("hidden");
+    }
+  });
+
+  // Left nav page switching
+  document.querySelectorAll(".leftnav__item").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const page = btn.dataset.page;
+      if (!page) return;
+      state.activePage = page;
+      document.querySelectorAll(".leftnav__item").forEach((b) => b.classList.remove("leftnav__item--active"));
+      btn.classList.add("leftnav__item--active");
+      document.querySelectorAll(".page").forEach((p) => p.classList.add("hidden"));
+      const target = document.querySelector(`#page-${page}`);
+      if (target) target.classList.remove("hidden");
+      // Show/hide subnav for editor page
+      const showSubnav = page === "editor";
+      el.subnav.classList.toggle("subnav--visible", showSubnav);
+      el.appLayout.classList.toggle("app-layout--subnav", showSubnav);
+    });
+  });
+
+  // Subnav tab switching
+  document.querySelectorAll(".subnav__item").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const tab = btn.dataset.subtab;
+      if (!tab) return;
+      document.querySelectorAll(".subnav__item").forEach((b) => b.classList.remove("subnav__item--active"));
+      btn.classList.add("subnav__item--active");
+      document.querySelectorAll(".subtab").forEach((t) => t.classList.add("hidden"));
+      const target = document.querySelector(`#subtab-${tab}`);
+      if (target) target.classList.remove("hidden");
+    });
+  });
+}
+
+async function startNewBuild() {
+  if (!confirmDiscardDirty("Start a new build")) return;
+  const profession = state.editor.profession || state.professions[0]?.id || "";
+  state.editor = createEmptyEditor(profession);
+  if (profession) {
+    await setProfession(profession, { preserveSelections: false });
+  }
+  state.detail = null;
+  captureEditorBaseline();
+  render();
+  setPublishStatus("Started a new local build draft.");
+}
+
+async function saveCurrentBuild() {
+  try {
+    const saved = await window.desktopApi.saveBuild(serializeEditorToBuild());
+    state.editor.id = saved.id;
     await reloadBuilds();
-  });
+    const savedBuild = state.builds.find((entry) => entry.id === saved.id);
+    if (savedBuild) await loadBuildIntoEditor(savedBuild, { captureBaseline: true });
+    else captureEditorBaseline();
+    render();
+    setPublishStatus("Build saved locally.");
+  } catch (err) {
+    showError(err);
+  }
+}
 
-  el.search.addEventListener("input", () => {
-    state.query = el.search.value.trim().toLowerCase();
-    renderBuilds();
-  });
+async function duplicateCurrentBuild() {
+  const baseTitle = String(state.editor.title || "Untitled Build").trim();
+  state.editor.id = "";
+  state.editor.title = baseTitle ? `${baseTitle} (Copy)` : "Copied Build";
+  markEditorChanged({ updateBuildList: true });
+  renderEditorForm();
+  setPublishStatus("Build duplicated. Save to keep it in your library.");
+}
 
-  el.sortBy.addEventListener("change", () => {
-    state.sortBy = el.sortBy.value;
-    renderBuilds();
-  });
+async function copyBuildJsonToClipboard() {
+  try {
+    const payload = serializeEditorToBuild();
+    const json = JSON.stringify(payload, null, 2);
+    await window.desktopApi.writeClipboardText(json);
+    setPublishStatus("Build JSON copied to clipboard.");
+  } catch (err) {
+    showError(err);
+  }
+}
+
+async function importBuildJsonFromClipboard() {
+  try {
+    if (!confirmDiscardDirty("Import another build")) return;
+    const text = await window.desktopApi.readClipboardText();
+    if (!text || !String(text).trim()) {
+      throw new Error("Clipboard is empty.");
+    }
+    const parsed = parseBuildImportPayload(String(text));
+    await loadBuildIntoEditor(parsed, { captureBaseline: false });
+    state.editor.id = "";
+    markEditorChanged({ updateBuildList: true });
+    state.editorDirty = true;
+    renderEditorMeta();
+    render();
+    setPublishStatus("Imported build JSON from clipboard. Save to keep it locally.");
+  } catch (err) {
+    showError(err);
+  }
 }
 
 function wireWindowControls() {
@@ -93,30 +300,269 @@ async function refreshWindowControls() {
   el.winMax.textContent = maximized ? "[] " : "+";
 }
 
+async function refreshOnboardingStatus() {
+  const status = await window.desktopApi.getOnboardingStatus();
+  state.onboarding = status;
+  state.user = status.viewer;
+
+  if (status.isAuthenticated) {
+    state.targets = await window.desktopApi.listTargets();
+    if (!state.selectedTarget) {
+      state.selectedTarget =
+        state.targets.find((target) => target.login === status.targetOwner) ||
+        state.targets[0] ||
+        null;
+    }
+  } else {
+    state.targets = [];
+    state.selectedTarget = null;
+  }
+
+  if (status.isAuthenticated && status.repoReady && !status.pagesReady && !state.pagesPoll.active) {
+    runPagesBuildPoll().catch((err) => showError(err));
+  }
+}
+
+async function setProfession(professionId, options = {}) {
+  const selected = String(professionId || "");
+  if (!selected) return;
+
+  const catalog = await getCatalog(selected);
+  state.activeCatalog = catalog;
+  state.editor.profession = selected;
+
+  if (!options.preserveSelections) {
+    state.editor.specializations = createDefaultSpecializationSelections(catalog);
+    state.editor.skills = createDefaultSkillSelections(catalog, state.editor.specializations);
+  }
+
+  enforceEditorConsistency({ preferredEliteSlot: options.preferredEliteSlot });
+  renderEditor();
+}
+
+async function getCatalog(professionId) {
+  if (state.catalogCache.has(professionId)) return state.catalogCache.get(professionId);
+  const raw = await window.desktopApi.getProfessionCatalog(professionId);
+  const catalog = {
+    ...raw,
+    specializationById: new Map((raw.specializations || []).map((entry) => [Number(entry.id), entry])),
+    traitById: new Map((raw.traits || []).map((entry) => [Number(entry.id), entry])),
+    skillById: new Map((raw.skills || []).map((entry) => [Number(entry.id), entry])),
+  };
+  state.catalogCache.set(professionId, catalog);
+
+  // Pre-load all spec background images so they're cached before the user switches specs
+  for (const spec of catalog.specializations || []) {
+    const wikiUrl = `https://wiki.guildwars2.com/wiki/Special:FilePath/${encodeURIComponent(`${spec.name || ""} specialization.png`)}`;
+    const img = new Image();
+    img.src = wikiUrl;
+  }
+
+  return catalog;
+}
+
+function createDefaultSpecializationSelections(catalog) {
+  const specs = Array.isArray(catalog.specializations) ? catalog.specializations : [];
+  const core = specs.filter((entry) => !entry.elite);
+  const elite = specs.filter((entry) => entry.elite);
+  const picks = [core[0], core[1], elite[0] || core[2] || core[0]].filter(Boolean);
+  const seen = new Set();
+  const selections = [];
+  for (const spec of picks) {
+    if (!spec || seen.has(spec.id)) continue;
+    seen.add(spec.id);
+    selections.push(createSpecializationSelection(spec, catalog));
+  }
+
+  while (selections.length < 3) {
+    const fallback = specs.find((entry) => !seen.has(entry.id));
+    if (!fallback) break;
+    seen.add(fallback.id);
+    selections.push(createSpecializationSelection(fallback, catalog));
+  }
+
+  return selections.slice(0, 3);
+}
+
+function createSpecializationSelection(spec, catalog) {
+  const majors = getMajorTraitsByTier(spec, catalog);
+  return {
+    specializationId: Number(spec.id),
+    majorChoices: {
+      1: Number(majors[1]?.[0]?.id || 0),
+      2: Number(majors[2]?.[0]?.id || 0),
+      3: Number(majors[3]?.[0]?.id || 0),
+    },
+  };
+}
+
+function createDefaultSkillSelections(catalog, specializations) {
+  const skillOptions = getSkillOptionsByType(catalog, specializations);
+  const utilityIds = (skillOptions.utility || []).slice(0, 3).map((skill) => skill.id);
+  return {
+    healId: Number(skillOptions.heal?.[0]?.id || 0),
+    utilityIds: [utilityIds[0] || 0, utilityIds[1] || 0, utilityIds[2] || 0],
+    eliteId: Number(skillOptions.elite?.[0]?.id || 0),
+  };
+}
+
+function enforceEditorConsistency(options = {}) {
+  const catalog = state.activeCatalog;
+  if (!catalog) return;
+
+  const specs = Array.isArray(catalog.specializations) ? catalog.specializations : [];
+  const used = new Set();
+  const nextSpecs = [];
+  for (let i = 0; i < 3; i += 1) {
+    const current = state.editor.specializations[i] || {};
+    const currentId = Number(current.specializationId) || 0;
+    let spec = catalog.specializationById.get(currentId) || null;
+    if (!spec || used.has(spec.id)) {
+      spec = specs.find((entry) => !used.has(entry.id)) || null;
+    }
+    if (!spec) continue;
+    used.add(spec.id);
+    const majors = getMajorTraitsByTier(spec, catalog);
+    nextSpecs.push({
+      specializationId: spec.id,
+      majorChoices: {
+        1: chooseTraitId(current.majorChoices?.[1], majors[1]),
+        2: chooseTraitId(current.majorChoices?.[2], majors[2]),
+        3: chooseTraitId(current.majorChoices?.[3], majors[3]),
+      },
+    });
+  }
+  const preferredEliteSlot = Number(options.preferredEliteSlot);
+  const eliteSlots = nextSpecs
+    .map((entry, index) => {
+      const spec = catalog.specializationById.get(Number(entry.specializationId));
+      return spec?.elite ? index : -1;
+    })
+    .filter((index) => index >= 0);
+  if (eliteSlots.length > 1) {
+    const keepSlot = eliteSlots.includes(preferredEliteSlot) ? preferredEliteSlot : eliteSlots[0];
+    for (const slot of eliteSlots) {
+      if (slot === keepSlot) continue;
+      const usedIds = new Set(nextSpecs.map((entry) => Number(entry.specializationId) || 0));
+      usedIds.delete(Number(nextSpecs[slot]?.specializationId) || 0);
+      const replacement = specs.find((entry) => !entry.elite && !usedIds.has(Number(entry.id)));
+      if (!replacement) continue;
+      const current = state.editor.specializations[slot] || {};
+      const majors = getMajorTraitsByTier(replacement, catalog);
+      nextSpecs[slot] = {
+        specializationId: Number(replacement.id),
+        majorChoices: {
+          1: chooseTraitId(current.majorChoices?.[1], majors[1]),
+          2: chooseTraitId(current.majorChoices?.[2], majors[2]),
+          3: chooseTraitId(current.majorChoices?.[3], majors[3]),
+        },
+      };
+    }
+  }
+
+  state.editor.specializations = nextSpecs;
+
+  const skillOptions = getSkillOptionsByType(catalog, state.editor.specializations);
+  const utilityIds = Array.isArray(state.editor.skills.utilityIds)
+    ? state.editor.skills.utilityIds.map((value) => Number(value) || 0).slice(0, 3)
+    : [];
+  while (utilityIds.length < 3) utilityIds.push(0);
+
+  state.editor.skills.healId = chooseSkillId(state.editor.skills.healId, skillOptions.heal);
+  state.editor.skills.eliteId = chooseSkillId(state.editor.skills.eliteId, skillOptions.elite);
+
+  const usedUtility = new Set();
+  state.editor.skills.utilityIds = utilityIds.map((value) => {
+    const selected = chooseSkillId(value, skillOptions.utility, usedUtility);
+    if (selected) usedUtility.add(selected);
+    return selected;
+  });
+}
+
+function chooseTraitId(currentId, options) {
+  const id = Number(currentId) || 0;
+  if (id && Array.isArray(options) && options.some((entry) => Number(entry.id) === id)) {
+    return id;
+  }
+  return Number(options?.[0]?.id || 0);
+}
+
+function chooseSkillId(currentId, options, usedSet = null) {
+  const id = Number(currentId) || 0;
+  if (
+    id &&
+    Array.isArray(options) &&
+    options.some((entry) => Number(entry.id) === id) &&
+    (!usedSet || !usedSet.has(id))
+  ) {
+    return id;
+  }
+  const fallback = (options || []).find((entry) => !usedSet || !usedSet.has(Number(entry.id)));
+  return Number(fallback?.id || 0);
+}
+
 function render() {
-  renderSetupGate();
+  hideHoverPreview();
+  closeCustomSelect();
   renderAuth();
   renderOnboarding();
-  renderBuilds();
+  renderSetupGate();
+  renderBuildList();
+  renderEditor();
+  // Update titlebar user display
+  const titlebarUser = document.querySelector("#titlebarUser");
+  if (titlebarUser) {
+    titlebarUser.textContent = state.user ? state.user.login : "";
+  }
+  if (el.workspaceBtn) {
+    el.workspaceBtn.title = state.user ? `Workspace (${state.user.login})` : "Workspace (not signed in)";
+    el.workspaceBtn.classList.toggle("titlebar__workspace-btn--active", Boolean(state.user));
+  }
 }
 
 function renderAuth() {
   el.authRow.innerHTML = "";
+
+  const status = state.onboarding;
+  const target = getSelectedTarget();
+
   if (state.user) {
-    const who = document.createElement("span");
-    who.className = "rounded-full border border-slate-600 px-2 py-1 text-xs text-slate-200";
-    who.textContent = `Signed in: ${state.user.login}`;
-    const logout = button("Log out", "secondary", async () => {
+    const who = document.createElement("div");
+    who.className = "workspace-menu__user";
+    who.textContent = `Signed in as ${state.user.login}`;
+    el.authRow.append(who);
+
+    const reauth = makeButton("Re-authenticate", "secondary", async () => {
+      try {
+        await startLoginFlow();
+        await refreshOnboardingStatus();
+        render();
+      } catch (err) { showError(err); }
+    });
+
+    const rerunSetup = makeButton("Re-run Setup", "secondary", async () => {
+      try {
+        if (!target) throw new Error("No target selected.");
+        await window.desktopApi.setupRepoPages(target.login, target.type);
+        await runPagesBuildPoll();
+        await refreshOnboardingStatus();
+        render();
+      } catch (err) { showError(err); }
+    });
+    rerunSetup.disabled = !status?.isAuthenticated || !target;
+
+    const logout = makeButton("Log out", "danger", async () => {
       await window.desktopApi.logout();
       state.loginFlow.beginData = null;
       await refreshOnboardingStatus();
       render();
     });
-    el.authRow.append(who, logout);
+
+    el.authRow.append(who, reauth, rerunSetup, logout);
     return;
   }
 
-  const loginBtn = button("Login with GitHub", "primary", async () => {
+  const loginBtn = makeButton("Login with GitHub", "primary", async () => {
     try {
       await startLoginFlow();
       await refreshOnboardingStatus();
@@ -132,7 +578,11 @@ function renderOnboarding() {
   const status = state.onboarding;
   el.onboarding.innerHTML = "";
   if (!status) return;
+  // Onboarding steps are surfaced via the workspace dropdown actions, not as cards here
+  if (status.isAuthenticated) return;
 
+  const target = getSelectedTarget();
+  const targetHint = target ? `Target: ${target.login}` : "Target: not selected";
   const steps = [
     {
       title: "Authenticate with GitHub",
@@ -146,23 +596,13 @@ function renderOnboarding() {
       },
     },
     {
-      title: "Create fork + enable Pages",
-      done: status.forkReady && status.pagesReady,
-      actionLabel: status.forkReady && status.pagesReady ? "Re-run Setup" : "Setup",
-      canRun: status.isAuthenticated,
+      title: "Create gw2builds + enable Pages",
+      done: status.repoReady && status.pagesReady,
+      actionLabel: status.repoReady && status.pagesReady ? "Re-run setup" : "Setup",
+      canRun: status.isAuthenticated && Boolean(target),
       action: async () => {
-        await window.desktopApi.setupForkPages();
-        await refreshOnboardingStatus();
-        render();
-      },
-    },
-    {
-      title: "Sync and run local buildsite",
-      done: status.localReady,
-      actionLabel: status.localReady ? "Re-sync" : "Sync",
-      canRun: status.isAuthenticated && status.forkReady && status.pagesReady,
-      action: async () => {
-        await window.desktopApi.syncLocalSite();
+        await window.desktopApi.setupRepoPages(target.login, target.type);
+        await runPagesBuildPoll();
         await refreshOnboardingStatus();
         render();
       },
@@ -171,17 +611,16 @@ function renderOnboarding() {
 
   for (const step of steps) {
     const card = document.createElement("article");
-    card.className = `rounded-lg border p-2 ${step.done ? "border-emerald-500/50 bg-emerald-500/10" : "border-slate-700 bg-slatebrand-900/80"}`;
+    card.className = `status-card ${step.done ? "status-card--done" : ""}`;
     const title = document.createElement("h3");
-    title.className = "text-sm font-medium";
     title.textContent = step.title;
     const body = document.createElement("p");
-    body.className = "mt-1 text-xs text-slate-300";
-    body.textContent = step.done ? "Completed" : "Required";
+    body.textContent =
+      step.title.includes("gw2builds") && !step.done ? targetHint : step.done ? "Completed" : "Required";
     card.append(title, body);
 
     if (step.canRun) {
-      const btn = button(step.actionLabel, "primary", async () => {
+      const btn = makeButton(step.actionLabel, "primary", async () => {
         try {
           btn.disabled = true;
           await step.action();
@@ -191,7 +630,7 @@ function renderOnboarding() {
           btn.disabled = false;
         }
       });
-      btn.classList.add("mt-2");
+      btn.classList.add("mt-8");
       card.append(btn);
     }
     el.onboarding.append(card);
@@ -201,7 +640,7 @@ function renderOnboarding() {
 function renderSetupGate() {
   const status = state.onboarding;
   if (!status) return;
-  const isReady = status.isAuthenticated && status.forkReady && status.pagesReady && status.localReady;
+  const isReady = status.isAuthenticated && status.repoReady && status.pagesReady && status.siteReady;
   if (isReady) {
     el.setupGate.classList.add("hidden");
     return;
@@ -211,30 +650,44 @@ function renderSetupGate() {
   const flow = state.loginFlow;
   const codeBlock = flow.beginData
     ? `
-      <article class="rounded-xl border border-slate-700 bg-slatebrand-900/80 p-4">
-        <h3 class="text-sm font-medium">GitHub Device Code</h3>
-        <p class="mt-1 text-sm text-slate-300">Enter the code displayed in the app or on the device you're signing in to. Never use a code sent by someone else.</p>
-        <div class="mt-3 rounded-lg border border-slate-600 bg-slatebrand-950 px-4 py-3 text-center font-mono text-3xl tracking-[0.3em] text-mint-400">${escapeHtml(flow.beginData.userCode || "")}</div>
-        <div class="mt-3">
-          <button id="copyDeviceCode" class="rounded-md bg-slate-700 px-3 py-1.5 text-xs font-medium text-slate-100 transition hover:bg-slate-600">Copy Code</button>
-        </div>
-        <p class="mt-3 text-xs text-slate-300">Open <a href="${escapeHtml(flow.beginData.verificationUri)}" target="_blank" rel="noreferrer" class="text-skybrand-400 underline">${escapeHtml(flow.beginData.verificationUri)}</a> and approve access.</p>
+      <article class="gate-card">
+        <h3>GitHub Device Code</h3>
+        <p>Approve login at GitHub using this code.</p>
+        <div class="gate-code">${escapeHtml(flow.beginData.userCode || "")}</div>
+        <button id="copyDeviceCode" class="btn btn-secondary">Copy code</button>
+        <p class="gate-link">Open <a href="${escapeHtml(flow.beginData.verificationUri)}" target="_blank" rel="noreferrer">${escapeHtml(flow.beginData.verificationUri)}</a>.</p>
+      </article>
+    `
+    : "";
+  const pollBlock = state.pagesPoll.active
+    ? `
+      <article class="gate-card gate-card--poll">
+        <h3>Waiting For GitHub Pages</h3>
+        <p>Current status: <strong>${escapeHtml(formatPagesStatus(state.pagesPoll.status))}</strong></p>
+        ${state.pagesPoll.error ? `<p class="error-line">${escapeHtml(state.pagesPoll.error)}</p>` : ""}
       </article>
     `
     : "";
 
   el.setupGate.innerHTML = `
-    <div class="mx-auto grid w-full max-w-3xl gap-4 rounded-2xl border border-slate-700 bg-slatebrand-800/80 p-6 shadow-2xl">
+    <div class="gate-shell">
       <div>
-        <h1 class="text-2xl font-semibold">Finish First-Time Setup</h1>
-        <p class="mt-1 text-sm text-slate-300">The app stays locked until authentication, fork/pages setup, and local sync are complete.</p>
+        <h1>Complete First-Time Setup</h1>
+        <p>GW2Builds stays locked until authentication and repository setup are complete.</p>
       </div>
       ${codeBlock}
-      <div id="setupGateSteps" class="grid gap-2"></div>
+      ${pollBlock}
+      <div id="targetPicker"></div>
+      <div id="setupGateSteps" class="gate-steps"></div>
     </div>
   `;
 
+  const picker = el.setupGate.querySelector("#targetPicker");
+  renderTargetPicker(picker);
+
   const host = el.setupGate.querySelector("#setupGateSteps");
+  const target = getSelectedTarget();
+  const targetHint = target ? `Target: ${target.login}` : "Pick a target first.";
   const steps = [
     {
       title: "1. Authenticate with GitHub",
@@ -252,23 +705,13 @@ function renderSetupGate() {
       },
     },
     {
-      title: "2. Create fork and enable Pages",
-      done: status.forkReady && status.pagesReady,
-      actionLabel: status.forkReady && status.pagesReady ? "Re-run Fork + Pages" : "Setup Fork + Pages",
-      canRun: status.isAuthenticated,
+      title: "2. Create gw2builds and enable Pages",
+      done: status.repoReady && status.pagesReady,
+      actionLabel: status.repoReady && status.pagesReady ? "Re-run setup" : "Setup repo + Pages",
+      canRun: status.isAuthenticated && Boolean(target),
       action: async () => {
-        await window.desktopApi.setupForkPages();
-        await refreshOnboardingStatus();
-        render();
-      },
-    },
-    {
-      title: "3. Sync and run local buildsite",
-      done: status.localReady,
-      actionLabel: status.localReady ? "Re-sync Local Buildsite" : "Sync Local Buildsite",
-      canRun: status.isAuthenticated && status.forkReady && status.pagesReady,
-      action: async () => {
-        await window.desktopApi.syncLocalSite();
+        await window.desktopApi.setupRepoPages(target.login, target.type);
+        await runPagesBuildPoll();
         await refreshOnboardingStatus();
         render();
       },
@@ -277,10 +720,10 @@ function renderSetupGate() {
 
   for (const step of steps) {
     const card = document.createElement("article");
-    card.className = `rounded-lg border p-3 ${step.done ? "border-emerald-500/50 bg-emerald-500/10" : "border-slate-700 bg-slatebrand-900/80"}`;
-    card.innerHTML = `<h3 class="text-sm font-medium">${escapeHtml(step.title)}</h3><p class="mt-1 text-xs text-slate-300">${step.done ? "Completed" : "Required"}</p>`;
+    card.className = `status-card ${step.done ? "status-card--done" : ""}`;
+    card.innerHTML = `<h3>${escapeHtml(step.title)}</h3><p>${step.done ? "Completed" : escapeHtml(targetHint)}</p>`;
     if (step.canRun) {
-      const btn = button(step.actionLabel, "primary", async () => {
+      const btn = makeButton(step.actionLabel, "primary", async () => {
         try {
           btn.disabled = true;
           await step.action();
@@ -290,7 +733,7 @@ function renderSetupGate() {
           btn.disabled = false;
         }
       });
-      btn.classList.add("mt-3");
+      btn.classList.add("mt-8");
       card.append(btn);
     }
     host.append(card);
@@ -302,89 +745,2174 @@ function renderSetupGate() {
       await window.desktopApi.writeClipboardText(flow.beginData.userCode);
       copyBtn.textContent = "Copied";
       setTimeout(() => {
-        copyBtn.textContent = "Copy Code";
+        copyBtn.textContent = "Copy code";
       }, 1000);
     });
   }
 }
 
-function renderBuilds() {
-  const filtered = state.builds
-    .filter(matchesQuery)
-    .sort((a, b) => compareBuilds(a, b, state.sortBy));
+function renderTargetPicker(container) {
+  if (!container || !state.targets.length) return;
+  const wrap = document.createElement("div");
+  wrap.className = "target-picker";
+  const label = document.createElement("label");
+  label.textContent = "Repository owner";
+  const host = document.createElement("div");
+  renderCustomSelect(host, {
+    value: state.selectedTarget?.login || state.targets[0]?.login || "",
+    className: "cselect--target",
+    options: state.targets.map((target) => ({
+      value: target.login,
+      label: target.login,
+      meta: String(target.type || "").toUpperCase(),
+      iconText: target.type === "org" ? "O" : "U",
+    })),
+    placeholder: "Select owner",
+    onChange: (login) => {
+      state.selectedTarget = state.targets.find((target) => target.login === String(login)) || null;
+      render();
+    },
+  });
+  label.append(host);
+  wrap.append(label);
+  container.innerHTML = "";
+  container.append(wrap);
+}
+
+function renderBuildList() {
+  const query = state.buildSearch;
+  const visible = state.builds
+    .filter((build) => matchesBuildQuery(build, query))
+    .sort((a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")));
 
   el.buildList.innerHTML = "";
-  if (!filtered.length) {
+  if (!visible.length) {
     const empty = document.createElement("p");
-    empty.className = "rounded-lg border border-slate-700 bg-slatebrand-900/70 p-3 text-sm text-slate-400";
-    empty.textContent = "No builds yet.";
+    empty.className = "empty-line";
+    empty.textContent = "No local builds yet.";
     el.buildList.append(empty);
     return;
   }
 
-  for (const build of filtered) {
+  for (const build of visible) {
     const card = document.createElement("article");
-    card.className = "rounded-lg border border-slate-700 bg-slatebrand-900/80 p-3";
+    const active = build.id && build.id === state.editor.id;
+    const dirtySuffix = active && state.editorDirty ? " | Unsaved edits" : "";
+    card.className = `build-card ${active ? "build-card--active" : ""}`;
     card.innerHTML = `
-      <h3 class="text-sm font-semibold">${escapeHtml(build.title || "Untitled Build")}</h3>
-      <p class="mt-1 text-xs text-slate-300">${escapeHtml(build.profession || "Unknown Profession")} • Updated ${formatDate(build.updatedAt)}</p>
-      <p class="mt-2 line-clamp-3 text-xs text-slate-400">${escapeHtml(build.notes || "")}</p>
+      <h3>${escapeHtml(build.title || "Untitled Build")}</h3>
+      <p>${escapeHtml(build.profession || "Unknown Profession")} | Updated ${escapeHtml(formatDate(build.updatedAt))}${escapeHtml(dirtySuffix)}</p>
     `;
 
     const actions = document.createElement("div");
-    actions.className = "mt-3 grid grid-cols-3 gap-2";
+    actions.className = "build-card__actions";
 
-    const openBtn = button("Open URL", "secondary", () => {
-      if (build.buildUrl) {
-        window.open(build.buildUrl, "_blank", "noopener");
-      }
+    const loadBtn = makeButton("Load", "secondary", async () => {
+      if (!confirmDiscardDirty("Load a different build")) return;
+      await loadBuildIntoEditor(build);
+      render();
     });
-    const publishBtn = button("Publish", "primary", async () => {
-      try {
-        if (!state.user) throw new Error("Log in with GitHub before publishing.");
-        const result = await window.desktopApi.publishBuild(build);
-        window.open(result.htmlUrl, "_blank", "noopener");
-      } catch (err) {
-        showError(err);
-      }
-    });
-    const deleteBtn = button("Delete", "danger", async () => {
+    const deleteBtn = makeButton("Delete", "danger", async () => {
       await window.desktopApi.deleteBuild(build.id);
       await reloadBuilds();
+      if (state.editor.id === build.id) {
+        const next = state.builds[0] || null;
+        if (next) await loadBuildIntoEditor(next);
+        else {
+          const profession = state.professions[0]?.id || "";
+          state.editor = createEmptyEditor(profession);
+          if (profession) {
+            await setProfession(profession, { preserveSelections: false });
+          }
+          captureEditorBaseline();
+        }
+      }
+      render();
     });
-
-    actions.append(openBtn, publishBtn, deleteBtn);
+    actions.append(loadBtn, deleteBtn);
     card.append(actions);
     el.buildList.append(card);
   }
 }
 
-function matchesQuery(build) {
-  if (!state.query) return true;
-  const haystack = [build.title || "", build.profession || "", build.notes || "", ...(build.tags || [])]
-    .join(" ")
-    .toLowerCase();
-  return haystack.includes(state.query);
+const STAT_COMBOS = [
+  { label: "Berserker's",   stats: ["Power", "Precision", "Ferocity"] },
+  { label: "Marauder's",    stats: ["Power", "Precision", "Vitality", "Ferocity"] },
+  { label: "Assassin's",    stats: ["Precision", "Power", "Ferocity"] },
+  { label: "Valkyrie",      stats: ["Power", "Vitality", "Ferocity"] },
+  { label: "Dragon's",      stats: ["Power", "Ferocity", "Vitality", "Precision"] },
+  { label: "Viper's",       stats: ["Power", "ConditionDamage", "Precision", "Expertise"] },
+  { label: "Grieving",      stats: ["Power", "ConditionDamage", "Ferocity", "Precision"] },
+  { label: "Sinister",      stats: ["ConditionDamage", "Power", "Precision"] },
+  { label: "Dire",          stats: ["ConditionDamage", "Toughness", "Vitality"] },
+  { label: "Rabid",         stats: ["ConditionDamage", "Toughness", "Precision"] },
+  { label: "Carrion",       stats: ["ConditionDamage", "Power", "Vitality"] },
+  { label: "Trailblazer's", stats: ["Toughness", "ConditionDamage", "Vitality", "Expertise"] },
+  { label: "Knight's",      stats: ["Toughness", "Power", "Precision"] },
+  { label: "Soldier's",     stats: ["Power", "Toughness", "Vitality"] },
+  { label: "Cleric's",      stats: ["HealingPower", "Toughness", "Power"] },
+  { label: "Minstrel's",    stats: ["Toughness", "HealingPower", "Vitality", "Concentration"] },
+  { label: "Harrier's",     stats: ["Power", "HealingPower", "Concentration"] },
+  { label: "Ritualist's",   stats: ["Vitality", "ConditionDamage", "Expertise", "Concentration"] },
+  { label: "Seraph",        stats: ["Precision", "ConditionDamage", "HealingPower", "Concentration"] },
+  { label: "Zealot's",      stats: ["Power", "Precision", "HealingPower"] },
+  { label: "Celestial",     stats: ["Power", "Precision", "Toughness", "Vitality", "ConditionDamage", "Ferocity", "HealingPower", "Expertise", "Concentration"] },
+];
+
+const SLOT_WEIGHTS = {
+  head:       { p: 60,  s: 43 },
+  shoulders:  { p: 45,  s: 32 },
+  chest:      { p: 134, s: 96 },
+  hands:      { p: 45,  s: 32 },
+  legs:       { p: 90,  s: 64 },
+  feet:       { p: 45,  s: 32 },
+  mainhand1:  { p: 120, s: 85 },
+  offhand1:   { p: 90,  s: 64 },
+  mainhand2:  { p: 120, s: 85 },
+  offhand2:   { p: 90,  s: 64 },
+  back:       { p: 63,  s: 40 },
+  amulet:     { p: 157, s: 108 },
+  ring1:      { p: 126, s: 85 },
+  ring2:      { p: 126, s: 85 },
+  accessory1: { p: 110, s: 74 },
+  accessory2: { p: 110, s: 74 },
+  aquatic1:   { p: 215, s: 154 },
+  aquatic2:   { p: 215, s: 154 },
+};
+
+const EQUIP_ARMOR_SLOTS = [
+  { key: "head",      label: "Head",      icon: "Head_slot.png" },
+  { key: "shoulders", label: "Shoulders", icon: "Shoulder_slot.png" },
+  { key: "chest",     label: "Chest",     icon: "Chest_slot.png" },
+  { key: "hands",     label: "Hands",     icon: "Hand_slot.png" },
+  { key: "legs",      label: "Legs",      icon: "Leg_slot.png" },
+  { key: "feet",      label: "Feet",      icon: "Feet_slot.png" },
+];
+
+const EQUIP_WEAPON_SETS = [
+  [{ key: "mainhand1", label: "Main Hand", hand: "main" }, { key: "offhand1", label: "Off Hand", hand: "off" }],
+  [{ key: "mainhand2", label: "Main Hand", hand: "main" }, { key: "offhand2", label: "Off Hand", hand: "off" }],
+];
+
+const _RW = "https://render.guildwars2.com/file";
+const GW2_WEAPONS = [
+  { id: "axe",        label: "Axe",        hand: "main",    icon: `${_RW}/B13970797CB3ED515913ECC855EC697AC30D4EF1/66723.png` },
+  { id: "dagger",     label: "Dagger",      hand: "either",  icon: `${_RW}/4C630DEC23FB5D92D60F00F4330B6891FDD5C858/66724.png` },
+  { id: "mace",       label: "Mace",        hand: "either",  icon: `${_RW}/0A4FEE0807022155A961E23AD31BC3CFD62D5674/66737.png` },
+  { id: "pistol",     label: "Pistol",      hand: "either",  icon: `${_RW}/3B0702BD5B1956056D037604FB0707140B2C21B9/66738.png` },
+  { id: "sword",      label: "Sword",       hand: "main",    icon: `${_RW}/F5250BCB0AA66105730CAA97E21FD62E9E1F1DB4/66744.png` },
+  { id: "scepter",    label: "Scepter",     hand: "main",    icon: `${_RW}/F6DAAD0C2CA7B7AB3EBAB419EA03CA123CDD57F9/66740.png` },
+  { id: "focus",      label: "Focus",       hand: "off",     icon: `${_RW}/920324A8CC464AC205D62208E75C70CF7FE6A492/63483.png` },
+  { id: "shield",     label: "Shield",      hand: "off",     icon: `${_RW}/ED77E5309C046F0E4C2CBDDC064AE5CAE01B7D79/66741.png` },
+  { id: "torch",      label: "Torch",       hand: "off",     icon: `${_RW}/0DBB98F2690B1A744E49CAD4E5BE940D661299B1/63131.png` },
+  { id: "warhorn",    label: "Warhorn",     hand: "off",     icon: `${_RW}/365E2BE425E494E30CDAF9099D1C39B2FA37331C/66751.png` },
+  { id: "greatsword", label: "Greatsword",  hand: "two",     icon: `${_RW}/F420E407B7FE087204E10619B140E440FF3FEDF7/63052.png` },
+  { id: "hammer",     label: "Hammer",      hand: "two",     icon: `${_RW}/9F2A3E0B0459DECE750DD093742720B1F49E9F9A/66735.png` },
+  { id: "longbow",    label: "Longbow",     hand: "two",     icon: `${_RW}/2060A7375FF7047DEBA8B937E905B541910A71BD/66736.png` },
+  { id: "rifle",      label: "Rifle",       hand: "two",     icon: `${_RW}/1ABCE2FD2BB41590BC1A6654624305A39CBC1626/66739.png` },
+  { id: "shortbow",   label: "Short Bow",   hand: "two",     icon: `${_RW}/F5BDB6EACB072894E577079D6457F40C72927E08/66742.png` },
+  { id: "staff",      label: "Staff",       hand: "two",     icon: `${_RW}/6426AC91389A582D7A0F02F641DDDAD6F8F87F4F/66497.png` },
+  { id: "harpoon",    label: "Harpoon Gun", hand: "aquatic", icon: `${_RW}/DCAD6461D629BBB5417CD8B6170E7CE27EB4DEF8/65195.png` },
+  { id: "spear",      label: "Spear",       hand: "aquatic", icon: `${_RW}/935CD7A5037BB9F3C46E0D770D2DD9730ED74A18/62495.png` },
+  { id: "trident",    label: "Trident",     hand: "aquatic", icon: `${_RW}/B8F4F953BC20F7A7FE9FF7459FD5534F0608730F/574969.png` },
+];
+
+const EQUIP_TRINKET_SLOTS = [
+  { key: "back",       label: "Back",        icon: "Back_slot.png" },
+  { key: "amulet",     label: "Amulet",      icon: "Amulet_slot.png" },
+  { key: "ring1",      label: "Ring 1",      icon: "Trinket_slot.png" },
+  { key: "ring2",      label: "Ring 2",      icon: "Trinket_slot.png" },
+  { key: "accessory1", label: "Accessory 1", icon: "Trinket_slot.png" },
+  { key: "accessory2", label: "Accessory 2", icon: "Trinket_slot.png" },
+];
+
+const EQUIP_UNDERWATER_SLOTS = [
+  { key: "aquatic1", label: "Aquatic 1", icon: null },
+  { key: "aquatic2", label: "Aquatic 2", icon: null },
+];
+
+const PROFESSION_WEIGHT = {
+  Elementalist: "light", Mesmer: "light", Necromancer: "light",
+  Engineer: "medium", Ranger: "medium", Thief: "medium",
+  Guardian: "heavy", Warrior: "heavy", Revenant: "heavy",
+};
+
+const R = "https://render.guildwars2.com/file";
+const LEGENDARY_ARMOR_ICONS = {
+  light: {
+    head:      `${R}/06146C9BD029041178F50B5D9ACD0A76E7051408/1634576.png`,
+    shoulders: `${R}/A77403E5F0EB03E46E686B12297A04707AF50278/1634579.png`,
+    chest:     `${R}/C8FB494379CC98171EFB0F13923CACFD047743B3/1634574.png`,
+    hands:     `${R}/9703DBC0926F6BB4072032E6B55BE593F6B750CD/1634575.png`,
+    legs:      `${R}/65A4D3A41592D10EEABD0BC0D611F13A383B0261/1634577.png`,
+    feet:      `${R}/FD60D4E3986FA46F4FEBB8131B65159195260B19/1634578.png`,
+  },
+  medium: {
+    head:      `${R}/49092A1358E528DEC67EFA1C090546ED034642E2/1634588.png`,
+    shoulders: `${R}/CF7609512FC6527D805F2B74F26AF4549FF4E808/1634591.png`,
+    chest:     `${R}/57360F35D1210D12010F6AE772382450A07D08F6/1634586.png`,
+    hands:     `${R}/C57E5E5FA69261A2503CBB50080A6C023A155C49/1634587.png`,
+    legs:      `${R}/EBD907C061747927AE062D1B41BC13D0EAF14AD5/1634589.png`,
+    feet:      `${R}/BF4C6A48BA02BD6D6AC32F1E9C3F32A50399E336/1634590.png`,
+  },
+  heavy: {
+    head:      `${R}/2695A8E44B7F07EF15A20857790EFCA91513F5F0/1634565.png`,
+    shoulders: `${R}/0F0F4BE73C9316BAA4956A3AA622CB0AE84D9CEA/1634567.png`,
+    chest:     `${R}/DACF9B1ACBE8687B6B31ABC0CF295301120D7A67/1634563.png`,
+    hands:     `${R}/A5DD0D661970F02CC26D04B510C7C94259B99520/1634564.png`,
+    legs:      `${R}/EA9294557C175A43567906721E43962EC4B12D34/1634566.png`,
+    feet:      `${R}/E895D40AE0D1A500FFFDB955C27A98FF687AA4C1/1634562.png`,
+  },
+};
+
+const GW2_RELICS = [
+  { label: "Relic of Akeem",               icon: "https://render.guildwars2.com/file/594C437E9606A167F4F372BCEB0C2B7C7828037B/3122330.png" },
+  { label: "Relic of Antitoxin",           icon: "https://render.guildwars2.com/file/61C74AAFED48CF9AD4BBCAD89F902654EA02B2AE/3122331.png" },
+  { label: "Relic of Cerus",               icon: "https://render.guildwars2.com/file/656FCA9408A0FFDB35A3CE20311E0F66423F026B/3122337.png" },
+  { label: "Relic of Dagda",               icon: "https://render.guildwars2.com/file/CA28F7BFEA1B695DD19204E455BA270D334EE307/3122340.png" },
+  { label: "Relic of Durability",          icon: "https://render.guildwars2.com/file/A8F61493030863CAB537780398D64D80554D959D/3122345.png" },
+  { label: "Relic of Dwayna",              icon: "https://render.guildwars2.com/file/CBBD4FAFCC3568ACA04F9901162FE7C0747C1E9B/3122346.png" },
+  { label: "Relic of Evasion",             icon: "https://render.guildwars2.com/file/19296379D120EF9FF10EE0B0CDD7711DA5E7A9AF/3122347.png" },
+  { label: "Relic of Febe",                icon: "https://render.guildwars2.com/file/3B063D0B0BA20A0530086595F367F0149D9679F2/3187628.png" },
+  { label: "Relic of Fireworks",           icon: "https://render.guildwars2.com/file/2999CCF7C94267B2EE3DDA7459050864622927C9/3122349.png" },
+  { label: "Relic of Isgarren",            icon: "https://render.guildwars2.com/file/5FB808F04E427650A84031E46B632DC292A3583F/3122354.png" },
+  { label: "Relic of Karakosa",            icon: "https://render.guildwars2.com/file/DD034A0B53355503350F07CCFFE5CC06A90F41D9/3187629.png" },
+  { label: "Relic of Leadership",          icon: "https://render.guildwars2.com/file/077C30D957D30B0D282BB21199A193A2D74971DF/3122356.png" },
+  { label: "Relic of Lyhr",               icon: "https://render.guildwars2.com/file/FE580A90C9E4513D062A148045F933C7F3C557E3/3122357.png" },
+  { label: "Relic of Mabon",              icon: "https://render.guildwars2.com/file/49481C31650D384B68A1BFB53DC1A39F2AE4AD56/3122358.png" },
+  { label: "Relic of Mercy",              icon: "https://render.guildwars2.com/file/1AA33B5654D3E7F91B9065BA6D0F1EB6AA755AFF/3122359.png" },
+  { label: "Relic of Nayos",              icon: "https://render.guildwars2.com/file/EA382BAFD541080F71D5530893CC7E069165EA0C/3187631.png" },
+  { label: "Relic of Nourys",             icon: "https://render.guildwars2.com/file/9B47CEBB551B7C5E7A961AB45361E292074E0823/3187632.png" },
+  { label: "Relic of Peitha",             icon: "https://render.guildwars2.com/file/949A6A4179F514FCDEF3AC3D9C292B38D5E0047D/3122365.png" },
+  { label: "Relic of Resistance",         icon: "https://render.guildwars2.com/file/C3A39C916063067E190EE5D42D6CAC2018385F44/3122367.png" },
+  { label: "Relic of Speed",              icon: "https://render.guildwars2.com/file/15B07C1813B63DFD27A6A8A5E36CF1BC50DB0562/3122369.png" },
+  { label: "Relic of Surging",            icon: "https://render.guildwars2.com/file/755D9F3BA1C2C42CDAEBF59BBF4564B77ADC105D/3592840.png" },
+  { label: "Relic of Vampirism",          icon: "https://render.guildwars2.com/file/349D3B9098A1EB445E00C45E70B892E8CFE3762C/3592842.png" },
+  { label: "Relic of Vass",               icon: "https://render.guildwars2.com/file/21D7FDF1DD4EAD33DBC01F11D80E48AD3370FDE6/3122374.png" },
+  { label: "Relic of the Adventurer",     icon: "https://render.guildwars2.com/file/9A76D8C27FCAB8F66D0DC531906808B134D80EAD/3122328.png" },
+  { label: "Relic of the Afflicted",      icon: "https://render.guildwars2.com/file/3B1DA625E3DF0591087E62F12E5301C1D8D6EDC0/3122329.png" },
+  { label: "Relic of the Aristocracy",    icon: "https://render.guildwars2.com/file/BCC01F0B6616FE26ED4BE159532A6A6FBD0EA2D8/3122332.png" },
+  { label: "Relic of the Astral Ward",    icon: "https://render.guildwars2.com/file/57A961A8ADFE279BC4F124A40CC4B5646BC8035F/3161446.png" },
+  { label: "Relic of the Brawler",        icon: "https://render.guildwars2.com/file/2B5297A932F55DA3BDDD0A39C9CB0D9CF70244A1/3122334.png" },
+  { label: "Relic of the Cavalier",       icon: "https://render.guildwars2.com/file/C3AFC50F654E2749ADD9033CE007033F6F9B0D7A/3122335.png" },
+  { label: "Relic of the Centaur",        icon: "https://render.guildwars2.com/file/59551CFA6F4AB3D678370651ABF20D5F69B949D5/3122336.png" },
+  { label: "Relic of the Chronomancer",   icon: "https://render.guildwars2.com/file/C209ABF01D7429EC09354E2E0BBF9DB14EBDD613/3122338.png" },
+  { label: "Relic of the Citadel",        icon: "https://render.guildwars2.com/file/B21C5A6DFCDB0A729358A22CA76547150E7C541E/3122339.png" },
+  { label: "Relic of the Daredevil",      icon: "https://render.guildwars2.com/file/29FE690460A037C7FAC3C71903BA1EBECB204012/3122341.png" },
+  { label: "Relic of the Deadeye",        icon: "https://render.guildwars2.com/file/060151B961CE56CB9546E7B6AF33B0A318426372/3122342.png" },
+  { label: "Relic of the Defender",       icon: "https://render.guildwars2.com/file/E854AFDE03F40ED335C0A30DE90BD9973612BD75/3122343.png" },
+  { label: "Relic of the Demon Queen",    icon: "https://render.guildwars2.com/file/D0C6F322473F2A0F6C65FBD3B21733777BB14015/3187627.png" },
+  { label: "Relic of the Dragonhunter",   icon: "https://render.guildwars2.com/file/F61EEC535059F1FA027049AB4DEFCD5465405DB7/3122344.png" },
+  { label: "Relic of the Earth",          icon: "https://render.guildwars2.com/file/EBB3060FF2E9A10CECC3F1B2CAC0213AE9D93337/3592833.png" },
+  { label: "Relic of the Firebrand",      icon: "https://render.guildwars2.com/file/4E4F4AA81DB63D9D9BB4BF3757D0750E935701F7/3122348.png" },
+  { label: "Relic of the Flock",          icon: "https://render.guildwars2.com/file/2F7AE267BA29B35DEC7F2C0FCE5C30D806E31E0D/3122350.png" },
+  { label: "Relic of the Fractal",        icon: "https://render.guildwars2.com/file/B2D409644147BF18935A95A52505ABCB9EECE142/3122351.png" },
+  { label: "Relic of the Golemancer",     icon: "https://render.guildwars2.com/file/13412697BB6AD89F2E6ED97A750873C0BB35AA9A/3592835.png" },
+  { label: "Relic of the Herald",         icon: "https://render.guildwars2.com/file/DE62250A48F802DD09A1FAFF0D2BA804EA29A3B9/3122352.png" },
+  { label: "Relic of the Holosmith",      icon: "https://render.guildwars2.com/file/0976F60805023D2F14DA6CC72F55F3D64407C7AF/3592836.png" },
+  { label: "Relic of the Ice",            icon: "https://render.guildwars2.com/file/5E0E012F921D3D5D364BFEFC04D7BEF1DC5B52F7/3122353.png" },
+  { label: "Relic of the Krait",          icon: "https://render.guildwars2.com/file/645EFCBFFBB7B1C6630CBB7C0FB268CA27B703AC/3122355.png" },
+  { label: "Relic of the Lich",           icon: "https://render.guildwars2.com/file/045D16259918EFA90A76B4D1B1400AA8D9CC0D4B/3592837.png" },
+  { label: "Relic of the Midnight King",  icon: "https://render.guildwars2.com/file/C0602C3D27B10AC815D4B9F0DF0E4C3D23D12E9F/3187630.png" },
+  { label: "Relic of the Mirage",         icon: "https://render.guildwars2.com/file/5FCA620E77D3D5022ADC70C1191F0B154AB13827/3122360.png" },
+  { label: "Relic of the Monk",           icon: "https://render.guildwars2.com/file/6C340014C525FEF8089AC6DAD03662637A5B07CA/3122361.png" },
+  { label: "Relic of the Necromancer",    icon: "https://render.guildwars2.com/file/B20C589B0915915F5AB55BDA6EC52670B29706F2/3122362.png" },
+  { label: "Relic of the Nightmare",      icon: "https://render.guildwars2.com/file/74940C36779745CBA9DDD56CDF6CBAC1CEA8179F/3122363.png" },
+  { label: "Relic of the Ogre",           icon: "https://render.guildwars2.com/file/633231B05DC3D1D44003DAA891400C4624180D17/3592838.png" },
+  { label: "Relic of the Pack",           icon: "https://render.guildwars2.com/file/26503D1FF7BA354058789E371992A7500B3AA89B/3122364.png" },
+  { label: "Relic of the Privateer",      icon: "https://render.guildwars2.com/file/9CE01CF33B943BCC3FABD8491073DE0AD63F340C/3592839.png" },
+  { label: "Relic of the Reaper",         icon: "https://render.guildwars2.com/file/AFDAA23D3C61F202225DDFA7C17F420C5368BBB8/3122366.png" },
+  { label: "Relic of the Scourge",        icon: "https://render.guildwars2.com/file/0802B36898A6EB0C77D20FD4F3DFD0A2270A3ECD/3122368.png" },
+  { label: "Relic of the Sunless",        icon: "https://render.guildwars2.com/file/CEF1E6DA2DBF143661DF26E668034A621812B61A/3122370.png" },
+  { label: "Relic of the Thief",          icon: "https://render.guildwars2.com/file/3523AC08EB04347CF371E9A91F4B985D12FB4ED3/3122371.png" },
+  { label: "Relic of the Trooper",        icon: "https://render.guildwars2.com/file/500CB9B12FED6948EB74FAF299726007002BDFBA/3122372.png" },
+  { label: "Relic of the Unseen Invasion",icon: "https://render.guildwars2.com/file/0CAF5ACE9D4ABEFF3EF2DE0DB47D57A8AB3CABB3/3122373.png" },
+  { label: "Relic of the Warrior",        icon: "https://render.guildwars2.com/file/1D3CF82C05450A605921F6EB9D0AC23421C9CFA5/3122375.png" },
+  { label: "Relic of the Water",          icon: "https://render.guildwars2.com/file/A202CF0CF4314C049B16A89A595CCC9534B0A90E/3122376.png" },
+  { label: "Relic of the Weaver",         icon: "https://render.guildwars2.com/file/12997110B0509463DD9F1364A92493B2C4309BE1/3122377.png" },
+  { label: "Relic of the Wizard's Tower", icon: "https://render.guildwars2.com/file/0C0EE407B9DAA44438ED6C2DCDA4EEB30953DF1B/3122378.png" },
+  { label: "Relic of the Zephyrite",      icon: "https://render.guildwars2.com/file/070E32046C250E32DA76F2CBDFC504D6C0AB0344/3122379.png" },
+];
+
+const _WK = "https://wiki.guildwars2.com/images";
+const PROFESSION_CONCEPT_ART = {
+  Elementalist: `${_WK}/5/5e/Elementalist_04_concept_art.png`,
+  Mesmer:       `${_WK}/4/4a/Mesmer_04_concept_art.png`,
+  Necromancer:  `${_WK}/4/43/Necromancer_04_concept_art.png`,
+  Guardian:     `${_WK}/8/88/Guardian_04_concept_art.png`,
+  Warrior:      `${_WK}/5/56/Warrior_04_concept_art.png`,
+  Ranger:       `${_WK}/f/f5/Ranger_04_concept_art.png`,
+  Thief:        `${_WK}/3/35/Thief_04_concept_art.png`,
+  Engineer:     `${_WK}/e/e5/Engineer_04_concept_art.png`,
+  Revenant:     `${_WK}/1/18/Revenant_02_concept_art.jpg`,
+};
+
+function computeSlotStats(comboLabel, slotKey) {
+  const combo = STAT_COMBOS.find((c) => c.label === comboLabel);
+  const w = SLOT_WEIGHTS[slotKey];
+  if (!combo || !w) return [];
+  const n = combo.stats.length;
+  const result = [];
+  if (n <= 3) {
+    result.push({ stat: combo.stats[0], value: w.p });
+    for (let i = 1; i < n; i++) result.push({ stat: combo.stats[i], value: w.s });
+  } else if (n === 4) {
+    result.push({ stat: combo.stats[0], value: Math.round(w.p * 0.895) });
+    result.push({ stat: combo.stats[1], value: Math.round(w.s * 0.889) });
+    result.push({ stat: combo.stats[2], value: Math.round(w.s * 0.889) });
+    result.push({ stat: combo.stats[3], value: Math.round(w.p * 0.452) });
+  } else {
+    const each = Math.round((w.p + 2 * w.s) / n);
+    for (const stat of combo.stats) result.push({ stat, value: each });
+  }
+  return result;
 }
 
-function compareBuilds(a, b, sortBy) {
-  if (sortBy === "title") return (a.title || "").localeCompare(b.title || "");
-  if (sortBy === "profession") return (a.profession || "").localeCompare(b.profession || "");
-  if (sortBy === "created") return (b.createdAt || "").localeCompare(a.createdAt || "");
-  return (b.updatedAt || "").localeCompare(a.updatedAt || "");
+function computeEquipmentStats() {
+  const slots = state.editor.equipment?.slots || {};
+  const totals = {
+    Power: 1000, Precision: 1000, Toughness: 1000, Vitality: 1000,
+    Ferocity: 0, ConditionDamage: 0, Expertise: 0, Concentration: 0, HealingPower: 0,
+  };
+  for (const [slotKey, comboLabel] of Object.entries(slots)) {
+    if (!comboLabel) continue;
+    const combo = STAT_COMBOS.find((c) => c.label === comboLabel);
+    const w = SLOT_WEIGHTS[slotKey];
+    if (!combo || !w) continue;
+    const n = combo.stats.length;
+    if (n <= 3) {
+      totals[combo.stats[0]] = (totals[combo.stats[0]] || 0) + w.p;
+      for (let i = 1; i < combo.stats.length; i++) {
+        totals[combo.stats[i]] = (totals[combo.stats[i]] || 0) + w.s;
+      }
+    } else if (n === 4) {
+      totals[combo.stats[0]] = (totals[combo.stats[0]] || 0) + Math.round(w.p * 0.895);
+      totals[combo.stats[1]] = (totals[combo.stats[1]] || 0) + Math.round(w.s * 0.889);
+      totals[combo.stats[2]] = (totals[combo.stats[2]] || 0) + Math.round(w.s * 0.889);
+      totals[combo.stats[3]] = (totals[combo.stats[3]] || 0) + Math.round(w.p * 0.452);
+    } else {
+      const each = Math.round((w.p + 2 * w.s) / n);
+      for (const stat of combo.stats) {
+        totals[stat] = (totals[stat] || 0) + each;
+      }
+    }
+  }
+  return totals;
+}
+
+let _slotPickerEl = null;
+let _slotPickerCleanup = null;
+let _connectorRafId = 0;
+
+function closeSlotPicker() {
+  if (_slotPickerEl) { _slotPickerEl.remove(); _slotPickerEl = null; }
+  if (_slotPickerCleanup) { _slotPickerCleanup(); _slotPickerCleanup = null; }
+}
+
+function openSlotPicker(anchorEl, currentValue, onSelect, { items = null, searchPlaceholder = "Search stats…" } = {}) {
+  closeSlotPicker();
+
+  const picker = document.createElement("div");
+  picker.className = "slot-picker";
+
+  const search = document.createElement("input");
+  search.type = "search";
+  search.className = "slot-picker__search";
+  search.placeholder = searchPlaceholder;
+  search.autocomplete = "off";
+
+  const list = document.createElement("div");
+  list.className = "slot-picker__list";
+
+  const allOptions = items ?? [
+    { value: "", label: "— Empty —", subtitle: "" },
+    ...STAT_COMBOS.map((c) => ({ value: c.label, label: c.label, subtitle: c.stats.join(" · ") })),
+  ];
+
+  function renderPickerList(query) {
+    list.innerHTML = "";
+    const q = query.trim().toLowerCase();
+    const filtered = allOptions.filter((o) => !q || o.label.toLowerCase().includes(q) || (o.subtitle || "").toLowerCase().includes(q));
+    for (const opt of filtered) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "slot-picker__option" + (opt.value === currentValue ? " slot-picker__option--selected" : "");
+      if (opt.icon) {
+        const img = document.createElement("img");
+        img.className = "slot-picker__icon";
+        img.src = opt.icon;
+        img.alt = "";
+        img.draggable = false;
+        img.addEventListener("error", () => img.remove());
+        btn.append(img);
+      }
+      const text = document.createElement("span");
+      text.className = "slot-picker__text";
+      if (opt.subtitle) {
+        text.innerHTML = `<span class="slot-picker__name">${escapeHtml(opt.label)}</span><span class="slot-picker__stats">${escapeHtml(opt.subtitle)}</span>`;
+      } else {
+        text.innerHTML = `<span class="slot-picker__name">${escapeHtml(opt.label)}</span>`;
+      }
+      btn.append(text);
+      btn.addEventListener("click", () => { onSelect(opt.value); closeSlotPicker(); });
+      list.append(btn);
+    }
+  }
+
+  renderPickerList("");
+  search.addEventListener("input", () => renderPickerList(search.value));
+  picker.append(search, list);
+  document.body.append(picker);
+  _slotPickerEl = picker;
+
+  const rect = anchorEl.getBoundingClientRect();
+  const pickerW = Math.max(rect.width, 250);
+  const spaceBelow = window.innerHeight - rect.bottom;
+  picker.style.position = "fixed";
+  picker.style.left = `${Math.min(rect.left, window.innerWidth - pickerW - 8)}px`;
+  picker.style.width = `${pickerW}px`;
+  if (spaceBelow >= 260 || spaceBelow >= rect.top) {
+    picker.style.top = `${rect.bottom + 4}px`;
+    picker.style.maxHeight = `${Math.min(300, spaceBelow - 8)}px`;
+  } else {
+    picker.style.bottom = `${window.innerHeight - rect.top + 4}px`;
+    picker.style.maxHeight = `${Math.min(300, rect.top - 8)}px`;
+  }
+
+  requestAnimationFrame(() => search.focus());
+
+  const onOutside = (e) => { if (!picker.contains(e.target) && !anchorEl.contains(e.target)) closeSlotPicker(); };
+  const onEsc = (e) => { if (e.key === "Escape") closeSlotPicker(); };
+  setTimeout(() => {
+    document.addEventListener("pointerdown", onOutside);
+    document.addEventListener("keydown", onEsc);
+  }, 0);
+  _slotPickerCleanup = () => {
+    document.removeEventListener("pointerdown", onOutside);
+    document.removeEventListener("keydown", onEsc);
+  };
+}
+
+function renderEquipmentPanel() {
+  const panel = el.equipmentPanel;
+  if (!panel) return;
+  closeSlotPicker();
+  panel.innerHTML = "";
+
+  const equip = state.editor.equipment;
+  const slots = equip.slots || {};
+  const weapons = equip.weapons || {};
+
+  function makeSlot(slotDef, { compact = false } = {}) {
+    const currentCombo = slots[slotDef.key] || "";
+    const wrapper = document.createElement("div");
+    wrapper.className = "equip-slot" + (compact ? " equip-slot--compact" : "");
+    wrapper.setAttribute("role", "button");
+    wrapper.tabIndex = 0;
+
+    const icon = document.createElement("div");
+    icon.className = "equip-slot__icon" + (currentCombo ? " equip-slot__icon--filled" : "");
+    const legendaryUrl = (() => {
+      if (!currentCombo) return null;
+      const prof = state.editor.profession;
+      const weight = PROFESSION_WEIGHT[prof];
+      return weight ? (LEGENDARY_ARMOR_ICONS[weight]?.[slotDef.key] ?? null) : null;
+    })();
+    const imgSrc = legendaryUrl
+      ? legendaryUrl
+      : slotDef.icon
+        ? `https://wiki.guildwars2.com/wiki/Special:FilePath/${slotDef.icon}`
+        : null;
+    if (imgSrc) {
+      const img = document.createElement("img");
+      img.src = imgSrc;
+      img.alt = slotDef.label;
+      img.draggable = false;
+      img.addEventListener("error", () => { img.remove(); });
+      icon.append(img);
+    }
+
+    const info = document.createElement("div");
+    info.className = "equip-slot__info";
+
+    const labelEl = document.createElement("div");
+    labelEl.className = "equip-slot__label";
+    labelEl.textContent = slotDef.label;
+
+    const valueEl = document.createElement("div");
+    valueEl.className = "equip-slot__value" + (currentCombo ? "" : " equip-slot__value--empty");
+    if (currentCombo) {
+      const combo = STAT_COMBOS.find((c) => c.label === currentCombo);
+      valueEl.innerHTML = `<span class="equip-slot__combo-name">${escapeHtml(currentCombo)}</span>${combo ? `<span class="equip-slot__combo-stats">${combo.stats.join(" · ")}</span>` : ""}`;
+    } else {
+      valueEl.textContent = "Select stats…";
+    }
+
+    info.append(labelEl, valueEl);
+    wrapper.append(icon, info);
+
+    const doOpen = () => openSlotPicker(wrapper, currentCombo, (newVal) => {
+      state.editor.equipment.slots[slotDef.key] = newVal || "";
+      markEditorChanged();
+      renderEquipmentPanel();
+    });
+    wrapper.addEventListener("click", doOpen);
+    wrapper.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); doOpen(); } });
+
+    bindHoverPreview(wrapper, "equip-stat", () => {
+      if (!currentCombo) return null;
+      const combo = STAT_COMBOS.find((c) => c.label === currentCombo);
+      if (!combo) return null;
+      const facts = computeSlotStats(currentCombo, slotDef.key)
+        .map(({ stat, value }) => ({ text: stat, value: `+${value}` }));
+      return { name: combo.label, icon: imgSrc, description: "", facts, slot: slotDef.label };
+    });
+
+    return wrapper;
+  }
+
+  function makeWeaponSlot(slotDef) {
+    const isOffhand = slotDef.hand === "off";
+    const mainhandKey = slotDef.key.replace("offhand", "mainhand");
+    const mainhoodWeapon = GW2_WEAPONS.find((w) => w.id === weapons[mainhandKey]);
+    const lockedByTwoHanded = isOffhand && mainhoodWeapon?.hand === "two";
+
+    const currentWeapon = weapons[slotDef.key] || "";
+    const currentCombo = slots[slotDef.key] || "";
+    const weaponDef = GW2_WEAPONS.find((w) => w.id === currentWeapon);
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "equip-slot equip-slot--weapon" + (lockedByTwoHanded ? " equip-slot--disabled" : "");
+
+    // Weapon type button (left side: icon + name)
+    const weaponBtn = document.createElement("button");
+    weaponBtn.type = "button";
+    weaponBtn.className = "equip-weapon-type-btn";
+    weaponBtn.disabled = lockedByTwoHanded;
+
+    const iconDiv = document.createElement("div");
+    iconDiv.className = "equip-slot__icon equip-slot__icon--weapon" + (currentWeapon ? " equip-slot__icon--filled" : "");
+    if (weaponDef) {
+      const img = document.createElement("img");
+      img.src = weaponDef.icon;
+      img.alt = weaponDef.label;
+      img.draggable = false;
+      img.addEventListener("error", () => { img.remove(); });
+      iconDiv.append(img);
+    }
+    const weaponNameSpan = document.createElement("span");
+    weaponNameSpan.className = "equip-weapon-name" + (currentWeapon ? "" : " equip-weapon-name--empty");
+    weaponNameSpan.textContent = lockedByTwoHanded
+      ? "— Two-Handed —"
+      : (weaponDef?.label || slotDef.label);
+
+    weaponBtn.append(iconDiv, weaponNameSpan);
+
+    // Stat button (right side)
+    const statBtn = document.createElement("button");
+    statBtn.type = "button";
+    statBtn.className = "equip-stat-pick-btn" + (currentCombo ? "" : " equip-stat-pick-btn--empty");
+    statBtn.disabled = lockedByTwoHanded;
+    if (currentCombo) {
+      const combo = STAT_COMBOS.find((c) => c.label === currentCombo);
+      statBtn.innerHTML = `<span class="equip-slot__combo-name">${escapeHtml(currentCombo)}</span>${combo ? `<span class="equip-slot__combo-stats">${combo.stats.join(" · ")}</span>` : ""}`;
+    } else {
+      statBtn.textContent = "Select stats…";
+    }
+
+    wrapper.append(weaponBtn, statBtn);
+
+    bindHoverPreview(weaponBtn, "equip-weapon", () => {
+      const wDef = GW2_WEAPONS.find((w) => w.id === (equip.weapons?.[slotDef.key] || ""));
+      if (!wDef) return null;
+      return { name: wDef.label, icon: wDef.icon, description: "", hand: wDef.hand };
+    });
+
+    bindHoverPreview(statBtn, "equip-stat", () => {
+      const curCombo = equip.slots?.[slotDef.key] || "";
+      const combo = curCombo ? STAT_COMBOS.find((c) => c.label === curCombo) : null;
+      if (!combo) return null;
+      const facts = computeSlotStats(curCombo, slotDef.key).map(({ stat, value }) => ({ text: stat, value: `+${value}` }));
+      return { name: combo.label, icon: "", description: "", facts, slot: slotDef.label };
+    });
+
+    if (!lockedByTwoHanded) {
+      // Filter weapons for this slot type
+      const allowedHands = isOffhand ? ["off", "either"] : ["main", "either", "two"];
+      const weaponItems = [
+        { value: "", label: "— Empty —", subtitle: "" },
+        ...GW2_WEAPONS.filter((w) => allowedHands.includes(w.hand))
+          .map((w) => ({ value: w.id, label: w.label, subtitle: w.hand === "two" ? "Two-handed" : "", icon: w.icon })),
+      ];
+      weaponBtn.addEventListener("click", () => {
+        openSlotPicker(weaponBtn, currentWeapon, (newVal) => {
+          if (!equip.weapons) equip.weapons = {};
+          equip.weapons[slotDef.key] = newVal || "";
+          // If two-handed selected for mainhand, clear the offhand weapon
+          const newWeaponDef = GW2_WEAPONS.find((w) => w.id === newVal);
+          if (newWeaponDef?.hand === "two") {
+            const ofKey = slotDef.key.replace("mainhand", "offhand");
+            equip.weapons[ofKey] = "";
+            equip.slots[ofKey] = "";
+          }
+          markEditorChanged();
+          renderEquipmentPanel();
+        }, { items: weaponItems, searchPlaceholder: "Search weapons…" });
+      });
+
+      statBtn.addEventListener("click", () => {
+        openSlotPicker(statBtn, currentCombo, (newVal) => {
+          equip.slots[slotDef.key] = newVal || "";
+          markEditorChanged();
+          renderEquipmentPanel();
+        });
+      });
+    }
+
+    return wrapper;
+  }
+
+  function makeSection(title, fillSlotKeys) {
+    const section = document.createElement("div");
+    section.className = "equip-section panel";
+    const head = document.createElement("div");
+    head.className = "equip-section__head";
+    const titleEl = document.createElement("span");
+    titleEl.textContent = title;
+    head.append(titleEl);
+    if (fillSlotKeys && fillSlotKeys.length) {
+      const fillBtn = document.createElement("button");
+      fillBtn.type = "button";
+      fillBtn.className = "equip-fill-btn";
+      fillBtn.textContent = "Fill All";
+      fillBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openSlotPicker(fillBtn, "", (newVal) => {
+          if (newVal === "") return;
+          for (const key of fillSlotKeys) state.editor.equipment.slots[key] = newVal;
+          markEditorChanged();
+          renderEquipmentPanel();
+        });
+      });
+      head.append(fillBtn);
+    }
+    section.append(head);
+    return section;
+  }
+
+  function makeTextInput(labelText, value, placeholder, onChange) {
+    const label = document.createElement("label");
+    label.className = "equip-text-label";
+    const span = document.createElement("span");
+    span.textContent = labelText;
+    const input = document.createElement("input");
+    input.type = "text";
+    input.value = value || "";
+    input.placeholder = placeholder;
+    input.addEventListener("input", () => onChange(input.value));
+    label.append(span, input);
+    return label;
+  }
+
+  // === LEFT COLUMN ===
+  const leftCol = document.createElement("div");
+  leftCol.className = "equip-col equip-col--left";
+
+  // Armor
+  const armorSection = makeSection("Armor", EQUIP_ARMOR_SLOTS.map((s) => s.key));
+  for (const slotDef of EQUIP_ARMOR_SLOTS) armorSection.append(makeSlot(slotDef));
+  leftCol.append(armorSection);
+
+  // Weapons
+  const weaponSection = makeSection("Weapons");
+  EQUIP_WEAPON_SETS.forEach((setSlots, i) => {
+    const setLabel = document.createElement("div");
+    setLabel.className = "equip-set-label";
+    setLabel.textContent = `Set ${i + 1}`;
+    weaponSection.append(setLabel);
+    for (const slotDef of setSlots) weaponSection.append(makeWeaponSlot(slotDef));
+  });
+  leftCol.append(weaponSection);
+
+  // Consumables
+  const consumeSection = makeSection("Consumables");
+  consumeSection.append(
+    makeTextInput("Food", equip.food, "Peppercorn-Crusted Sous-Vide Steak", (v) => { equip.food = v; markEditorChanged(); }),
+    makeTextInput("Utility", equip.utility, "Superior Sharpening Stone", (v) => { equip.utility = v; markEditorChanged(); }),
+  );
+  leftCol.append(consumeSection);
+
+  // Notes
+  const notesSection = makeSection("Notes");
+  const notesTA = document.createElement("textarea");
+  notesTA.id = "notesInput";
+  notesTA.className = "equip-notes";
+  notesTA.rows = 4;
+  notesTA.value = state.editor.notes || "";
+  notesTA.placeholder = "Combo priorities, matchup notes, rotation...";
+  notesTA.addEventListener("input", () => {
+    state.editor.notes = notesTA.value;
+    markEditorChanged({ updateBuildList: true });
+  });
+  notesSection.append(notesTA);
+  leftCol.append(notesSection);
+
+  // === RIGHT COLUMN ===
+  const rightCol = document.createElement("div");
+  rightCol.className = "equip-col equip-col--right";
+
+  // Attributes
+  const statsSection = makeSection("Attributes");
+  const computed = computeEquipmentStats();
+  const professionName = state.editor.profession;
+  const baseHP = PROFESSION_BASE_HP[professionName] || 9212;
+  const health = baseHP + (computed.Vitality || 0) * 10;
+  const critChance = Math.min(100, 5 + ((computed.Precision || 1000) - 895) / 21.0);
+  const critDamage = 150 + (computed.Ferocity || 0) / 15.0;
+  const condDuration = (computed.Expertise || 0) / 15.0;
+  const boonDuration = (computed.Concentration || 0) / 15.0;
+
+  const statRows = [
+    { stat: "Power",           value: computed.Power },
+    { stat: "Precision",       value: computed.Precision,       derived: "Crit Chance",      derivedVal: `${critChance.toFixed(1)}%` },
+    { stat: "Toughness",       value: computed.Toughness },
+    { stat: "Vitality",        value: computed.Vitality,        derived: "Health",            derivedVal: health.toLocaleString() },
+    { stat: "Ferocity",        value: computed.Ferocity,        derived: "Crit Damage",       derivedVal: `${critDamage.toFixed(0)}%` },
+    { stat: "Condition Dmg",   value: computed.ConditionDamage },
+    { stat: "Expertise",       value: computed.Expertise,       derived: "Cond. Duration",    derivedVal: `${condDuration.toFixed(1)}%` },
+    { stat: "Concentration",   value: computed.Concentration,   derived: "Boon Duration",     derivedVal: `${boonDuration.toFixed(1)}%` },
+    { stat: "Healing Power",   value: computed.HealingPower },
+  ];
+
+  const statsGrid = document.createElement("div");
+  statsGrid.className = "equip-stats";
+  for (const row of statRows) {
+    const rowEl = document.createElement("div");
+    rowEl.className = "equip-stat-row";
+
+    const leftEl = document.createElement("div");
+    leftEl.className = "equip-stat-cell";
+    leftEl.innerHTML = `<span class="equip-stat-label">${row.stat}</span><span class="equip-stat-value">${(row.value || 0).toLocaleString()}</span>`;
+
+    rowEl.append(leftEl);
+
+    if (row.derived) {
+      const rightEl = document.createElement("div");
+      rightEl.className = "equip-stat-cell equip-stat-cell--derived";
+      rightEl.innerHTML = `<span class="equip-stat-label">${row.derived}</span><span class="equip-stat-value equip-stat-value--derived">${row.derivedVal}</span>`;
+      rowEl.append(rightEl);
+    }
+
+    statsGrid.append(rowEl);
+  }
+  statsSection.append(statsGrid);
+  rightCol.append(statsSection);
+
+  // Upgrades (rune only now — relic moved to trinkets row)
+  const upgradesSection = makeSection("Upgrades");
+  upgradesSection.append(
+    makeTextInput("Rune", equip.runeSet, "Rune of the Scholar", (v) => { equip.runeSet = v; markEditorChanged(); }),
+  );
+  rightCol.append(upgradesSection);
+
+  // Trinkets — row1 (4 cols): Back, Accessory 1, Accessory 2, Relic
+  //            row2 (3 cols): Amulet, Ring 1, Ring 2
+  const relicItems = [
+    { value: "", label: "— None —" },
+    ...GW2_RELICS.map((r) => ({ value: r.label, label: r.label, icon: r.icon })),
+  ];
+
+  function makeRelicSlot() {
+    const currentRelic = equip.relic || "";
+    const relicDef = GW2_RELICS.find((r) => r.label === currentRelic);
+    const wrapper = document.createElement("div");
+    wrapper.className = "equip-slot equip-slot--compact";
+    wrapper.setAttribute("role", "button");
+    wrapper.tabIndex = 0;
+
+    const iconDiv = document.createElement("div");
+    iconDiv.className = "equip-slot__icon equip-slot__icon--weapon" + (currentRelic ? " equip-slot__icon--filled" : "");
+    if (relicDef) {
+      const img = document.createElement("img");
+      img.src = relicDef.icon;
+      img.alt = relicDef.label;
+      img.draggable = false;
+      img.addEventListener("error", () => img.remove());
+      iconDiv.append(img);
+    }
+
+    const info = document.createElement("div");
+    info.className = "equip-slot__info";
+    const labelEl = document.createElement("div");
+    labelEl.className = "equip-slot__label";
+    labelEl.textContent = "Relic";
+    const valueEl = document.createElement("div");
+    valueEl.className = "equip-slot__combo-name" + (currentRelic ? "" : " equip-slot__value--empty");
+    valueEl.style.fontSize = "10px";
+    valueEl.textContent = currentRelic
+      ? currentRelic.replace("Relic of ", "").replace("Relic of the ", "the ")
+      : "Select…";
+    info.append(labelEl, valueEl);
+    wrapper.append(iconDiv, info);
+
+    const doOpen = () => openSlotPicker(wrapper, currentRelic, (newVal) => {
+      equip.relic = newVal || "";
+      markEditorChanged();
+      renderEquipmentPanel();
+    }, { items: relicItems, searchPlaceholder: "Search relics…" });
+    wrapper.addEventListener("click", doOpen);
+    wrapper.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); doOpen(); } });
+
+    bindHoverPreview(wrapper, "equip-relic", () => {
+      const rDef = GW2_RELICS.find((r) => r.label === (equip.relic || ""));
+      if (!rDef) return null;
+      return { name: rDef.label, icon: rDef.icon, description: "" };
+    });
+
+    return wrapper;
+  }
+
+  const allTrinketKeys = ["back", "accessory1", "accessory2", "amulet", "ring1", "ring2"];
+  const trinketSection = makeSection("Trinkets", allTrinketKeys);
+
+  const trinketRow1 = document.createElement("div");
+  trinketRow1.className = "equip-trinket-grid equip-trinket-grid--4";
+  for (const key of ["back", "accessory1", "accessory2"]) {
+    const slotDef = EQUIP_TRINKET_SLOTS.find((s) => s.key === key);
+    if (slotDef) trinketRow1.append(makeSlot(slotDef, { compact: true }));
+  }
+  trinketRow1.append(makeRelicSlot());
+
+  const trinketRow2 = document.createElement("div");
+  trinketRow2.className = "equip-trinket-grid";
+  for (const key of ["amulet", "ring1", "ring2"]) {
+    const slotDef = EQUIP_TRINKET_SLOTS.find((s) => s.key === key);
+    if (slotDef) trinketRow2.append(makeSlot(slotDef, { compact: true }));
+  }
+
+  trinketSection.append(trinketRow1, trinketRow2);
+  rightCol.append(trinketSection);
+
+  // Underwater
+  const underwaterSection = makeSection("Underwater");
+  for (const slotDef of EQUIP_UNDERWATER_SLOTS) underwaterSection.append(makeSlot(slotDef));
+  rightCol.append(underwaterSection);
+
+  // Center: profession concept art
+  const artCol = document.createElement("div");
+  artCol.className = "equip-col equip-col--art";
+  const artUrl = PROFESSION_CONCEPT_ART[state.editor.profession];
+  if (artUrl) {
+    const artImg = document.createElement("img");
+    artImg.className = "equip-concept-art";
+    artImg.src = artUrl;
+    artImg.alt = state.editor.profession || "";
+    artImg.draggable = false;
+    artCol.append(artImg);
+  }
+
+  // Layout
+  const layout = document.createElement("div");
+  layout.className = "equip-layout";
+  layout.append(leftCol, artCol, rightCol);
+  panel.append(layout);
+}
+
+function renderEditor() {
+  closeCustomSelect();
+  hideHoverPreview();
+  renderEditorForm();
+  renderEditorMeta();
+  renderSpecializations();
+  renderSkills();
+  renderEquipmentPanel();
+  renderDetailPanel();
+}
+
+function renderEditorForm() {
+  renderCustomSelect(el.professionSelect, {
+    value: state.editor.profession,
+    className: "cselect--toolbar",
+    options: state.professions.map((profession) => ({
+      value: profession.id,
+      label: profession.name,
+      icon: profession.icon || "",
+    })),
+    placeholder: "Select profession",
+    onChange: async (nextProfession) => {
+      const professionId = String(nextProfession || "");
+      if (!professionId || professionId === state.editor.profession) return;
+      state.editor.profession = professionId;
+      await setProfession(professionId, { preserveSelections: false });
+      state.detail = null;
+      markEditorChanged({ updateBuildList: true });
+      renderEditor();
+    },
+  });
+
+  el.editorTitle.value = state.editor.title || "";
+  el.tagsInput.value = state.editor.tagsText || "";
+
+  const status = state.onboarding;
+  const canPublish = Boolean(status?.isAuthenticated && status?.repoReady);
+  el.publishSiteBtn.disabled = !canPublish;
+  el.copyBuildBtn.disabled = !state.editor.profession;
+  el.duplicateBuildBtn.disabled = !state.editor.profession;
+}
+
+function renderEditorMeta() {
+  el.saveBuildBtn.textContent = state.editorDirty ? "Save Build*" : "Save Build";
+  if (state.editorDirty) {
+    el.editorDirtyBadge.classList.remove("hidden");
+  } else {
+    el.editorDirtyBadge.classList.add("hidden");
+  }
+
+  const catalog = state.activeCatalog;
+  const professionName =
+    state.professions.find((entry) => entry.id === state.editor.profession)?.name ||
+    state.editor.profession ||
+    "Not selected";
+  const specNames = (state.editor.specializations || [])
+    .map((entry) => catalog?.specializationById.get(Number(entry.specializationId))?.name || "")
+    .filter(Boolean);
+  const eliteSpec = (state.editor.specializations || [])
+    .map((entry) => catalog?.specializationById.get(Number(entry.specializationId)))
+    .find((entry) => entry?.elite);
+  const skillById = catalog?.skillById || new Map();
+  const utilityNames = (state.editor.skills?.utilityIds || [])
+    .map((id) => skillById.get(Number(id))?.name || "")
+    .filter(Boolean);
+  const skills = [
+    skillById.get(Number(state.editor.skills?.healId))?.name || "",
+    ...utilityNames,
+    skillById.get(Number(state.editor.skills?.eliteId))?.name || "",
+  ].filter(Boolean);
+  const summaryRows = [
+    { label: "Status", value: state.editorDirty ? "Unsaved draft" : "Saved" },
+    { label: "Profession", value: professionName },
+    { label: "Specializations", value: specNames.join(" | ") || "None selected" },
+    { label: "Skills", value: skills.join(" | ") || "None selected" },
+  ];
+  if (eliteSpec) {
+    summaryRows.push({ label: "Elite Line", value: eliteSpec.name });
+  }
+  el.buildSummary.innerHTML = summaryRows
+    .map(
+      (row) =>
+        `<div class="build-summary__row"><span class="build-summary__label">${escapeHtml(row.label)}</span><span class="build-summary__value">${escapeHtml(row.value)}</span></div>`
+    )
+    .join("");
+}
+
+function renderSpecializations() {
+  const catalog = state.activeCatalog;
+  el.specializationsHost.innerHTML = "";
+  if (!catalog) {
+    el.specializationsHost.innerHTML = `<p class="empty-line">Choose a profession to load specialization data.</p>`;
+    return;
+  }
+
+  const allSpecs = Array.isArray(catalog.specializations) ? catalog.specializations : [];
+  const selectedEliteCount = (state.editor.specializations || []).reduce((count, entry) => {
+    const spec = catalog.specializationById.get(Number(entry?.specializationId) || 0);
+    return spec?.elite ? count + 1 : count;
+  }, 0);
+  const ruleHint = document.createElement("p");
+  ruleHint.className = "empty-line";
+  ruleHint.textContent =
+    selectedEliteCount > 0
+      ? "One elite specialization is active. Picking another elite line will swap the previous elite line to a core line."
+      : "You can use up to one elite specialization.";
+  el.specializationsHost.append(ruleHint);
+
+  for (let slotIndex = 0; slotIndex < 3; slotIndex += 1) {
+    const selection = state.editor.specializations[slotIndex];
+    const currentId = Number(selection?.specializationId) || 0;
+    const spec = catalog.specializationById.get(currentId) || null;
+    if (!spec) continue;
+
+    const card = document.createElement("article");
+    card.className = "spec-card";
+    const panel = document.createElement("div");
+    panel.className = spec.elite ? "spec-card__panel spec-card__panel--elite" : "spec-card__panel";
+    const wikiBackground = `https://wiki.guildwars2.com/wiki/Special:FilePath/${encodeURIComponent(`${spec.name || ""} specialization.png`)}`;
+    panel.style.backgroundImage = `linear-gradient(0deg, rgba(7, 14, 27, 0.1), rgba(7, 14, 27, 0.1)), url("${wikiBackground.replaceAll('"', '\\"')}")`;
+    panel.style.backgroundPosition = "center, center";
+    panel.style.backgroundSize = "100% 100%, cover";
+    panel.style.backgroundRepeat = "no-repeat, no-repeat";
+
+    const selectHost = document.createElement("div");
+    renderCustomSelect(selectHost, {
+      value: String(spec.id),
+      className: "cselect--spec",
+      options: allSpecs
+        .filter((optionSpec) => slotIndex === 2 || !optionSpec.elite)
+        .map((optionSpec) => ({
+          value: String(optionSpec.id),
+          label: optionSpec.name,
+          icon: optionSpec.icon || "",
+        })),
+      placeholder: "Select specialization",
+      onChange: (nextValue) => {
+        const nextId = Number(nextValue) || 0;
+        state.editor.specializations[slotIndex] = {
+          specializationId: nextId,
+          majorChoices: { 1: 0, 2: 0, 3: 0 },
+        };
+        enforceEditorConsistency({ preferredEliteSlot: slotIndex });
+        markEditorChanged({ updateBuildList: true });
+        renderEditor();
+      },
+    });
+    selectHost.classList.add("spec-select-overlay");
+
+    const body = document.createElement("div");
+    body.className = "spec-card__body";
+    const emblem = document.createElement("button");
+    emblem.type = "button";
+    emblem.className = spec.elite ? "spec-emblem spec-emblem--elite" : "spec-emblem";
+    emblem.title = spec.name || `Spec ${slotIndex + 1}`;
+    if (spec.icon) {
+      emblem.innerHTML = `<img src="${escapeHtml(spec.icon)}" alt="${escapeHtml(spec.name || "Specialization")}" />`;
+    } else {
+      emblem.textContent = "?";
+    }
+    emblem.addEventListener("click", () => {
+      const trigger = selectHost.querySelector(".cselect__trigger");
+      if (trigger instanceof HTMLElement) trigger.click();
+    });
+    body.append(emblem);
+
+    const majors = getMajorTraitsByTier(spec, catalog);
+    const minorTraits = (spec.minorTraits || [])
+      .slice(0, 3)
+      .map((traitId) => catalog.traitById.get(Number(traitId)) || null);
+    const lanes = [1, 2, 3];
+    for (const tier of lanes) {
+      const minorColumn = document.createElement("div");
+      minorColumn.className = "trait-minor-anchor";
+      const minorTrait = minorTraits[tier - 1];
+      const minorButton = makeTraitButton(minorTrait, false, () => selectDetail("trait", minorTrait), {
+        alwaysSelected: true,
+      });
+      minorButton.dataset.connectorRole = `minor-${tier}`;
+      minorColumn.append(minorButton);
+      body.append(minorColumn);
+
+      const column = document.createElement("div");
+      column.className = "trait-column trait-column--major";
+      const selectedId = Number(selection?.majorChoices?.[tier]) || 0;
+      for (const trait of majors[tier] || []) {
+        const isSelected = Number(trait.id) === selectedId;
+        const majorButton = makeTraitButton(trait, isSelected, () => {
+          state.editor.specializations[slotIndex].majorChoices[tier] = Number(trait.id);
+          markEditorChanged({ updateBuildList: true });
+          // Surgical update: toggle active class and connector role without full re-render
+          for (const sibling of column.querySelectorAll(".trait-btn")) {
+            sibling.classList.remove("trait-btn--active");
+            delete sibling.dataset.connectorRole;
+          }
+          majorButton.classList.add("trait-btn--active");
+          majorButton.dataset.connectorRole = `major-${tier}`;
+          cancelAnimationFrame(_connectorRafId);
+          _connectorRafId = requestAnimationFrame(() => drawSpecConnector(body));
+          selectDetail("trait", trait);
+        });
+        if (isSelected) {
+          majorButton.dataset.connectorRole = `major-${tier}`;
+        }
+        column.append(majorButton);
+      }
+      body.append(column);
+    }
+
+    panel.append(body);
+    card.append(panel, selectHost);
+    el.specializationsHost.append(card);
+  }
+
+  cancelAnimationFrame(_connectorRafId);
+  _connectorRafId = requestAnimationFrame(() => {
+    for (const body of el.specializationsHost.querySelectorAll(".spec-card__body")) {
+      drawSpecConnector(body);
+    }
+  });
+}
+
+function drawSpecConnector(body) {
+  if (!body) return;
+  body.querySelector(".spec-connector")?.remove();
+  const roles = ["minor-1", "major-1", "minor-2", "major-2", "minor-3", "major-3"];
+  const bodyRect = body.getBoundingClientRect();
+
+  const points = [];
+  for (const role of roles) {
+    const node = body.querySelector(`[data-connector-role="${role}"]`);
+    if (!(node instanceof HTMLElement)) continue;
+    const r = node.getBoundingClientRect();
+    points.push({ x: r.left + r.width / 2 - bodyRect.left, y: r.top + r.height / 2 - bodyRect.top });
+  }
+  if (points.length < 2) return;
+
+  const pathData = `M ${points[0].x} ${points[0].y} ` + points.slice(1).map(p => `L ${p.x} ${p.y}`).join(" ");
+
+  const svgNS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(svgNS, "svg");
+  svg.setAttribute("class", "spec-connector");
+  svg.setAttribute("viewBox", `0 0 ${Math.max(1, bodyRect.width)} ${Math.max(1, bodyRect.height)}`);
+  svg.setAttribute("preserveAspectRatio", "none");
+
+  const corePath = document.createElementNS(svgNS, "path");
+  corePath.setAttribute("d", pathData);
+  corePath.setAttribute("fill", "none");
+  corePath.setAttribute("stroke", "rgba(180, 235, 255, 0.5)");
+  corePath.setAttribute("stroke-width", "1.5");
+  corePath.setAttribute("stroke-linecap", "round");
+  svg.append(corePath);
+
+  const flowPath = document.createElementNS(svgNS, "path");
+  flowPath.setAttribute("class", "connector-flow");
+  flowPath.setAttribute("d", pathData);
+  flowPath.setAttribute("fill", "none");
+  flowPath.setAttribute("stroke", "rgba(220, 250, 255, 1)");
+  flowPath.setAttribute("stroke-width", "2.5");
+  flowPath.setAttribute("stroke-linecap", "round");
+  flowPath.setAttribute("stroke-dasharray", "10 22");
+  svg.append(flowPath);
+
+  const flowPath2 = document.createElementNS(svgNS, "path");
+  flowPath2.setAttribute("class", "connector-flow2");
+  flowPath2.setAttribute("d", pathData);
+  flowPath2.setAttribute("fill", "none");
+  flowPath2.setAttribute("stroke", "rgba(160, 230, 255, 0.7)");
+  flowPath2.setAttribute("stroke-width", "2.5");
+  flowPath2.setAttribute("stroke-linecap", "round");
+  flowPath2.setAttribute("stroke-dasharray", "10 22");
+  svg.append(flowPath2);
+
+  body.prepend(svg);
+}
+
+const PROFESSION_BASE_HP = {
+  Warrior: 20212, Berserker: 20212, Spellbreaker: 20212, Bladesworn: 20212,
+  Revenant: 21894, Herald: 21894, Renegade: 21894, Vindicator: 21894,
+  Necromancer: 17985, Reaper: 17985, Scourge: 17985, Harbinger: 17985,
+  Ranger: 15922, Druid: 15922, Soulbeast: 15922, Untamed: 15922,
+  Guardian: 14462, Dragonhunter: 14462, Firebrand: 14462, Willbender: 14462,
+  Engineer: 14462, Scrapper: 14462, Holosmith: 14462, Mechanist: 14462,
+  Elementalist: 11645, Tempest: 11645, Weaver: 11645, Catalyst: 11645,
+  Mesmer: 11645, Chronomancer: 11645, Mirage: 11645, Virtuoso: 11645,
+  Thief: 11645, Daredevil: 11645, Deadeye: 11645, Specter: 11645,
+};
+
+function makeSkillSlot(slot, catalog, options, utilitySelection) {
+  const query = "";
+  const selectedId =
+    slot.index === undefined
+      ? Number(state.editor.skills[slot.key]) || 0
+      : Number(state.editor.skills[slot.key]?.[slot.index]) || 0;
+  const selectedSkill = slot.list.find((skill) => Number(skill.id) === selectedId) || null;
+  const filteredList = filterSkillList(slot.list, query, selectedId);
+
+  const usedByOtherUtilitySlots =
+    slot.index === undefined
+      ? new Set()
+      : new Set(
+          utilitySelection
+            .filter((value, idx) => idx !== slot.index && Number(value))
+            .map((value) => Number(value))
+        );
+  const skillOptions = filteredList.map((skill) => {
+    const optionId = Number(skill.id) || 0;
+    const disabled =
+      slot.index !== undefined && usedByOtherUtilitySlots.has(optionId) && optionId !== selectedId;
+    return {
+      value: String(skill.id),
+      label: disabled ? `${skill.name} (already used)` : skill.name,
+      icon: skill.icon || "",
+      disabled,
+      meta: skill.type ? String(skill.type).toUpperCase() : "",
+      kind: "skill",
+      entity: skill,
+    };
+  });
+
+  const slotEl = document.createElement("div");
+  slotEl.className = "skill-slot";
+
+  const iconBtn = document.createElement("button");
+  iconBtn.type = "button";
+  iconBtn.className = "skill-icon-large";
+  iconBtn.title = selectedSkill?.name || slot.label;
+  if (selectedSkill?.icon) {
+    iconBtn.innerHTML = `<img src="${escapeHtml(selectedSkill.icon)}" alt="${escapeHtml(selectedSkill.name || "")}" />`;
+  }
+  if (selectedSkill) {
+    bindHoverPreview(iconBtn, "skill", () => selectedSkill);
+  }
+
+  const selectHost = document.createElement("div");
+  renderCustomSelect(selectHost, {
+    value: String(selectedId || ""),
+    className: "cselect--skill-slot",
+    options: skillOptions,
+    placeholder: filteredList.length ? "Select skill" : "No skills available",
+    disabled: !filteredList.length,
+    onChange: (nextValue) => {
+      const nextId = Number(nextValue) || 0;
+      if (!nextId) return;
+      if (slot.index === undefined) {
+        state.editor.skills[slot.key] = nextId;
+      } else {
+        state.editor.skills[slot.key][slot.index] = nextId;
+      }
+      enforceEditorConsistency();
+      markEditorChanged({ updateBuildList: true });
+      renderSkills();
+      const nextSkill = options[resolveSkillSlotType(slot)]?.find((skill) => Number(skill.id) === nextId) || null;
+      if (nextSkill) selectDetail("skill", nextSkill);
+    },
+  });
+  selectHost.classList.add("skill-select-overlay");
+
+  iconBtn.addEventListener("click", () => {
+    const trigger = selectHost.querySelector(".cselect__trigger");
+    if (trigger instanceof HTMLElement) trigger.click();
+  });
+
+  if (selectedSkill?.specialization) {
+    const lockSpec = catalog.specializationById.get(Number(selectedSkill.specialization));
+    if (lockSpec?.name) {
+      slotEl.classList.add("skill-slot--locked");
+      iconBtn.title = `${selectedSkill.name} (Locked to ${lockSpec.name})`;
+    }
+  }
+
+  slotEl.append(iconBtn, selectHost);
+  return slotEl;
+}
+
+function renderSkills() {
+  const catalog = state.activeCatalog;
+  el.skillsHost.innerHTML = "";
+  if (!catalog) return;
+
+  const options = getSkillOptionsByType(catalog, state.editor.specializations);
+  const utilitySelection = Array.isArray(state.editor.skills?.utilityIds)
+    ? state.editor.skills.utilityIds.map((value) => Number(value) || 0)
+    : [0, 0, 0];
+
+  const bar = document.createElement("div");
+  bar.className = "skills-bar";
+
+  // Left: 5 blank weapon skill slots
+  const weaponGroup = document.createElement("div");
+  weaponGroup.className = "skill-group skill-group--weapons";
+  for (let i = 0; i < 5; i++) {
+    const slotEl = document.createElement("div");
+    slotEl.className = "skill-slot skill-slot--weapon";
+    const iconBtn = document.createElement("button");
+    iconBtn.type = "button";
+    iconBtn.className = "skill-icon-large skill-icon--weapon";
+    iconBtn.disabled = true;
+    weaponGroup.append(slotEl);
+    slotEl.append(iconBtn);
+  }
+
+  // Center: health orb
+  const profession = state.editor.profession || "";
+  const baseHp = PROFESSION_BASE_HP[profession] ?? 0;
+  const orbEl = document.createElement("div");
+  orbEl.className = "health-orb";
+  orbEl.innerHTML = `
+    <div class="health-orb__fill"></div>
+    <div class="health-orb__text">
+      <span class="health-orb__hp">${baseHp > 0 ? baseHp.toLocaleString() : "—"}</span>
+      <span class="health-orb__label">HP</span>
+    </div>
+  `;
+
+  // Right: heal, 3 utility, elite
+  const utilityGroup = document.createElement("div");
+  utilityGroup.className = "skill-group skill-group--utilities";
+  const utilitySlots = [
+    { key: "healId", label: "Heal", list: options.heal || [] },
+    { key: "utilityIds", index: 0, label: "Utility", list: options.utility || [] },
+    { key: "utilityIds", index: 1, label: "Utility", list: options.utility || [] },
+    { key: "utilityIds", index: 2, label: "Utility", list: options.utility || [] },
+    { key: "eliteId", label: "Elite", list: options.elite || [] },
+  ];
+  for (const slot of utilitySlots) {
+    utilityGroup.append(makeSkillSlot(slot, catalog, options, utilitySelection));
+  }
+
+  bar.append(weaponGroup, orbEl, utilityGroup);
+  el.skillsHost.append(bar);
+}
+
+function renderDetailPanel() {
+  const detail = state.detail;
+  if (!detail) {
+    el.detailHost.innerHTML = `<p class="empty-line">Select a trait or skill to inspect wiki and API details.</p>`;
+    return;
+  }
+
+  const facts = Array.isArray(detail.facts) ? detail.facts.slice(0, 6) : [];
+  const factsHtml = facts.length
+    ? facts
+        .map((fact) => `<li>${escapeHtml(formatFact(fact))}</li>`)
+        .join("")
+    : "<li>No fact entries.</li>";
+
+  const wiki = detail.wiki || {};
+  const wikiSummary = wiki.loading
+    ? "<p>Loading wiki summary...</p>"
+    : wiki.summary
+      ? `<p>${escapeHtml(wiki.summary)}</p>`
+      : "<p>No wiki summary available.</p>";
+  const wikiLink = wiki.url
+    ? `<a href="${escapeHtml(wiki.url)}" target="_blank" rel="noreferrer">Open Wiki Page</a>`
+    : "";
+
+  el.detailHost.innerHTML = `
+    <article class="detail-card">
+      <header>
+        ${detail.icon ? `<img src="${escapeHtml(detail.icon)}" alt="${escapeHtml(detail.title)}" />` : ""}
+        <div>
+          <h3>${escapeHtml(detail.title)}</h3>
+          <p>${escapeHtml(detail.kindLabel)}</p>
+        </div>
+      </header>
+      <section>
+        <h4>In-Game Description</h4>
+        <p>${escapeHtml(detail.description || "No description.")}</p>
+      </section>
+      <section>
+        <h4>Wiki</h4>
+        ${wikiSummary}
+        ${wikiLink}
+      </section>
+      <section>
+        <h4>Facts</h4>
+        <ul>${factsHtml}</ul>
+      </section>
+    </article>
+  `;
+}
+
+function makeTraitButton(trait, active, onClick, options = {}) {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  const classNames = ["trait-btn"];
+  if (active) classNames.push("trait-btn--active");
+  if (options.alwaysSelected) classNames.push("trait-btn--always");
+  btn.className = classNames.join(" ");
+  btn.title = trait?.name || "Unknown trait";
+  if (trait?.icon) {
+    const img = document.createElement("img");
+    img.src = String(trait.icon);
+    img.alt = trait.name || "Trait";
+    const fallback = String(trait.iconFallback || "");
+    if (fallback) {
+      img.addEventListener("error", () => {
+        if (img.dataset.fallbackApplied === "1") return;
+        img.dataset.fallbackApplied = "1";
+        img.src = fallback;
+      });
+    }
+    btn.append(img);
+  } else {
+    btn.textContent = "?";
+  }
+  btn.disabled = !trait;
+  if (trait && typeof onClick === "function") {
+    btn.addEventListener("click", onClick);
+  }
+  if (trait) {
+    bindHoverPreview(btn, "trait", () => trait);
+  }
+  return btn;
+}
+
+function bindHoverPreview(node, kind, entityProvider) {
+  if (!node) return;
+  const readEntity = () =>
+    typeof entityProvider === "function" ? entityProvider() : entityProvider || null;
+
+  node.addEventListener("mouseenter", (event) => {
+    const entity = readEntity();
+    if (!entity) return;
+    showHoverPreview(kind, entity, event.clientX, event.clientY);
+  });
+
+  node.addEventListener("mousemove", (event) => {
+    if (el.hoverPreview.classList.contains("hidden")) return;
+    positionHoverPreview(event.clientX, event.clientY);
+  });
+
+  node.addEventListener("mouseleave", () => {
+    hideHoverPreview();
+  });
+
+  node.addEventListener("focus", () => {
+    const entity = readEntity();
+    if (!entity) return;
+    const rect = node.getBoundingClientRect();
+    showHoverPreview(kind, entity, rect.right, rect.top + rect.height / 2);
+  });
+
+  node.addEventListener("blur", () => {
+    hideHoverPreview();
+  });
+}
+
+function showHoverPreview(kind, entity, x, y) {
+  if (!entity) return;
+  const icon = String(entity.icon || entity.iconFallback || "");
+  const description = normalizeText(entity.description || "");
+  const maxFacts = kind.startsWith("equip-") ? 12 : 4;
+  const facts = (Array.isArray(entity.facts) ? entity.facts : [])
+    .slice(0, maxFacts)
+    .map((fact) => formatFact(fact))
+    .filter(Boolean);
+  const meta = getHoverMetaLine(kind, entity);
+  el.hoverPreview.innerHTML = `
+    <div class="hover-preview__head">
+      ${icon ? `<img class="hover-preview__icon" src="${escapeHtml(icon)}" alt="${escapeHtml(entity.name || "Icon")}" onerror="this.onerror=null;this.src='${escapeHtml(String(entity.iconFallback || icon))}'" />` : "<div></div>"}
+      <div>
+        <h4 class="hover-preview__title">${escapeHtml(entity.name || "Unknown")}</h4>
+        <p class="hover-preview__meta">${escapeHtml(meta)}</p>
+      </div>
+    </div>
+    ${description ? `<p class="hover-preview__desc">${escapeHtml(description)}</p>` : (!facts.length ? `<p class="hover-preview__desc">No description available.</p>` : "")}
+    ${facts.length ? `<ul class="hover-preview__facts">${facts.map((entry) => `<li>${escapeHtml(entry)}</li>`).join("")}</ul>` : ""}
+  `;
+  el.hoverPreview.classList.remove("hidden");
+  positionHoverPreview(x, y);
+}
+
+function getHoverMetaLine(kind, entity) {
+  if (kind === "trait") {
+    const tier = Number(entity?.tier) || 0;
+    return tier ? `Trait • ${tierLabel(tier)}` : "Trait";
+  }
+  if (kind === "equip-stat") return `Equipment • ${entity?.slot || ""}`.replace(/ • $/, "");
+  if (kind === "equip-weapon") {
+    const hand = entity?.hand;
+    const handLabel = hand === "two" ? "Two-handed" : hand === "main" ? "Main Hand" : hand === "off" ? "Off Hand" : hand === "either" ? "One-handed" : hand === "aquatic" ? "Aquatic" : "";
+    return handLabel ? `Weapon • ${handLabel}` : "Weapon";
+  }
+  if (kind === "equip-relic") return "Relic";
+  const type = String(entity?.type || "").trim();
+  const slot = String(entity?.slot || "").trim();
+  if (type && slot) return `Skill • ${type} • ${slot}`;
+  if (type) return `Skill • ${type}`;
+  return "Skill";
+}
+
+function positionHoverPreview(x, y) {
+  const node = el.hoverPreview;
+  if (!node || node.classList.contains("hidden")) return;
+  const pad = 8;
+  const offset = 16;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const rect = node.getBoundingClientRect();
+  let left = Number(x) + offset;
+  let top = Number(y) + offset;
+  if (left + rect.width > vw - pad) {
+    left = Number(x) - rect.width - offset;
+  }
+  if (top + rect.height > vh - pad) {
+    top = Number(y) - rect.height - offset;
+  }
+  left = Math.max(pad, Math.min(left, vw - rect.width - pad));
+  top = Math.max(46, Math.min(top, vh - rect.height - pad));
+  node.style.left = `${left}px`;
+  node.style.top = `${top}px`;
+}
+
+function hideHoverPreview() {
+  el.hoverPreview.classList.add("hidden");
+}
+
+async function selectDetail(kind, entity) {
+  if (!entity) return;
+  const detail = {
+    kind,
+    kindLabel: kind === "trait" ? "Trait" : "Skill",
+    title: entity.name || "Unknown",
+    icon: entity.icon || "",
+    description: entity.description || "",
+    facts: Array.isArray(entity.facts) ? entity.facts : [],
+    wiki: { loading: true, summary: "", url: "" },
+  };
+  state.detail = detail;
+  renderDetailPanel();
+
+  const key = `${kind}:${String(entity.name || "").toLowerCase()}`;
+  let wiki = state.wikiCache.get(key);
+  if (!wiki) {
+    try {
+      wiki = await window.desktopApi.getWikiSummary(entity.name);
+    } catch {
+      wiki = { title: entity.name, summary: "", url: "", missing: true };
+    }
+    state.wikiCache.set(key, wiki);
+  }
+  if (state.detail === detail) {
+    state.detail = {
+      ...detail,
+      wiki: {
+        loading: false,
+        summary: wiki?.summary || "",
+        url: wiki?.url || "",
+      },
+    };
+    renderDetailPanel();
+  }
+}
+
+function getMajorTraitsByTier(spec, catalog) {
+  const result = { 1: [], 2: [], 3: [] };
+  for (const traitId of spec.majorTraits || []) {
+    const trait = catalog.traitById.get(Number(traitId));
+    if (!trait) continue;
+    const tier = Number(trait.tier) || 0;
+    if (!result[tier]) continue;
+    result[tier].push(trait);
+  }
+  for (const tier of [1, 2, 3]) {
+    result[tier].sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
+  }
+  return result;
+}
+
+function getSkillOptionsByType(catalog, specializationSelections) {
+  const selectedSpecIds = new Set(
+    (specializationSelections || [])
+      .map((entry) => Number(entry?.specializationId) || 0)
+      .filter(Boolean)
+  );
+
+  const allSkills = Array.isArray(catalog.skills) ? catalog.skills : [];
+  const filtered = allSkills.filter((skill) => {
+    const lockSpec = Number(skill.specialization) || 0;
+    return !lockSpec || selectedSpecIds.has(lockSpec);
+  });
+
+  return {
+    heal: filtered
+      .filter((skill) => (skill.type || "").toLowerCase() === "heal")
+      .sort((a, b) => a.name.localeCompare(b.name)),
+    utility: filtered
+      .filter((skill) => (skill.type || "").toLowerCase() === "utility")
+      .sort((a, b) => a.name.localeCompare(b.name)),
+    elite: filtered
+      .filter((skill) => (skill.type || "").toLowerCase() === "elite")
+      .sort((a, b) => a.name.localeCompare(b.name)),
+  };
+}
+
+function resolveSkillSlotType(slot) {
+  if (slot.key === "healId") return "heal";
+  if (slot.key === "eliteId") return "elite";
+  return "utility";
+}
+
+function filterSkillList(list, query, selectedId) {
+  const source = Array.isArray(list) ? list : [];
+  if (!query) return source;
+  const normalized = String(query || "").toLowerCase();
+  const selected = source.find((skill) => Number(skill.id) === Number(selectedId)) || null;
+  const filtered = source.filter((skill) => String(skill.name || "").toLowerCase().includes(normalized));
+  if (selected && !filtered.some((skill) => Number(skill.id) === Number(selected.id))) {
+    filtered.unshift(selected);
+  }
+  return filtered;
+}
+
+function renderCustomSelect(host, config = {}) {
+  if (!host) return;
+  const options = Array.isArray(config.options) ? config.options : [];
+  const currentValue = String(config.value ?? "");
+  const selectedOption =
+    options.find((option) => String(option.value) === currentValue) ||
+    options.find((option) => !option.disabled) ||
+    options[0] ||
+    null;
+
+  host.innerHTML = "";
+  host.classList.add("cselect-host");
+
+  const root = document.createElement("div");
+  root.className = `cselect ${String(config.className || "").trim()}`.trim();
+
+  const trigger = document.createElement("button");
+  trigger.type = "button";
+  trigger.className = "cselect__trigger";
+  trigger.disabled = Boolean(config.disabled) || !options.length;
+  trigger.append(makeCustomSelectValueNode(selectedOption, config.placeholder || "Select"));
+
+  const chevron = document.createElement("span");
+  chevron.className = "cselect__chevron";
+  chevron.textContent = "▾";
+  trigger.append(chevron);
+
+  const menu = document.createElement("div");
+  menu.className = "cselect__menu";
+  const list = document.createElement("div");
+  list.className = "cselect__list";
+
+  if (!options.length) {
+    const empty = document.createElement("p");
+    empty.className = "cselect__empty";
+    empty.textContent = "No options";
+    list.append(empty);
+  } else {
+    for (const option of options) {
+      const button = document.createElement("button");
+      button.type = "button";
+      const isSelected = String(option.value) === String(selectedOption?.value ?? "");
+      button.className = `cselect__option ${isSelected ? "cselect__option--selected" : ""}`;
+      button.disabled = Boolean(option.disabled);
+      button.append(makeCustomSelectValueNode(option, config.placeholder || "Select"));
+
+      if (option.kind && option.entity) {
+        bindHoverPreview(button, option.kind, () => option.entity);
+      }
+
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (button.disabled) return;
+        closeCustomSelect();
+        if (typeof config.onChange === "function") {
+          Promise.resolve(config.onChange(option.value, option)).catch((err) => showError(err));
+        }
+      });
+      list.append(button);
+    }
+  }
+
+  menu.append(list);
+  root.append(trigger, menu);
+  host.append(root);
+
+  trigger.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    toggleCustomSelect(root);
+  });
+}
+
+function makeCustomSelectValueNode(option, placeholder) {
+  const value = document.createElement("span");
+  value.className = "cselect__value";
+  value.append(makeCustomSelectIconNode(option));
+
+  const text = document.createElement("span");
+  text.className = "cselect__text";
+  const label = document.createElement("span");
+  label.className = "cselect__label";
+  label.textContent = String(option?.label || placeholder || "Select");
+  text.append(label);
+  if (option?.meta) {
+    const meta = document.createElement("span");
+    meta.className = "cselect__meta";
+    meta.textContent = String(option.meta);
+    text.append(meta);
+  }
+  value.append(text);
+  return value;
+}
+
+function makeCustomSelectIconNode(option) {
+  if (option?.icon) {
+    const img = document.createElement("img");
+    img.className = "cselect__icon";
+    img.src = String(option.icon);
+    img.alt = `${String(option.label || "Option")} icon`;
+    return img;
+  }
+  const fallback = document.createElement("span");
+  fallback.className = "cselect__icon cselect__icon--fallback";
+  const source = String(option?.iconText || option?.label || option?.meta || "?").trim();
+  fallback.textContent = source ? source.slice(0, 1).toUpperCase() : "?";
+  return fallback;
+}
+
+function getSelectAnchorRect(root) {
+  // For spec overlays, always anchor to the visible emblem button
+  const card = root.closest(".spec-card");
+  if (card) {
+    const emblem = card.querySelector(".spec-emblem");
+    if (emblem) return emblem.getBoundingClientRect();
+  }
+  const trigger = root.querySelector(".cselect__trigger");
+  return trigger?.getBoundingClientRect() ?? null;
+}
+
+function toggleCustomSelect(root) {
+  if (!root) return;
+  const currentlyOpen = state.openCustomSelect;
+  if (currentlyOpen && currentlyOpen !== root) {
+    currentlyOpen.classList.remove("cselect--open");
+    resetCustomSelectMenuPosition(currentlyOpen.querySelector(".cselect__menu"));
+  }
+  const shouldOpen = !root.classList.contains("cselect--open");
+  if (shouldOpen) {
+    const menu = root.querySelector(".cselect__menu");
+    const rect = getSelectAnchorRect(root);
+    if (rect && menu) {
+      const menuEstHeight = 300;
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      const dropUp = spaceBelow < menuEstHeight + 8 && spaceAbove > spaceBelow;
+      menu.style.position = "fixed";
+      menu.style.left = `${Math.min(rect.left, window.innerWidth - 200)}px`;
+      menu.style.right = "auto";
+      if (dropUp) {
+        menu.style.top = "auto";
+        menu.style.bottom = `${window.innerHeight - rect.top + 6}px`;
+      } else {
+        menu.style.top = `${rect.bottom + 6}px`;
+        menu.style.bottom = "auto";
+      }
+    }
+  } else {
+    resetCustomSelectMenuPosition(root.querySelector(".cselect__menu"));
+  }
+  root.classList.toggle("cselect--open", shouldOpen);
+  state.openCustomSelect = shouldOpen ? root : null;
+}
+
+function resetCustomSelectMenuPosition(menu) {
+  if (!menu) return;
+  menu.style.position = "";
+  menu.style.top = "";
+  menu.style.bottom = "";
+  menu.style.left = "";
+  menu.style.right = "";
+}
+
+function closeCustomSelect() {
+  const open = state.openCustomSelect;
+  if (!open) return;
+  if (open.isConnected) {
+    open.classList.remove("cselect--open");
+    resetCustomSelectMenuPosition(open.querySelector(".cselect__menu"));
+  }
+  state.openCustomSelect = null;
+}
+
+function confirmDiscardDirty(actionLabel) {
+  if (!state.editorDirty) return true;
+  return window.confirm(`Unsaved changes will be lost. ${actionLabel}?`);
+}
+
+function markEditorChanged(options = {}) {
+  state.editorDirty = computeEditorSignature() !== state.editorBaselineSignature;
+  if (options.updateBuildList) {
+    renderBuildList();
+  }
+  if (options.updateMeta !== false) {
+    renderEditorMeta();
+  }
+}
+
+function captureEditorBaseline() {
+  state.editorBaselineSignature = computeEditorSignature();
+  state.editorDirty = false;
+  renderEditorMeta();
+}
+
+function computeEditorSignature() {
+  const editor = state.editor || createEmptyEditor();
+  const specializations = (editor.specializations || []).slice(0, 3).map((entry) => ({
+    specializationId: Number(entry?.specializationId) || 0,
+    majorChoices: {
+      1: Number(entry?.majorChoices?.[1]) || 0,
+      2: Number(entry?.majorChoices?.[2]) || 0,
+      3: Number(entry?.majorChoices?.[3]) || 0,
+    },
+  }));
+  const utilityIds = Array.isArray(editor.skills?.utilityIds)
+    ? editor.skills.utilityIds.slice(0, 3).map((value) => Number(value) || 0)
+    : [0, 0, 0];
+  while (utilityIds.length < 3) utilityIds.push(0);
+  const payload = {
+    title: String(editor.title || ""),
+    profession: String(editor.profession || ""),
+    tags: parseTags(editor.tagsText),
+    notes: String(editor.notes || ""),
+    equipment: {
+      statPackage: String(editor.equipment?.statPackage || ""),
+      runeSet: String(editor.equipment?.runeSet || ""),
+      relic: String(editor.equipment?.relic || ""),
+      food: String(editor.equipment?.food || ""),
+      utility: String(editor.equipment?.utility || ""),
+      slots: editor.equipment?.slots || {},
+      weapons: editor.equipment?.weapons || {},
+    },
+    specializations,
+    skills: {
+      healId: Number(editor.skills?.healId) || 0,
+      utilityIds,
+      eliteId: Number(editor.skills?.eliteId) || 0,
+    },
+  };
+  return JSON.stringify(payload);
+}
+
+function parseBuildImportPayload(text) {
+  let parsed;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    throw new Error("Clipboard does not contain valid JSON.");
+  }
+  if (!parsed || typeof parsed !== "object") {
+    throw new Error("Imported JSON must be an object.");
+  }
+  const source = parsed.build && typeof parsed.build === "object" ? parsed.build : parsed;
+  const profession = resolveImportedProfession(source);
+  const skills = normalizeImportedSkills(source);
+  const specializations = normalizeImportedSpecializations(source.specializations);
+  const notes = String(source.notes || source.description || "");
+  const tags = Array.isArray(source.tags)
+    ? source.tags
+    : typeof source.tagsText === "string"
+      ? parseTags(source.tagsText)
+      : [];
+  return {
+    id: "",
+    title: String(source.title || source.name || "Imported Build"),
+    profession,
+    tags,
+    notes,
+    equipment: {
+      statPackage: String(source.equipment?.statPackage || source.stats || ""),
+      runeSet: String(source.equipment?.runeSet || source.runes || ""),
+      relic: String(source.equipment?.relic || ""),
+      food: String(source.equipment?.food || ""),
+      utility: String(source.equipment?.utility || ""),
+      slots: {
+        head: String(source.equipment?.slots?.head || ""),
+        shoulders: String(source.equipment?.slots?.shoulders || ""),
+        chest: String(source.equipment?.slots?.chest || ""),
+        hands: String(source.equipment?.slots?.hands || ""),
+        legs: String(source.equipment?.slots?.legs || ""),
+        feet: String(source.equipment?.slots?.feet || ""),
+        mainhand1: String(source.equipment?.slots?.mainhand1 || ""),
+        offhand1: String(source.equipment?.slots?.offhand1 || ""),
+        mainhand2: String(source.equipment?.slots?.mainhand2 || ""),
+        offhand2: String(source.equipment?.slots?.offhand2 || ""),
+        back: String(source.equipment?.slots?.back || ""),
+        amulet: String(source.equipment?.slots?.amulet || ""),
+        ring1: String(source.equipment?.slots?.ring1 || ""),
+        ring2: String(source.equipment?.slots?.ring2 || ""),
+        accessory1: String(source.equipment?.slots?.accessory1 || ""),
+        accessory2: String(source.equipment?.slots?.accessory2 || ""),
+        aquatic1: String(source.equipment?.slots?.aquatic1 || ""),
+        aquatic2: String(source.equipment?.slots?.aquatic2 || ""),
+      },
+      weapons: {
+        mainhand1: String(source.equipment?.weapons?.mainhand1 || ""),
+        offhand1:  String(source.equipment?.weapons?.offhand1  || ""),
+        mainhand2: String(source.equipment?.weapons?.mainhand2 || ""),
+        offhand2:  String(source.equipment?.weapons?.offhand2  || ""),
+        aquatic1:  String(source.equipment?.weapons?.aquatic1  || ""),
+        aquatic2:  String(source.equipment?.weapons?.aquatic2  || ""),
+      },
+    },
+    specializations,
+    skills,
+  };
+}
+
+function resolveImportedProfession(source) {
+  const raw = String(source?.profession || source?.professionId || source?.professionName || "").trim();
+  if (!raw) return state.editor.profession || state.professions[0]?.id || "";
+  if (state.professions.some((entry) => entry.id === raw)) return raw;
+  const lower = raw.toLowerCase();
+  const byName = state.professions.find((entry) => entry.name.toLowerCase() === lower);
+  return byName?.id || raw;
+}
+
+function normalizeImportedSpecializations(value) {
+  if (!Array.isArray(value)) return [];
+  return value.slice(0, 3).map((entry) => ({
+    id: Number(entry?.id || entry?.specializationId) || 0,
+    specializationId: Number(entry?.specializationId || entry?.id) || 0,
+    majorChoices: {
+      1: Number(entry?.majorChoices?.[1] || entry?.majorChoices?.adept) || 0,
+      2: Number(entry?.majorChoices?.[2] || entry?.majorChoices?.master) || 0,
+      3: Number(entry?.majorChoices?.[3] || entry?.majorChoices?.grandmaster) || 0,
+    },
+  }));
+}
+
+function normalizeImportedSkills(source) {
+  const skills = source?.skills && typeof source.skills === "object" ? source.skills : {};
+  const healId = extractSkillId(skills.healId ?? skills.heal ?? source?.healId);
+  const eliteId = extractSkillId(skills.eliteId ?? skills.elite ?? source?.eliteId);
+  const utilityRaw = Array.isArray(skills.utilityIds)
+    ? skills.utilityIds
+    : Array.isArray(skills.utility)
+      ? skills.utility
+      : Array.isArray(source?.utilityIds)
+        ? source.utilityIds
+        : [];
+  const utilityIds = utilityRaw
+    .slice(0, 3)
+    .map((entry) => extractSkillId(entry))
+    .filter((value) => value > 0);
+  return {
+    heal: healId ? { id: healId } : null,
+    utility: utilityIds.map((id) => ({ id })),
+    elite: eliteId ? { id: eliteId } : null,
+  };
+}
+
+function extractSkillId(value) {
+  if (value === null || value === undefined) return 0;
+  if (typeof value === "number" || typeof value === "string") return Number(value) || 0;
+  if (typeof value === "object") {
+    return Number(value.id || value.skillId || value.value) || 0;
+  }
+  return 0;
 }
 
 async function reloadBuilds() {
   state.builds = await window.desktopApi.listBuilds();
-  renderBuilds();
+  renderBuildList();
 }
 
-async function refreshOnboardingStatus() {
-  const status = await window.desktopApi.getOnboardingStatus();
-  state.onboarding = status;
-  state.user = status.viewer;
-  if (status.localUrl) {
-    el.frame.src = status.localUrl;
+async function loadBuildIntoEditor(build, options = {}) {
+  const profession = resolveLoadedBuildProfession(build);
+  state.editor = {
+    id: build.id || "",
+    title: String(build.title || ""),
+    profession,
+    tagsText: Array.isArray(build.tags) ? build.tags.join(", ") : "",
+    notes: String(build.notes || ""),
+    equipment: {
+      statPackage: String(build.equipment?.statPackage || ""),
+      runeSet: String(build.equipment?.runeSet || ""),
+      relic: String(build.equipment?.relic || ""),
+      food: String(build.equipment?.food || ""),
+      utility: String(build.equipment?.utility || ""),
+      slots: {
+        head: String(build.equipment?.slots?.head || ""),
+        shoulders: String(build.equipment?.slots?.shoulders || ""),
+        chest: String(build.equipment?.slots?.chest || ""),
+        hands: String(build.equipment?.slots?.hands || ""),
+        legs: String(build.equipment?.slots?.legs || ""),
+        feet: String(build.equipment?.slots?.feet || ""),
+        mainhand1: String(build.equipment?.slots?.mainhand1 || ""),
+        offhand1: String(build.equipment?.slots?.offhand1 || ""),
+        mainhand2: String(build.equipment?.slots?.mainhand2 || ""),
+        offhand2: String(build.equipment?.slots?.offhand2 || ""),
+        back: String(build.equipment?.slots?.back || ""),
+        amulet: String(build.equipment?.slots?.amulet || ""),
+        ring1: String(build.equipment?.slots?.ring1 || ""),
+        ring2: String(build.equipment?.slots?.ring2 || ""),
+        accessory1: String(build.equipment?.slots?.accessory1 || ""),
+        accessory2: String(build.equipment?.slots?.accessory2 || ""),
+        aquatic1: String(build.equipment?.slots?.aquatic1 || ""),
+        aquatic2: String(build.equipment?.slots?.aquatic2 || ""),
+      },
+      weapons: {
+        mainhand1: String(build.equipment?.weapons?.mainhand1 || ""),
+        offhand1:  String(build.equipment?.weapons?.offhand1  || ""),
+        mainhand2: String(build.equipment?.weapons?.mainhand2 || ""),
+        offhand2:  String(build.equipment?.weapons?.offhand2  || ""),
+        aquatic1:  String(build.equipment?.weapons?.aquatic1  || ""),
+        aquatic2:  String(build.equipment?.weapons?.aquatic2  || ""),
+      },
+    },
+    specializations: Array.isArray(build.specializations)
+      ? build.specializations.slice(0, 3).map((entry) => ({
+          specializationId: Number(entry?.id) || Number(entry?.specializationId) || 0,
+          majorChoices: {
+            1: Number(entry?.majorChoices?.[1]) || 0,
+            2: Number(entry?.majorChoices?.[2]) || 0,
+            3: Number(entry?.majorChoices?.[3]) || 0,
+          },
+        }))
+      : [],
+    skills: {
+      healId: Number(build.skills?.heal?.id) || 0,
+      utilityIds: Array.isArray(build.skills?.utility)
+        ? build.skills.utility.slice(0, 3).map((entry) => Number(entry?.id) || 0)
+        : [0, 0, 0],
+      eliteId: Number(build.skills?.elite?.id) || 0,
+    },
+  };
+
+  if (profession) {
+    await setProfession(profession, { preserveSelections: true });
+  }
+  enforceEditorConsistency();
+  if (options.captureBaseline !== false) {
+    captureEditorBaseline();
+  } else {
+    markEditorChanged();
+  }
+}
+
+function resolveLoadedBuildProfession(build) {
+  const raw = String(build?.profession || "").trim();
+  if (raw && state.professions.some((entry) => entry.id === raw)) return raw;
+  if (raw) {
+    const byName = state.professions.find((entry) => entry.name.toLowerCase() === raw.toLowerCase());
+    if (byName) return byName.id;
+  }
+  return state.professions[0]?.id || "";
+}
+
+function serializeEditorToBuild() {
+  const catalog = state.activeCatalog;
+  const specById = catalog?.specializationById || new Map();
+  const traitById = catalog?.traitById || new Map();
+  const skillById = catalog?.skillById || new Map();
+
+  const specializations = (state.editor.specializations || []).map((entry) => {
+    const spec = specById.get(Number(entry.specializationId));
+    const majorTraitsByTier = spec ? getMajorTraitsByTier(spec, catalog) : { 1: [], 2: [], 3: [] };
+    return {
+      id: Number(spec?.id || entry.specializationId || 0),
+      name: spec?.name || "",
+      elite: Boolean(spec?.elite),
+      icon: spec?.icon || "",
+      background: spec?.background || "",
+      minorTraits: (spec?.minorTraits || []).map((traitId) => simplifyTrait(traitById.get(Number(traitId)))),
+      majorChoices: {
+        1: Number(entry.majorChoices?.[1]) || 0,
+        2: Number(entry.majorChoices?.[2]) || 0,
+        3: Number(entry.majorChoices?.[3]) || 0,
+      },
+      majorTraitsByTier: {
+        1: (majorTraitsByTier[1] || []).map((trait) => simplifyTrait(trait)),
+        2: (majorTraitsByTier[2] || []).map((trait) => simplifyTrait(trait)),
+        3: (majorTraitsByTier[3] || []).map((trait) => simplifyTrait(trait)),
+      },
+    };
+  });
+
+  const heal = simplifySkill(skillById.get(Number(state.editor.skills.healId)));
+  const elite = simplifySkill(skillById.get(Number(state.editor.skills.eliteId)));
+  const utility = (state.editor.skills.utilityIds || [])
+    .slice(0, 3)
+    .map((skillId) => simplifySkill(skillById.get(Number(skillId))))
+    .filter(Boolean);
+
+  return {
+    id: state.editor.id || undefined,
+    title: String(state.editor.title || "Untitled Build"),
+    profession: String(state.editor.profession || ""),
+    specializations,
+    skills: {
+      heal,
+      utility,
+      elite,
+    },
+    equipment: {
+      statPackage: String(state.editor.equipment.statPackage || ""),
+      runeSet: String(state.editor.equipment.runeSet || ""),
+      relic: String(state.editor.equipment.relic || ""),
+      food: String(state.editor.equipment.food || ""),
+      utility: String(state.editor.equipment.utility || ""),
+      slots: {
+        head: String(state.editor.equipment.slots?.head || ""),
+        shoulders: String(state.editor.equipment.slots?.shoulders || ""),
+        chest: String(state.editor.equipment.slots?.chest || ""),
+        hands: String(state.editor.equipment.slots?.hands || ""),
+        legs: String(state.editor.equipment.slots?.legs || ""),
+        feet: String(state.editor.equipment.slots?.feet || ""),
+        mainhand1: String(state.editor.equipment.slots?.mainhand1 || ""),
+        offhand1: String(state.editor.equipment.slots?.offhand1 || ""),
+        mainhand2: String(state.editor.equipment.slots?.mainhand2 || ""),
+        offhand2: String(state.editor.equipment.slots?.offhand2 || ""),
+        back: String(state.editor.equipment.slots?.back || ""),
+        amulet: String(state.editor.equipment.slots?.amulet || ""),
+        ring1: String(state.editor.equipment.slots?.ring1 || ""),
+        ring2: String(state.editor.equipment.slots?.ring2 || ""),
+        accessory1: String(state.editor.equipment.slots?.accessory1 || ""),
+        accessory2: String(state.editor.equipment.slots?.accessory2 || ""),
+        aquatic1: String(state.editor.equipment.slots?.aquatic1 || ""),
+        aquatic2: String(state.editor.equipment.slots?.aquatic2 || ""),
+      },
+      weapons: {
+        mainhand1: String(state.editor.equipment.weapons?.mainhand1 || ""),
+        offhand1:  String(state.editor.equipment.weapons?.offhand1  || ""),
+        mainhand2: String(state.editor.equipment.weapons?.mainhand2 || ""),
+        offhand2:  String(state.editor.equipment.weapons?.offhand2  || ""),
+        aquatic1:  String(state.editor.equipment.weapons?.aquatic1  || ""),
+        aquatic2:  String(state.editor.equipment.weapons?.aquatic2  || ""),
+      },
+    },
+    tags: parseTags(state.editor.tagsText),
+    notes: String(state.editor.notes || ""),
+  };
+}
+
+function simplifyTrait(trait) {
+  if (!trait) return null;
+  return {
+    id: Number(trait.id) || 0,
+    name: String(trait.name || ""),
+    icon: String(trait.icon || ""),
+    description: String(trait.description || ""),
+    tier: Number(trait.tier) || 0,
+  };
+}
+
+function simplifySkill(skill) {
+  if (!skill) return null;
+  return {
+    id: Number(skill.id) || 0,
+    name: String(skill.name || ""),
+    icon: String(skill.icon || ""),
+    description: String(skill.description || ""),
+    slot: String(skill.slot || ""),
+    type: String(skill.type || ""),
+    specialization: Number(skill.specialization) || 0,
+  };
+}
+
+function parseTags(input) {
+  return String(input || "")
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
+async function runPagesBuildPoll() {
+  state.pagesPoll.active = true;
+  state.pagesPoll.status = "queued";
+  state.pagesPoll.error = null;
+  renderSetupGate();
+
+  try {
+    for (let i = 0; i < 120; i += 1) {
+      const poll = await window.desktopApi.pollPagesStatus();
+      state.pagesPoll.status = poll.status || "unknown";
+      state.pagesPoll.error = poll.error || null;
+      renderSetupGate();
+
+      if (poll.ready && poll.pagesUrl) return;
+      if (poll.status === "errored" || poll.status === "error") {
+        throw new Error(poll.error || "GitHub Pages build failed.");
+      }
+      await delay(3000);
+    }
+    throw new Error("Timed out waiting for GitHub Pages to finish building.");
+  } finally {
+    state.pagesPoll.active = false;
+    renderSetupGate();
   }
 }
 
@@ -403,24 +2931,129 @@ async function startLoginFlow() {
   }
 }
 
-function button(label, variant, onClick) {
+function makeButton(label, variant, onClick) {
   const btn = document.createElement("button");
   btn.type = "button";
   btn.textContent = label;
-  btn.className =
-    "rounded-md px-2 py-1.5 text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-50 " +
-    (variant === "primary"
-      ? "bg-skybrand-500 text-white hover:bg-skybrand-400"
-      : variant === "danger"
-        ? "bg-rose-600 text-white hover:bg-rose-500"
-        : "bg-slate-700 text-slate-100 hover:bg-slate-600");
+  btn.className = `btn btn-${variant}`;
   btn.addEventListener("click", onClick);
   return btn;
 }
 
+function getSelectedTarget() {
+  if (!state.targets.length) return null;
+  return state.selectedTarget || state.targets[0];
+}
+
+function tierLabel(tier) {
+  if (tier === 1) return "Adept";
+  if (tier === 2) return "Master";
+  return "Grandmaster";
+}
+
+function formatPagesStatus(status) {
+  if (!status) return "unknown";
+  if (status === "queued") return "Queued";
+  if (status === "building") return "Building";
+  if (status === "built") return "Built";
+  if (status === "errored" || status === "error") return "Error";
+  return status;
+}
+
+function setPublishStatus(message) {
+  el.publishStatus.textContent = message || "";
+}
+
+function matchesBuildQuery(build, query) {
+  if (!query) return true;
+  const haystack = [
+    build.title || "",
+    build.profession || "",
+    build.notes || "",
+    ...(build.tags || []),
+    ...((build.specializations || []).map((entry) => entry.name || "")),
+  ]
+    .join(" ")
+    .toLowerCase();
+  return haystack.includes(query);
+}
+
+function createEmptyEditor(profession = "") {
+  return {
+    id: "",
+    title: "",
+    profession,
+    tagsText: "",
+    notes: "",
+    equipment: {
+      statPackage: "",
+      runeSet: "",
+      relic: "",
+      food: "",
+      utility: "",
+      slots: {
+        head: "", shoulders: "", chest: "", hands: "", legs: "", feet: "",
+        mainhand1: "", offhand1: "", mainhand2: "", offhand2: "",
+        back: "", amulet: "", ring1: "", ring2: "", accessory1: "", accessory2: "",
+        aquatic1: "", aquatic2: "",
+      },
+      weapons: {
+        mainhand1: "", offhand1: "", mainhand2: "", offhand2: "", aquatic1: "", aquatic2: "",
+      },
+    },
+    specializations: [],
+    skills: {
+      healId: 0,
+      utilityIds: [0, 0, 0],
+      eliteId: 0,
+    },
+  };
+}
+
+function formatDate(value) {
+  if (!value) return "unknown";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "unknown";
+  return d.toLocaleString();
+}
+
+function formatFact(fact) {
+  if (!fact || typeof fact !== "object") return "Unknown fact";
+  const label = String(fact.text || fact.type || "Fact");
+  const value =
+    fact.value ??
+    fact.percent ??
+    fact.distance ??
+    fact.duration ??
+    fact.hit_count ??
+    fact.apply_count ??
+    fact.status ??
+    fact.description ??
+    "";
+  return value === "" ? label : `${label}: ${value}`;
+}
+
+function normalizeText(input) {
+  const raw = String(input || "");
+  const noTags = raw.replace(/<[^>]*>/g, " ");
+  const entityDecoded = decodeHtmlEntities(noTags);
+  return entityDecoded.replace(/\s+/g, " ").trim();
+}
+
+function decodeHtmlEntities(value) {
+  const node = document.createElement("textarea");
+  node.innerHTML = String(value || "");
+  return node.value;
+}
+
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function showError(err) {
   const message = err instanceof Error ? err.message : String(err);
-  await window.desktopApi.showError("Buildsite Desktop Error", message);
+  setPublishStatus(`Error: ${message}`);
+  await window.desktopApi.showError("GW2Builds Error", message);
 }
 
 function escapeHtml(value) {
@@ -430,11 +3063,4 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll("\"", "&quot;")
     .replaceAll("'", "&#039;");
-}
-
-function formatDate(iso) {
-  if (!iso) return "unknown";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "unknown";
-  return d.toLocaleString();
 }

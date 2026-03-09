@@ -3,93 +3,160 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>GW2 Buildsite Desktop</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              slatebrand: {
-                950: "#05070d",
-                900: "#0a1020",
-                800: "#111a31",
-              },
-              mint: {
-                400: "#56d3a8",
-                500: "#25bc94",
-              },
-              skybrand: {
-                400: "#4fa8ff",
-                500: "#2f86f6",
-              },
-            },
-          },
-        },
-      };
-    </script>
+    <title>GW2Builds Desktop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Exo+2:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./styles.css" />
   </head>
-  <body class="h-screen overflow-hidden bg-slatebrand-950 text-slate-100 antialiased">
-    <header id="titlebar" class="app-drag fixed inset-x-0 top-0 z-40 h-10 border-b border-slate-700/70 bg-slatebrand-900/95 backdrop-blur">
-      <div class="flex h-full items-center justify-between px-3">
-        <div class="flex items-center gap-2 text-xs font-medium tracking-wide text-slate-300">
-          <span class="inline-block h-2 w-2 rounded-full bg-mint-500"></span>
-          <span>GW2 Buildsite Desktop</span>
-        </div>
-        <div class="no-drag flex items-center gap-1">
-          <button id="winMin" class="h-7 w-9 rounded-md text-slate-300 hover:bg-slate-700/70">-</button>
-          <button id="winMax" class="h-7 w-9 rounded-md text-slate-300 hover:bg-slate-700/70">+</button>
-          <button id="winClose" class="h-7 w-9 rounded-md text-slate-300 hover:bg-rose-600/80">x</button>
-        </div>
+  <body>
+    <header id="titlebar" class="titlebar app-drag">
+      <div class="titlebar__brand">
+        <span class="titlebar__dot"></span>
+        <span>GW2Builds Editor</span>
+      </div>
+      <div class="titlebar__controls no-drag">
+        <button id="workspaceBtn" class="titlebar__workspace-btn" type="button" title="Workspace">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="8" cy="5" r="3"/>
+            <path d="M2 13c0-3.314 2.686-5 6-5s6 1.686 6 5"/>
+          </svg>
+          <span id="titlebarUser" class="titlebar__user"></span>
+        </button>
+        <button id="winMin" type="button">-</button>
+        <button id="winMax" type="button">+</button>
+        <button id="winClose" type="button">x</button>
       </div>
     </header>
 
-    <section id="setupGate" class="fixed inset-x-0 bottom-0 top-10 z-50 hidden bg-slatebrand-950/95 p-5"></section>
-    <div class="grid h-full grid-cols-1 pt-10 lg:grid-cols-[390px_1fr]">
-      <aside class="overflow-y-auto border-r border-slate-800 bg-slatebrand-900/70 p-4">
-        <section class="mb-3 rounded-xl border border-slate-700/70 bg-slatebrand-800/80 p-3">
-          <h1 class="text-lg font-semibold">Buildsite Desktop</h1>
-          <p class="mb-3 text-sm text-slate-300">Sync, sort, search, and publish builds to your GitHub fork.</p>
-          <div id="authRow" class="flex items-center gap-2 text-sm"></div>
-        </section>
-
-        <section class="mb-3 rounded-xl border border-slate-700/70 bg-slatebrand-800/80 p-3">
-          <h2 class="mb-2 text-base font-semibold">First-Time Setup</h2>
-          <div id="onboarding" class="grid gap-2"></div>
-        </section>
-
-        <section class="mb-3 rounded-xl border border-slate-700/70 bg-slatebrand-800/80 p-3">
-          <h2 class="mb-2 text-base font-semibold">Add Build</h2>
-          <form id="buildForm" class="grid gap-2">
-            <label class="grid gap-1 text-xs text-slate-300">Title <input class="w-full rounded-lg border border-slate-600 bg-slatebrand-900 px-3 py-2 text-sm outline-none ring-skybrand-500 placeholder:text-slate-500 focus:ring-2" name="title" required maxlength="120" /></label>
-            <label class="grid gap-1 text-xs text-slate-300">Profession <input class="w-full rounded-lg border border-slate-600 bg-slatebrand-900 px-3 py-2 text-sm outline-none ring-skybrand-500 placeholder:text-slate-500 focus:ring-2" name="profession" maxlength="40" /></label>
-            <label class="grid gap-1 text-xs text-slate-300">Build URL <input class="w-full rounded-lg border border-slate-600 bg-slatebrand-900 px-3 py-2 text-sm outline-none ring-skybrand-500 placeholder:text-slate-500 focus:ring-2" name="buildUrl" placeholder="https://..." /></label>
-            <label class="grid gap-1 text-xs text-slate-300">Tags (comma separated) <input class="w-full rounded-lg border border-slate-600 bg-slatebrand-900 px-3 py-2 text-sm outline-none ring-skybrand-500 placeholder:text-slate-500 focus:ring-2" name="tags" /></label>
-            <label class="grid gap-1 text-xs text-slate-300">Notes <textarea class="w-full rounded-lg border border-slate-600 bg-slatebrand-900 px-3 py-2 text-sm outline-none ring-skybrand-500 placeholder:text-slate-500 focus:ring-2" name="notes" rows="4"></textarea></label>
-            <button class="w-full rounded-lg bg-skybrand-500 px-3 py-2 text-sm font-medium text-white transition hover:bg-skybrand-400" type="submit">Save Build</button>
-          </form>
-        </section>
-
-        <section class="rounded-xl border border-slate-700/70 bg-slatebrand-800/80 p-3">
-          <div class="mb-2 flex items-center gap-2">
-            <h2 class="mr-auto text-base font-semibold">My Builds</h2>
-            <select id="sortBy" title="Sort builds" class="rounded-lg border border-slate-600 bg-slatebrand-900 px-2 py-1 text-xs">
-              <option value="updated">Updated</option>
-              <option value="created">Created</option>
-              <option value="title">Title</option>
-              <option value="profession">Profession</option>
-            </select>
-          </div>
-          <input id="search" class="w-full rounded-lg border border-slate-600 bg-slatebrand-900 px-3 py-2 text-sm outline-none ring-skybrand-500 placeholder:text-slate-500 focus:ring-2" placeholder="Search title, tags, notes..." />
-          <div id="buildList" class="mt-2 grid gap-2"></div>
-        </section>
-      </aside>
-
-      <main class="h-full bg-slatebrand-950 p-3">
-        <iframe id="buildsiteFrame" title="Buildsite" class="h-full w-full rounded-xl border border-slate-700 bg-white"></iframe>
-      </main>
+    <div id="workspaceMenu" class="workspace-menu hidden">
+      <div id="authRow" class="auth-row"></div>
+      <div id="onboarding" class="onboarding"></div>
     </div>
-    <script src="./renderer.js"></script>
+
+    <section id="setupGate" class="setup-gate hidden"></section>
+
+    <div class="app-layout app-layout--subnav">
+      <nav class="leftnav">
+        <button class="leftnav__item leftnav__item--active" data-page="editor" type="button">
+          <span class="leftnav__icon">&#9998;</span>
+          <span class="leftnav__label">Build Editor</span>
+        </button>
+        <button class="leftnav__item" data-page="library" type="button">
+          <span class="leftnav__icon">&#9783;</span>
+          <span class="leftnav__label">Build Library</span>
+        </button>
+        <button class="leftnav__item" data-page="comps" type="button">
+          <span class="leftnav__icon">&#9776;</span>
+          <span class="leftnav__label">Comps</span>
+        </button>
+      </nav>
+
+      <!-- Secondary nav (slides in for Build Editor) -->
+      <nav id="subnav" class="subnav subnav--visible">
+        <button class="subnav__item subnav__item--active" data-subtab="build" type="button"><span class="subnav__icon">&#9876;</span> Build</button>
+        <button class="subnav__item" data-subtab="equipment" type="button"><span class="subnav__icon">&#9775;</span> Equipment</button>
+      </nav>
+
+      <div class="page-content">
+
+        <!-- Build Editor page -->
+        <div id="page-editor" class="page">
+          <main class="editor">
+
+            <!-- Shared toolbar always visible in editor -->
+            <section class="panel panel--toolbar">
+              <div class="toolbar-grid">
+                <label>
+                  Build Title
+                  <input id="editorTitle" type="text" maxlength="140" placeholder="Power Reaper Roamer" />
+                </label>
+                <label>
+                  Profession
+                  <div id="professionSelect"></div>
+                </label>
+                <label>
+                  Tags
+                  <input id="tagsInput" type="text" placeholder="wvw, roaming, sustain" />
+                </label>
+              </div>
+              <div class="toolbar-actions">
+                <span id="editorDirtyBadge" class="dirty-badge hidden">Unsaved changes</span>
+                <button id="saveBuildBtn" class="btn btn-primary" type="button">Save Build</button>
+                <button id="duplicateBuildBtn" class="btn btn-secondary" type="button">Duplicate</button>
+                <button id="copyBuildBtn" class="btn btn-secondary" type="button">Copy JSON</button>
+                <button id="pasteBuildBtn" class="btn btn-secondary" type="button">Paste JSON</button>
+                <button id="publishSiteBtn" class="btn btn-primary" type="button">Publish Static Site</button>
+                <p id="publishStatus" class="publish-status"></p>
+              </div>
+              <div id="buildSummary" class="build-summary"></div>
+            </section>
+
+            <!-- Build subtab -->
+            <div id="subtab-build" class="subtab">
+              <section class="panel panel--skillbar">
+                <div id="skillsHost" class="skills-host"></div>
+              </section>
+
+              <div class="specs-with-detail">
+                <section class="panel specs-panel">
+                  <div class="section-head">
+                    <h2>Specializations</h2>
+                    <p>Pick trait lines and major traits (Adept, Master, Grandmaster).</p>
+                  </div>
+                  <div id="specializationsHost" class="specializations-host"></div>
+                </section>
+
+                <section class="panel detail-panel">
+                  <div class="section-head">
+                    <h2>Reference Panel</h2>
+                    <p>Skill and trait details pulled from GW2 API + wiki.</p>
+                  </div>
+                  <div id="detailHost" class="detail-host"></div>
+                </section>
+              </div>
+            </div>
+
+            <!-- Equipment subtab -->
+            <div id="subtab-equipment" class="subtab hidden">
+              <div id="equipmentPanel"></div>
+            </div>
+
+          </main>
+        </div>
+
+        <!-- Build Library page -->
+        <div id="page-library" class="page hidden">
+          <div class="library-page">
+            <section class="panel">
+              <div class="section-head">
+                <h2>Build Library</h2>
+                <button id="newBuildBtn" class="btn btn-secondary" type="button">New Build</button>
+              </div>
+              <input id="buildSearch" type="search" placeholder="Search local builds..." />
+              <div id="buildList" class="build-list"></div>
+            </section>
+          </div>
+        </div>
+
+        <!-- Comps page -->
+        <div id="page-comps" class="page hidden">
+          <div class="comps-page">
+            <section class="panel">
+              <h2>Comps</h2>
+              <p class="empty-line">Squad composition planner coming soon.</p>
+            </section>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="hoverPreview" class="hover-preview hidden"></div>
+
+    <script type="module" src="./renderer.js"></script>
   </body>
 </html>

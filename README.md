@@ -1,56 +1,50 @@
-# GW2 Buildsite Desktop
+# GW2Builds Desktop
 
-Electron wrapper for [`pyrogw2/buildsite`](https://github.com/pyrogw2/buildsite) with:
+Electron app for creating Guild Wars 2 builds, publishing a static build site, and syncing it to GitHub Pages.
 
-- GitHub OAuth (device flow) login
-- First-time onboarding (auth -> fork/pages -> local sync)
-- Local build storage
-- Search and sorting
-- Publish builds to `builds/*.json` in your fork of `pyrogw2/buildsite`
+## What It Does
+
+- GitHub device-flow auth
+- First-time setup for a dedicated `gw2builds` repository
+- Automatic Pages workflow setup + status polling
+- Native build editor for:
+  - profession
+  - three specialization lines + trait picks
+  - heal / utility / elite skills
+  - optional equipment notes + tags
+- Data-driven editor catalog from Guild Wars 2 API
+- Wiki summary panel for selected traits/skills
+- Static site publish to `site/*` in your `gw2builds` repo
 
 ## Setup
 
-1. Create a GitHub OAuth App:
-   - Application type: OAuth App
-   - Homepage URL: any valid URL
-   - Callback URL: any valid URL (not used in device flow)
-2. Copy the OAuth **Client ID**.
-3. Create `.env` from example and set your client ID:
+1. Create a GitHub OAuth App and copy its Client ID.
+2. Create `.env` and set the client ID:
 
 ```bash
 cp .env.example .env
 ```
 
-4. Install dependencies:
+3. Install dependencies:
 
 ```bash
 npm install
 ```
 
-5. Run app:
+4. Start app:
 
 ```bash
 npm start
 ```
 
-6. Development with live updates (Vite + Electron):
+## Dev
 
 ```bash
 npm run dev
 ```
 
-## First-Time Flow
+To reset dev profile data:
 
-On first launch, use the in-app setup steps:
-
-1. Authenticate with GitHub
-   - The app shows your GitHub device code in-app
-2. Create/check your `buildsite` fork and enable GitHub Pages
-3. Sync the fork locally and run it in-app via a local server
-
-## Notes
-
-- On first publish, the app creates a fork of `pyrogw2/buildsite` under your GitHub account.
-- After local sync, the app loads your local buildsite copy in the embedded frame instead of the public URL.
-- Build data is stored in Electron `userData` under `data/builds.json`.
-- OAuth token is currently stored in `data/auth.json` in the same directory.
+```bash
+npm run dev:clean
+```

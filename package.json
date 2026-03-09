@@ -1,16 +1,16 @@
 {
-  "name": "gw2-buildsite-desktop",
+  "name": "gw2builds-desktop",
   "version": "0.1.0",
-  "description": "Electron wrapper for pyrogw2/buildsite with GitHub sync and publish",
+  "description": "GW2 build editor desktop app with GitHub Pages publishing",
   "main": "src/main/index.js",
   "scripts": {
     "start": "electron .",
-    "dev": "concurrently -k \"vite\" \"wait-on tcp:5173 && VITE_DEV_SERVER_URL=http://localhost:5173 electronmon .\"",
+    "dev": "concurrently -k \"vite\" \"wait-on tcp:5173 && APP_PROFILE=dev VITE_DEV_SERVER_URL=http://localhost:5173 electronmon .\"",
+    "dev:clean": "node scripts/dev-clean.mjs",
     "build:renderer": "vite build"
   },
   "license": "MIT",
   "dependencies": {
-    "adm-zip": "^0.5.16",
     "dotenv": "^17.2.3",
     "electron": "^37.2.0"
   },

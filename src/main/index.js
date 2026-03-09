@@ -2,36 +2,46 @@ const path = require("node:path");
 require("dotenv").config({ path: path.resolve(process.cwd(), ".env") });
 const { app, BrowserWindow, ipcMain, dialog, clipboard } = require("electron");
 const { BuildStore } = require("./buildStore");
+const { beginGitHubDeviceAuth, completeGitHubDeviceAuth } = require("./githubAuth");
 const {
-  startGitHubDeviceAuth,
-  beginGitHubDeviceAuth,
-  completeGitHubDeviceAuth,
-} = require("./githubAuth");
-const { getViewer, ensureFork, ensurePages, getRepo, publishBuildToFork } = require("./githubApi");
-const { LocalBuildsiteHost } = require("./localSite");
+  TARGET_REPO,
+  getViewer,
+  listTargets,
+  ensureGw2BuildsRepo,
+  ensurePages,
+  getPagesBuildStatus,
+  getRepo,
+  ensurePagesWorkflow,
+  triggerPagesWorkflow,
+  publishSiteBundle,
+} = require("./githubApi");
+const { getProfessionList, getProfessionCatalog, getWikiSummary } = require("./gw2Data");
+const { buildSiteBundle } = require("./siteBundle");
 
-const BUILD_SITE_URL = "https://pyrogw2.github.io/buildsite/";
 const DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL || "";
+const IS_DEV_PROFILE = process.env.APP_PROFILE === "dev" && !app.isPackaged;
+if (IS_DEV_PROFILE) {
+  const devUserData = path.join(app.getPath("appData"), `${app.getName()}-dev`);
+  app.setPath("userData", devUserData);
+}
+
 const store = new BuildStore(path.join(app.getPath("userData"), "data"));
-const localSite = new LocalBuildsiteHost(path.join(app.getPath("userData"), "buildsite-local"));
-let mainWindow = null;
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1500,
+    width: 1600,
     height: 980,
-    minWidth: 1080,
-    minHeight: 720,
+    minWidth: 1120,
+    minHeight: 740,
     frame: false,
     titleBarStyle: process.platform === "darwin" ? "hiddenInset" : "hidden",
-    backgroundColor: "#0b1220",
+    backgroundColor: "#050910",
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
       preload: path.join(__dirname, "../preload/index.js"),
     },
   });
-  mainWindow = win;
 
   if (DEV_SERVER_URL) {
     win.loadURL(DEV_SERVER_URL);
@@ -42,9 +52,7 @@ function createWindow() {
 
 async function getSession() {
   const auth = await store.getAuth();
-  if (!auth.token) {
-    return null;
-  }
+  if (!auth.token) return null;
   try {
     const viewer = await getViewer(auth.token);
     return { token: auth.token, viewer };
@@ -75,16 +83,31 @@ async function patchAuthRecord(patch) {
 async function getOnboardingStatus() {
   const auth = await getAuthRecord();
   const session = await getSession();
-  const localUrl = await localSite.ensureStarted();
   const onboarding = auth.onboarding || {};
+  const pagesUrl = onboarding.pagesUrl || null;
+  const reachable = pagesUrl ? await isPagesUrlReachable(pagesUrl) : false;
+  const repoReady = Boolean(onboarding.repoReady || onboarding.forkReady);
+  const pagesReady = Boolean(onboarding.pagesReady || reachable);
+  const buildStatus = String(onboarding.pagesBuildStatus || "").toLowerCase();
+  const pagesBuildStatus =
+    pagesReady && (!buildStatus || buildStatus === "queued" || buildStatus === "deploying")
+      ? "built"
+      : onboarding.pagesBuildStatus || null;
+
   return {
     isAuthenticated: Boolean(session),
     viewer: session?.viewer || null,
-    forkReady: Boolean(onboarding.forkReady),
-    pagesReady: Boolean(onboarding.pagesReady),
-    localReady: Boolean(localUrl),
-    localUrl: localUrl || null,
-    pagesUrl: onboarding.pagesUrl || null,
+    repoReady,
+    forkReady: repoReady,
+    pagesReady,
+    pagesBuildStatus,
+    pagesBuildUpdatedAt: onboarding.pagesBuildUpdatedAt || null,
+    pagesBuildError: onboarding.pagesBuildError || null,
+    siteReady: Boolean(reachable),
+    pagesUrl,
+    targetOwner: onboarding.targetOwner || null,
+    repoName: onboarding.repoName || TARGET_REPO,
+    branch: onboarding.branch || "main",
   };
 }
 
@@ -93,51 +116,44 @@ app.whenReady().then(async () => {
   createWindow();
 
   ipcMain.handle("app:get-config", async () => {
-    const localUrl = await localSite.ensureStarted();
-    return { buildSiteUrl: localUrl || BUILD_SITE_URL };
+    const auth = await getAuthRecord();
+    return {
+      pagesUrl: auth?.onboarding?.pagesUrl || "",
+      repoName: auth?.onboarding?.repoName || TARGET_REPO,
+    };
   });
 
   ipcMain.handle("window:minimize", (event) => {
     BrowserWindow.fromWebContents(event.sender)?.minimize();
     return true;
   });
+
   ipcMain.handle("window:toggle-maximize", (event) => {
     const win = BrowserWindow.fromWebContents(event.sender);
     if (!win) return false;
-    if (win.isMaximized()) {
-      win.unmaximize();
-    } else {
-      win.maximize();
-    }
+    if (win.isMaximized()) win.unmaximize();
+    else win.maximize();
     return win.isMaximized();
   });
+
   ipcMain.handle("window:is-maximized", (event) => {
     return BrowserWindow.fromWebContents(event.sender)?.isMaximized() || false;
   });
+
   ipcMain.handle("window:close", (event) => {
     BrowserWindow.fromWebContents(event.sender)?.close();
     return true;
   });
+
   ipcMain.handle("clipboard:write-text", (_event, text) => {
     clipboard.writeText(String(text || ""));
     return true;
   });
+  ipcMain.handle("clipboard:read-text", () => {
+    return clipboard.readText();
+  });
 
   ipcMain.handle("auth:get-session", async () => getSession());
-
-  ipcMain.handle("auth:login", async () => {
-    const clientId = process.env.GITHUB_OAUTH_CLIENT_ID || "";
-    const authResult = await startGitHubDeviceAuth(clientId);
-    const viewer = await getViewer(authResult.token);
-    const previous = await getAuthRecord();
-    await store.saveAuth({
-      ...previous,
-      token: authResult.token,
-      viewer,
-      onboarding: previous.onboarding || {},
-    });
-    return { viewer, userCode: authResult.userCode, verificationUri: authResult.verificationUri };
-  });
 
   ipcMain.handle("auth:begin-login", async () => {
     const clientId = process.env.GITHUB_OAUTH_CLIENT_ID || "";
@@ -175,7 +191,7 @@ app.whenReady().then(async () => {
     return true;
   });
 
-  ipcMain.handle("builds:publish", async (_e, build) => {
+  ipcMain.handle("builds:publish-site", async () => {
     const session = await getSession();
     if (!session) {
       throw new Error("You must log in with GitHub before publishing.");
@@ -183,52 +199,148 @@ app.whenReady().then(async () => {
 
     const auth = await getAuthRecord();
     const branch = auth?.onboarding?.branch || "main";
-    return publishBuildToFork(session.token, session.viewer.login, build, branch);
+    const owner = auth?.onboarding?.targetOwner || session.viewer.login;
+
+    await ensureGw2BuildsRepo(session.token, owner, "user");
+    await ensurePagesWorkflow(session.token, owner, branch, TARGET_REPO);
+    await ensurePages(session.token, owner, branch, TARGET_REPO);
+
+    const builds = await store.listBuilds();
+    const bundle = buildSiteBundle(builds);
+    const publish = await publishSiteBundle(session.token, owner, bundle, branch, TARGET_REPO);
+    if (!publish.changed) {
+      await triggerPagesWorkflow(session.token, owner, branch, TARGET_REPO).catch(() => null);
+    }
+    const pagesUrl = publish.pagesUrl || `https://${owner}.github.io/${TARGET_REPO}/`;
+
+    await patchAuthRecord({
+      onboarding: {
+        repoReady: true,
+        forkReady: true,
+        repoName: TARGET_REPO,
+        pagesReady: false,
+        pagesBuildStatus: "queued",
+        pagesBuildUpdatedAt: new Date().toISOString(),
+        pagesBuildError: null,
+        pagesUrl,
+        branch,
+        targetOwner: owner,
+      },
+    });
+
+    return publish;
   });
 
-  ipcMain.handle("onboarding:status", async () => getOnboardingStatus());
+  ipcMain.handle("gw2:list-professions", async () => getProfessionList("en"));
+  ipcMain.handle("gw2:get-profession-catalog", async (_e, professionId) =>
+    getProfessionCatalog(professionId, "en")
+  );
+  ipcMain.handle("wiki:get-summary", async (_e, title) => getWikiSummary(title));
 
-  ipcMain.handle("onboarding:setup-fork-pages", async () => {
+  ipcMain.handle("onboarding:status", async () => getOnboardingStatus());
+  ipcMain.handle("onboarding:list-targets", async () => {
+    const session = await getSession();
+    if (!session) return [];
+    return listTargets(session.token, session.viewer.login);
+  });
+
+  async function setupRepoPages(targetOwner, ownerType = "user") {
     const session = await getSession();
     if (!session) {
       throw new Error("Authenticate with GitHub before continuing setup.");
     }
 
-    await ensureFork(session.token, session.viewer.login);
-    const repo = await getRepo(session.token, session.viewer.login, "buildsite");
-    const defaultBranch = repo.default_branch || "main";
-    const pages = await ensurePages(session.token, session.viewer.login, defaultBranch);
+    const owner = targetOwner || session.viewer.login;
+    try {
+      await ensureGw2BuildsRepo(session.token, owner, ownerType);
+      const repo = await getRepo(session.token, owner, TARGET_REPO);
+      const defaultBranch = repo.default_branch || "main";
+      await ensurePagesWorkflow(session.token, owner, defaultBranch, TARGET_REPO);
+      await ensurePages(session.token, owner, defaultBranch, TARGET_REPO);
 
-    await patchAuthRecord({
-      onboarding: {
-        forkReady: true,
-        pagesReady: true,
-        pagesUrl: pages.htmlUrl || null,
-        branch: defaultBranch,
-      },
-    });
+      const emptySite = buildSiteBundle([]);
+      const publish = await publishSiteBundle(
+        session.token,
+        owner,
+        emptySite,
+        defaultBranch,
+        TARGET_REPO
+      );
+      if (!publish.changed) {
+        await triggerPagesWorkflow(session.token, owner, defaultBranch, TARGET_REPO);
+      }
 
-    return getOnboardingStatus();
-  });
-
-  ipcMain.handle("onboarding:sync-local-site", async () => {
-    const session = await getSession();
-    if (!session) {
-      throw new Error("Authenticate with GitHub before syncing local buildsite.");
+      await patchAuthRecord({
+        onboarding: {
+          repoReady: true,
+          forkReady: true,
+          repoName: TARGET_REPO,
+          pagesReady: false,
+          pagesBuildStatus: "queued",
+          pagesBuildUpdatedAt: null,
+          pagesBuildError: null,
+          pagesUrl: `https://${owner}.github.io/${TARGET_REPO}/`,
+          branch: defaultBranch,
+          targetOwner: owner,
+        },
+      });
+    } catch (err) {
+      const apiTail = buildGithubApiDebugTail(err);
+      if (err?.status === 404) {
+        const orgHint =
+          ownerType === "org"
+            ? " If this is an org, approve the OAuth app for the org and ensure you can create repos there."
+            : "";
+        throw new Error(
+          `Could not access ${owner}/${TARGET_REPO}.${orgHint} Check token scopes and owner permissions.${apiTail}`
+        );
+      }
+      if (err?.status === 403) {
+        throw new Error(
+          `Permission denied for ${owner}/${TARGET_REPO}. Ensure the OAuth app is approved for that owner and your account can create repos and manage Pages.${apiTail}`
+        );
+      }
+      throw err;
     }
 
+    return getOnboardingStatus();
+  }
+
+  ipcMain.handle("onboarding:setup-repo-pages", async (_e, targetOwner, ownerType = "user") =>
+    setupRepoPages(targetOwner, ownerType)
+  );
+
+  ipcMain.handle("onboarding:setup-fork-pages", async (_e, targetOwner, ownerType = "user") =>
+    setupRepoPages(targetOwner, ownerType)
+  );
+
+  ipcMain.handle("onboarding:poll-pages-status", async () => {
+    const session = await getSession();
+    if (!session) {
+      throw new Error("Authenticate with GitHub before checking Pages status.");
+    }
     const auth = await getAuthRecord();
-    const branch = auth?.onboarding?.branch || "main";
-    await localSite.syncFromGitHub(session.token, session.viewer.login, "buildsite", branch);
-    const localUrl = await localSite.ensureStarted();
+    const onboarding = auth?.onboarding || {};
+    const owner = onboarding.targetOwner || session.viewer.login;
+    const build = await getPagesBuildStatus(session.token, owner, TARGET_REPO);
+
     await patchAuthRecord({
       onboarding: {
-        localReady: true,
-        localLastSyncAt: new Date().toISOString(),
+        pagesBuildStatus: build.status,
+        pagesBuildUpdatedAt: build.updatedAt,
+        pagesBuildError: build.error,
+        pagesReady: Boolean(build.ready),
+        pagesUrl: build.htmlUrl || onboarding.pagesUrl || `https://${owner}.github.io/${TARGET_REPO}/`,
       },
     });
 
-    return { localUrl };
+    return {
+      status: build.status,
+      ready: build.ready,
+      pagesUrl: build.htmlUrl || onboarding.pagesUrl || `https://${owner}.github.io/${TARGET_REPO}/`,
+      updatedAt: build.updatedAt,
+      error: build.error,
+    };
   });
 
   ipcMain.handle("dialog:error", async (_e, title, body) => {
@@ -242,13 +354,28 @@ app.whenReady().then(async () => {
 });
 
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
+  if (process.platform !== "darwin") app.quit();
 });
 
 app.on("activate", () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
+  if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
+
+async function isPagesUrlReachable(url) {
+  try {
+    const res = await fetch(url, { method: "GET", redirect: "follow" });
+    return res.status >= 200 && res.status < 400;
+  } catch {
+    return false;
+  }
+}
+
+function buildGithubApiDebugTail(err) {
+  if (!err) return "";
+  const parts = [];
+  if (err?.data?.message) parts.push(`GitHub said: ${err.data.message}.`);
+  if (err?.path) parts.push(`Endpoint: ${err.path}.`);
+  if (err?.oauthScopes) parts.push(`Token scopes: ${err.oauthScopes}.`);
+  if (err?.acceptedOauthScopes) parts.push(`Endpoint accepts: ${err.acceptedOauthScopes}.`);
+  return parts.length ? ` ${parts.join(" ")}` : "";
+}
