@@ -1,0 +1,106 @@
+:root{
+  color-scheme: dark;
+  --bg:#04070f;
+  --surface:#0b1223;
+  --surface-2:#101a33;
+  --line:#1f3157;
+  --text:#e8f0ff;
+  --muted:#9bb0d9;
+  --accent:#45d18f;
+  --accent-2:#4aa7ff;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:"Segoe UI",ui-sans-serif,system-ui,-apple-system,sans-serif;
+  background:
+    radial-gradient(1200px 500px at 0 -20%, rgba(69,209,143,0.2), transparent 60%),
+    radial-gradient(1000px 500px at 100% 0, rgba(74,167,255,0.2), transparent 55%),
+    var(--bg);
+  color:var(--text);
+}
+.site-shell{
+  width:min(1200px,94vw);
+  margin:32px auto 48px;
+}
+.site-header h1{margin:4px 0 8px;font-size:2.1rem}
+.eyebrow{margin:0;color:var(--accent);font-size:.78rem;letter-spacing:.22em;text-transform:uppercase}
+.subtitle{margin:0;color:var(--muted)}
+.controls{
+  margin-top:20px;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:rgba(16,26,51,.75);
+}
+.search-wrap{
+  display:grid;
+  gap:8px;
+  font-size:.78rem;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--muted);
+}
+.search-wrap input{
+  border:1px solid #2a3f6b;
+  border-radius:10px;
+  background:#070d1a;
+  color:var(--text);
+  padding:10px 12px;
+}
+.build-grid{
+  margin-top:18px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:12px;
+}
+.build-card{
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:linear-gradient(180deg, rgba(16,26,51,.96), rgba(10,17,34,.98));
+  padding:14px;
+}
+.build-card h2{margin:0 0 6px;font-size:1.1rem}
+.meta{margin:0;color:var(--muted);font-size:.86rem}
+.section{margin-top:10px}
+.section h3{
+  margin:0 0 6px;
+  color:var(--accent-2);
+  font-size:.72rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.token-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.token{
+  border:1px solid #2b4577;
+  background:#0c152a;
+  border-radius:999px;
+  padding:4px 8px;
+  font-size:.74rem;
+  color:#c6d7fa;
+}
+.skill{
+  display:grid;
+  grid-template-columns:30px 1fr;
+  gap:8px;
+  align-items:center;
+  font-size:.8rem;
+  margin:4px 0;
+}
+.skill img{
+  width:30px;
+  height:30px;
+  border-radius:6px;
+  border:1px solid #2d3b60;
+  background:#0a1020;
+}
+.site-footer{
+  margin-top:18px;
+  color:var(--muted);
+  font-size:.78rem;
+}
