@@ -985,6 +985,14 @@ const GW2_WEAPONS = [
   { id: "trident",    label: "Trident",     hand: "aquatic", icon: `${_WK}/6/66/Bandit_Trident.png` },
 ];
 
+// Exotic level 80 weapon strength midpoints (avg of min/max per wiki.guildwars2.com/wiki/Weapon_strength).
+const WEAPON_STRENGTH_MIDPOINT = {
+  axe: 952.5, dagger: 952.5, mace: 952.5, pistol: 952.5, sword: 952.5, scepter: 952.5,
+  focus: 857.5, shield: 857.5, torch: 857.5, warhorn: 857,
+  greatsword: 1047.5, hammer: 1048, longbow: 1000, rifle: 1095.5, shortbow: 952.5, staff: 1048,
+  spear: 952.5, trident: 952.5, harpoon: 952.5,
+};
+
 const EQUIP_TRINKET_SLOTS = [
   { key: "back",       label: "Back",        icon: "Back_slot.png" },
   { key: "amulet",     label: "Amulet",      icon: "Amulet_slot.png" },
@@ -2490,7 +2498,11 @@ function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "", active
       if (!matchesAttunement(ref, n)) continue;
       if (n >= 1 && n <= 5) {
         const skill = weaponSkillById.get(ref.id);
-        if (skill && !slots[n - 1]) slots[n - 1] = skill;
+        if (skill && !slots[n - 1]) {
+          // Skip Weaver dual-attack skills (dualWield set) for non-Weaver builds.
+          if (!isWeaver && skill.dualWield) continue;
+          slots[n - 1] = skill;
+        }
       }
     }
   }
@@ -2508,17 +2520,16 @@ function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "", active
     }
   }
 
-  // Weaver slot 3: Dual Attack — identified by spec=56, Weapon_3, matching weapon type,
-  // and both attunements (attunement + dualWield) matching order-independently.
+  // Weaver slot 3: Dual Attack — dual-attack skills live in weaponSkillById (they are weapon
+  // skills fetched via profession.weapons, not profession.skills). Match by weaponType and
+  // the pair of attunements (order-independent).
   if (isWeaver && mhId && att1 && att2) {
-    const skillById = catalog?.skillById || new Map();
-    for (const skill of skillById.values()) {
-      if (skill.specialization !== 56) continue;
+    for (const skill of weaponSkillById.values()) {
+      if (!skill.dualWield) continue;
       if ((skill.slot || "") !== "Weapon_3") continue;
       if ((skill.weaponType || "").toLowerCase() !== mhId) continue;
       const sa = (skill.attunement || "").toLowerCase();
-      const sd = (skill.dualWield || "").toLowerCase();
-      if (!sa || !sd) continue;
+      const sd = skill.dualWield.toLowerCase();
       if ((sa === att1 && sd === att2) || (sa === att2 && sd === att1)) {
         slots[2] = skill;
         break;
@@ -2767,15 +2778,29 @@ function renderSkills() {
         const wt = (s) => (s.weaponType || "").toLowerCase();
         // Attunement-keyed skills (e.g. Catalyst "Deploy Jade Sphere", Tempest overloads):
         // prefer the variant whose attunement field matches the currently active attunement.
-        const attunementSkill = activeAttunement
+        // Weaver is excluded: its attunement skills have attunement set to the *source* (current)
+        // attunement rather than the target, which would cause skills to appear at the wrong F slot.
+        const attunementSkill = !isWeaver && activeAttunement
           ? pool.find((s) => s.attunement && s.attunement.toLowerCase() === activeAttunement.toLowerCase())
           : null;
-        skill = pool.find((s) => activePetType && wt(s) === activePetType)
-             || pool.find((s) => wt(s) && wt(s) === activeMainhand)
-             || pool.find((s) => wt(s) && wt(s) === activeOffhand)
-             || attunementSkill
-             || pool.find((s) => !s.weaponType && !s.attunement)
-             || pool[0];
+        if (isWeaver) {
+          // Weaver F slots are always attunement swap buttons (Fire/Water/Air/Earth).
+          // The pool may contain dual-attunement combo variants whose `attunement` field is set
+          // to the *source* attunement (not the target), causing wrong icons if selected by
+          // attunement match or highest-ID. Pick by standard "X Attunement" name instead:
+          // prefer the Weaver-spec (56) version, fall back to any standard-named attunement.
+          const stdName = /^(?:Fire|Water|Air|Earth)\s+Attunement\b/i;
+          skill = pool.find((s) => Number(s.specialization) === 56 && stdName.test(s.name || ""))
+               || pool.find((s) => stdName.test(s.name || ""))
+               || pool[0];
+        } else {
+          skill = pool.find((s) => activePetType && wt(s) === activePetType)
+               || pool.find((s) => wt(s) && wt(s) === activeMainhand)
+               || pool.find((s) => wt(s) && wt(s) === activeOffhand)
+               || attunementSkill
+               || pool.find((s) => !s.weaponType && !s.attunement)
+               || pool[0];
+        }
       }
       return { skill, sourceId: skill?.id || 0, isStatic: true, isSelectable: false };
     });
@@ -2838,11 +2863,12 @@ function renderSkills() {
     const iconBtn = document.createElement("button");
     iconBtn.type = "button";
     iconBtn.className = "skill-icon-large skill-icon--weapon" + (wSkill ? "" : " skill-icon--empty");
-    iconBtn.disabled = true;
+    iconBtn.disabled = !wSkill;
     if (wSkill?.icon) {
       iconBtn.innerHTML = `<img src="${escapeHtml(wSkill.icon)}" alt="${escapeHtml(wSkill.name || "")}" />`;
       iconBtn.title = wSkill.name || "";
       bindHoverPreview(iconBtn, "skill", () => wSkill);
+      iconBtn.addEventListener("click", () => selectDetail("skill", wSkill));
     }
     const wKeyLabel = document.createElement("span");
     wKeyLabel.className = "skill-icon-large__keylabel";
@@ -3207,9 +3233,23 @@ function renderDetailPanel() {
   }
 
   const facts = Array.isArray(detail.facts) ? detail.facts.slice(0, 6) : [];
+  const detailDmgStats = (() => {
+    if (detail.kindLabel === "Trait") return null;
+    const computed = computeEquipmentStats();
+    const power = computed.Power || 1000;
+    const precision = computed.Precision || 1000;
+    const ferocity = computed.Ferocity || 0;
+    const activeWeaponSet = Number(state.editor.activeWeaponSet) || 1;
+    const mhKey = activeWeaponSet === 2 ? "mainhand2" : "mainhand1";
+    const mhId = state.editor?.equipment?.weapons?.[mhKey] || "";
+    const weaponStrength = WEAPON_STRENGTH_MIDPOINT[mhId] || 952.5;
+    const critChance = Math.min(1, (precision - 895) / 2100);
+    const effectivePower = power * (1 + critChance * (0.5 + ferocity / 1500));
+    return { weaponStrength, effectivePower };
+  })();
   const factsHtml = facts.length
     ? facts
-        .map((fact) => `<li>${formatFactHtml(fact)}</li>`)
+        .map((fact) => `<li>${formatFactHtml(fact, detailDmgStats)}</li>`)
         .join("")
     : "<li>No fact entries.</li>";
 
@@ -3317,13 +3357,13 @@ function bindHoverPreview(node, kind, entityProvider) {
   });
 }
 
-function buildSkillCard(skill, kind, isChained = false) {
+function buildSkillCard(skill, kind, isChained = false, dmgStats = null) {
   const icon = String(skill.icon || skill.iconFallback || "");
   const description = normalizeText(skill.description || "");
   const maxFacts = kind.startsWith("equip-") ? 12 : 4;
   const facts = (Array.isArray(skill.facts) ? skill.facts : [])
     .slice(0, maxFacts)
-    .map((fact) => formatFactHtml(fact))
+    .map((fact) => formatFactHtml(fact, dmgStats))
     .filter(Boolean);
   const meta = getHoverMetaLine(kind, skill);
   return `
@@ -3343,9 +3383,27 @@ function buildSkillCard(skill, kind, isChained = false) {
 function showHoverPreview(kind, entity, x, y) {
   if (!entity) return;
 
+  // Compute damage stats from the current build for Damage fact calculations.
+  // Formula: Damage = WeaponStrength × EffectivePower × Coefficient × Hits / 2597
+  // EffectivePower = Power × (1 + CritChance × (0.5 + Ferocity/1500))
+  let dmgStats = null;
+  if (kind === "skill") {
+    const computed = computeEquipmentStats();
+    const power = computed.Power || 1000;
+    const precision = computed.Precision || 1000;
+    const ferocity = computed.Ferocity || 0;
+    const activeWeaponSet = Number(state.editor.activeWeaponSet) || 1;
+    const mhKey = activeWeaponSet === 2 ? "mainhand2" : "mainhand1";
+    const mhId = state.editor?.equipment?.weapons?.[mhKey] || "";
+    const weaponStrength = WEAPON_STRENGTH_MIDPOINT[mhId] || 952.5;
+    const critChance = Math.min(1, (precision - 895) / 2100);
+    const effectivePower = power * (1 + critChance * (0.5 + ferocity / 1500));
+    dmgStats = { weaponStrength, effectivePower };
+  }
+
   // For skills, follow flipSkill chain to show chained/charged skills as subsequent cards.
   // Weapon skills live in weaponSkillById; profession/utility skills in skillById — check both.
-  const chainCards = [buildSkillCard(entity, kind, false)];
+  const chainCards = [buildSkillCard(entity, kind, false, dmgStats)];
   if (kind === "skill" && entity.flipSkill) {
     const catalog = state.activeCatalog;
     const lookupSkill = (id) => catalog?.skillById?.get(id) || catalog?.weaponSkillById?.get(id);
@@ -3361,7 +3419,7 @@ function showHoverPreview(kind, entity, x, y) {
       const curSpec = Number(cur.specialization) || 0;
       if (curSpec && curSpec !== originalSpec) break;
       seen.add(cur.id);
-      chainCards.push(buildSkillCard(cur, kind, true));
+      chainCards.push(buildSkillCard(cur, kind, true, dmgStats));
       cur = cur.flipSkill ? lookupSkill(cur.flipSkill) : null;
     }
   }
@@ -4268,9 +4326,28 @@ function formatDate(value) {
   return d.toLocaleString();
 }
 
-function formatFact(fact) {
+function formatBuffConditionText(fact) {
+  const name = String(fact.status || fact.text || "Unknown");
+  const count = Number(fact.apply_count) || 0;
+  const stackPart = count > 1 ? ` ×${count}` : "";
+  const duration = fact.duration != null ? ` (${fact.duration}s)` : "";
+  return `${name}${stackPart}${duration}`;
+}
+
+function formatFact(fact, dmgStats = null) {
   if (!fact || typeof fact !== "object") return "Unknown fact";
   const label = String(fact.text || fact.type || "Fact");
+  if (fact.type === "Damage" && fact.dmg_multiplier != null) {
+    const hits = Number(fact.hit_count) || 1;
+    const coeff = (Number(fact.dmg_multiplier) * hits).toFixed(2);
+    let text = hits > 1 ? `${label}: ×${coeff} (${hits} hits)` : `${label}: ×${coeff}`;
+    if (dmgStats) {
+      const dmg = Math.round(dmgStats.weaponStrength * dmgStats.effectivePower * Number(fact.dmg_multiplier) * hits / 2597);
+      text += ` ≈ ${dmg.toLocaleString()}`;
+    }
+    return text;
+  }
+  if (BUFF_FACT_TYPES.has(fact.type)) return formatBuffConditionText(fact);
   const value =
     fact.value ??
     fact.percent ??
@@ -4320,8 +4397,25 @@ const BOON_CONDITION_ICONS = {
 // Fact types where the icon represents the boon/condition being applied.
 const BUFF_FACT_TYPES = new Set(["Buff", "ApplyBuffCondition", "PrefixedBuff"]);
 
-function formatFactHtml(fact) {
+function formatFactHtml(fact, dmgStats = null) {
   if (!fact || typeof fact !== "object") return "Unknown fact";
+  if (fact.type === "Damage" && fact.dmg_multiplier != null) {
+    const label = String(fact.text || fact.type || "Fact");
+    const hits = Number(fact.hit_count) || 1;
+    const coeff = (Number(fact.dmg_multiplier) * hits).toFixed(2);
+    let text = hits > 1 ? `${label}: ×${coeff} (${hits} hits)` : `${label}: ×${coeff}`;
+    if (dmgStats) {
+      const dmg = Math.round(dmgStats.weaponStrength * dmgStats.effectivePower * Number(fact.dmg_multiplier) * hits / 2597);
+      text += ` ≈ ${dmg.toLocaleString()}`;
+    }
+    const iconUrl = fact.icon || "";
+    return iconUrl ? `<img class="fact-status-icon" src="${escapeHtml(iconUrl)}" alt="" aria-hidden="true">${escapeHtml(text)}` : escapeHtml(text);
+  }
+  if (BUFF_FACT_TYPES.has(fact.type)) {
+    const text = formatBuffConditionText(fact);
+    const iconUrl = fact.icon || (fact.status && BOON_CONDITION_ICONS[fact.status]) || "";
+    return iconUrl ? `<img class="fact-status-icon" src="${escapeHtml(iconUrl)}" alt="" aria-hidden="true">${escapeHtml(text)}` : escapeHtml(text);
+  }
   const label = String(fact.text || fact.type || "Fact");
   const value =
     fact.value ??
@@ -4334,9 +4428,7 @@ function formatFactHtml(fact) {
     fact.description ??
     "";
   const text = value === "" ? label : `${label}: ${value}`;
-  // Show icon when: fact has its own icon (all real API facts), OR it's a buff/cond type with a
-  // known status name (fallback for hardcoded facts that omit the icon field).
-  const iconUrl = fact.icon || (BUFF_FACT_TYPES.has(fact.type) && fact.status && BOON_CONDITION_ICONS[fact.status]) || "";
+  const iconUrl = fact.icon || "";
   if (!iconUrl) return escapeHtml(text);
   return `<img class="fact-status-icon" src="${escapeHtml(iconUrl)}" alt="" aria-hidden="true">${escapeHtml(text)}`;
 }
