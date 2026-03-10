@@ -142,6 +142,16 @@ async function getProfessionCatalog(professionId, lang = "en") {
   const PHOTON_FORGE_SKILL_ID = 42938;
   const PHOTON_FORGE_BUNDLE = [44588, 42965, 44530, 45783, 42521];
 
+  // Luminary (Guardian elite spec, spec 81) — Enter Radiant Forge (77073) replaces weapon skills.
+  // API does not expose bundle_skills; hardcoded from /v2/skills lookups.
+  // Multiple Glaring Burst variants exist (76982→77058→78674 chain); all listed so the slot-based
+  // dedup in the renderer picks 76950 (the standalone variant, lowest ID) for Weapon_1.
+  // Flip skills (76910, 77136, 77366) are fetched via RADIANT_FORGE_FLIP_SKILLS but kept OUT of
+  // the bundle so dedup doesn't pick them over the primary skills.
+  const RADIANT_FORGE_SKILL_ID = 77073;
+  const RADIANT_FORGE_BUNDLE      = [76950, 76982, 77058, 78674, 78730, 77339, 76708, 76924, 76978];
+  const RADIANT_FORGE_FLIP_SKILLS = [76910, 77136, 77366];
+
   // Firebrand tome chapter skills — the GW2 public API does not expose these via bundle_skills
   // or any other field. Skill data sourced from community tools (GW2EI, discretize-ui).
   const _WK = "https://wiki.guildwars2.com/images";
@@ -336,6 +346,8 @@ async function getProfessionCatalog(professionId, lang = "en") {
     ...(professionId === "Engineer" ? PHOTON_FORGE_BUNDLE : []),
     // Include correct Toss Elixir toolbelt skills (API points to Detonate variants instead).
     ...(professionId === "Engineer" ? [...ELIXIR_TOOLBELT_OVERRIDES.values()] : []),
+    // Include Radiant Forge weapon skills + their flip skills (Luminary, Guardian).
+    ...(professionId === "Guardian" ? [...RADIANT_FORGE_BUNDLE, ...RADIANT_FORGE_FLIP_SKILLS] : []),
   ]);
   const extraSkillsRaw = extraSkillIds.length ? await fetchGw2ByIds("skills", extraSkillIds, lang) : [];
 
@@ -424,7 +436,9 @@ async function getProfessionCatalog(professionId, lang = "en") {
       ? rawBundleSkills
       : skill.id === PHOTON_FORGE_SKILL_ID
         ? PHOTON_FORGE_BUNDLE
-        : FIREBRAND_TOME_CHAPTERS.has(skill.id)
+        : skill.id === RADIANT_FORGE_SKILL_ID
+          ? RADIANT_FORGE_BUNDLE
+          : FIREBRAND_TOME_CHAPTERS.has(skill.id)
           ? FIREBRAND_TOME_CHAPTERS.get(skill.id).map((c) => c.id)
           : (transformBundleBySpec.get(specId) || []);
     // GW2 API returns "None" for weapon-agnostic skills; normalize to "" so falsy checks work.
