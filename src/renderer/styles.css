@@ -826,9 +826,12 @@ label {
   left: calc(18px * var(--spec-scale));
   width: calc(96px * var(--spec-scale));
   height: calc(96px * var(--spec-scale));
-  z-index: 5;
   overflow: visible;
   pointer-events: none;
+  /* z-index keeps the overlay above panel children so :hover on the emblem works via
+     pointer-events pass-through. The dropdown menu itself uses position:fixed so it
+     escapes this stacking context and is unaffected by this z-index. */
+  z-index: 5;
 }
 
 .spec-select-overlay .cselect {
@@ -1195,7 +1198,13 @@ label {
   padding-left: 40px; /* align over weapon icons, past swap button (34px + 6px gap) */
 }
 
+/* When legend stack sits left of mechBar, no extra padding needed — legend stack provides offset */
+.skills-bar__mech-area > .profession-mechanics-bar {
+  padding-left: 0;
+}
+
 .skill-icon--profession {
+  position: relative;
   width: 36px;
   height: 36px;
   border: 1px solid rgba(210, 180, 80, 0.5);
@@ -1205,7 +1214,7 @@ label {
   cursor: pointer;
   display: grid;
   place-items: center;
-  overflow: hidden;
+  overflow: visible;
   transition: border-color 0.16s ease, box-shadow 0.16s ease;
 }
 
@@ -1214,6 +1223,8 @@ label {
   height: 100%;
   object-fit: cover;
   display: block;
+  border-radius: 3px;
+  overflow: hidden;
 }
 
 .skill-icon--profession:hover {
@@ -1233,6 +1244,180 @@ label {
   pointer-events: none;
 }
 
+.skill-icon--profession-nokit {
+  cursor: default;
+}
+.skill-icon--profession-nokit:hover {
+  border-color: rgba(210, 180, 80, 0.5);
+  box-shadow: none;
+}
+
+.skill-icon--profession-flabel {
+  position: absolute;
+  bottom: -1px;
+  left: -1px;
+  background: rgba(0, 0, 0, 0.72);
+  color: rgba(220, 200, 120, 0.9);
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 1px 3px 2px;
+  border-radius: 0 2px 0 2px;
+  pointer-events: none;
+  letter-spacing: 0.02em;
+  z-index: 1;
+}
+
+.kit-toggle-indicator {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  background: rgba(0, 0, 0, 0.72);
+  color: rgba(220, 200, 120, 0.9);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 2px 4px 3px;
+  border-radius: 2px 0 2px 0;
+  pointer-events: all;
+  cursor: pointer;
+  user-select: none;
+  z-index: 1;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.kit-toggle-indicator:hover {
+  background: rgba(255, 200, 50, 0.85);
+  color: #000;
+}
+.kit-toggle-indicator--active {
+  background: rgba(210, 180, 80, 0.5);
+  color: #fff;
+}
+.kit-toggle-indicator--active:hover {
+  background: rgba(255, 80, 60, 0.8);
+  color: #fff;
+}
+
+/* Revenant legend stack — sits to the left of the mechBar */
+.skills-bar__mech-area {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.legend-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.legend-slot-btn {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border: 2px solid rgba(160, 120, 60, 0.6);
+  border-radius: 3px;
+  background: rgba(4, 12, 22, 0.85);
+  padding: 0;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  overflow: visible;
+  color: rgba(200, 180, 120, 0.75);
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+  flex-shrink: 0;
+}
+
+.legend-slot-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 2px;
+}
+
+.legend-slot-btn:hover {
+  border-color: rgba(220, 180, 80, 0.9);
+  box-shadow: 0 0 10px rgba(200, 160, 40, 0.5);
+}
+
+.legend-slot-btn--active {
+  border-color: rgba(220, 190, 60, 0.95) !important;
+  box-shadow: 0 0 12px rgba(200, 170, 30, 0.6) !important;
+}
+
+/* F1/F2 label on legend slot button */
+.legend-slot-btn__label {
+  position: absolute;
+  bottom: -1px;
+  left: -1px;
+  background: rgba(0, 0, 0, 0.75);
+  color: rgba(220, 200, 120, 0.9);
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 1px 3px 2px;
+  border-radius: 0 2px 0 2px;
+  pointer-events: none;
+  letter-spacing: 0.02em;
+}
+
+/* Ranger pet panel — sits above the weapon row */
+.pet-selector-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  padding-left: 40px; /* align with weapon icons (past swap button) */
+  margin-bottom: 3px;
+}
+
+.pet-slot-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.pet-slot-btn {
+  width: 40px;
+  height: 40px;
+  border: 2px solid rgba(80, 140, 60, 0.6);
+  border-radius: 3px;
+  background: rgba(4, 12, 22, 0.85);
+  padding: 0;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: rgba(140, 200, 110, 0.75);
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+  flex-shrink: 0;
+}
+
+.pet-slot-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pet-slot-btn:hover {
+  border-color: rgba(120, 200, 80, 0.9);
+  box-shadow: 0 0 10px rgba(100, 180, 60, 0.5);
+}
+
+.pet-slot-btn__label {
+  font-size: 9px;
+  color: rgba(160, 210, 130, 0.75);
+  text-align: center;
+  max-width: 40px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 .skills-bar {
   display: flex;
   align-items: flex-end;
@@ -1249,8 +1434,8 @@ label {
 
 .health-orb {
   position: relative;
-  width: 80px;
-  height: 80px;
+  width: 110px;
+  height: 110px;
   border-radius: 50%;
   background: radial-gradient(circle at 50% 70%, rgba(160, 20, 20, 0.95) 0%, rgba(100, 8, 8, 0.9) 55%, rgba(40, 4, 4, 0.85) 100%);
   border: 2px solid rgba(200, 60, 60, 0.6);
@@ -1280,7 +1465,7 @@ label {
 
 .health-orb__hp {
   font-family: var(--font-display, 'Cinzel', serif);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   color: #fff;
   text-shadow: 0 0 6px rgba(255, 120, 120, 0.8);
@@ -1308,6 +1493,10 @@ label {
   cursor: default;
 }
 
+.skill-icon-large.skill-icon--weapon {
+  border-color: rgba(210, 180, 80, 0.5);
+}
+
 .skill-icon--weapon.skill-icon--empty {
   opacity: 0.3;
   background: rgba(2, 8, 16, 0.5);
@@ -1315,24 +1504,26 @@ label {
 }
 
 .skill-icon-large {
+  position: relative;
+  overflow: visible;
   width: 72px;
   height: 72px;
-  border: 1px solid rgba(80, 132, 163, 0.48);
+  border: 1px solid rgba(210, 180, 80, 0.5);
   border-radius: 4px;
   background: rgba(2, 8, 16, 0.7);
   cursor: pointer;
   padding: 0;
   display: grid;
   place-items: center;
-  overflow: hidden;
   transition:
     border-color 0.16s ease,
     box-shadow 0.16s ease;
 }
 
+.skill-slot:hover .skill-icon-large,
 .skill-icon-large:hover {
-  border-color: rgba(153, 230, 255, 0.7);
-  box-shadow: 0 0 10px rgba(100, 220, 255, 0.3);
+  border-color: rgba(255, 220, 100, 0.85);
+  box-shadow: 0 0 8px rgba(255, 200, 50, 0.4);
 }
 
 .skill-icon-large img {
@@ -1340,6 +1531,24 @@ label {
   height: 100%;
   object-fit: cover;
   display: block;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.skill-icon-large__keylabel {
+  position: absolute;
+  bottom: -1px;
+  left: -1px;
+  background: rgba(0, 0, 0, 0.72);
+  color: rgba(220, 200, 120, 0.9);
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 1px 3px 2px;
+  border-radius: 0 2px 0 2px;
+  pointer-events: none;
+  letter-spacing: 0.02em;
+  z-index: 1;
 }
 
 .skill-slot-label {
@@ -1359,7 +1568,6 @@ label {
   left: 0;
   width: 72px;
   height: 72px;
-  z-index: 5;
   overflow: visible;
   pointer-events: none;
 }

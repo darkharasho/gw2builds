@@ -163,7 +163,12 @@ function wireEvents() {
     closeCustomSelect();
   });
 
-  document.addEventListener("scroll", () => closeCustomSelect(), { capture: true, passive: true });
+  document.addEventListener("scroll", (event) => {
+    // Don't close when scrolling inside the open dropdown's own list
+    const open = state.openCustomSelect;
+    if (open && event.target instanceof Node && open.contains(event.target)) return;
+    closeCustomSelect();
+  }, { capture: true, passive: true });
 
   // Workspace menu toggle
   el.workspaceBtn.addEventListener("click", (event) => {
@@ -351,6 +356,8 @@ async function getCatalog(professionId) {
     traitById: new Map((raw.traits || []).map((entry) => [Number(entry.id), entry])),
     skillById: new Map((raw.skills || []).map((entry) => [Number(entry.id), entry])),
     weaponSkillById: new Map((raw.weaponSkills || []).map((entry) => [Number(entry.id), entry])),
+    legendById: new Map((raw.legends || []).map((entry) => [String(entry.id), entry])),
+    petById: new Map((raw.pets || []).map((entry) => [Number(entry.id), entry])),
   };
   state.catalogCache.set(professionId, catalog);
 
@@ -465,21 +472,77 @@ function enforceEditorConsistency(options = {}) {
 
   state.editor.specializations = nextSpecs;
 
-  const skillOptions = getSkillOptionsByType(catalog, state.editor.specializations);
-  const utilityIds = Array.isArray(state.editor.skills.utilityIds)
-    ? state.editor.skills.utilityIds.map((value) => Number(value) || 0).slice(0, 3)
-    : [];
-  while (utilityIds.length < 3) utilityIds.push(0);
+  // Revenant: skills are locked to the active legend; skip normal skill-options enforcement.
+  // Instead, sync from the selected legend (or set defaults if no legend is selected yet).
+  const isRevenant = Array.isArray(catalog.legends) && catalog.legends.length > 0;
+  if (isRevenant) {
+    if (!state.editor.selectedLegends) state.editor.selectedLegends = ["", ""];
+    // Default to first two legends if none selected
+    if (!state.editor.selectedLegends[0] && catalog.legends[0]) {
+      state.editor.selectedLegends[0] = catalog.legends[0].id;
+    }
+    if (!state.editor.selectedLegends[1] && catalog.legends[1]) {
+      state.editor.selectedLegends[1] = catalog.legends[1].id;
+    }
+    syncRevenantSkillsFromLegend(catalog);
+  } else {
+    const skillOptions = getSkillOptionsByType(catalog, state.editor.specializations);
+    const utilityIds = Array.isArray(state.editor.skills.utilityIds)
+      ? state.editor.skills.utilityIds.map((value) => Number(value) || 0).slice(0, 3)
+      : [];
+    while (utilityIds.length < 3) utilityIds.push(0);
 
-  state.editor.skills.healId = chooseSkillId(state.editor.skills.healId, skillOptions.heal);
-  state.editor.skills.eliteId = chooseSkillId(state.editor.skills.eliteId, skillOptions.elite);
+    state.editor.skills.healId = chooseSkillId(state.editor.skills.healId, skillOptions.heal);
+    state.editor.skills.eliteId = chooseSkillId(state.editor.skills.eliteId, skillOptions.elite);
 
-  const usedUtility = new Set();
-  state.editor.skills.utilityIds = utilityIds.map((value) => {
-    const selected = chooseSkillId(value, skillOptions.utility, usedUtility);
-    if (selected) usedUtility.add(selected);
-    return selected;
-  });
+    const usedUtility = new Set();
+    state.editor.skills.utilityIds = utilityIds.map((value) => {
+      const selected = chooseSkillId(value, skillOptions.utility, usedUtility);
+      if (selected) usedUtility.add(selected);
+      return selected;
+    });
+  }
+
+  // Weaver: ensure both attunements are set and distinct
+  const weaverEliteId = 56;
+  const activeEliteSpecId = Number(
+    (state.editor.specializations || [])
+      .map((e) => Number(e?.specializationId))
+      .find((id) => catalog.specializationById.get(id)?.elite)
+  ) || 0;
+  if (activeEliteSpecId === weaverEliteId) {
+    const attunements = ["Fire", "Water", "Air", "Earth"];
+    if (!state.editor.activeAttunement || !attunements.includes(state.editor.activeAttunement)) {
+      state.editor.activeAttunement = "Fire";
+    }
+    if (!state.editor.activeAttunement2 ||
+        !attunements.includes(state.editor.activeAttunement2) ||
+        state.editor.activeAttunement2 === state.editor.activeAttunement) {
+      state.editor.activeAttunement2 = attunements.find((a) => a !== state.editor.activeAttunement) || "Water";
+    }
+  }
+
+  // Clear weapons that the new profession cannot equip
+  const profWeapons = catalog.professionWeapons || {};
+  const equip = state.editor.equipment;
+  if (equip?.weapons) {
+    for (const [key, weaponId] of Object.entries(equip.weapons)) {
+      if (!weaponId) continue;
+      const wData = profWeapons[weaponId];
+      const isOffhand = key.startsWith("offhand");
+      const isMainhand = key.startsWith("mainhand");
+      let valid = false;
+      if (wData) {
+        if (isOffhand) valid = wData.flags.includes("Offhand");
+        else if (isMainhand) valid = wData.flags.includes("Mainhand") || wData.flags.includes("TwoHand");
+        else valid = true; // aquatic — keep as-is (no per-profession filtering in picker)
+      }
+      if (!valid) {
+        equip.weapons[key] = "";
+        if (equip.slots?.[key] !== undefined) equip.slots[key] = "";
+      }
+    }
+  }
 }
 
 function chooseTraitId(currentId, options) {
@@ -1244,6 +1307,16 @@ function openSlotPicker(anchorEl, currentValue, onSelect, { items = null, search
   };
 }
 
+function updateHealthOrb() {
+  const orbHp = document.querySelector(".health-orb__hp");
+  if (!orbHp) return;
+  const profession = state.editor.profession || "";
+  const baseHp = PROFESSION_BASE_HP[profession] ?? 0;
+  const computed = computeEquipmentStats();
+  const totalHp = baseHp > 0 ? baseHp + (computed.Vitality || 0) * 10 : 0;
+  orbHp.textContent = totalHp > 0 ? totalHp.toLocaleString() : "—";
+}
+
 function renderEquipmentPanel() {
   const panel = el.equipmentPanel;
   if (!panel) return;
@@ -1848,6 +1921,7 @@ function renderEquipmentPanel() {
   layout.className = "equip-layout";
   layout.append(leftCol, artCol, rightCol);
   panel.append(layout);
+  updateHealthOrb();
 }
 
 function renderEditor() {
@@ -1946,6 +2020,9 @@ function renderSpecializations() {
   }
 
   const allSpecs = Array.isArray(catalog.specializations) ? catalog.specializations : [];
+  const lastSlotSpec = catalog.specializationById.get(
+    Number(state.editor.specializations[2]?.specializationId) || 0
+  );
   const selectedEliteCount = (state.editor.specializations || []).reduce((count, entry) => {
     const spec = catalog.specializationById.get(Number(entry?.specializationId) || 0);
     return spec?.elite ? count + 1 : count;
@@ -1978,23 +2055,87 @@ function renderSpecializations() {
     renderCustomSelect(selectHost, {
       value: String(spec.id),
       className: "cselect--spec",
-      options: allSpecs
-        .filter((optionSpec) => slotIndex === 2 || !optionSpec.elite)
-        .map((optionSpec) => ({
-          value: String(optionSpec.id),
-          label: optionSpec.name,
-          icon: optionSpec.icon || "",
-        })),
+      options: (() => {
+        // Slot 2 with elite: disable specs already used in slots 0/1 (no swap allowed).
+        // Slots 0/1: never disable anything — always freely swappable.
+        const slot2IsElite = slotIndex === 2 && !!lastSlotSpec?.elite;
+        const usedInOtherSlots = slot2IsElite
+          ? new Set(state.editor.specializations
+              .filter((_, i) => i !== slotIndex)
+              .map(e => Number(e?.specializationId) || 0)
+              .filter(Boolean))
+          : new Set();
+        return allSpecs
+          .filter((optionSpec) => slotIndex === 2 || !optionSpec.elite)
+          .map((optionSpec) => ({
+            value: String(optionSpec.id),
+            label: optionSpec.name,
+            icon: optionSpec.icon || "",
+            disabled: usedInOtherSlots.has(optionSpec.id),
+          }));
+      })(),
       placeholder: "Select specialization",
       onChange: (nextValue) => {
         const nextId = Number(nextValue) || 0;
-        state.editor.specializations[slotIndex] = {
-          specializationId: nextId,
-          majorChoices: { 1: 0, 2: 0, 3: 0 },
-        };
+        const currentSpec = catalog.specializationById.get(Number(spec.id) || 0);
+        const otherIdx = state.editor.specializations.findIndex(
+          (entry, i) => i !== slotIndex && (Number(entry?.specializationId) || 0) === nextId
+        );
+        // Slots 0/1 always swap freely. Slot 2 swaps only if its current spec is not elite.
+        const canSwap = otherIdx !== -1 && (slotIndex !== 2 || !currentSpec?.elite);
+
+        let swapRects = null;
+        if (canSwap) {
+          // Capture card positions BEFORE re-render for FLIP animation.
+          const cards = el.specializationsHost?.querySelectorAll('.spec-card');
+          const fromCard = cards?.[slotIndex];
+          const toCard = cards?.[otherIdx];
+          if (fromCard && toCard) {
+            swapRects = {
+              fromIdx: slotIndex, toIdx: otherIdx,
+              fromRect: fromCard.getBoundingClientRect(),
+              toRect: toCard.getBoundingClientRect(),
+            };
+          }
+          // Swap: preserve each slot's majorChoices.
+          const tmp = state.editor.specializations[slotIndex];
+          state.editor.specializations[slotIndex] = state.editor.specializations[otherIdx];
+          state.editor.specializations[otherIdx] = tmp;
+        } else {
+          state.editor.specializations[slotIndex] = {
+            specializationId: nextId,
+            majorChoices: { 1: 0, 2: 0, 3: 0 },
+          };
+        }
+
         enforceEditorConsistency({ preferredEliteSlot: slotIndex });
         markEditorChanged({ updateBuildList: true });
         renderEditor();
+
+        if (swapRects) {
+          const newCards = el.specializationsHost?.querySelectorAll('.spec-card');
+          const newFromCard = newCards?.[swapRects.fromIdx];
+          const newToCard = newCards?.[swapRects.toIdx];
+          if (newFromCard && newToCard) {
+            const dx1 = swapRects.toRect.left - swapRects.fromRect.left;
+            const dy1 = swapRects.toRect.top  - swapRects.fromRect.top;
+            const dx2 = swapRects.fromRect.left - swapRects.toRect.left;
+            const dy2 = swapRects.fromRect.top  - swapRects.toRect.top;
+            newFromCard.style.transition = 'none';
+            newFromCard.style.transform = `translate(${dx1}px,${dy1}px)`;
+            newToCard.style.transition = 'none';
+            newToCard.style.transform = `translate(${dx2}px,${dy2}px)`;
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+              const spring = 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)';
+              newFromCard.style.transition = spring;
+              newFromCard.style.transform = '';
+              newToCard.style.transition = spring;
+              newToCard.style.transform = '';
+              newFromCard.addEventListener('transitionend', () => { newFromCard.style.transition = ''; }, { once: true });
+              newToCard.addEventListener('transitionend', () => { newToCard.style.transition = ''; }, { once: true });
+            }));
+          }
+        }
       },
     });
     selectHost.classList.add("spec-select-overlay");
@@ -2014,6 +2155,9 @@ function renderSpecializations() {
       const trigger = selectHost.querySelector(".cselect__trigger");
       if (trigger instanceof HTMLElement) trigger.click();
     });
+    if (spec.name) {
+      bindHoverPreview(emblem, "spec", () => spec);
+    }
     body.append(emblem);
 
     const majors = getMajorTraitsByTier(spec, catalog);
@@ -2049,6 +2193,7 @@ function renderSpecializations() {
           majorButton.dataset.connectorRole = `major-${tier}`;
           cancelAnimationFrame(_connectorRafId);
           _connectorRafId = requestAnimationFrame(() => drawSpecConnector(body));
+          renderSkills();
           selectDetail("trait", trait);
         });
         if (isSelected) {
@@ -2147,28 +2292,14 @@ function makeSkillSlot(slot, catalog, options, utilitySelection) {
   const selectedSkill = slot.list.find((skill) => Number(skill.id) === selectedId) || null;
   const filteredList = filterSkillList(slot.list, query, selectedId);
 
-  const usedByOtherUtilitySlots =
-    slot.index === undefined
-      ? new Set()
-      : new Set(
-          utilitySelection
-            .filter((value, idx) => idx !== slot.index && Number(value))
-            .map((value) => Number(value))
-        );
-  const skillOptions = filteredList.map((skill) => {
-    const optionId = Number(skill.id) || 0;
-    const disabled =
-      slot.index !== undefined && usedByOtherUtilitySlots.has(optionId) && optionId !== selectedId;
-    return {
-      value: String(skill.id),
-      label: disabled ? `${skill.name} (already used)` : skill.name,
-      icon: skill.icon || "",
-      disabled,
-      meta: skill.type ? String(skill.type).toUpperCase() : "",
-      kind: "skill",
-      entity: skill,
-    };
-  });
+  const skillOptions = filteredList.map((skill) => ({
+    value: String(skill.id),
+    label: skill.name,
+    icon: skill.icon || "",
+    meta: skill.type ? String(skill.type).toUpperCase() : "",
+    kind: "skill",
+    entity: skill,
+  }));
 
   const slotEl = document.createElement("div");
   slotEl.className = "skill-slot";
@@ -2183,6 +2314,28 @@ function makeSkillSlot(slot, catalog, options, utilitySelection) {
   if (selectedSkill) {
     bindHoverPreview(iconBtn, "skill", () => selectedSkill);
   }
+  if (slot.keybind) {
+    const keyLabel = document.createElement("span");
+    keyLabel.className = "skill-icon-large__keylabel";
+    keyLabel.textContent = slot.keybind;
+    iconBtn.append(keyLabel);
+  }
+
+  // Kit utilities (Flamethrower, Grenade Kit, etc.) get a toggle badge in the bottom-right
+  // that shows/hides the kit's weapon skills in the weapon bar.
+  const isKitSkill = (selectedSkill?.bundleSkills?.length ?? 0) > 0;
+  if (isKitSkill) {
+    const isKitActive = state.editor.activeKit === selectedId;
+    const toggleBadge = document.createElement("span");
+    toggleBadge.className = "kit-toggle-indicator" + (isKitActive ? " kit-toggle-indicator--active" : "");
+    toggleBadge.textContent = isKitActive ? "✕" : "▸";
+    toggleBadge.addEventListener("click", (e) => {
+      e.stopPropagation();
+      state.editor.activeKit = state.editor.activeKit === selectedId ? 0 : selectedId;
+      renderSkills();
+    });
+    iconBtn.append(toggleBadge);
+  }
 
   const selectHost = document.createElement("div");
   renderCustomSelect(selectHost, {
@@ -2194,15 +2347,70 @@ function makeSkillSlot(slot, catalog, options, utilitySelection) {
     onChange: (nextValue) => {
       const nextId = Number(nextValue) || 0;
       if (!nextId) return;
+
+      let swapRects = null;
       if (slot.index === undefined) {
         state.editor.skills[slot.key] = nextId;
       } else {
-        state.editor.skills[slot.key][slot.index] = nextId;
+        // If the chosen skill is already in another utility slot, swap the two slots.
+        const ids = state.editor.skills[slot.key];
+        const otherIdx = ids.findIndex((id, i) => i !== slot.index && Number(id) === nextId);
+        if (otherIdx !== -1) {
+          // Capture icon positions BEFORE re-render for FLIP animation.
+          // Utility slots are at DOM indices slot.index+1 and otherIdx+1 (heal is index 0).
+          const utilSlots = el.skillsHost?.querySelectorAll('.skill-group--utilities .skill-slot');
+          const fromBtn = utilSlots?.[slot.index + 1]?.querySelector('.skill-icon-large');
+          const toBtn = utilSlots?.[otherIdx + 1]?.querySelector('.skill-icon-large');
+          if (fromBtn && toBtn) {
+            swapRects = {
+              fromIdx: slot.index,
+              toIdx: otherIdx,
+              fromRect: fromBtn.getBoundingClientRect(),
+              toRect: toBtn.getBoundingClientRect(),
+            };
+          }
+          ids[otherIdx] = Number(ids[slot.index]) || 0;
+        }
+        ids[slot.index] = nextId;
       }
       enforceEditorConsistency();
       state.editor.activeKit = 0; // clear kit view when utility selection changes
       markEditorChanged({ updateBuildList: true });
       renderSkills();
+
+      // FLIP animation: after re-render, briefly offset the new icons to their OLD positions
+      // then transition them to their natural (0,0) resting place with a springy easing.
+      if (swapRects) {
+        const newSlots = el.skillsHost?.querySelectorAll('.skill-group--utilities .skill-slot');
+        const newFromBtn = newSlots?.[swapRects.fromIdx + 1]?.querySelector('.skill-icon-large');
+        const newToBtn = newSlots?.[swapRects.toIdx + 1]?.querySelector('.skill-icon-large');
+        if (newFromBtn && newToBtn) {
+          const dx1 = swapRects.toRect.left - swapRects.fromRect.left;
+          const dy1 = swapRects.toRect.top  - swapRects.fromRect.top;
+          const dx2 = swapRects.fromRect.left - swapRects.toRect.left;
+          const dy2 = swapRects.fromRect.top  - swapRects.toRect.top;
+          newFromBtn.style.transition = 'none';
+          newFromBtn.style.transform = `translate(${dx1}px,${dy1}px)`;
+          newToBtn.style.transition = 'none';
+          newToBtn.style.transform = `translate(${dx2}px,${dy2}px)`;
+          // Double rAF: first frame applies the offset, second starts the spring transition.
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            const spring = 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)';
+            newFromBtn.style.transition = spring;
+            newFromBtn.style.transform = '';
+            newToBtn.style.transition = spring;
+            newToBtn.style.transform = '';
+            // Clean up inline styles once settled.
+            newFromBtn.addEventListener('transitionend', () => {
+              newFromBtn.style.transition = '';
+            }, { once: true });
+            newToBtn.addEventListener('transitionend', () => {
+              newToBtn.style.transition = '';
+            }, { once: true });
+          }));
+        }
+      }
+
       const nextSkill = options[resolveSkillSlotType(slot)]?.find((skill) => Number(skill.id) === nextId) || null;
       if (nextSkill) selectDetail("skill", nextSkill);
     },
@@ -2231,7 +2439,7 @@ function parseWeaponSlotNum(slotStr) {
   return m ? parseInt(m[1], 10) : 0;
 }
 
-function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "") {
+function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "", activeAttunement2 = "", isWeaver = false) {
   const profWeapons = catalog?.professionWeapons || {};
   const weaponSkillById = catalog?.weaponSkillById || new Map();
   const slots = [null, null, null, null, null];
@@ -2247,20 +2455,39 @@ function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "") {
     ...(!isTwoHanded && ohId ? (profWeapons[ohId]?.skills || []) : []),
   ];
   const availableAttunements = [...new Set(allRefs.map((r) => r.attunement).filter(Boolean))];
-  // Pick the effective attunement: prefer the stored one, fall back to first available
+  // Pick the effective primary attunement: prefer the stored one, fall back to first available
   const effectiveAttunement = availableAttunements.includes(activeAttunement)
     ? activeAttunement
     : (availableAttunements[0] || "");
 
-  function matches(ref) {
+  // For Weaver: effective secondary attunement (must differ from primary)
+  const effectiveAttunement2 = isWeaver
+    ? (availableAttunements.includes(activeAttunement2) && activeAttunement2 !== effectiveAttunement
+        ? activeAttunement2
+        : availableAttunements.find((a) => a !== effectiveAttunement) || "")
+    : "";
+
+  const att1 = effectiveAttunement.toLowerCase();
+  const att2 = effectiveAttunement2.toLowerCase();
+
+  function matchesAttunement(ref, slotNum) {
+    if (isWeaver) {
+      // Slot 3 handled separately via catalog.skillById + dualWield
+      if (slotNum === 3) return false;
+      // Slots 1-2 use primary attunement, slots 4-5 use secondary
+      const refAtt = (ref.attunement || "").toLowerCase();
+      if (slotNum >= 1 && slotNum <= 2) return !refAtt || refAtt === att1;
+      if (slotNum >= 4 && slotNum <= 5) return !refAtt || refAtt === att2;
+      return false;
+    }
     if (!ref.attunement) return true;
     return ref.attunement === effectiveAttunement;
   }
 
   if (mhData) {
     for (const ref of mhData.skills) {
-      if (!matches(ref)) continue;
       const n = parseWeaponSlotNum(ref.slot);
+      if (!matchesAttunement(ref, n)) continue;
       if (n >= 1 && n <= 5) {
         const skill = weaponSkillById.get(ref.id);
         if (skill && !slots[n - 1]) slots[n - 1] = skill;
@@ -2271,8 +2498,8 @@ function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "") {
     const ohData = profWeapons[ohId];
     if (ohData) {
       for (const ref of ohData.skills) {
-        if (!matches(ref)) continue;
         const n = parseWeaponSlotNum(ref.slot);
+        if (!matchesAttunement(ref, n)) continue;
         if (n >= 4 && n <= 5) {
           const skill = weaponSkillById.get(ref.id);
           if (skill && !slots[n - 1]) slots[n - 1] = skill;
@@ -2280,6 +2507,25 @@ function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "") {
       }
     }
   }
+
+  // Weaver slot 3: Dual Attack — identified by spec=56, Weapon_3, matching weapon type,
+  // and both attunements (attunement + dualWield) matching order-independently.
+  if (isWeaver && mhId && att1 && att2) {
+    const skillById = catalog?.skillById || new Map();
+    for (const skill of skillById.values()) {
+      if (skill.specialization !== 56) continue;
+      if ((skill.slot || "") !== "Weapon_3") continue;
+      if ((skill.weaponType || "").toLowerCase() !== mhId) continue;
+      const sa = (skill.attunement || "").toLowerCase();
+      const sd = (skill.dualWield || "").toLowerCase();
+      if (!sa || !sd) continue;
+      if ((sa === att1 && sd === att2) || (sa === att2 && sd === att1)) {
+        slots[2] = skill;
+        break;
+      }
+    }
+  }
+
   return slots;
 }
 
@@ -2297,6 +2543,7 @@ function renderSkills() {
   bar.className = "skills-bar";
 
   const activeAttunement = state.editor.activeAttunement || "";
+  const activeAttunement2 = state.editor.activeAttunement2 || "";
   const activeKit = Number(state.editor.activeKit) || 0;
   const activeWeaponSet = Number(state.editor.activeWeaponSet) || 1;
   const equippedWeapons = state.editor.equipment?.weapons || {};
@@ -2304,34 +2551,6 @@ function renderSkills() {
   const mhKey = activeWeaponSet === 2 ? "mainhand2" : "mainhand1";
   const ohKey = activeWeaponSet === 2 ? "offhand2" : "offhand1";
   const hasWeaponSet2 = !!(equippedWeapons.mainhand2 || equippedWeapons.offhand2);
-
-  // Resolve weapon skills: kit bundle overrides equipped weapon
-  const kitSrcSkill = activeKit ? catalog.skillById.get(activeKit) : null;
-  const weaponSkills = kitSrcSkill?.bundleSkills?.length
-    ? kitSrcSkill.bundleSkills.slice(0, 5).map((id) => catalog.skillById.get(id) || null)
-    : getEquippedWeaponSkills(catalog, {
-        mainhand: equippedWeapons[mhKey] || "",
-        offhand: equippedWeapons[ohKey] || "",
-      }, activeAttunement);
-
-  const weaponGroup = document.createElement("div");
-  weaponGroup.className = "skill-group skill-group--weapons";
-  for (let i = 0; i < 5; i++) {
-    const skill = weaponSkills[i];
-    const slotEl = document.createElement("div");
-    slotEl.className = "skill-slot skill-slot--weapon";
-    const iconBtn = document.createElement("button");
-    iconBtn.type = "button";
-    iconBtn.className = "skill-icon-large skill-icon--weapon" + (skill ? "" : " skill-icon--empty");
-    iconBtn.disabled = true;
-    if (skill?.icon) {
-      iconBtn.innerHTML = `<img src="${escapeHtml(skill.icon)}" alt="${escapeHtml(skill.name || "")}" />`;
-      iconBtn.title = skill.name || "";
-      bindHoverPreview(iconBtn, "skill", () => skill);
-    }
-    slotEl.append(iconBtn);
-    weaponGroup.append(slotEl);
-  }
 
   // Build mechanic slot descriptors: { skill, sourceId, isStatic }
   // isStatic = true means the slot is a fixed profession mechanic (not toolbelt-derived), so kit toggling doesn't apply
@@ -2354,6 +2573,7 @@ function renderSkills() {
   const eliteSpecEntry = (state.editor.specializations || [])
     .find((e) => catalog.specializationById.get(Number(e?.specializationId))?.elite);
   const eliteSpecId = Number(eliteSpecEntry?.specializationId) || 0;
+  const isWeaver = eliteSpecId === 56;
 
   // Collect elite spec's static profession mechanic skills (type "Profession", not "Toolbelt").
   // Deduplicate by slot: some skills have multiple contextual variants at the same slot
@@ -2374,8 +2594,10 @@ function renderSkills() {
   const morphSlotSkills = eliteSpecOptions.filter((s) => s.name.toLowerCase() === "locked");
   const eliteFixedSkills = eliteSpecOptions.filter((s) => s.name.toLowerCase() !== "locked");
 
-  const eliteOverridesToolbelt = isToolbelt && eliteSpecId > 0 &&
-    eliteSpecOptions.some((s) => s.slot === "Profession_1");
+  // Mechanist (spec 70) is the only toolbelt engineer whose F1-F3 are trait-gated mech commands
+  // rather than toolbelt skills. Detect explicitly by spec ID to avoid false positives from
+  // trait skills that may be incorrectly tagged as Profession_1 for other engineer elite specs.
+  const eliteOverridesToolbelt = isToolbelt && eliteSpecId === 70;
   const isSelectablePool = isToolbelt && morphSlotSkills.length > 0;
 
   if (eliteOverridesToolbelt) {
@@ -2384,9 +2606,8 @@ function renderSkills() {
     // Fall back to the first available skill in that slot if no trait is selected.
     const mechSpecEntry = (state.editor.specializations || [])
       .find((e) => Number(e?.specializationId) === eliteSpecId);
-    const selectedMajorTraitIds = new Set(
-      (mechSpecEntry?.majorTraits || []).map(Number).filter(Boolean)
-    );
+    const mechMajorChoices = mechSpecEntry?.majorChoices || {};
+    const selectedMajorTraitIds = new Set(Object.values(mechMajorChoices).map(Number).filter(Boolean));
 
     mechSlots = [];
     for (const tier of [1, 2, 3]) {
@@ -2450,14 +2671,181 @@ function renderSkills() {
     mechSlots = toolbeltSourceIds.map((id) => {
       const src = catalog.skillById.get(id);
       const fskill = src?.toolbeltSkill ? (catalog.skillById.get(src.toolbeltSkill) || null) : null;
-      return { skill: fskill, sourceId: id, isStatic: false, isSelectable: false };
+      return { skill: fskill, sourceId: id, sourceSkill: src || null, isStatic: false, isSelectable: false };
     });
     // Fixed F5 from elite spec (Scrapper → Function Gyro, Holosmith → Photon Forge)
     const staticF5 = eliteFixedSkills.find((s) => s.slot === "Profession_5");
     if (staticF5) mechSlots.push({ skill: staticF5, sourceId: 0, isStatic: true, isSelectable: false });
+  } else if (Array.isArray(catalog.legends) && catalog.legends.length > 0) {
+    // Revenant: F1 = active legend swap, subsequent slots from elite spec or inactive legend swap.
+    // Elite spec skills (Renegade F2/F3/F4, Vindicator F2, etc.) take priority over the inactive
+    // legend swap. If no elite spec occupies Profession_2, the inactive legend's swap goes there.
+    const legendSlots = state.editor.selectedLegends || ["", ""];
+    const activeLegendSlot = Number(state.editor.activeLegendSlot) || 0;
+    const activeLegendId = legendSlots[activeLegendSlot] || "";
+    const inactiveLegendId = legendSlots[1 - activeLegendSlot] || "";
+    const activeLegend = activeLegendId ? catalog.legendById.get(activeLegendId) : null;
+    const inactiveLegend = inactiveLegendId ? catalog.legendById.get(inactiveLegendId) : null;
+
+    const activeSwapSkill = activeLegend?.swap ? catalog.skillById.get(activeLegend.swap) : null;
+    const inactiveSwapSkill = inactiveLegend?.swap ? catalog.skillById.get(inactiveLegend.swap) : null;
+
+    // Build a lookup of elite spec skills by Profession_N slot
+    const eliteByProfSlot = new Map(eliteFixedSkills.map((s) => [s.slot, s]));
+
+    mechSlots = [
+      { skill: activeSwapSkill, sourceId: activeSwapSkill?.id || 0, isStatic: true, isSelectable: false },
+    ];
+    for (let n = 2; n <= 5; n++) {
+      const slotKey = `Profession_${n}`;
+      const eliteSkill = eliteByProfSlot.get(slotKey);
+      if (eliteSkill) {
+        mechSlots.push({ skill: eliteSkill, sourceId: eliteSkill.id, isStatic: true, isSelectable: false });
+      } else if (n === 2 && inactiveSwapSkill) {
+        // Core/Herald: inactive legend swap lives at Profession_2 when no elite spec overrides it
+        mechSlots.push({ skill: inactiveSwapSkill, sourceId: inactiveSwapSkill.id, isStatic: true, isSelectable: false });
+        break;
+      } else {
+        break;
+      }
+    }
+
+    // Override skill option lists so they show this legend's fixed skills (not free-choice catalog).
+    if (activeLegend) {
+      const ls = (id) => (id ? catalog.skillById.get(id) : null);
+      options.heal = [ls(activeLegend.heal)].filter(Boolean);
+      options.utility = (activeLegend.utilities || []).map(ls).filter(Boolean);
+      options.elite = [ls(activeLegend.elite)].filter(Boolean);
+    }
   } else {
-    // Elementalist, Guardian, etc.: all static Profession_* slot skills
-    mechSlots = (options.profession || []).map((skill) => ({ skill, sourceId: 0, isStatic: true, isSelectable: false }));
+    // Non-toolbelt professions (warrior, necro, guardian, mesmer, ele, ranger, thief, etc.)
+    // Group by slot, then pick the best candidate per slot:
+    //   - If an elite spec skill exists for this slot, prefer it (e.g. berserker primal burst over
+    //     base warrior burst, spellbreaker Full Counter over all weapon bursts, etc.)
+    //   - Among the preferred pool, pick the skill whose weaponType matches the equipped mainhand
+    //     (falls back to offhand, pet type for Soulbeast, weapon-agnostic, then first available).
+    const activeMainhand = (equippedWeapons[mhKey] || "").toLowerCase();
+    const activeOffhand = (equippedWeapons[ohKey] || "").toLowerCase();
+
+    // For Soulbeast: F skills are keyed by pet family type (stored in skill.weaponType).
+    // Resolve the active pet's type so we can match the correct family variant.
+    const activePetId = Number(state.editor.selectedPets?.terrestrial1) || 0;
+    const activePet = activePetId && catalog.petById ? catalog.petById.get(activePetId) : null;
+    const activePetType = (activePet?.type || "").toLowerCase();
+
+    const bySlot = new Map(); // slotKey → skill[]
+    for (const skill of (options.profession || [])) {
+      if (!skill.slot) continue;
+      if (!bySlot.has(skill.slot)) bySlot.set(skill.slot, []);
+      bySlot.get(skill.slot).push(skill);
+    }
+
+    const sortedSlotKeys = [...bySlot.keys()]
+      .filter((k) => !isWeaver || parseInt(k.replace("Profession_", ""), 10) <= 4)
+      .sort((a, b) => {
+        const na = parseInt(a.replace("Profession_", ""), 10) || 0;
+        const nb = parseInt(b.replace("Profession_", ""), 10) || 0;
+        return na - nb;
+      });
+
+    mechSlots = sortedSlotKeys.map((slotKey) => {
+      const candidates = bySlot.get(slotKey);
+      let skill;
+      if (candidates.length === 1) {
+        skill = candidates[0];
+      } else {
+        // Split into elite-spec and base pools; prefer elite-spec when active.
+        // Weaver is excluded: its F skills are the standard ele attunement swaps.
+        const eliteCandidates = eliteSpecId && !isWeaver
+          ? candidates.filter((s) => Number(s.specialization) === eliteSpecId)
+          : [];
+        const pool = eliteCandidates.length > 0 ? eliteCandidates : candidates;
+        const wt = (s) => (s.weaponType || "").toLowerCase();
+        // Attunement-keyed skills (e.g. Catalyst "Deploy Jade Sphere", Tempest overloads):
+        // prefer the variant whose attunement field matches the currently active attunement.
+        const attunementSkill = activeAttunement
+          ? pool.find((s) => s.attunement && s.attunement.toLowerCase() === activeAttunement.toLowerCase())
+          : null;
+        skill = pool.find((s) => activePetType && wt(s) === activePetType)
+             || pool.find((s) => wt(s) && wt(s) === activeMainhand)
+             || pool.find((s) => wt(s) && wt(s) === activeOffhand)
+             || attunementSkill
+             || pool.find((s) => !s.weaponType && !s.attunement)
+             || pool[0];
+      }
+      return { skill, sourceId: skill?.id || 0, isStatic: true, isSelectable: false };
+    });
+  }
+
+  // If activeKit refers to a static shroud/bundle skill, ensure it still exists in current mechSlots.
+  // This prevents stale shroud state when switching elite specs (e.g. Reaper → Scourge).
+  // Must happen before weapon skill resolution so the weapon bar reflects the correct state.
+  if (activeKit) {
+    const kitSkill = catalog.skillById.get(activeKit);
+    const isStaticBundle = kitSkill?.bundleSkills?.length > 0 &&
+      mechSlots.some((s) => s.isStatic && s.skill?.id === activeKit);
+    const isToolbeltSource = mechSlots.some((s) => !s.isStatic && s.sourceId === activeKit);
+    // Also allow heal/utility/elite slot kits (e.g. Mortar Kit in elite slot, Med Kit in heal slot).
+    const equippedIds = new Set([
+      Number(state.editor.skills?.healId) || 0,
+      ...(state.editor.skills?.utilityIds || []).map(Number),
+      Number(state.editor.skills?.eliteId) || 0,
+    ].filter(Boolean));
+    const isEquippedSlotKit = (kitSkill?.bundleSkills?.length ?? 0) > 0 && equippedIds.has(activeKit);
+    if (!isStaticBundle && !isToolbeltSource && !isEquippedSlotKit) {
+      state.editor.activeKit = 0;
+    }
+  }
+
+  // Resolve weapon skills after kit validation so bundle/shroud state is correct.
+  const resolvedKit = Number(state.editor.activeKit) || 0;
+  const kitSrcSkill = resolvedKit ? catalog.skillById.get(resolvedKit) : null;
+  // Build weapon bar skills for active kit/bundle, or fall back to equipped weapon skills.
+  // bundle_skills arrays include both land and aquatic variants with no flags to distinguish them.
+  // Group by Weapon_N/Downed_N slot and prefer the lower skill ID per slot — land skills are
+  // historically assigned lower IDs than their aquatic counterparts (e.g. Box of Nails 5995
+  // vs Box of Piranhas 6175 in Tool Kit).
+  let weaponSkills;
+  if (kitSrcSkill?.bundleSkills?.length) {
+    const slotMap = new Map(); // slot number (1–5) → skill
+    for (const id of kitSrcSkill.bundleSkills) {
+      const s = catalog.skillById.get(id);
+      if (!s) continue;
+      const m = /^(?:Weapon|Downed)_(\d)$/.exec(s.slot || "");
+      if (!m) continue;
+      const slotNum = parseInt(m[1], 10);
+      const existing = slotMap.get(slotNum);
+      if (!existing || id < existing.id) slotMap.set(slotNum, s);
+    }
+    weaponSkills = [1, 2, 3, 4, 5].map((n) => slotMap.get(n) || null);
+  } else {
+    weaponSkills = getEquippedWeaponSkills(catalog, {
+      mainhand: equippedWeapons[mhKey] || "",
+      offhand: equippedWeapons[ohKey] || "",
+    }, activeAttunement, activeAttunement2, isWeaver);
+  }
+
+  const weaponGroup = document.createElement("div");
+  weaponGroup.className = "skill-group skill-group--weapons";
+  for (let i = 0; i < 5; i++) {
+    const wSkill = weaponSkills[i];
+    const slotEl = document.createElement("div");
+    slotEl.className = "skill-slot skill-slot--weapon";
+    const iconBtn = document.createElement("button");
+    iconBtn.type = "button";
+    iconBtn.className = "skill-icon-large skill-icon--weapon" + (wSkill ? "" : " skill-icon--empty");
+    iconBtn.disabled = true;
+    if (wSkill?.icon) {
+      iconBtn.innerHTML = `<img src="${escapeHtml(wSkill.icon)}" alt="${escapeHtml(wSkill.name || "")}" />`;
+      iconBtn.title = wSkill.name || "";
+      bindHoverPreview(iconBtn, "skill", () => wSkill);
+    }
+    const wKeyLabel = document.createElement("span");
+    wKeyLabel.className = "skill-icon-large__keylabel";
+    wKeyLabel.textContent = String(i + 1);
+    iconBtn.append(wKeyLabel);
+    slotEl.append(iconBtn);
+    weaponGroup.append(slotEl);
   }
 
   const weaponCol = document.createElement("div");
@@ -2467,33 +2855,73 @@ function renderSkills() {
     const mechBar = document.createElement("div");
     mechBar.className = "profession-mechanics-bar";
 
-    for (const { skill, sourceId, isStatic, isSelectable, morphIndex, mechIconOverride } of mechSlots) {
+    for (let fIdx = 0; fIdx < mechSlots.length; fIdx++) {
+      const { skill, sourceId, sourceSkill, isStatic, isSelectable, morphIndex, mechIconOverride } = mechSlots[fIdx];
       const slotEl = document.createElement("div");
       slotEl.className = "skill-slot";
       const iconBtn = document.createElement("button");
       iconBtn.type = "button";
 
+      // Determine if this slot has a kit (bundle weapon skills available to toggle).
+      // Toolbelt slots: the SOURCE utility skill must have bundleSkills (i.e. be a kit).
+      // Static slots: the skill itself has bundleSkills (shroud, Photon Forge, etc.).
+      const srcSkillForKit = (!isStatic && isToolbelt) ? catalog.skillById.get(sourceId) : null;
+      const isKit = !isStatic && isToolbelt
+        ? (srcSkillForKit?.bundleSkills?.length ?? 0) > 0
+        : isStatic && (skill?.bundleSkills?.length ?? 0) > 0;
+
       let isActive = false;
       if (isSelectable) {
         // Amalgam morph slot — always interactive, never "active" in the attunement/kit sense
       } else if (!isStatic && isToolbelt) {
-        const srcSkill = catalog.skillById.get(sourceId);
-        isActive = (srcSkill?.bundleSkills?.length ?? 0) > 0 && activeKit === sourceId;
+        isActive = isKit && resolvedKit === sourceId;
+      } else if (isStatic && (skill?.bundleSkills?.length ?? 0) > 0) {
+        // Static bundle skills: shroud, celestial avatar, Photon Forge, etc.
+        isActive = resolvedKit === skill.id;
       } else if (isStatic && !isToolbelt) {
-        const attunementMatch = /^(\w+)\s+Attunement\b/i.exec(skill?.name || "");
-        const skillAttunement = attunementMatch ? attunementMatch[1] : "";
-        isActive = weaponHasAttunements && !!skillAttunement && skillAttunement === effectiveAttunement;
+        // Attunement-keyed skills: check name pattern ("Fire Attunement") or attunement field
+        const attunementNameMatch = /^(\w+)\s+Attunement\b/i.exec(skill?.name || "");
+        const skillAttunement = attunementNameMatch ? attunementNameMatch[1] : (skill?.attunement || "");
+        const sa = skillAttunement.toLowerCase();
+        // Weaver: both primary and secondary attunements are highlighted
+        isActive = !!skillAttunement && (
+          sa === activeAttunement.toLowerCase() ||
+          (isWeaver && !!activeAttunement2 && sa === activeAttunement2.toLowerCase())
+        );
       }
 
       iconBtn.className = "skill-icon--profession"
         + (isActive ? " skill-icon--profession-active" : "")
-        + (!skill ? " skill-icon--profession-empty" : "");
+        + (!skill ? " skill-icon--profession-empty" : "")
+        + (!isKit && !isSelectable && isStatic === false ? " skill-icon--profession-nokit" : "");
       iconBtn.title = skill?.name || (isSelectable ? "Choose morph skill…" : "");
-      const displayIcon = skill?.icon || mechIconOverride || "";
+
+      // When a static bundle skill (e.g. Photon Forge) is active, show the flip_skill icon.
+      const flipSkillId = isActive && isStatic && (skill?.flipSkill ?? 0);
+      const flipSkill = flipSkillId ? catalog.skillById.get(flipSkillId) : null;
+      // Elixir toolbelt skills ("Detonate Elixir X") share a generic icon in the API.
+      // Fall back to the source elixir's own icon so each slot looks distinct.
+      // All other toolbelt skills (Defense Field, turret actions, etc.) have correct distinct icons.
+      const isDetonateElixir = !isKit && !isStatic && /^Detonate Elixir\b/i.test(skill?.name || "");
+      const slotIcon = (isDetonateElixir && sourceSkill?.icon)
+        ? sourceSkill.icon
+        : (skill?.icon || mechIconOverride || "");
+      const displayIcon = (flipSkill?.icon) || slotIcon;
+      const displayName = (flipSkill?.name) || skill?.name || "";
       if (displayIcon) {
-        iconBtn.innerHTML = `<img src="${escapeHtml(displayIcon)}" alt="${escapeHtml(skill?.name || "")}" />`;
+        iconBtn.innerHTML = `<img src="${escapeHtml(displayIcon)}" alt="${escapeHtml(displayName)}" />`;
       }
-      if (skill) bindHoverPreview(iconBtn, "skill", () => skill);
+      if (flipSkill) {
+        bindHoverPreview(iconBtn, "skill", () => flipSkill);
+      } else if (skill) {
+        bindHoverPreview(iconBtn, "skill", () => skill);
+      }
+
+      // F-key label (F1, F2, …) in the bottom-left corner of the slot icon
+      const fLabel = document.createElement("span");
+      fLabel.className = "skill-icon--profession-flabel";
+      fLabel.textContent = `F${fIdx + 1}`;
+      iconBtn.append(fLabel);
 
       if (isSelectable) {
         iconBtn.addEventListener("click", () => {
@@ -2523,19 +2951,34 @@ function renderSkills() {
           }, { items: morphItems, searchPlaceholder: "Choose morph skill…" });
           if (skill) selectDetail("skill", skill);
         });
+      } else if (!isKit && !isStatic && isToolbelt) {
+        // Non-kit toolbelt slot (elixir, gadget, etc.): not interactive, just show skill detail.
+        if (skill) iconBtn.addEventListener("click", () => selectDetail("skill", skill));
+      } else if (isKit && !isStatic && isToolbelt) {
+        // Kit toolbelt slot: clicking shows skill detail. Weapon skill toggling is done via the
+        // badge on the utility skill slot itself (see makeSkillSlot).
+        if (skill) iconBtn.addEventListener("click", () => selectDetail("skill", skill));
       } else {
         iconBtn.addEventListener("click", () => {
-          if (!isStatic && isToolbelt) {
-            const srcSkill = catalog.skillById.get(sourceId);
-            if ((srcSkill?.bundleSkills?.length ?? 0) > 0) {
-              state.editor.activeKit = activeKit === sourceId ? 0 : sourceId;
-              renderSkills();
-            }
+          if (isStatic && (skill?.bundleSkills?.length ?? 0) > 0) {
+            // Static bundle skill (shroud, Photon Forge, etc.): toggle bundle weapon skills.
+            state.editor.activeKit = resolvedKit === skill.id ? 0 : skill.id;
+            renderSkills();
+            if (skill) selectDetail("skill", skill);
+            return;
           } else if (isStatic && !isToolbelt) {
-            const attunementMatch = /^(\w+)\s+Attunement\b/i.exec(skill?.name || "");
-            const skillAttunement = attunementMatch ? attunementMatch[1] : "";
+            const attunementNameMatch = /^(\w+)\s+Attunement\b/i.exec(skill?.name || "");
+            const skillAttunement = attunementNameMatch ? attunementNameMatch[1] : (skill?.attunement || "");
             if (skillAttunement) {
-              state.editor.activeAttunement = skillAttunement;
+              if (isWeaver) {
+                // Shift: current primary → secondary, clicked → primary (no-op if already primary)
+                if (skillAttunement.toLowerCase() !== state.editor.activeAttunement.toLowerCase()) {
+                  state.editor.activeAttunement2 = state.editor.activeAttunement;
+                  state.editor.activeAttunement = skillAttunement;
+                }
+              } else {
+                state.editor.activeAttunement = skillAttunement;
+              }
               renderSkills();
             }
           }
@@ -2546,7 +2989,88 @@ function renderSkills() {
       slotEl.append(iconBtn);
       mechBar.append(slotEl);
     }
-    weaponCol.append(mechBar);
+    // Revenant: build a legend stack to the LEFT of the mechBar
+    if (Array.isArray(catalog.legends) && catalog.legends.length > 0) {
+      const legendSlots = state.editor.selectedLegends || ["", ""];
+      const activeLegendSlot = Number(state.editor.activeLegendSlot) || 0;
+      const legendStack = document.createElement("div");
+      legendStack.className = "legend-stack";
+
+      for (let slotIdx = 0; slotIdx < 2; slotIdx++) {
+        const legendId = legendSlots[slotIdx] || "";
+        const legend = legendId ? catalog.legendById.get(legendId) : null;
+        const swapSkill = legend?.swap ? catalog.skillById.get(legend.swap) : null;
+        const legendName = swapSkill?.name || legend?.id || "—";
+        const legendIcon = swapSkill?.icon || "";
+        const isActive = slotIdx === activeLegendSlot;
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "legend-slot-btn" + (isActive ? " legend-slot-btn--active" : "");
+        btn.title = legendName + (isActive ? " (active)" : " — click to activate, right-click to change");
+        if (legendIcon) {
+          btn.innerHTML = `<img src="${escapeHtml(legendIcon)}" alt="${escapeHtml(legendName)}" />`;
+        }
+        const slotLabel = document.createElement("span");
+        slotLabel.className = "legend-slot-btn__label";
+        slotLabel.textContent = isActive ? "F1" : "F2";
+        btn.append(slotLabel);
+        btn.addEventListener("click", () => {
+          if (isActive || !legendId) {
+            openLegendPicker(btn, slotIdx, catalog);
+          } else {
+            if (!state.editor.selectedLegends) state.editor.selectedLegends = ["", ""];
+            state.editor.activeLegendSlot = slotIdx;
+            syncRevenantSkillsFromLegend(catalog);
+            markEditorChanged();
+            renderSkills();
+          }
+        });
+        btn.addEventListener("contextmenu", (e) => {
+          e.preventDefault();
+          openLegendPicker(btn, slotIdx, catalog);
+        });
+        legendStack.append(btn);
+      }
+
+      const mechArea = document.createElement("div");
+      mechArea.className = "skills-bar__mech-area";
+      mechArea.append(legendStack, mechBar);
+      weaponCol.append(mechArea);
+    } else {
+      weaponCol.append(mechBar);
+    }
+  }
+
+  // Ranger: build a pet selector row above the weapon row
+  if (Array.isArray(catalog.pets) && catalog.pets.length > 0) {
+    const petRow = document.createElement("div");
+    petRow.className = "pet-selector-row";
+    const petSlotDefs = [
+      { key: "terrestrial1", label: "T1" },
+      { key: "terrestrial2", label: "T2" },
+      { key: "aquatic1", label: "A1" },
+      { key: "aquatic2", label: "A2" },
+    ];
+    for (const { key, label } of petSlotDefs) {
+      const petId = Number(state.editor.selectedPets?.[key]) || 0;
+      const pet = petId ? catalog.petById.get(petId) : null;
+      const wrapper = document.createElement("div");
+      wrapper.className = "pet-slot-wrapper";
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "pet-slot-btn";
+      btn.title = pet?.name || `Slot ${label}`;
+      if (pet?.icon) {
+        btn.innerHTML = `<img src="${escapeHtml(pet.icon)}" alt="${escapeHtml(pet.name || "")}" />`;
+      }
+      const slotLabel = document.createElement("span");
+      slotLabel.className = "pet-slot-btn__label";
+      slotLabel.textContent = pet?.name ? pet.name.split(" ")[0] : label;
+      btn.addEventListener("click", () => openPetPicker(btn, key, catalog));
+      wrapper.append(btn, slotLabel);
+      petRow.append(wrapper);
+    }
+    weaponCol.append(petRow);
   }
 
   const swapBtn = document.createElement("button");
@@ -2573,12 +3097,14 @@ function renderSkills() {
   // Center: health orb
   const profession = state.editor.profession || "";
   const baseHp = PROFESSION_BASE_HP[profession] ?? 0;
+  const computed = computeEquipmentStats();
+  const totalHp = baseHp > 0 ? baseHp + (computed.Vitality || 0) * 10 : 0;
   const orbEl = document.createElement("div");
   orbEl.className = "health-orb";
   orbEl.innerHTML = `
     <div class="health-orb__fill"></div>
     <div class="health-orb__text">
-      <span class="health-orb__hp">${baseHp > 0 ? baseHp.toLocaleString() : "—"}</span>
+      <span class="health-orb__hp">${totalHp > 0 ? totalHp.toLocaleString() : "—"}</span>
       <span class="health-orb__label">HP</span>
     </div>
   `;
@@ -2587,11 +3113,11 @@ function renderSkills() {
   const utilityGroup = document.createElement("div");
   utilityGroup.className = "skill-group skill-group--utilities";
   const utilitySlots = [
-    { key: "healId", label: "Heal", list: options.heal || [] },
-    { key: "utilityIds", index: 0, label: "Utility", list: options.utility || [] },
-    { key: "utilityIds", index: 1, label: "Utility", list: options.utility || [] },
-    { key: "utilityIds", index: 2, label: "Utility", list: options.utility || [] },
-    { key: "eliteId", label: "Elite", list: options.elite || [] },
+    { key: "healId", label: "Heal", list: options.heal || [], keybind: "6" },
+    { key: "utilityIds", index: 0, label: "Utility", list: options.utility || [], keybind: "7" },
+    { key: "utilityIds", index: 1, label: "Utility", list: options.utility || [], keybind: "8" },
+    { key: "utilityIds", index: 2, label: "Utility", list: options.utility || [], keybind: "9" },
+    { key: "eliteId", label: "Elite", list: options.elite || [], keybind: "0" },
   ];
   for (const slot of utilitySlots) {
     utilityGroup.append(makeSkillSlot(slot, catalog, options, utilitySelection));
@@ -2599,6 +3125,61 @@ function renderSkills() {
 
   bar.append(weaponCol, orbEl, utilityGroup);
   el.skillsHost.append(bar);
+}
+
+function openLegendPicker(anchorEl, slotIdx, catalog) {
+  const legendSlots = state.editor.selectedLegends || ["", ""];
+  const otherLegendId = legendSlots[1 - slotIdx] || "";
+  const items = [
+    { value: "", label: "— None —" },
+    ...(catalog.legends || []).map((l) => {
+      const swapSkill = l.swap ? catalog.skillById.get(l.swap) : null;
+      return { value: l.id, label: swapSkill?.name || l.id, icon: swapSkill?.icon || "" };
+    }).filter((item) => item.value !== otherLegendId),
+  ];
+  openSlotPicker(anchorEl, legendSlots[slotIdx] || "", (newVal) => {
+    if (!state.editor.selectedLegends) state.editor.selectedLegends = ["", ""];
+    state.editor.selectedLegends[slotIdx] = newVal || "";
+    syncRevenantSkillsFromLegend(catalog);
+    markEditorChanged();
+    renderSkills();
+  }, { items, searchPlaceholder: "Search legends…" });
+}
+
+function openPetPicker(anchorEl, petKey, catalog) {
+  const currentPetId = Number(state.editor.selectedPets?.[petKey]) || 0;
+  const isAquatic = petKey.startsWith("aquatic");
+  // Filter pets: aquatic slots show aquatic family pets; terrestrial slots show non-aquatic
+  const aquaticFamilies = new Set(["Amphibious", "Aquatic"]);
+  const filteredPets = (catalog.pets || []).filter((p) => {
+    const isAquaticPet = aquaticFamilies.has(p.type);
+    return isAquatic ? isAquaticPet : !isAquaticPet;
+  });
+  const items = [
+    { value: "", label: "— None —" },
+    ...filteredPets.map((p) => ({ value: String(p.id), label: p.name, icon: p.icon })),
+  ];
+  openSlotPicker(anchorEl, currentPetId ? String(currentPetId) : "", (newVal) => {
+    if (!state.editor.selectedPets) state.editor.selectedPets = { terrestrial1: 0, terrestrial2: 0, aquatic1: 0, aquatic2: 0 };
+    state.editor.selectedPets[petKey] = Number(newVal) || 0;
+    markEditorChanged();
+    renderSkills();
+  }, { items, searchPlaceholder: "Search pets…" });
+}
+
+function syncRevenantSkillsFromLegend(catalog) {
+  const legendSlots = state.editor.selectedLegends || ["", ""];
+  const activeLegendSlot = Number(state.editor.activeLegendSlot) || 0;
+  const activeLegendId = legendSlots[activeLegendSlot] || "";
+  const activeLegend = activeLegendId ? catalog.legendById.get(activeLegendId) : null;
+  if (!activeLegend) return;
+  if (!state.editor.skills) state.editor.skills = { healId: 0, utilityIds: [0, 0, 0], eliteId: 0 };
+  state.editor.skills.healId = activeLegend.heal || 0;
+  state.editor.skills.utilityIds = [
+    ...(activeLegend.utilities || []).slice(0, 3),
+    ...Array(3).fill(0),
+  ].slice(0, 3);
+  state.editor.skills.eliteId = activeLegend.elite || 0;
 }
 
 function renderDetailPanel() {
@@ -2756,9 +3337,11 @@ function getHoverMetaLine(kind, entity) {
     return handLabel ? `Weapon • ${handLabel}` : "Weapon";
   }
   if (kind === "equip-relic") return "Relic";
+  if (kind === "spec") return entity?.elite ? "Elite Specialization" : "Specialization";
   const type = String(entity?.type || "").trim();
   const slot = String(entity?.slot || "").trim();
-  if (type && slot) return `Skill • ${type} • ${slot}`;
+  const showSlot = slot && !/^(Profession|Weapon)_/i.test(slot) && !/^(Heal|Utility|Elite)$/i.test(slot);
+  if (type && showSlot) return `Skill • ${type} • ${slot}`;
   if (type) return `Skill • ${type}`;
   return "Skill";
 }
@@ -2850,15 +3433,25 @@ function getSkillOptionsByType(catalog, specializationSelections) {
   );
 
   const allSkills = Array.isArray(catalog.skills) ? catalog.skills : [];
+
+  // Build a set of flip_skill IDs — these are in-combat replacement skills (e.g. "Detonate Turret",
+  // "Deploy Mine") that appear in the API as type "Utility" but are never base equippable skills.
+  const flipSkillIds = new Set(allSkills.flatMap((s) => s.flipSkill ? [s.flipSkill] : []));
+
   const filtered = allSkills.filter((skill) => {
+    if (flipSkillIds.has(skill.id)) return false;
     const lockSpec = Number(skill.specialization) || 0;
     return !lockSpec || selectedSpecIds.has(lockSpec);
   });
 
   // Profession mechanic skills (F1–F5): slot is "Profession_1" ... "Profession_5"
   // Include unspecced ones plus those locked to a selected spec.
+  // Exclude "Exit" / "Leave" variants (e.g. "Exit Reaper's Shroud", "Leave Beastmode") — these are
+  // the toggle-off skill IDs that appear as bundleSkills children, not standalone F-slot entries.
+  const exitLeavePattern = /^(Exit|Leave)\b/i;
   const profMechanics = allSkills
     .filter((skill) => /^Profession_\d/.test(skill.slot || ""))
+    .filter((skill) => !exitLeavePattern.test(skill.name || ""))
     .filter((skill) => {
       const lockSpec = Number(skill.specialization) || 0;
       return !lockSpec || selectedSpecIds.has(lockSpec);
@@ -3320,6 +3913,23 @@ async function loadBuildIntoEditor(build, options = {}) {
         : [0, 0, 0],
       eliteId: Number(build.skills?.elite?.id) || 0,
     },
+    activeAttunement: "",
+    activeAttunement2: "",
+    activeKit: 0,
+    activeWeaponSet: 1,
+    morphSkillIds: Array.isArray(build.morphSkillIds)
+      ? build.morphSkillIds.slice(0, 3).map(Number)
+      : [0, 0, 0],
+    selectedLegends: Array.isArray(build.selectedLegends)
+      ? build.selectedLegends.slice(0, 2).map(String)
+      : ["", ""],
+    activeLegendSlot: Number(build.activeLegendSlot) || 0,
+    selectedPets: {
+      terrestrial1: Number(build.selectedPets?.terrestrial1) || 0,
+      terrestrial2: Number(build.selectedPets?.terrestrial2) || 0,
+      aquatic1: Number(build.selectedPets?.aquatic1) || 0,
+      aquatic2: Number(build.selectedPets?.aquatic2) || 0,
+    },
   };
 
   if (profession) {
@@ -3427,6 +4037,19 @@ function serializeEditorToBuild() {
     },
     tags: parseTags(state.editor.tagsText),
     notes: String(state.editor.notes || ""),
+    morphSkillIds: Array.isArray(state.editor.morphSkillIds)
+      ? state.editor.morphSkillIds.map(Number)
+      : [0, 0, 0],
+    selectedLegends: Array.isArray(state.editor.selectedLegends)
+      ? state.editor.selectedLegends.slice(0, 2).map(String)
+      : ["", ""],
+    activeLegendSlot: Number(state.editor.activeLegendSlot) || 0,
+    selectedPets: {
+      terrestrial1: Number(state.editor.selectedPets?.terrestrial1) || 0,
+      terrestrial2: Number(state.editor.selectedPets?.terrestrial2) || 0,
+      aquatic1: Number(state.editor.selectedPets?.aquatic1) || 0,
+      aquatic2: Number(state.editor.selectedPets?.aquatic2) || 0,
+    },
   };
 }
 
@@ -3579,9 +4202,15 @@ function createEmptyEditor(profession = "") {
       eliteId: 0,
     },
     activeAttunement: "",
+    activeAttunement2: "",
     activeKit: 0,
     activeWeaponSet: 1,
     morphSkillIds: [0, 0, 0],
+    // Revenant: two legend slots (active/inactive), identified by legend string ID (e.g. "Legend1")
+    selectedLegends: ["", ""],
+    activeLegendSlot: 0,           // 0 = first legend active, 1 = second legend active
+    // Ranger/Soulbeast: two pet slots (terrestrial + aquatic) per legend slot (A/B)
+    selectedPets: { terrestrial1: 0, terrestrial2: 0, aquatic1: 0, aquatic2: 0 },
   };
 }
 
