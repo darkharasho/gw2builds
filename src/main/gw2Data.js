@@ -31,8 +31,9 @@ async function getProfessionCatalog(professionId, lang = "en") {
   }
 
   // Step 1: fetch profession data — everything else depends on this.
-  const professionUrl = `${GW2_API_ROOT}/professions/${encodeURIComponent(professionId)}?lang=${encodeURIComponent(lang)}`;
-  const profession = await fetchCachedJson(`profession:${professionId}:${lang}`, professionUrl, 1000 * 60 * 60);
+  const professionUrl = `${GW2_API_ROOT}/professions?ids=${encodeURIComponent(professionId)}&lang=${encodeURIComponent(lang)}`;
+  const professionArr = await fetchCachedJson(`profession:${professionId}:${lang}`, professionUrl, 1000 * 60 * 60);
+  const profession = Array.isArray(professionArr) ? professionArr[0] : professionArr;
   if (!profession?.id) {
     throw new Error(`Unknown profession "${professionId}".`);
   }
@@ -455,17 +456,37 @@ async function getProfessionCatalog(professionId, lang = "en") {
     ...extraSkillsRaw.map((s) => s.id),
   ]);
   const traitSkillIdsToFetch = [...traitSkillTagMap.keys()].filter((id) => !alreadyFetchedForTraits.has(id));
+
+  // Slots already occupied by base (spec=0) profession mechanic skills (e.g. Mesmer shatters at
+  // Profession_1..4). Used to exclude contextual trait-sourced skills (e.g. Mirage mirror
+  // mechanics at Profession_3) that would otherwise displace the base skill. Legitimate elite spec
+  // additions like DH's F2/F3 appear at NEW slots not present in the base, so they pass through.
+  const baseProfSlots = new Set(
+    professionSkillsRaw
+      .filter((s) => Number(s.specialization) === 0 && /^Profession_\d/.test(s.slot))
+      .map((s) => s.slot)
+  );
+
   const [weaponChainDepth2Raw, traitSkillsRaw, morphPoolSkillsRaw] = await Promise.all([
     weaponChainDepth2Ids.length ? fetchGw2ByIds("skills", weaponChainDepth2Ids, lang) : Promise.resolve([]),
     traitSkillIdsToFetch.length
       ? fetchGw2ByIds("skills", traitSkillIdsToFetch, lang).then((raw) =>
-          raw.map((skill) => {
-            const tag = traitSkillTagMap.get(skill.id);
-            // Prefer the skill's own slot from /v2/skills over the trait-tier-inferred fallback.
-            // Trait skills all share the same tier (e.g. DH minor trait 1848 is tier 1), so
-            // the `Profession_${tier}` fallback would incorrectly map F2 and F3 to Profession_1.
-            return tag ? { ...skill, slot: skill.slot || tag.slot, specialization: tag.specialization, type: tag.type } : skill;
-          })
+          raw
+            .map((skill) => {
+              const tag = traitSkillTagMap.get(skill.id);
+              // Prefer the skill's own slot from /v2/skills over the trait-tier-inferred fallback.
+              // Trait skills all share the same tier (e.g. DH minor trait 1848 is tier 1), so
+              // the `Profession_${tier}` fallback would incorrectly map F2 and F3 to Profession_1.
+              return tag ? { ...skill, slot: skill.slot || tag.slot, specialization: tag.specialization, type: tag.type } : skill;
+            })
+            .filter((skill) => {
+              // Exclude contextual mechanic skills (e.g. Mirage mirror skills at Profession_3)
+              // that appear at Profession_N slots already occupied by a base profession skill.
+              const lockSpec = Number(skill.specialization) || 0;
+              if (!lockSpec) return true;
+              if (!/^Profession_\d/.test(skill.slot)) return true;
+              return !baseProfSlots.has(skill.slot);
+            })
         )
       : Promise.resolve([]),
     morphPoolPromise,

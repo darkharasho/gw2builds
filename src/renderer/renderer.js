@@ -2759,7 +2759,11 @@ function renderSkills() {
         const eliteCandidates = eliteSpecId && !isWeaver
           ? candidates.filter((s) => Number(s.specialization) === eliteSpecId)
           : [];
-        const pool = eliteCandidates.length > 0 ? eliteCandidates : candidates;
+        // Sort by ID descending: when the API lists multiple skill variants at the same slot
+        // (e.g. Troubadour's Lively Lute has an old and updated version with the same name),
+        // the higher ID is the more recently added/updated skill and should be preferred.
+        const pool = [...(eliteCandidates.length > 0 ? eliteCandidates : candidates)]
+          .sort((a, b) => b.id - a.id);
         const wt = (s) => (s.weaponType || "").toLowerCase();
         // Attunement-keyed skills (e.g. Catalyst "Deploy Jade Sphere", Tempest overloads):
         // prefer the variant whose attunement field matches the currently active attunement.
