@@ -397,19 +397,24 @@ async function getProfessionCatalog(professionId, lang = "en") {
 
   // Build a transform-bundle map: spec_id → weapon-slot skill IDs.
   // For skills that have transform_skills but no bundle_skills (like Death Shroud), we group the
-  // fetched transform children by their specialization. Each shroud variant's weapon skills share
-  // the same spec as the shroud itself, letting us assign them as bundleSkills for Reaper's/Harbinger's Shroud.
+  // fetched transform children by specialization. The child skill's spec is preferred; if unset,
+  // fall back to the parent's specialization.
+  // NOTE: Reaper's/Harbinger's Shroud weapon bar skills use "Downed_N" slots in the GW2 API
+  // (not "Weapon_N"), so we must accept both slot patterns.
   const transformBundleBySpec = new Map(); // specId → skillId[]
   for (const parent of professionSkillsRaw) {
     if ((parent.bundle_skills || []).length > 0) continue;
     if (!(parent.transform_skills || []).length) continue;
+    const parentSpec = Number(parent.specialization) || 0;
     for (const childId of parent.transform_skills) {
       const childSkill = extraSkillsRaw.find((s) => s.id === Number(childId));
       if (!childSkill) continue;
-      // Only include weapon-bar skills (Weapon_1 … Weapon_5); skip exit/F-slot variants
-      if (!/^Weapon_\d/.test(childSkill.slot || "")) continue;
-      const childSpec = KNOWN_SKILL_SPEC_OVERRIDES.get(childSkill.id) || Number(childSkill.specialization) || 0;
-      if (!childSpec) continue; // spec-0 children (e.g. Elixir X's transforms) don't belong to a shroud variant
+      // Include weapon-bar skills using either Weapon_N or Downed_N slots.
+      // Reaper's Shroud skills 1-4 use Downed_N; Executioner's Scythe (slot 5) uses Weapon_5.
+      if (!/^(?:Weapon|Downed)_\d/.test(childSkill.slot || "")) continue;
+      // Use child's spec if set; fall back to parent's spec for untagged children.
+      const childSpec = KNOWN_SKILL_SPEC_OVERRIDES.get(childSkill.id) || Number(childSkill.specialization) || parentSpec;
+      if (!childSpec) continue; // skip spec-0 children of spec-0 parents (e.g. Elixir X's transforms)
       if (!transformBundleBySpec.has(childSpec)) transformBundleBySpec.set(childSpec, []);
       transformBundleBySpec.get(childSpec).push(Number(childId));
     }
