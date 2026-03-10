@@ -152,6 +152,25 @@ async function getProfessionCatalog(professionId, lang = "en") {
   const RADIANT_FORGE_BUNDLE      = [76950, 76982, 77058, 78674, 78730, 77339, 76708, 76924, 76978];
   const RADIANT_FORGE_FLIP_SKILLS = [76910, 77136, 77366];
 
+  // Death Shroud (core Necromancer F1, id 10574) has no bundle_skills in the API. Its transform_skills
+  // children have specialization: null (spec=0), so the transformBundleBySpec logic skips them.
+  // Hardcode the 5 in-shroud weapon skills. Transform children are already fetched via transform_skills
+  // in extraSkillIds; only the flip_skills of those children need explicit addition.
+  // Skills: Life Blast (10554), Dark Path (10604), Doom (10588), Life Transfer (10594),
+  //         Tainted Shackles (19504). Exit skill "End Death Shroud" (10585) is excluded.
+  const DEATH_SHROUD_SKILL_ID = 10574;
+  const DEATH_SHROUD_BUNDLE = [10554, 10604, 10588, 10594, 19504];
+  const DEATH_SHROUD_FLIP_SKILLS = [18504, 56916]; // Dhuumfire (Life Blast flip), Dark Pursuit (Dark Path flip)
+
+  // Lich Form (Necromancer elite 10550) has no bundle_skills in the API; uses transform_skills.
+  // The transform children are already fetched via transform_skills in extraSkillIds, but March of
+  // Undeath (45780, flip_skill of Ripple of Horror 10633) must be added explicitly.
+  // Skills: Deathly Claws (10634), Lich's Gaze (10635), Ripple of Horror (10633),
+  //         Summon Madness (10636), Grim Specter (10632). "Return" (14350) is excluded (exit skill).
+  const LICH_FORM_SKILL_ID = 10550;
+  const LICH_FORM_BUNDLE = [10634, 10635, 10633, 10636, 10632];
+  const LICH_FORM_FLIP_SKILLS = [45780]; // March of Undeath (flip of Ripple of Horror)
+
   // Firebrand tome chapter skills — the GW2 public API does not expose these via bundle_skills
   // or any other field. Skill data sourced from community tools (GW2EI, discretize-ui).
   const _WK = "https://wiki.guildwars2.com/images";
@@ -351,6 +370,8 @@ async function getProfessionCatalog(professionId, lang = "en") {
     ...(professionId === "Engineer" ? [...ELIXIR_TOOLBELT_OVERRIDES.values()] : []),
     // Include Radiant Forge weapon skills + their flip skills (Luminary, Guardian).
     ...(professionId === "Guardian" ? [...RADIANT_FORGE_BUNDLE, ...RADIANT_FORGE_FLIP_SKILLS] : []),
+    // Include flip_skills of Death Shroud and Lich Form transform children (not auto-fetched).
+    ...(professionId === "Necromancer" ? [...DEATH_SHROUD_FLIP_SKILLS, ...LICH_FORM_FLIP_SKILLS] : []),
     // Weapon auto-attack chain continuations (depth 1): merged here to avoid an extra round-trip.
     ...weaponChainDepth1Ids,
   ]);
@@ -537,6 +558,10 @@ async function getProfessionCatalog(professionId, lang = "en") {
         ? PHOTON_FORGE_BUNDLE
         : skill.id === RADIANT_FORGE_SKILL_ID
           ? RADIANT_FORGE_BUNDLE
+          : skill.id === LICH_FORM_SKILL_ID
+          ? LICH_FORM_BUNDLE
+          : skill.id === DEATH_SHROUD_SKILL_ID
+          ? DEATH_SHROUD_BUNDLE
           : FIREBRAND_TOME_CHAPTERS.has(skill.id)
           ? FIREBRAND_TOME_CHAPTERS.get(skill.id).map((c) => c.id)
           : (transformOpenerSlots.has(skill.slot || "") ? (transformBundleBySpecId.get(specId) || []) : []);
