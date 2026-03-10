@@ -3349,10 +3349,17 @@ function showHoverPreview(kind, entity, x, y) {
   if (kind === "skill" && entity.flipSkill) {
     const catalog = state.activeCatalog;
     const lookupSkill = (id) => catalog?.skillById?.get(id) || catalog?.weaponSkillById?.get(id);
-    const exitPattern = /^(Exit|Leave|Deactivate)\b/i;
+    const exitPattern = /^(Exit|Leave|Deactivate|Stow)\b/i;
     const seen = new Set([entity.id]);
+    const originalSpec = Number(entity.specialization) || 0;
     let cur = lookupSkill(entity.flipSkill);
     while (cur && !seen.has(cur.id) && !exitPattern.test(cur.name || "") && chainCards.length < 5) {
+      // Stop if the flip is a same-named activated-state copy (e.g. Luminary F2/F3 virtues).
+      if (cur.name === entity.name) break;
+      // Stop if the flip jumps to a different specialization (e.g. base Virtue of Justice spec=0
+      // or Luminary F1 spec=81 both flip to Dragonhunter Spear of Justice spec=27).
+      const curSpec = Number(cur.specialization) || 0;
+      if (curSpec && curSpec !== originalSpec) break;
       seen.add(cur.id);
       chainCards.push(buildSkillCard(cur, kind, true));
       cur = cur.flipSkill ? lookupSkill(cur.flipSkill) : null;
@@ -3491,6 +3498,7 @@ function getSkillOptionsByType(catalog, specializationSelections) {
   const profMechanics = allSkills
     .filter((skill) => /^Profession_\d/.test(skill.slot || ""))
     .filter((skill) => !exitLeavePattern.test(skill.name || ""))
+    .filter((skill) => !flipSkillIds.has(skill.id))
     .filter((skill) => {
       const lockSpec = Number(skill.specialization) || 0;
       return !lockSpec || selectedSpecIds.has(lockSpec);

@@ -112,6 +112,7 @@ async function getProfessionCatalog(professionId, lang = "en") {
   const KNOWN_SKILL_SPEC_OVERRIDES = new Map([
     [30792, 34],  // Reaper's Shroud → Reaper
     [62567, 64],  // Harbinger Shroud → Harbinger
+    [77238, 76],  // Ritualist's Shroud → Ritualist (API returns spec=0)
     [77397, 71],  // Specter Siphon (API name "Skritt Swipe") → Specter
     // Weaver dual-attunement F skills — /v2/skills returns spec=80 but Weaver spec is 56
     [76580, 56], [76988, 56], [76703, 56], [77082, 56],
@@ -305,6 +306,9 @@ async function getProfessionCatalog(professionId, lang = "en") {
         ] },
     ]],
   ]);
+  // 42371 is a second GW2 API entry for Tome of Courage at the same slot.
+  // The ID-descending sort in the renderer prefers it over 42259, so it must share chapters.
+  FIREBRAND_TOME_CHAPTERS.set(42371, FIREBRAND_TOME_CHAPTERS.get(42259));
 
   // The GW2 API's toolbelt_skill for elixirs points to "Detonate Elixir X" (secondary action),
   // but the actual in-game F-slot skill is "Toss Elixir X" (the throw/primary action).
@@ -363,7 +367,12 @@ async function getProfessionCatalog(professionId, lang = "en") {
       // Don't overwrite a more specific existing entry
       if (!traitSkillTagMap.has(skillId)) {
         traitSkillTagMap.set(skillId, {
-          slot: ts.slot || `Profession_${tier}`,
+          // Use the slot from the trait's skills entry if present; do NOT fall back to
+          // Profession_${tier} — that would incorrectly assign mechanic slots to passive
+          // trait-proc skills (e.g. Harbinger major tier-2 skills get "Profession_2" and
+          // show up as a spurious F2 button). DH F2/F3 skills are safe because they have
+          // an explicit slot in /v2/skills that takes precedence in the step-4 map.
+          slot: ts.slot || "",
           specialization: specId,
           type: "Profession",
         });
@@ -395,17 +404,22 @@ async function getProfessionCatalog(professionId, lang = "en") {
       .filter((id) => id && !weaponSkillIdSet.has(id) && !extraSkillIdSet.has(id))
   );
 
-  // Build a transform-bundle map: spec_id → weapon-slot skill IDs.
+  // Build a transform-bundle map: skillId → weapon-slot skill IDs.
   // For skills that have transform_skills but no bundle_skills (like Death Shroud), we group the
-  // fetched transform children by specialization. The child skill's spec is preferred; if unset,
-  // fall back to the parent's specialization.
+  // fetched transform children by specialization to find which weapon skills belong to each
+  // elite-spec shroud variant. We then map the bundle to the SPECIFIC shroud-opener skill ID
+  // (e.g. Reaper's Shroud 30792, Harbinger's Shroud 62567) rather than to a generic specId.
+  // This prevents other F-mechanic skills sharing the same specId from incorrectly appearing
+  // as shroud toggles in the UI.
   // NOTE: Reaper's/Harbinger's Shroud weapon bar skills use "Downed_N" slots in the GW2 API
   // (not "Weapon_N"), so we must accept both slot patterns.
-  const transformBundleBySpec = new Map(); // specId → skillId[]
+  const transformBundleBySpecId = new Map(); // intermediate: specId → skillId[]
+  const transformParentSlots = new Map();    // parentSkillId → slot (e.g. "Profession_1")
   for (const parent of professionSkillsRaw) {
     if ((parent.bundle_skills || []).length > 0) continue;
     if (!(parent.transform_skills || []).length) continue;
     const parentSpec = Number(parent.specialization) || 0;
+    transformParentSlots.set(parent.id, parent.slot || "");
     for (const childId of parent.transform_skills) {
       const childSkill = extraSkillsRaw.find((s) => s.id === Number(childId));
       if (!childSkill) continue;
@@ -415,10 +429,22 @@ async function getProfessionCatalog(professionId, lang = "en") {
       // Use child's spec if set; fall back to parent's spec for untagged children.
       const childSpec = KNOWN_SKILL_SPEC_OVERRIDES.get(childSkill.id) || Number(childSkill.specialization) || parentSpec;
       if (!childSpec) continue; // skip spec-0 children of spec-0 parents (e.g. Elixir X's transforms)
-      if (!transformBundleBySpec.has(childSpec)) transformBundleBySpec.set(childSpec, []);
-      transformBundleBySpec.get(childSpec).push(Number(childId));
+      if (!transformBundleBySpecId.has(childSpec)) transformBundleBySpecId.set(childSpec, []);
+      transformBundleBySpecId.get(childSpec).push(Number(childId));
     }
   }
+  // Build the set of "opener slots" — Profession_N slots that have a parent transform skill
+  // (e.g. "Profession_1" for Death Shroud, "Profession_5" for Celestial Avatar).
+  // In mapSkill, only skills whose slot is in this set receive the transform bundle.
+  // This replaces the old skill-ID lookup (which missed traitSkillsRaw skills like the
+  // Ritualist's Shroud, discovered via a minor trait rather than profession.skills):
+  //   ✓ Ritualist's Shroud at Profession_1 → slot matches parent → gets bundle
+  //   ✗ Ritualist F2/F3/F4 at Profession_2/3/4 → slot doesn't match → no bundle
+  // We restrict to Profession_N slots to avoid assigning shroud weapon skills to
+  // Elite/Heal/Utility skills that share a specId via a parent's Elite-slot transform.
+  const transformOpenerSlots = new Set(
+    [...transformParentSlots.values()].filter((slot) => /^Profession_\d/.test(slot))
+  );
 
   // Build morph pool promise (runs concurrently in step 4).
   // Morph pool fetches skills for specs with "Locked" profession slots (e.g. Amalgam F2–F4).
@@ -462,36 +488,17 @@ async function getProfessionCatalog(professionId, lang = "en") {
   ]);
   const traitSkillIdsToFetch = [...traitSkillTagMap.keys()].filter((id) => !alreadyFetchedForTraits.has(id));
 
-  // Slots already occupied by base (spec=0) profession mechanic skills (e.g. Mesmer shatters at
-  // Profession_1..4). Used to exclude contextual trait-sourced skills (e.g. Mirage mirror
-  // mechanics at Profession_3) that would otherwise displace the base skill. Legitimate elite spec
-  // additions like DH's F2/F3 appear at NEW slots not present in the base, so they pass through.
-  const baseProfSlots = new Set(
-    professionSkillsRaw
-      .filter((s) => Number(s.specialization) === 0 && /^Profession_\d/.test(s.slot))
-      .map((s) => s.slot)
-  );
-
   const [weaponChainDepth2Raw, traitSkillsRaw, morphPoolSkillsRaw] = await Promise.all([
     weaponChainDepth2Ids.length ? fetchGw2ByIds("skills", weaponChainDepth2Ids, lang) : Promise.resolve([]),
     traitSkillIdsToFetch.length
       ? fetchGw2ByIds("skills", traitSkillIdsToFetch, lang).then((raw) =>
-          raw
-            .map((skill) => {
-              const tag = traitSkillTagMap.get(skill.id);
-              // Prefer the skill's own slot from /v2/skills over the trait-tier-inferred fallback.
-              // Trait skills all share the same tier (e.g. DH minor trait 1848 is tier 1), so
-              // the `Profession_${tier}` fallback would incorrectly map F2 and F3 to Profession_1.
-              return tag ? { ...skill, slot: skill.slot || tag.slot, specialization: tag.specialization, type: tag.type } : skill;
-            })
-            .filter((skill) => {
-              // Exclude contextual mechanic skills (e.g. Mirage mirror skills at Profession_3)
-              // that appear at Profession_N slots already occupied by a base profession skill.
-              const lockSpec = Number(skill.specialization) || 0;
-              if (!lockSpec) return true;
-              if (!/^Profession_\d/.test(skill.slot)) return true;
-              return !baseProfSlots.has(skill.slot);
-            })
+          raw.map((skill) => {
+            const tag = traitSkillTagMap.get(skill.id);
+            // Prefer the skill's own slot from /v2/skills over the trait-tier-inferred fallback.
+            // Trait skills all share the same tier (e.g. DH minor trait 1848 is tier 1), so
+            // the `Profession_${tier}` fallback would incorrectly map F2 and F3 to Profession_1.
+            return tag ? { ...skill, slot: skill.slot || tag.slot, specialization: tag.specialization, type: tag.type } : skill;
+          })
         )
       : Promise.resolve([]),
     morphPoolPromise,
@@ -509,8 +516,9 @@ async function getProfessionCatalog(professionId, lang = "en") {
     const rawBundleSkills = Array.isArray(skill.bundle_skills)
       ? skill.bundle_skills.map(Number).filter(Boolean)
       : [];
-    // For skills with no bundle_skills of their own (e.g. Reaper's/Harbinger's Shroud), fall back
-    // to the transform-bundle map built from Death Shroud's transform_skills, grouped by spec.
+    // For skills with no bundle_skills of their own (e.g. Reaper's/Harbinger's Shroud), look up
+    // by exact skill ID in the transform-bundle map. This ensures only the specific shroud-opener
+    // skill gets the bundle, not every F-mechanic skill sharing the same specId.
     // Photon Forge (42938) gets its bundle injected from the hardcoded PHOTON_FORGE_BUNDLE list.
     const bundleSkills = rawBundleSkills.length > 0
       ? rawBundleSkills
@@ -520,7 +528,7 @@ async function getProfessionCatalog(professionId, lang = "en") {
           ? RADIANT_FORGE_BUNDLE
           : FIREBRAND_TOME_CHAPTERS.has(skill.id)
           ? FIREBRAND_TOME_CHAPTERS.get(skill.id).map((c) => c.id)
-          : (transformBundleBySpec.get(specId) || []);
+          : (transformOpenerSlots.has(skill.slot || "") ? (transformBundleBySpecId.get(specId) || []) : []);
     // GW2 API returns "None" for weapon-agnostic skills; normalize to "" so falsy checks work.
     const weaponType = skill.weapon_type === "None" ? "" : (skill.weapon_type || "");
     const attunement = skill.attunement === "None" ? "" : (skill.attunement || "");
@@ -589,7 +597,7 @@ async function getProfessionCatalog(professionId, lang = "en") {
   // Firebrand tome chapters are not in the GW2 API — inject synthetic raw skill objects so mapSkill
   // can include them in the catalog for weapon-bar display when a tome is toggled.
   if (professionId === "Guardian") {
-    for (const chapters of FIREBRAND_TOME_CHAPTERS.values()) {
+    for (const chapters of new Set(FIREBRAND_TOME_CHAPTERS.values())) {
       for (const ch of chapters) {
         skills.push({
           id: ch.id, name: ch.name, icon: ch.icon, slot: ch.slot,
