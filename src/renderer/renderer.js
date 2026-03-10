@@ -503,7 +503,8 @@ function enforceEditorConsistency(options = {}) {
     });
   }
 
-  // Weaver: ensure both attunements are set and distinct
+  // Weaver: primary (mainhand) is always set; secondary (offhand) can be any element including
+  // the same as primary, producing a single-attunement skill bar (identical to core Ele slot 3).
   const weaverEliteId = 56;
   const activeEliteSpecId = Number(
     (state.editor.specializations || [])
@@ -515,10 +516,9 @@ function enforceEditorConsistency(options = {}) {
     if (!state.editor.activeAttunement || !attunements.includes(state.editor.activeAttunement)) {
       state.editor.activeAttunement = "Fire";
     }
-    if (!state.editor.activeAttunement2 ||
-        !attunements.includes(state.editor.activeAttunement2) ||
-        state.editor.activeAttunement2 === state.editor.activeAttunement) {
-      state.editor.activeAttunement2 = attunements.find((a) => a !== state.editor.activeAttunement) || "Water";
+    // Secondary defaults to primary (single-attunement start state); any valid element is accepted.
+    if (!state.editor.activeAttunement2 || !attunements.includes(state.editor.activeAttunement2)) {
+      state.editor.activeAttunement2 = state.editor.activeAttunement;
     }
   }
 
@@ -2468,11 +2468,11 @@ function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "", active
     ? activeAttunement
     : (availableAttunements[0] || "");
 
-  // For Weaver: effective secondary attunement (must differ from primary)
+  // For Weaver: effective secondary attunement. May equal primary (single-attunement mode).
   const effectiveAttunement2 = isWeaver
-    ? (availableAttunements.includes(activeAttunement2) && activeAttunement2 !== effectiveAttunement
+    ? (availableAttunements.includes(activeAttunement2)
         ? activeAttunement2
-        : availableAttunements.find((a) => a !== effectiveAttunement) || "")
+        : effectiveAttunement)
     : "";
 
   const att1 = effectiveAttunement.toLowerCase();
@@ -2480,12 +2480,14 @@ function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "", active
 
   function matchesAttunement(ref, slotNum) {
     if (isWeaver) {
-      // Slot 3 handled separately via catalog.skillById + dualWield
-      if (slotNum === 3) return false;
-      // Slots 1-2 use primary attunement, slots 4-5 use secondary
       const refAtt = (ref.attunement || "").toLowerCase();
+      // Slots 1-2: mainhand attunement
       if (slotNum >= 1 && slotNum <= 2) return !refAtt || refAtt === att1;
+      // Slots 4-5: offhand attunement
       if (slotNum >= 4 && slotNum <= 5) return !refAtt || refAtt === att2;
+      // Slot 3: in single-attunement mode (att1 === att2) fall through to the normal weapon
+      // slot-3 skill; in dual-attunement mode it is handled by the separate dual-attack loop.
+      if (slotNum === 3) return att1 === att2 && (!refAtt || refAtt === att1);
       return false;
     }
     if (!ref.attunement) return true;
@@ -2499,8 +2501,9 @@ function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "", active
       if (n >= 1 && n <= 5) {
         const skill = weaponSkillById.get(ref.id);
         if (skill && !slots[n - 1]) {
-          // Skip Weaver dual-attack skills (dualWield set) for non-Weaver builds.
-          if (!isWeaver && skill.dualWield) continue;
+          // Skip dual-attack skills (dualWield set) for non-Weaver builds, and also for
+          // Weaver slot 3 in single-attunement mode (dual-attack has its own separate loop).
+          if (skill.dualWield && (!isWeaver || n === 3)) continue;
           slots[n - 1] = skill;
         }
       }
@@ -2520,10 +2523,10 @@ function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "", active
     }
   }
 
-  // Weaver slot 3: Dual Attack — dual-attack skills live in weaponSkillById (they are weapon
-  // skills fetched via profession.weapons, not profession.skills). Match by weaponType and
-  // the pair of attunements (order-independent).
-  if (isWeaver && mhId && att1 && att2) {
+  // Weaver slot 3: Dual Attack — only when the two attunements differ. Skills live in
+  // weaponSkillById (fetched via profession.weapons). Match by weaponType and the pair of
+  // attunements (order-independent). Same-element mode is handled by matchesAttunement above.
+  if (isWeaver && mhId && att1 && att2 && att1 !== att2) {
     for (const skill of weaponSkillById.values()) {
       if (!skill.dualWield) continue;
       if ((skill.slot || "") !== "Weapon_3") continue;
@@ -3014,11 +3017,11 @@ function renderSkills() {
             const skillAttunement = attunementNameMatch ? attunementNameMatch[1] : (skill?.attunement || "");
             if (skillAttunement) {
               if (isWeaver) {
-                // Shift: current primary → secondary, clicked → primary (no-op if already primary)
-                if (skillAttunement.toLowerCase() !== state.editor.activeAttunement.toLowerCase()) {
-                  state.editor.activeAttunement2 = state.editor.activeAttunement;
-                  state.editor.activeAttunement = skillAttunement;
-                }
+                // Clicked element → mainhand; current mainhand → offhand.
+                // Clicking the current mainhand element again sets both to the same element
+                // (single-attunement mode). Clicking the current offhand swaps them.
+                state.editor.activeAttunement2 = state.editor.activeAttunement;
+                state.editor.activeAttunement = skillAttunement;
               } else {
                 state.editor.activeAttunement = skillAttunement;
               }

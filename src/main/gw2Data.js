@@ -114,13 +114,24 @@ async function getProfessionCatalog(professionId, lang = "en") {
     [62567, 64],  // Harbinger Shroud → Harbinger
     [77238, 76],  // Ritualist's Shroud → Ritualist (API returns spec=0)
     [77397, 71],  // Specter Siphon (API name "Skritt Swipe") → Specter
-    // Weaver dual-attunement F skills — /v2/skills returns spec=80 but Weaver spec is 56
+    // Weaver attunement button skills — /v2/skills returns spec=80 but Weaver spec is 56
     [76580, 56], [76988, 56], [76703, 56], [77082, 56],
+    // Weaver F5 dual-attunement combo skills (Conflagration, Buoyant Deluge, Lightning Blitz, Seismic Impact)
     [76585, 56], [76811, 56], [77089, 56], [76707, 56],
     // Scrapper Function Gyro variants — profession endpoint incorrectly tags these as Holosmith (57)
     // but /v2/skills correctly returns spec=43 (Scrapper). Without override, they could appear at
     // Holosmith's F5 slot instead of Photon Forge (42938).
     [72103, 43], [72114, 43],
+  ]);
+
+  // The GW2 profession API assigns incorrect slot values to Weaver's 4 attunement button skills.
+  // All four are crammed into Profession_1/2 instead of the correct Profession_1 through 4.
+  // Override slots here so the renderer places each attunement at the right F-key position.
+  const KNOWN_SKILL_SLOT_OVERRIDES = new Map([
+    [76703, "Profession_1"], // Weaver Fire Attunement  (API wrongly says Profession_2)
+    [76988, "Profession_2"], // Weaver Water Attunement (API wrongly says Profession_1)
+    [76580, "Profession_3"], // Weaver Air Attunement   (API wrongly says Profession_1)
+    [77082, "Profession_4"], // Weaver Earth Attunement (API wrongly says Profession_1)
   ]);
 
   // Photon Forge (skill 42938) has no bundle_skills in the GW2 API, but in-game it grants
@@ -389,7 +400,7 @@ async function getProfessionCatalog(professionId, lang = "en") {
     const traitTag = traitSkillTagMap.get(skill.id);
     return {
       ...skill,
-      slot: ref?.slot || skill.slot || "",
+      slot: KNOWN_SKILL_SLOT_OVERRIDES.get(skill.id) || ref?.slot || skill.slot || "",
       specialization: KNOWN_SKILL_SPEC_OVERRIDES.get(skill.id) || ref?.specialization || traitTag?.specialization || skill.specialization || 0,
       type: ref?.type || skill.type || "",
     };
