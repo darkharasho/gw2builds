@@ -1231,11 +1231,11 @@ function closeSlotPicker() {
   if (_slotPickerCleanup) { _slotPickerCleanup(); _slotPickerCleanup = null; }
 }
 
-function openSlotPicker(anchorEl, currentValue, onSelect, { items = null, searchPlaceholder = "Search stats…" } = {}) {
+function openSlotPicker(anchorEl, currentValue, onSelect, { items = null, searchPlaceholder = "Search stats…", className = "" } = {}) {
   closeSlotPicker();
 
   const picker = document.createElement("div");
-  picker.className = "slot-picker";
+  picker.className = "slot-picker" + (className ? ` ${className}` : "");
 
   const search = document.createElement("input");
   search.type = "search";
@@ -2543,6 +2543,65 @@ function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "", active
   return slots;
 }
 
+// Ranger F1–F3 skills are pet-family-dependent. The GW2 API does not expose pet families,
+// and all Ranger Profession_1–3 skills are tagged spec=55 in the API even though they apply
+// to Core Ranger, Druid, and Untamed as well. This map provides the authoritative lookup.
+// Keys are pet IDs; values are {p1, p2, p3} skill IDs for Profession_1/2/3 (F1/F2/F3).
+// p3 is archetype-based (Ferocious/Stout/Deadly/Versatile/Supportive) — same within a family.
+// p4 (Eternal Bond 59554) is Soulbeast-only and handled separately via eliteSpecId check.
+const RANGER_PET_FAMILY_SKILLS = new Map([
+  // Bird / Avian — Deadly archetype (Primal Cry)
+  ...[10, 30, 31, 32, 44].map((id) => [id, { p1: 44991, p2: 42042, p3: 40588 }]),
+  // Bear / Ursine — Ferocious archetype (Worldly Impact, Soulbeast variant)
+  ...[5, 20, 23, 24, 25].map((id) => [id, { p1: 43136, p2: 43060, p3: 42809 }]),
+  // Canine — Deadly archetype (Primal Cry)
+  ...[4, 8, 22, 28, 29].map((id) => [id, { p1: 43726, p2: 42894, p3: 40588 }]),
+  // Devourer — Versatile archetype (Prelude Lash)
+  ...[6, 26, 27].map((id) => [id, { p1: 43068, p2: 41461, p3: 43375 }]),
+  // Drake — Stout archetype (Unflinching Fortitude)
+  ...[7, 12, 18, 19, 45].map((id) => [id, { p1: 41537, p2: 41575, p3: 45797 }]),
+  // Feline — Deadly archetype (Primal Cry)
+  ...[1, 3, 9, 11, 47, 54, 55, 63].map((id) => [id, { p1: 40625, p2: 44514, p3: 40588 }]),
+  // Jellyfish (aquatic) — Supportive archetype (Spiritual Reprieve)
+  ...[41, 42, 43].map((id) => [id, { p1: 43186, p2: 41837, p3: 44626 }]),
+  // Moa — Supportive archetype (Spiritual Reprieve)
+  ...[13, 14, 15, 16, 17].map((id) => [id, { p1: 44617, p2: 43548, p3: 44626 }]),
+  // Porcine — Stout archetype (Unflinching Fortitude)
+  ...[2, 37, 38, 39].map((id) => [id, { p1: 41406, p2: 46432, p3: 45797 }]),
+  // Shark (aquatic) — Supportive archetype
+  [21, { p1: 42797, p2: 44360, p3: 44626 }],
+  // Armor Fish (aquatic) — Supportive archetype
+  [40, { p1: 42717, p2: 44885, p3: 44626 }],
+  // Smokescale — Deadly archetype (Primal Cry)
+  [46, { p1: 42907, p2: 40255, p3: 40588 }],
+  // Spider — Versatile archetype (Prelude Lash)
+  ...[33, 34, 35, 36].map((id) => [id, { p1: 44097, p2: 43671, p3: 43375 }]),
+  // Wyvern — Stout archetype (Unflinching Fortitude)
+  ...[48, 51].map((id) => [id, { p1: 46386, p2: 41908, p3: 45797 }]),
+  // Jacaranda — Supportive archetype (Spiritual Reprieve)
+  [57, { p1: 43788, p2: 43701, p3: 44626 }],
+  // Iboga — Versatile archetype (Prelude Lash)
+  [61, { p1: 44384, p2: 40111, p3: 43375 }],
+  // Bristleback — Versatile archetype (Prelude Lash)
+  [52, { p1: 41206, p2: 45479, p3: 43375 }],
+  // Rock Gazelle — Ferocious archetype (Worldly Impact, core variant)
+  [59, { p1: 41524, p2: 45743, p3: 40729 }],
+  // Phoenix (newer)
+  [65, { p1: 64038, p2: 64882, p3: null }],
+  // Wallow (newer)
+  [64, { p1: 64699, p2: 66258, p3: null }],
+  // Warclaw (newer)
+  [70, { p1: 71282, p2: 67382, p3: null }],
+  // Aether Hunter (newer)
+  [67, { p1: 71499, p2: 70889, p3: null }],
+  // Spinegazer (newer)
+  [69, { p1: 72851, p2: 72636, p3: null }],
+  // Janthiri Bee (newer)
+  [71, { p1: 75771, p2: 75814, p3: null }],
+  // Raptor Swiftwing (newer)
+  [72, { p1: 79203, p2: 78091, p3: null }],
+]);
+
 function renderSkills() {
   const catalog = state.activeCatalog;
   el.skillsHost.innerHTML = "";
@@ -2588,6 +2647,8 @@ function renderSkills() {
     .find((e) => catalog.specializationById.get(Number(e?.specializationId))?.elite);
   const eliteSpecId = Number(eliteSpecEntry?.specializationId) || 0;
   const isWeaver = eliteSpecId === 56;
+  // Ranger and all Ranger elite specs (Druid/Soulbeast/Untamed) use catalog.pets.
+  const isRanger = Array.isArray(catalog.pets) && catalog.pets.length > 0;
 
   // Collect elite spec's static profession mechanic skills (type "Profession", not "Toolbelt").
   // Deduplicate by slot: some skills have multiple contextual variants at the same slot
@@ -2731,21 +2792,63 @@ function renderSkills() {
       options.utility = (activeLegend.utilities || []).map(ls).filter(Boolean);
       options.elite = [ls(activeLegend.elite)].filter(Boolean);
     }
+  } else if (isRanger) {
+    // Ranger F skills differ by spec:
+    // - Soulbeast (55): F1–F3 are Profession_1/2/3 beastmode weapon-bar skills (hardcoded
+    //   via RANGER_PET_FAMILY_SKILLS), F4 = Eternal Bond, F5 = Beastmode toggle.
+    // - Core / Druid / Untamed / Galeshot: F1 = "Attack My Target" (client-side command),
+    //   F2 = the pet's own last skill from /v2/pets (unique per pet), F3 = "Return to Me"
+    //   (client-side command). Untamed replaces F3 with Enveloping Haze (spec=72).
+    const activePetSlotKey = state.editor.activePetSlot === "terrestrial2" ? "terrestrial2" : "terrestrial1";
+    const activePetId = Number(state.editor.selectedPets?.[activePetSlotKey]) || 0;
+    const activePet = activePetId && catalog.petById ? catalog.petById.get(activePetId) : null;
+
+    mechSlots = [];
+    if (eliteSpecId === 55) {
+      // Soulbeast: beastmode weapon bar skills (Profession_1/2/3 from the API)
+      const petFamilySkills = activePetId ? RANGER_PET_FAMILY_SKILLS.get(activePetId) : null;
+      for (const key of ["p1", "p2", "p3"]) {
+        const skillId = petFamilySkills?.[key] || null;
+        const skill = skillId ? (catalog.skillById.get(skillId) || null) : null;
+        mechSlots.push({ skill, sourceId: skill?.id || 0, isStatic: true, isSelectable: false });
+      }
+      // F4: Eternal Bond
+      const eternalBond = catalog.skillById.get(59554) || null;
+      mechSlots.push({ skill: eternalBond, sourceId: eternalBond?.id || 0, isStatic: true, isSelectable: false });
+    } else {
+      // Core / Druid / Untamed / Galeshot
+      // F1: fake "Attack My Target" (client-side command, no API skill)
+      mechSlots.push({ skill: null, sourceId: 0, isStatic: true, isSelectable: false, fakeCommand: "attack" });
+      // F2: the pet's own special skill from /v2/pets — unique per individual pet.
+      // The skills array is ordered: [terrestrial, aquatic] (land pets have 1 entry; amphibious
+      // pets have 2). Use index 0 for terrestrial slots, index 1 for aquatic slots.
+      const petSkills = activePet?.skills || [];
+      const isAquaticSlot = activePetSlotKey === "aquatic1" || activePetSlotKey === "aquatic2";
+      const f2SkillIdx = isAquaticSlot && petSkills.length > 1 ? 1 : 0;
+      const f2Skill = petSkills[f2SkillIdx] || null;
+      mechSlots.push({ skill: f2Skill, sourceId: f2Skill?.id || 0, isStatic: true, isSelectable: false });
+      // F3: Enveloping Haze for Untamed; fake "Return to Me" for all others
+      if (eliteSpecId === 72) {
+        const envHaze = catalog.skillById.get(63094) || null;
+        mechSlots.push({ skill: envHaze, sourceId: envHaze?.id || 0, isStatic: true, isSelectable: false });
+      } else {
+        mechSlots.push({ skill: null, sourceId: 0, isStatic: true, isSelectable: false, fakeCommand: "return" });
+      }
+    }
+    // P5: elite-spec toggle (Celestial Avatar/Beastmode/Unleash/Cyclone Bow)
+    const p5Skill = (options.profession || []).find((s) => s.slot === "Profession_5") || null;
+    if (p5Skill) {
+      mechSlots.push({ skill: p5Skill, sourceId: p5Skill.id, isStatic: true, isSelectable: false });
+    }
   } else {
-    // Non-toolbelt professions (warrior, necro, guardian, mesmer, ele, ranger, thief, etc.)
+    // Non-toolbelt professions (warrior, necro, guardian, mesmer, ele, thief, etc.)
     // Group by slot, then pick the best candidate per slot:
     //   - If an elite spec skill exists for this slot, prefer it (e.g. berserker primal burst over
     //     base warrior burst, spellbreaker Full Counter over all weapon bursts, etc.)
     //   - Among the preferred pool, pick the skill whose weaponType matches the equipped mainhand
-    //     (falls back to offhand, pet type for Soulbeast, weapon-agnostic, then first available).
+    //     (falls back to offhand, weapon-agnostic, then first available).
     const activeMainhand = (equippedWeapons[mhKey] || "").toLowerCase();
     const activeOffhand = (equippedWeapons[ohKey] || "").toLowerCase();
-
-    // For Soulbeast: F skills are keyed by pet family type (stored in skill.weaponType).
-    // Resolve the active pet's type so we can match the correct family variant.
-    const activePetId = Number(state.editor.selectedPets?.terrestrial1) || 0;
-    const activePet = activePetId && catalog.petById ? catalog.petById.get(activePetId) : null;
-    const activePetType = (activePet?.type || "").toLowerCase();
 
     const bySlot = new Map(); // slotKey → skill[]
     for (const skill of (options.profession || [])) {
@@ -2797,8 +2900,7 @@ function renderSkills() {
                || pool.find((s) => stdName.test(s.name || ""))
                || pool[0];
         } else {
-          skill = pool.find((s) => activePetType && wt(s) === activePetType)
-               || pool.find((s) => wt(s) && wt(s) === activeMainhand)
+          skill = pool.find((s) => wt(s) && wt(s) === activeMainhand)
                || pool.find((s) => wt(s) && wt(s) === activeOffhand)
                || attunementSkill
                || pool.find((s) => !s.weaponType && !s.attunement)
@@ -2884,12 +2986,14 @@ function renderSkills() {
   const weaponCol = document.createElement("div");
   weaponCol.className = "skills-bar__weapon-col";
 
-  if (mechSlots.length > 0 && mechSlots.some((s) => s.skill || s.isSelectable)) {
+  // Always create the mechBar for Ranger (even core Ranger with empty mechSlots) so the
+  // pet selector panel can be shown. For all other professions, require at least one skill.
+  if (isRanger || (mechSlots.length > 0 && mechSlots.some((s) => s.skill || s.isSelectable))) {
     const mechBar = document.createElement("div");
     mechBar.className = "profession-mechanics-bar";
 
     for (let fIdx = 0; fIdx < mechSlots.length; fIdx++) {
-      const { skill, sourceId, sourceSkill, isStatic, isSelectable, morphIndex, mechIconOverride } = mechSlots[fIdx];
+      const { skill, sourceId, sourceSkill, isStatic, isSelectable, morphIndex, mechIconOverride, fakeCommand } = mechSlots[fIdx];
       const slotEl = document.createElement("div");
       slotEl.className = "skill-slot";
       const iconBtn = document.createElement("button");
@@ -2925,29 +3029,50 @@ function renderSkills() {
 
       iconBtn.className = "skill-icon--profession"
         + (isActive ? " skill-icon--profession-active" : "")
-        + (!skill ? " skill-icon--profession-empty" : "")
-        + (!isKit && !isSelectable && isStatic === false ? " skill-icon--profession-nokit" : "");
-      iconBtn.title = skill?.name || (isSelectable ? "Choose morph skill…" : "");
+        + (!skill && !fakeCommand ? " skill-icon--profession-empty" : "")
+        + (!isKit && !isSelectable && isStatic === false ? " skill-icon--profession-nokit" : "")
+        + (fakeCommand ? ` skill-icon--fake-command skill-icon--fake-${fakeCommand}` : "");
+      iconBtn.title = fakeCommand === "attack" ? "Attack My Target"
+        : fakeCommand === "return" ? "Return to Me"
+        : skill?.name || (isSelectable ? "Choose morph skill…" : "");
 
-      // When a static bundle skill (e.g. Photon Forge) is active, show the flip_skill icon.
-      const flipSkillId = isActive && isStatic && (skill?.flipSkill ?? 0);
-      const flipSkill = flipSkillId ? catalog.skillById.get(flipSkillId) : null;
-      // Elixir toolbelt skills ("Detonate Elixir X") share a generic icon in the API.
-      // Fall back to the source elixir's own icon so each slot looks distinct.
-      // All other toolbelt skills (Defense Field, turret actions, etc.) have correct distinct icons.
-      const isDetonateElixir = !isKit && !isStatic && /^Detonate Elixir\b/i.test(skill?.name || "");
-      const slotIcon = (isDetonateElixir && sourceSkill?.icon)
-        ? sourceSkill.icon
-        : (skill?.icon || mechIconOverride || "");
-      const displayIcon = (flipSkill?.icon) || slotIcon;
-      const displayName = (flipSkill?.name) || skill?.name || "";
-      if (displayIcon) {
-        iconBtn.innerHTML = `<img src="${escapeHtml(displayIcon)}" alt="${escapeHtml(displayName)}" />`;
-      }
-      if (flipSkill) {
-        bindHoverPreview(iconBtn, "skill", () => flipSkill);
-      } else if (skill) {
-        bindHoverPreview(iconBtn, "skill", () => skill);
+      if (fakeCommand) {
+        // Ranger client-side pet commands — no API skill, render a placeholder icon
+        iconBtn.disabled = true;
+        iconBtn.innerHTML = fakeCommand === "attack"
+          ? `<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+               <circle cx="16" cy="16" r="11" stroke="rgba(160,230,140,0.9)" stroke-width="1.5" fill="none"/>
+               <circle cx="16" cy="16" r="3" fill="rgba(160,230,140,0.9)"/>
+               <line x1="16" y1="2" x2="16" y2="9" stroke="rgba(160,230,140,0.9)" stroke-width="1.5"/>
+               <line x1="16" y1="23" x2="16" y2="30" stroke="rgba(160,230,140,0.9)" stroke-width="1.5"/>
+               <line x1="2" y1="16" x2="9" y2="16" stroke="rgba(160,230,140,0.9)" stroke-width="1.5"/>
+               <line x1="23" y1="16" x2="30" y2="16" stroke="rgba(160,230,140,0.9)" stroke-width="1.5"/>
+             </svg>`
+          : `<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+               <path d="M26 7 L26 18 C26 22 22 25 18 25 L9 25" stroke="rgba(240,220,100,0.9)" stroke-width="2" fill="none" stroke-linecap="round"/>
+               <polyline points="13,19 9,25 15,29" stroke="rgba(240,220,100,0.9)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+             </svg>`;
+      } else {
+        // When a static bundle skill (e.g. Photon Forge) is active, show the flip_skill icon.
+        const flipSkillId = isActive && isStatic && (skill?.flipSkill ?? 0);
+        const flipSkill = flipSkillId ? catalog.skillById.get(flipSkillId) : null;
+        // Elixir toolbelt skills ("Detonate Elixir X") share a generic icon in the API.
+        // Fall back to the source elixir's own icon so each slot looks distinct.
+        // All other toolbelt skills (Defense Field, turret actions, etc.) have correct distinct icons.
+        const isDetonateElixir = !isKit && !isStatic && /^Detonate Elixir\b/i.test(skill?.name || "");
+        const slotIcon = (isDetonateElixir && sourceSkill?.icon)
+          ? sourceSkill.icon
+          : (skill?.icon || mechIconOverride || "");
+        const displayIcon = (flipSkill?.icon) || slotIcon;
+        const displayName = (flipSkill?.name) || skill?.name || "";
+        if (displayIcon) {
+          iconBtn.innerHTML = `<img src="${escapeHtml(displayIcon)}" alt="${escapeHtml(displayName)}" />`;
+        }
+        if (flipSkill) {
+          bindHoverPreview(iconBtn, "skill", () => flipSkill);
+        } else if (skill) {
+          bindHoverPreview(iconBtn, "skill", () => skill);
+        }
       }
 
       // F-key label (F1, F2, …) in the bottom-left corner of the slot icon
@@ -3035,6 +3160,50 @@ function renderSkills() {
       slotEl.append(iconBtn);
       mechBar.append(slotEl);
     }
+    // Ranger: add pet selector directly inside mechBar (right side, pushed by auto-margin spacer)
+    if (Array.isArray(catalog.pets) && catalog.pets.length > 0) {
+      const activeSlotKey = state.editor.activePetSlot === "terrestrial2" ? "terrestrial2" : "terrestrial1";
+      const inactiveSlotKey = activeSlotKey === "terrestrial1" ? "terrestrial2" : "terrestrial1";
+      const activePetId = Number(state.editor.selectedPets?.[activeSlotKey]) || 0;
+      const inactivePetId = Number(state.editor.selectedPets?.[inactiveSlotKey]) || 0;
+      const activePet = activePetId ? catalog.petById.get(activePetId) : null;
+
+      const spacer = document.createElement("div");
+      spacer.className = "pet-panel-spacer";
+
+      const petWrapper = document.createElement("div");
+      petWrapper.className = "pet-slot-wrapper";
+
+      const petBtn = document.createElement("button");
+      petBtn.type = "button";
+      petBtn.className = "pet-slot-btn" + (activePet ? " pet-slot-btn--filled" : "");
+      petBtn.title = activePet?.name || `Click to select ${activeSlotKey === "terrestrial1" ? "Pet 1" : "Pet 2"}`;
+      if (activePet?.icon) {
+        petBtn.innerHTML = `<img src="${escapeHtml(activePet.icon)}" alt="${escapeHtml(activePet.name || "")}" />`;
+      }
+      petBtn.addEventListener("click", () => openPetPicker(petBtn, activeSlotKey, catalog));
+
+      const petLabel = document.createElement("span");
+      petLabel.className = "pet-slot-btn__label";
+      petLabel.textContent = activePet?.name?.replace(/^Juvenile\s+/i, "") || (activeSlotKey === "terrestrial1" ? "Pet 1" : "Pet 2");
+
+      petWrapper.append(petBtn, petLabel);
+
+      const petSwapBtn = document.createElement("button");
+      petSwapBtn.type = "button";
+      petSwapBtn.className = "pet-swap-btn" + (activeSlotKey === "terrestrial2" ? " pet-swap-btn--active" : "");
+      petSwapBtn.title = inactivePetId
+        ? `Switch to pet ${activeSlotKey === "terrestrial1" ? 2 : 1}`
+        : "No second pet equipped";
+      petSwapBtn.innerHTML = `<svg viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="2,3.5 13,3.5"/><polyline points="10,1 13,3.5 10,6"/><polyline points="16,10.5 5,10.5"/><polyline points="8,8 5,10.5 8,13"/></svg>`;
+      petSwapBtn.addEventListener("click", () => {
+        state.editor.activePetSlot = inactiveSlotKey;
+        renderSkills();
+      });
+
+      mechBar.append(spacer, petWrapper, petSwapBtn);
+    }
+
     // Revenant: build a legend stack to the LEFT of the mechBar
     if (Array.isArray(catalog.legends) && catalog.legends.length > 0) {
       const legendSlots = state.editor.selectedLegends || ["", ""];
@@ -3085,38 +3254,6 @@ function renderSkills() {
     } else {
       weaponCol.append(mechBar);
     }
-  }
-
-  // Ranger: build a pet selector row above the weapon row
-  if (Array.isArray(catalog.pets) && catalog.pets.length > 0) {
-    const petRow = document.createElement("div");
-    petRow.className = "pet-selector-row";
-    const petSlotDefs = [
-      { key: "terrestrial1", label: "T1" },
-      { key: "terrestrial2", label: "T2" },
-      { key: "aquatic1", label: "A1" },
-      { key: "aquatic2", label: "A2" },
-    ];
-    for (const { key, label } of petSlotDefs) {
-      const petId = Number(state.editor.selectedPets?.[key]) || 0;
-      const pet = petId ? catalog.petById.get(petId) : null;
-      const wrapper = document.createElement("div");
-      wrapper.className = "pet-slot-wrapper";
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "pet-slot-btn";
-      btn.title = pet?.name || `Slot ${label}`;
-      if (pet?.icon) {
-        btn.innerHTML = `<img src="${escapeHtml(pet.icon)}" alt="${escapeHtml(pet.name || "")}" />`;
-      }
-      const slotLabel = document.createElement("span");
-      slotLabel.className = "pet-slot-btn__label";
-      slotLabel.textContent = pet?.name ? pet.name.split(" ")[0] : label;
-      btn.addEventListener("click", () => openPetPicker(btn, key, catalog));
-      wrapper.append(btn, slotLabel);
-      petRow.append(wrapper);
-    }
-    weaponCol.append(petRow);
   }
 
   const swapBtn = document.createElement("button");
@@ -3210,7 +3347,7 @@ function openPetPicker(anchorEl, petKey, catalog) {
     state.editor.selectedPets[petKey] = Number(newVal) || 0;
     markEditorChanged();
     renderSkills();
-  }, { items, searchPlaceholder: "Search pets…" });
+  }, { items, searchPlaceholder: "Search pets…", className: "slot-picker--pet" });
 }
 
 function syncRevenantSkillsFromLegend(catalog) {
@@ -4038,6 +4175,7 @@ async function loadBuildIntoEditor(build, options = {}) {
       aquatic1: Number(build.selectedPets?.aquatic1) || 0,
       aquatic2: Number(build.selectedPets?.aquatic2) || 0,
     },
+    activePetSlot: build.activePetSlot === "terrestrial2" ? "terrestrial2" : "terrestrial1",
   };
 
   if (profession) {
@@ -4158,6 +4296,7 @@ function serializeEditorToBuild() {
       aquatic1: Number(state.editor.selectedPets?.aquatic1) || 0,
       aquatic2: Number(state.editor.selectedPets?.aquatic2) || 0,
     },
+    activePetSlot: state.editor.activePetSlot === "terrestrial2" ? "terrestrial2" : "terrestrial1",
   };
 }
 
@@ -4319,6 +4458,7 @@ function createEmptyEditor(profession = "") {
     activeLegendSlot: 0,           // 0 = first legend active, 1 = second legend active
     // Ranger/Soulbeast: two pet slots (terrestrial + aquatic) per legend slot (A/B)
     selectedPets: { terrestrial1: 0, terrestrial2: 0, aquatic1: 0, aquatic2: 0 },
+    activePetSlot: "terrestrial1",  // "terrestrial1" or "terrestrial2"
   };
 }
 

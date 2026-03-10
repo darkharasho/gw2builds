@@ -647,14 +647,22 @@ async function getProfessionCatalog(professionId, lang = "en") {
   }
 
   // Sixth pass: Ranger pet data.
-  // Each pet has a type (family) and a set of skills. The pet's active skill (shown as the pet's
-  // unique contribution to the skillbar) is skills[4] (the 5th slot). In Soulbeast, F1/F2 skill
-  // resolution matches the skill's weapon_type against the active pet's type field.
   // petsPromise was started in step 2, so this await is typically instant (already in flight).
+  // The /v2/pets skills array returns only {id} — names/icons must be fetched from /v2/skills.
   let pets = [];
   if (professionId === "Ranger") {
     const petsRaw = await petsPromise;
     if (Array.isArray(petsRaw)) {
+      // Collect all pet skill IDs and fetch their full data from /v2/skills.
+      const petSkillIds = dedupeNumbers(
+        petsRaw.flatMap((p) => (Array.isArray(p.skills) ? p.skills.map((s) => Number(s.id)) : []))
+          .filter(Boolean)
+      );
+      const petSkillsRaw = petSkillIds.length
+        ? await fetchGw2ByIds("skills", petSkillIds, lang)
+        : [];
+      const petSkillById = new Map(petSkillsRaw.map((s) => [s.id, s]));
+
       pets = petsRaw.map((p) => ({
         id: p.id,
         name: p.name || "",
@@ -662,12 +670,15 @@ async function getProfessionCatalog(professionId, lang = "en") {
         icon: p.icon || "",
         type: p.type || "",
         skills: Array.isArray(p.skills)
-          ? p.skills.map((s) => ({
-              id: Number(s.id) || 0,
-              name: s.name || "",
-              description: s.description || "",
-              icon: s.icon || "",
-            }))
+          ? p.skills.map((s) => {
+              const full = petSkillById.get(Number(s.id)) || {};
+              return {
+                id: Number(s.id) || 0,
+                name: full.name || "",
+                description: full.description || "",
+                icon: full.icon || "",
+              };
+            })
           : [],
       }));
     }
