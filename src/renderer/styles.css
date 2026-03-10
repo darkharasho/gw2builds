@@ -1707,6 +1707,12 @@ label {
   color: #d8e6ff;
 }
 
+.detail-card li:has(.fact-status-icon) {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .setup-gate {
   position: fixed;
   inset: 42px 0 0 0;
@@ -1849,6 +1855,16 @@ label {
 
 .hover-preview__facts li {
   font-size: 0.74rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.fact-status-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border-radius: 2px;
 }
 
 @media (max-width: 1200px) {

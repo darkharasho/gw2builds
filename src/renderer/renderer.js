@@ -2923,6 +2923,19 @@ function renderSkills() {
       fLabel.textContent = `F${fIdx + 1}`;
       iconBtn.append(fLabel);
 
+      // Static kit slots (tomes, Photon Forge, shrouds) get a toggle badge bottom-right.
+      if (isKit && isStatic) {
+        const toggleBadge = document.createElement("span");
+        toggleBadge.className = "kit-toggle-indicator" + (isActive ? " kit-toggle-indicator--active" : "");
+        toggleBadge.textContent = isActive ? "✕" : "▸";
+        toggleBadge.addEventListener("click", (e) => {
+          e.stopPropagation();
+          state.editor.activeKit = resolvedKit === skill.id ? 0 : skill.id;
+          renderSkills();
+        });
+        iconBtn.append(toggleBadge);
+      }
+
       if (isSelectable) {
         iconBtn.addEventListener("click", () => {
           const otherSelectedIds = new Set(
@@ -3192,7 +3205,7 @@ function renderDetailPanel() {
   const facts = Array.isArray(detail.facts) ? detail.facts.slice(0, 6) : [];
   const factsHtml = facts.length
     ? facts
-        .map((fact) => `<li>${escapeHtml(formatFact(fact))}</li>`)
+        .map((fact) => `<li>${formatFactHtml(fact)}</li>`)
         .join("")
     : "<li>No fact entries.</li>";
 
@@ -3307,7 +3320,7 @@ function showHoverPreview(kind, entity, x, y) {
   const maxFacts = kind.startsWith("equip-") ? 12 : 4;
   const facts = (Array.isArray(entity.facts) ? entity.facts : [])
     .slice(0, maxFacts)
-    .map((fact) => formatFact(fact))
+    .map((fact) => formatFactHtml(fact))
     .filter(Boolean);
   const meta = getHoverMetaLine(kind, entity);
   el.hoverPreview.innerHTML = `
@@ -3319,7 +3332,7 @@ function showHoverPreview(kind, entity, x, y) {
       </div>
     </div>
     ${description ? `<p class="hover-preview__desc">${escapeHtml(description)}</p>` : (!facts.length ? `<p class="hover-preview__desc">No description available.</p>` : "")}
-    ${facts.length ? `<ul class="hover-preview__facts">${facts.map((entry) => `<li>${escapeHtml(entry)}</li>`).join("")}</ul>` : ""}
+    ${facts.length ? `<ul class="hover-preview__facts">${facts.map((entry) => `<li>${entry}</li>`).join("")}</ul>` : ""}
   `;
   el.hoverPreview.classList.remove("hidden");
   positionHoverPreview(x, y);
@@ -4235,6 +4248,63 @@ function formatFact(fact) {
     fact.description ??
     "";
   return value === "" ? label : `${label}: ${value}`;
+}
+
+// Render CDN icon URLs for boons and conditions, used as fallback when fact.icon is absent.
+const _RW_BOONS = `${_RW}`;
+const BOON_CONDITION_ICONS = {
+  // Boons
+  Aegis:          `${_RW_BOONS}/DFB4D1B50AE4D6A275B349E15B179261EE3EB0AF/102854.png`,
+  Alacrity:       `${_RW_BOONS}/4FDAC2113B500104121753EF7E026E45C141E94D/1938787.png`,
+  Fury:           `${_RW_BOONS}/96D90DF84CAFE008233DD1C2606A12C1A0E68048/102842.png`,
+  Might:          `${_RW_BOONS}/2FA9DF9D6BC17839BBEA14723F1C53D645DDB5E1/102852.png`,
+  Protection:     `${_RW_BOONS}/CD77D1FAB7B270223538A8F8ECDA1CFB044D65F4/102834.png`,
+  Quickness:      `${_RW_BOONS}/D4AB6401A6D6917C3D4F230764452BCCE1035B0D/1012835.png`,
+  Regeneration:   `${_RW_BOONS}/F69996772B9E18FD18AD0AABAB25D7E3FC42F261/102835.png`,
+  Resistance:     `${_RW_BOONS}/50BAC1B8E10CFAB9E749A5D910D4A9DCF29EBB7C/961398.png`,
+  Resolution:     `${_RW_BOONS}/D104A6B9344A2E2096424A3C300E46BC2926E4D7/2440718.png`,
+  Stability:      `${_RW_BOONS}/3D3A1C2D6D791C05179AB871902D28782C65C244/415959.png`,
+  Swiftness:      `${_RW_BOONS}/20CFC14967E67F7A3FD4A4B8722B4CF5B8565E11/102836.png`,
+  Vigor:          `${_RW_BOONS}/58E92EBAF0DB4DA7C4AC04D9B22BCA5ECF0100DE/102843.png`,
+  // Conditions
+  Bleeding:       `${_RW_BOONS}/79FF0046A5F9ADA3B4C4EC19ADB4CB124D5F0021/102848.png`,
+  Blinded:        `${_RW_BOONS}/09770136BB76FD0DBE1CC4267DEED54774CB20F6/102837.png`,
+  Burning:        `${_RW_BOONS}/B47BF5803FED2718D7474EAF9617629AD068EE10/102849.png`,
+  Chilled:        `${_RW_BOONS}/28C4EC547A3516AF0242E826772DA43A5EAC3DF3/102839.png`,
+  Confusion:      `${_RW_BOONS}/289AA0A4644F0E044DED3D3F39CED958E1DDFF53/102880.png`,
+  Crippled:       `${_RW_BOONS}/070325E519C178D502A8160523766070D30C0C19/102838.png`,
+  Fear:           `${_RW_BOONS}/30307A6E766D74B6EB09EDA12A4A2DE50E4D76F4/102869.png`,
+  Immobile:       `${_RW_BOONS}/397A613651BFCA2832B6469CE34735580A2C120E/102844.png`,
+  Poisoned:       `${_RW_BOONS}/559B0AF9FB5E1243D2649FAAE660CCB338AACC19/102840.png`,
+  Slow:           `${_RW_BOONS}/F60D1EF5271D7B9319610855676D320CD25F01C6/961397.png`,
+  Taunt:          `${_RW_BOONS}/02EED459AD65FAF7DF32A260E479C625070841B9/1228472.png`,
+  Torment:        `${_RW_BOONS}/10BABF2708CA3575730AC662A2E72EC292565B08/598887.png`,
+  Vulnerability:  `${_RW_BOONS}/3A394C1A0A3257EB27A44842DDEEF0DF000E1241/102850.png`,
+  Weakness:       `${_RW_BOONS}/6CB0E64AF9AA292E332A38C1770CE577E2CDE0E8/102853.png`,
+};
+
+// Fact types where the icon represents the boon/condition being applied.
+const BUFF_FACT_TYPES = new Set(["Buff", "ApplyBuffCondition", "PrefixedBuff"]);
+
+function formatFactHtml(fact) {
+  if (!fact || typeof fact !== "object") return "Unknown fact";
+  const label = String(fact.text || fact.type || "Fact");
+  const value =
+    fact.value ??
+    fact.percent ??
+    fact.distance ??
+    fact.duration ??
+    fact.hit_count ??
+    fact.apply_count ??
+    fact.status ??
+    fact.description ??
+    "";
+  const text = value === "" ? label : `${label}: ${value}`;
+  // Show icon when: fact has its own icon (all real API facts), OR it's a buff/cond type with a
+  // known status name (fallback for hardcoded facts that omit the icon field).
+  const iconUrl = fact.icon || (BUFF_FACT_TYPES.has(fact.type) && fact.status && BOON_CONDITION_ICONS[fact.status]) || "";
+  if (!iconUrl) return escapeHtml(text);
+  return `<img class="fact-status-icon" src="${escapeHtml(iconUrl)}" alt="" aria-hidden="true">${escapeHtml(text)}`;
 }
 
 function normalizeText(input) {

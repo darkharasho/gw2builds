@@ -142,6 +142,172 @@ async function getProfessionCatalog(professionId, lang = "en") {
   const PHOTON_FORGE_SKILL_ID = 42938;
   const PHOTON_FORGE_BUNDLE = [44588, 42965, 44530, 45783, 42521];
 
+  // Firebrand tome chapter skills — the GW2 public API does not expose these via bundle_skills
+  // or any other field. Skill data sourced from community tools (GW2EI, discretize-ui).
+  const _WK = "https://wiki.guildwars2.com/images";
+  const FIREBRAND_TOME_CHAPTERS = new Map([
+    [44364, [ // Tome of Justice
+      { id: 41258, name: "Chapter 1: Searing Spell",      slot: "Weapon_1", icon: `${_WK}/d/d3/Chapter_1-_Searing_Spell.png`,
+        description: "Fueled by tales of the desolation in Istan, incite a great swelling of heat before you.",
+        facts: [
+          { type: "Damage",              text: "Damage",             dmg_multiplier: 1.6006,  hit_count: 1 },
+          { type: "ApplyBuffCondition",  text: "Burning",            status: "Burning",       duration: 2.5, apply_count: 1 },
+          { type: "ApplyBuffCondition",  text: "Vulnerability",      status: "Vulnerability", duration: 6 },
+          { type: "Number",              text: "Number of Targets",  value: 5 },
+          { type: "Distance",            text: "Range",              value: 600 },
+          { type: "Number",              text: "Page Cost",          value: 1 },
+        ] },
+      { id: 40635, name: "Chapter 2: Igniting Burst",     slot: "Weapon_2", icon: `${_WK}/5/53/Chapter_2-_Igniting_Burst.png`,
+        description: "Ignite the air around you in an expanding burst.",
+        facts: [
+          { type: "Damage",              text: "Damage",             dmg_multiplier: 1.46055, hit_count: 1 },
+          { type: "ApplyBuffCondition",  text: "Burning",            status: "Burning",       duration: 5, apply_count: 1 },
+          { type: "ApplyBuffCondition",  text: "Weakness",           status: "Weakness",      duration: 3 },
+          { type: "ComboFinisher",       text: "Combo Finisher",     finisher_type: "Blast",  percent: 100 },
+          { type: "Number",              text: "Number of Targets",  value: 5 },
+          { type: "Distance",            text: "Radius",             value: 240 },
+          { type: "Recharge",            text: "Recharge",           value: 8.5 },
+          { type: "Number",              text: "Page Cost",          value: 1 },
+        ] },
+      { id: 42449, name: "Chapter 3: Heated Rebuke",      slot: "Weapon_3", icon: `${_WK}/e/e7/Chapter_3-_Heated_Rebuke.png`,
+        description: "Call forth a heated vortex to collapse your enemies together.",
+        facts: [
+          { type: "Damage",              text: "Damage",             dmg_multiplier: 0.03001, hit_count: 1 },
+          { type: "Distance",            text: "Pull",               value: 240 },
+          { type: "Number",              text: "Defiance Break",     value: 150 },
+          { type: "Number",              text: "Number of Targets",  value: 5 },
+          { type: "Distance",            text: "Radius",             value: 240 },
+          { type: "Distance",            text: "Range",              value: 900 },
+          { type: "Recharge",            text: "Recharge",           value: 15 },
+          { type: "Number",              text: "Page Cost",          value: 1 },
+        ] },
+      { id: 40015, name: "Chapter 4: Scorched Aftermath", slot: "Weapon_4", icon: `${_WK}/c/c9/Chapter_4-_Scorched_Aftermath.png`,
+        description: "Detail the suffering in fire and blood inflicted during Vabbi's occupation.",
+        facts: [
+          { type: "Damage",              text: "Damage",             dmg_multiplier: 1.06008, hit_count: 5 },
+          { type: "ApplyBuffCondition",  text: "Bleeding",           status: "Bleeding",      duration: 2, apply_count: 1 },
+          { type: "ApplyBuffCondition",  text: "Burning",            status: "Burning",       duration: 2, apply_count: 1 },
+          { type: "ComboField",          text: "Combo Field",        field_type: "Fire" },
+          { type: "Number",              text: "Pulses",             value: 5 },
+          { type: "Duration",            text: "Duration",           duration: 4 },
+          { type: "Number",              text: "Number of Targets",  value: 5 },
+          { type: "Distance",            text: "Radius",             value: 360 },
+          { type: "Number",              text: "Page Cost",          value: 1 },
+        ] },
+      { id: 42898, name: "Epilogue: Ashes of the Just",   slot: "Weapon_5", icon: `${_WK}/6/6d/Epilogue-_Ashes_of_the_Just.png`,
+        description: "Recall the memory of fallen heroes, granting allies the searing blades of justice.",
+        facts: [
+          { type: "Buff",                text: "Ashes of the Just",  status: "Ashes of the Just", duration: 10 },
+          { type: "ApplyBuffCondition",  text: "Burning",            status: "Burning",       duration: 3, apply_count: 1 },
+          { type: "Buff",                text: "Might",              status: "Might",         duration: 8, apply_count: 1 },
+          { type: "Number",              text: "Number of Targets",  value: 5 },
+          { type: "Distance",            text: "Radius",             value: 600 },
+          { type: "Recharge",            text: "Recharge",           value: 20 },
+          { type: "Number",              text: "Page Cost",          value: 1 },
+        ] },
+    ]],
+    [41780, [ // Tome of Resolve
+      { id: 45022, name: "Chapter 1: Desert Bloom",       slot: "Weapon_1", icon: `${_WK}/f/fd/Chapter_1-_Desert_Bloom.png`,
+        description: "Tales of desert blooms create a wave of healing for your allies.",
+        facts: [
+          { type: "Heal",                text: "Healing",            value: 5640 },
+          { type: "Number",              text: "Number of Targets",  value: 5 },
+          { type: "Distance",            text: "Range",              value: 600 },
+          { type: "Number",              text: "Page Cost",          value: 1 },
+        ] },
+      { id: 40679, name: "Chapter 2: Radiant Recovery",   slot: "Weapon_2", icon: `${_WK}/9/95/Chapter_2-_Radiant_Recovery.png`,
+        description: "Release magic from pages detailing the rebuilding of Vabbi, cleansing conditions on nearby allies. Allies are healed for each condition removed.",
+        facts: [
+          { type: "Heal",                text: "Healing per Condition Removed", value: 3881 },
+          { type: "Number",              text: "Conditions Removed", value: 2 },
+          { type: "Number",              text: "Number of Targets",  value: 5 },
+          { type: "Distance",            text: "Radius",             value: 240 },
+          { type: "Recharge",            text: "Recharge",           value: 8.75 },
+          { type: "Number",              text: "Page Cost",          value: 1 },
+        ] },
+      { id: 45128, name: "Chapter 3: Azure Sun",          slot: "Weapon_3", icon: `${_WK}/b/bf/Chapter_3-_Azure_Sun.png`,
+        description: "Inspired by countless poems describing the comforting powers of the water-reflected sun, grant boons to allies.",
+        facts: [
+          { type: "Buff",                text: "Vigor",              status: "Vigor",         duration: 5 },
+          { type: "Buff",                text: "Regeneration",       status: "Regeneration",  duration: 6 },
+          { type: "Buff",                text: "Swiftness",          status: "Swiftness",     duration: 5 },
+          { type: "Number",              text: "Number of Targets",  value: 5 },
+          { type: "Distance",            text: "Radius",             value: 240 },
+          { type: "Distance",            text: "Range",              value: 900 },
+          { type: "Number",              text: "Page Cost",          value: 1 },
+        ] },
+      { id: 42008, name: "Chapter 4: Shining River",      slot: "Weapon_4", icon: `${_WK}/1/16/Chapter_4-_Shining_River.png`,
+        description: "Release a torrent of pages describing the water cycle of the Elon River. Heal allies and grant them swiftness.",
+        facts: [
+          { type: "Heal",                text: "Healing",            value: 4640 },
+          { type: "Buff",                text: "Swiftness",          status: "Swiftness",     duration: 4 },
+          { type: "ComboField",          text: "Combo Field",        field_type: "Water" },
+          { type: "Number",              text: "Pulses",             value: 5 },
+          { type: "Distance",            text: "Radius",             value: 360 },
+          { type: "Recharge",            text: "Recharge",           value: 15.5 },
+          { type: "Number",              text: "Page Cost",          value: 1 },
+        ] },
+      { id: 42925, name: "Epilogue: Eternal Oasis",       slot: "Weapon_5", icon: `${_WK}/5/5f/Epilogue-_Eternal_Oasis.png`,
+        description: "Purify your allies with the waters of Amnoon and increase the healing they receive.",
+        facts: [
+          { type: "Duration",            text: "Duration",           duration: 8 },
+          { type: "Number",              text: "Healing Effectiveness Increase", value: "20%" },
+          { type: "Number",              text: "Conditions Converted to Boons", value: 5 },
+          { type: "Number",              text: "Number of Targets",  value: 5 },
+          { type: "Distance",            text: "Radius",             value: 600 },
+          { type: "Number",              text: "Page Cost",          value: 2 },
+        ] },
+    ]],
+    [42259, [ // Tome of Courage
+      { id: 42986, name: "Chapter 1: Unflinching Charge", slot: "Weapon_1", icon: `${_WK}/3/30/Chapter_1-_Unflinching_Charge.png`,
+        description: "Roused by tales of mythical Sunspear charges, ground and motivate allies before you.",
+        facts: [
+          { type: "Buff",                text: "Protection",         status: "Protection",    duration: 1.5 },
+          { type: "Buff",                text: "Swiftness",          status: "Swiftness",     duration: 6 },
+          { type: "Number",              text: "Number of Targets",  value: 5 },
+          { type: "Distance",            text: "Range",              value: 600 },
+          { type: "Number",              text: "Page Cost",          value: 1 },
+        ] },
+      { id: 41968, name: "Chapter 2: Daring Challenge",   slot: "Weapon_2", icon: `${_WK}/7/79/Chapter_2-_Daring_Challenge.png`,
+        description: "As the tales recount of Turai, taunt your enemies by issuing an insightfully inciting challenge.",
+        facts: [
+          { type: "ApplyBuffCondition",  text: "Taunt",              status: "Taunt",         duration: 1 },
+          { type: "Buff",                text: "Resolution",         status: "Resolution",    duration: 3 },
+          { type: "Distance",            text: "Radius",             value: 240 },
+          { type: "Number",              text: "Page Cost",          value: 1 },
+        ] },
+      { id: 41836, name: "Chapter 3: Valiant Bulwark",    slot: "Weapon_3", icon: `${_WK}/7/73/Chapter_3-_Valiant_Bulwark.png`,
+        description: "Manifest the shimmering purity of the desert sun, reflecting enemy missiles.",
+        facts: [
+          { type: "Duration",            text: "Duration",           duration: 5 },
+          { type: "Distance",            text: "Radius",             value: 240 },
+          { type: "Distance",            text: "Range",              value: 900 },
+          { type: "Number",              text: "Page Cost",          value: 1 },
+        ] },
+      { id: 40988, name: "Chapter 4: Stalwart Stand",     slot: "Weapon_4", icon: `${_WK}/8/89/Chapter_4-_Stalwart_Stand.png`,
+        description: "Recount the stand of Elonian loyalists against Palawa Joko, granting resistance to your allies.",
+        facts: [
+          { type: "Buff",                text: "Resistance",         status: "Resistance",    duration: 1 },
+          { type: "Number",              text: "Pulses",             value: 3 },
+          { type: "ComboField",          text: "Combo Field",        field_type: "Light" },
+          { type: "Distance",            text: "Radius",             value: 360 },
+          { type: "Recharge",            text: "Recharge",           value: 20 },
+          { type: "Number",              text: "Page Cost",          value: 1 },
+        ] },
+      { id: 44455, name: "Epilogue: Unbroken Lines",      slot: "Weapon_5", icon: `${_WK}/d/d8/Epilogue-_Unbroken_Lines.png`,
+        description: "Recalling the memory of heroes past, enchant nearby allies with formidable defenses.",
+        facts: [
+          { type: "Buff",                text: "Protection",         status: "Protection",    duration: 5 },
+          { type: "Buff",                text: "Stability",          status: "Stability",     duration: 5, apply_count: 2 },
+          { type: "Buff",                text: "Aegis",              status: "Aegis",         duration: 4 },
+          { type: "Number",              text: "Number of Targets",  value: 5 },
+          { type: "Distance",            text: "Radius",             value: 600 },
+          { type: "Recharge",            text: "Recharge",           value: 25 },
+          { type: "Number",              text: "Page Cost",          value: 2 },
+        ] },
+    ]],
+  ]);
+
   // The GW2 API's toolbelt_skill for elixirs points to "Detonate Elixir X" (secondary action),
   // but the actual in-game F-slot skill is "Toss Elixir X" (the throw/primary action).
   // Map each elixir utility/heal skill ID → correct Toss Elixir toolbelt skill ID.
@@ -258,7 +424,9 @@ async function getProfessionCatalog(professionId, lang = "en") {
       ? rawBundleSkills
       : skill.id === PHOTON_FORGE_SKILL_ID
         ? PHOTON_FORGE_BUNDLE
-        : (transformBundleBySpec.get(specId) || []);
+        : FIREBRAND_TOME_CHAPTERS.has(skill.id)
+          ? FIREBRAND_TOME_CHAPTERS.get(skill.id).map((c) => c.id)
+          : (transformBundleBySpec.get(specId) || []);
     // GW2 API returns "None" for weapon-agnostic skills; normalize to "" so falsy checks work.
     const weaponType = skill.weapon_type === "None" ? "" : (skill.weapon_type || "");
     const attunement = skill.attunement === "None" ? "" : (skill.attunement || "");
@@ -336,6 +504,22 @@ async function getProfessionCatalog(professionId, lang = "en") {
   }
 
   const skills = [...professionSkillsRaw, ...extraSkillsRaw, ...morphPoolSkillsRaw, ...traitSkillsRaw, ...legendSkillsRaw];
+
+  // Firebrand tome chapters are not in the GW2 API — inject synthetic raw skill objects so mapSkill
+  // can include them in the catalog for weapon-bar display when a tome is toggled.
+  if (professionId === "Guardian") {
+    for (const chapters of FIREBRAND_TOME_CHAPTERS.values()) {
+      for (const ch of chapters) {
+        skills.push({
+          id: ch.id, name: ch.name, icon: ch.icon, slot: ch.slot,
+          type: "Weapon", specialization: 62, professions: ["Guardian"],
+          weapon_type: "None", attunement: "None", dual_attunement: "None",
+          categories: [], facts: ch.facts || [], bundle_skills: [], transform_skills: [],
+          toolbelt_skill: 0, flip_skill: 0, description: ch.description || "",
+        });
+      }
+    }
+  }
 
   // Sixth pass: Ranger pet data.
   // Each pet has a type (family) and a set of skills. The pet's active skill (shown as the pet's
