@@ -2805,16 +2805,33 @@ function renderSkills() {
 
     mechSlots = [];
     if (eliteSpecId === 55) {
-      // Soulbeast: beastmode weapon bar skills (Profession_1/2/3 from the API)
-      const petFamilySkills = activePetId ? RANGER_PET_FAMILY_SKILLS.get(activePetId) : null;
-      for (const key of ["p1", "p2", "p3"]) {
-        const skillId = petFamilySkills?.[key] || null;
-        const skill = skillId ? (catalog.skillById.get(skillId) || null) : null;
-        mechSlots.push({ skill, sourceId: skill?.id || 0, isStatic: true, isSelectable: false });
+      // Soulbeast: F5 is Beastmode toggle. Default state (not in beastmode) mirrors Core Ranger;
+      // when beastmode is active, F1–F3 show the merged pet skills from RANGER_PET_FAMILY_SKILLS.
+      const p5SoulbeastSkill = (options.profession || []).find((s) => s.slot === "Profession_5") || null;
+      const beastmodeId = p5SoulbeastSkill?.id || 0;
+      const beastmodeActive = beastmodeId > 0 && activeKit === beastmodeId;
+      if (beastmodeActive) {
+        const petFamilySkills = activePetId ? RANGER_PET_FAMILY_SKILLS.get(activePetId) : null;
+        for (const key of ["p1", "p2", "p3"]) {
+          const skillId = petFamilySkills?.[key] || null;
+          const skill = skillId ? (catalog.skillById.get(skillId) || null) : null;
+          mechSlots.push({ skill, sourceId: skill?.id || 0, isStatic: true, isSelectable: false });
+        }
+      } else {
+        // Default: same as Core Ranger (fake commands + live pet F2 skill)
+        mechSlots.push({ skill: null, sourceId: 0, isStatic: true, isSelectable: false, fakeCommand: "attack" });
+        const f2Skill = (activePet?.skills || [])[0] || null;
+        mechSlots.push({ skill: f2Skill, sourceId: f2Skill?.id || 0, isStatic: true, isSelectable: false });
+        mechSlots.push({ skill: null, sourceId: 0, isStatic: true, isSelectable: false, fakeCommand: "return" });
       }
-      // F4: Eternal Bond
-      const eternalBond = catalog.skillById.get(59554) || null;
-      mechSlots.push({ skill: eternalBond, sourceId: eternalBond?.id || 0, isStatic: true, isSelectable: false });
+      if (p5SoulbeastSkill) {
+        mechSlots.push({
+          skill: p5SoulbeastSkill, sourceId: p5SoulbeastSkill.id, isStatic: true, isSelectable: false,
+          isBeastmodeToggle: true,
+          leaveIcon: "https://wiki.guildwars2.com/images/2/2a/Leave_Beastmode.png",
+          fKeyLabel: "F5",
+        });
+      }
     } else {
       // Core / Druid / Untamed / Galeshot
       // F1: fake "Attack My Target" (client-side command, no API skill)
@@ -2835,10 +2852,13 @@ function renderSkills() {
         mechSlots.push({ skill: null, sourceId: 0, isStatic: true, isSelectable: false, fakeCommand: "return" });
       }
     }
-    // P5: elite-spec toggle (Celestial Avatar/Beastmode/Unleash/Cyclone Bow)
-    const p5Skill = (options.profession || []).find((s) => s.slot === "Profession_5") || null;
-    if (p5Skill) {
-      mechSlots.push({ skill: p5Skill, sourceId: p5Skill.id, isStatic: true, isSelectable: false });
+    // P5: elite-spec toggle for non-Soulbeast specs (Celestial Avatar/Unleash/Cyclone Bow).
+    // Soulbeast (55) handles its own P5 (Beastmode) above with isBeastmodeToggle.
+    if (eliteSpecId !== 55) {
+      const p5Skill = (options.profession || []).find((s) => s.slot === "Profession_5") || null;
+      if (p5Skill) {
+        mechSlots.push({ skill: p5Skill, sourceId: p5Skill.id, isStatic: true, isSelectable: false });
+      }
     }
   } else {
     // Non-toolbelt professions (warrior, necro, guardian, mesmer, ele, thief, etc.)
@@ -2926,7 +2946,9 @@ function renderSkills() {
       Number(state.editor.skills?.eliteId) || 0,
     ].filter(Boolean));
     const isEquippedSlotKit = (kitSkill?.bundleSkills?.length ?? 0) > 0 && equippedIds.has(activeKit);
-    if (!isStaticBundle && !isToolbeltSource && !isEquippedSlotKit) {
+    // Soulbeast Beastmode has no bundle_skills in the API; allow it to persist via isBeastmodeToggle.
+    const isBeastmodeKit = mechSlots.some((s) => s.isBeastmodeToggle && s.skill?.id === activeKit);
+    if (!isStaticBundle && !isToolbeltSource && !isEquippedSlotKit && !isBeastmodeKit) {
       state.editor.activeKit = 0;
     }
   }
@@ -2993,7 +3015,7 @@ function renderSkills() {
     mechBar.className = "profession-mechanics-bar";
 
     for (let fIdx = 0; fIdx < mechSlots.length; fIdx++) {
-      const { skill, sourceId, sourceSkill, isStatic, isSelectable, morphIndex, mechIconOverride, fakeCommand } = mechSlots[fIdx];
+      const { skill, sourceId, sourceSkill, isStatic, isSelectable, morphIndex, mechIconOverride, fakeCommand, isBeastmodeToggle, leaveIcon, fKeyLabel } = mechSlots[fIdx];
       const slotEl = document.createElement("div");
       slotEl.className = "skill-slot";
       const iconBtn = document.createElement("button");
@@ -3005,16 +3027,16 @@ function renderSkills() {
       const srcSkillForKit = (!isStatic && isToolbelt) ? catalog.skillById.get(sourceId) : null;
       const isKit = !isStatic && isToolbelt
         ? (srcSkillForKit?.bundleSkills?.length ?? 0) > 0
-        : isStatic && (skill?.bundleSkills?.length ?? 0) > 0;
+        : isStatic && ((skill?.bundleSkills?.length ?? 0) > 0 || !!isBeastmodeToggle);
 
       let isActive = false;
       if (isSelectable) {
         // Amalgam morph slot — always interactive, never "active" in the attunement/kit sense
       } else if (!isStatic && isToolbelt) {
         isActive = isKit && resolvedKit === sourceId;
-      } else if (isStatic && (skill?.bundleSkills?.length ?? 0) > 0) {
-        // Static bundle skills: shroud, celestial avatar, Photon Forge, etc.
-        isActive = resolvedKit === skill.id;
+      } else if (isStatic && ((skill?.bundleSkills?.length ?? 0) > 0 || isBeastmodeToggle)) {
+        // Static bundle skills: shroud, celestial avatar, Photon Forge, beastmode, etc.
+        isActive = resolvedKit === skill?.id;
       } else if (isStatic && !isToolbelt) {
         // Attunement-keyed skills: check name pattern ("Fire Attunement") or attunement field
         const attunementNameMatch = /^(\w+)\s+Attunement\b/i.exec(skill?.name || "");
@@ -3034,6 +3056,7 @@ function renderSkills() {
         + (fakeCommand ? ` skill-icon--fake-command skill-icon--fake-${fakeCommand}` : "");
       iconBtn.title = fakeCommand === "attack" ? "Attack My Target"
         : fakeCommand === "return" ? "Return to Me"
+        : (isActive && leaveIcon) ? "Leave Beastmode"
         : skill?.name || (isSelectable ? "Choose morph skill…" : "");
 
       if (fakeCommand) {
@@ -3063,8 +3086,9 @@ function renderSkills() {
         const slotIcon = (isDetonateElixir && sourceSkill?.icon)
           ? sourceSkill.icon
           : (skill?.icon || mechIconOverride || "");
-        const displayIcon = (flipSkill?.icon) || slotIcon;
-        const displayName = (flipSkill?.name) || skill?.name || "";
+        // Beastmode: show Leave Beastmode icon when active (API has no flip_skill for Beastmode).
+        const displayIcon = (isActive && leaveIcon) ? leaveIcon : (flipSkill?.icon) || slotIcon;
+        const displayName = (isActive && leaveIcon) ? "Leave Beastmode" : (flipSkill?.name) || skill?.name || "";
         if (displayIcon) {
           iconBtn.innerHTML = `<img src="${escapeHtml(displayIcon)}" alt="${escapeHtml(displayName)}" />`;
         }
@@ -3078,7 +3102,7 @@ function renderSkills() {
       // F-key label (F1, F2, …) in the bottom-left corner of the slot icon
       const fLabel = document.createElement("span");
       fLabel.className = "skill-icon--profession-flabel";
-      fLabel.textContent = `F${fIdx + 1}`;
+      fLabel.textContent = fKeyLabel || `F${fIdx + 1}`;
       iconBtn.append(fLabel);
 
       // Static kit slots (tomes, Photon Forge, shrouds) get a toggle badge bottom-right.
@@ -3131,8 +3155,8 @@ function renderSkills() {
         if (skill) iconBtn.addEventListener("click", () => selectDetail("skill", skill));
       } else {
         iconBtn.addEventListener("click", () => {
-          if (isStatic && (skill?.bundleSkills?.length ?? 0) > 0) {
-            // Static bundle skill (shroud, Photon Forge, etc.): toggle bundle weapon skills.
+          if (isStatic && ((skill?.bundleSkills?.length ?? 0) > 0 || isBeastmodeToggle)) {
+            // Static bundle skill (shroud, Photon Forge, beastmode, etc.): toggle active state.
             state.editor.activeKit = resolvedKit === skill.id ? 0 : skill.id;
             renderSkills();
             if (skill) selectDetail("skill", skill);
