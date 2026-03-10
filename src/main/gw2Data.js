@@ -5,8 +5,14 @@ const USER_AGENT = "gw2builds-desktop";
 const cache = new Map();
 
 async function getProfessionList(lang = "en") {
-  const url = `${GW2_API_ROOT}/professions?ids=all&lang=${encodeURIComponent(lang)}`;
-  const data = await fetchCachedJson(`professions:${lang}`, url, 1000 * 60 * 60);
+  // Profession IDs are static (unchanged since 2015); hardcode to avoid an extra round-trip
+  // and to avoid the /v2/professions bare endpoint which has inconsistent API support.
+  const PROFESSION_IDS = ["Guardian","Warrior","Engineer","Ranger","Thief","Elementalist","Mesmer","Necromancer","Revenant"];
+  const data = await fetchCachedJson(
+    `professions:${lang}`,
+    `${GW2_API_ROOT}/professions?ids=${PROFESSION_IDS.join(",")}&lang=${encodeURIComponent(lang)}`,
+    1000 * 60 * 60
+  );
   if (!Array.isArray(data)) return [];
   return data
     .filter((entry) => entry?.id)
@@ -24,19 +30,12 @@ async function getProfessionCatalog(professionId, lang = "en") {
     throw new Error("Missing profession id.");
   }
 
+  // Step 1: fetch profession data — everything else depends on this.
   const professionUrl = `${GW2_API_ROOT}/professions/${encodeURIComponent(professionId)}?lang=${encodeURIComponent(lang)}`;
   const profession = await fetchCachedJson(`profession:${professionId}:${lang}`, professionUrl, 1000 * 60 * 60);
   if (!profession?.id) {
     throw new Error(`Unknown profession "${professionId}".`);
   }
-
-  const specializationIds = dedupeNumbers(profession.specializations || []);
-  const specializations = await fetchGw2ByIds("specializations", specializationIds, lang);
-
-  const traitIds = dedupeNumbers(
-    specializations.flatMap((spec) => [...(spec?.minor_traits || []), ...(spec?.major_traits || [])])
-  );
-  const traits = await fetchGw2ByIds("traits", traitIds, lang);
 
   // Build a map of skill ID → reference metadata from the profession endpoint.
   // The profession.skills entries carry slot/specialization/type for how the profession
@@ -52,32 +51,7 @@ async function getProfessionCatalog(professionId, lang = "en") {
       }])
   );
 
-  // Build trait-skill specialization tag map early so it can be applied to profession skills.
-  // Skills embedded in elite spec major traits (e.g. Mechanist's Jade Mech F1-F3) should
-  // inherit that elite spec's specialization ID, even when the profession or skills API omits it.
-  // Include skills WITH a slot set — those are already in profession.skills and need the
-  // specialization tag applied there. Skills WITHOUT a slot will be fetched separately below.
-  const eliteSpecIdSet = new Set(specializations.filter((s) => s.elite).map((s) => Number(s.id)));
-  const traitSkillTagMap = new Map(); // skillId → {slot, specialization, type}
-  for (const trait of traits) {
-    const specId = Number(trait.specialization) || 0;
-    if (!eliteSpecIdSet.has(specId)) continue;
-    const tier = Number(trait.tier) || 0;
-    if (!tier || !Array.isArray(trait.skills)) continue;
-    for (const ts of trait.skills) {
-      const skillId = Number(ts?.id);
-      if (!skillId) continue;
-      // Don't overwrite a more specific existing entry
-      if (!traitSkillTagMap.has(skillId)) {
-        traitSkillTagMap.set(skillId, {
-          slot: ts.slot || `Profession_${tier}`,
-          specialization: specId,
-          type: "Profession",
-        });
-      }
-    }
-  }
-
+  const specializationIds = dedupeNumbers(profession.specializations || []);
   const professionSkillIds = dedupeNumbers((profession.skills || []).map((entry) => entry?.id));
 
   // Also include any Skill unlocks from elite specialization training tracks.
@@ -99,10 +73,38 @@ async function getProfessionCatalog(professionId, lang = "en") {
   const weaponSkillIds = dedupeNumbers(
     Object.values(profession.weapons || {}).flatMap((w) => (w.skills || []).map((s) => s?.id))
   );
-  const [professionSkillsRawApi, weaponSkillsRaw] = await Promise.all([
+
+  // Step 2: fetch specializations, profession skills, and weapon skills in parallel.
+  // These are all independent of each other — they only need the profession data from step 1.
+  // Also start Ranger pets and Revenant legend IDs here since they're fully independent.
+  const petsPromise = professionId === "Ranger"
+    ? fetchCachedJson(`pets:${lang}`, `${GW2_API_ROOT}/pets?ids=all&lang=${encodeURIComponent(lang)}`, 1000 * 60 * 60 * 24)
+    : Promise.resolve([]);
+  const legendsRawPromise = professionId === "Revenant"
+    ? fetchCachedJson(`legendIds`, `${GW2_API_ROOT}/legends`, 1000 * 60 * 60 * 24)
+        .then((legendIds) =>
+          Array.isArray(legendIds) && legendIds.length
+            ? fetchCachedJson(
+                `legends:${legendIds.join(",")}`,
+                `${GW2_API_ROOT}/legends?ids=${encodeURIComponent(legendIds.join(","))}`,
+                1000 * 60 * 60 * 24
+              )
+            : []
+        )
+    : Promise.resolve([]);
+
+  const [specializations, professionSkillsRawApi, weaponSkillsBase] = await Promise.all([
+    fetchGw2ByIds("specializations", specializationIds, lang),
     fetchGw2ByIds("skills", allProfessionSkillIds, lang),
     fetchGw2ByIds("skills", weaponSkillIds, lang),
   ]);
+
+  // Collect depth-1 weapon chain flip IDs upfront so they can be merged into the extraSkillIds
+  // batch below — avoiding a separate sequential network request.
+  const weaponSkillIdSet = new Set(weaponSkillIds);
+  const weaponChainDepth1Ids = dedupeNumbers(
+    weaponSkillsBase.map((s) => Number(s.flip_skill)).filter((id) => id && !weaponSkillIdSet.has(id))
+  );
 
   // Some GW2 skills have specialization: null in /v2/skills despite belonging to an elite spec,
   // or their spec is inconsistent between API endpoints. Override the specialization for known skills.
@@ -118,21 +120,6 @@ async function getProfessionCatalog(professionId, lang = "en") {
     // Holosmith's F5 slot instead of Photon Forge (42938).
     [72103, 43], [72114, 43],
   ]);
-
-  // Merge profession reference metadata into fetched skill objects.
-  // Prefer the reference's slot/specialization/type over the skill's own values.
-  // Also apply traitSkillTagMap specialization as a fallback for elite spec skills whose
-  // specialization the profession API leaves unset (e.g. Mechanist's mech command variants).
-  const professionSkillsRaw = professionSkillsRawApi.map((skill) => {
-    const ref = profSkillRefs.get(skill.id);
-    const traitTag = traitSkillTagMap.get(skill.id);
-    return {
-      ...skill,
-      slot: ref?.slot || skill.slot || "",
-      specialization: KNOWN_SKILL_SPEC_OVERRIDES.get(skill.id) || ref?.specialization || traitTag?.specialization || skill.specialization || 0,
-      type: ref?.type || skill.type || "",
-    };
-  });
 
   // Photon Forge (skill 42938) has no bundle_skills in the GW2 API, but in-game it grants
   // 5 weapon skills when active. Hardcode them here so the toggle can display them.
@@ -331,12 +318,12 @@ async function getProfessionCatalog(professionId, lang = "en") {
     // Elixir X (5832) keeps Detonate Elixir X (29722) — no Toss Elixir X exists.
   ]);
 
-  // Second pass: fetch toolbelt skills + bundle (kit weapon) skills referenced by profession skills.
-  // Also fetch transform_skills — used by Death Shroud to list all shroud weapon skill variants.
-  // These are needed to synthesize bundleSkills for Reaper's Shroud and Harbinger Shroud, which
-  // have no bundle_skills of their own in the GW2 API.
+  // Step 3: compute extraSkillIds from raw API data and fetch traits + extra skills in parallel.
+  // extraSkillIds only uses toolbelt_skill/flip_skill/bundle_skills/transform_skills — fields that
+  // come directly from the GW2 API and are unaffected by the profSkillRefs/traitSkillTagMap merge.
+  // This lets us start fetching extras without waiting for traits to complete.
   const extraSkillIds = dedupeNumbers([
-    ...professionSkillsRaw.flatMap((s) => [
+    ...professionSkillsRawApi.flatMap((s) => [
       s.toolbelt_skill,
       s.flip_skill,
       ...(Array.isArray(s.bundle_skills) ? s.bundle_skills : []),
@@ -348,8 +335,64 @@ async function getProfessionCatalog(professionId, lang = "en") {
     ...(professionId === "Engineer" ? [...ELIXIR_TOOLBELT_OVERRIDES.values()] : []),
     // Include Radiant Forge weapon skills + their flip skills (Luminary, Guardian).
     ...(professionId === "Guardian" ? [...RADIANT_FORGE_BUNDLE, ...RADIANT_FORGE_FLIP_SKILLS] : []),
+    // Weapon auto-attack chain continuations (depth 1): merged here to avoid an extra round-trip.
+    ...weaponChainDepth1Ids,
   ]);
-  const extraSkillsRaw = extraSkillIds.length ? await fetchGw2ByIds("skills", extraSkillIds, lang) : [];
+  const traitIds = dedupeNumbers(
+    specializations.flatMap((spec) => [...(spec?.minor_traits || []), ...(spec?.major_traits || [])])
+  );
+  const [traits, extraSkillsRaw] = await Promise.all([
+    fetchGw2ByIds("traits", traitIds, lang),
+    extraSkillIds.length ? fetchGw2ByIds("skills", extraSkillIds, lang) : Promise.resolve([]),
+  ]);
+
+  // Build trait-skill specialization tag map (needs traits + specializations).
+  // Skills embedded in elite spec major traits (e.g. Mechanist's Jade Mech F1-F3) should
+  // inherit that elite spec's specialization ID, even when the profession or skills API omits it.
+  const eliteSpecIdSet = new Set(specializations.filter((s) => s.elite).map((s) => Number(s.id)));
+  const traitSkillTagMap = new Map(); // skillId → {slot, specialization, type}
+  for (const trait of traits) {
+    const specId = Number(trait.specialization) || 0;
+    if (!eliteSpecIdSet.has(specId)) continue;
+    const tier = Number(trait.tier) || 0;
+    if (!tier || !Array.isArray(trait.skills)) continue;
+    for (const ts of trait.skills) {
+      const skillId = Number(ts?.id);
+      if (!skillId) continue;
+      // Don't overwrite a more specific existing entry
+      if (!traitSkillTagMap.has(skillId)) {
+        traitSkillTagMap.set(skillId, {
+          slot: ts.slot || `Profession_${tier}`,
+          specialization: specId,
+          type: "Profession",
+        });
+      }
+    }
+  }
+
+  // Merge profession reference metadata into fetched skill objects (needs traitSkillTagMap).
+  // Prefer the reference's slot/specialization/type over the skill's own values.
+  // Also apply traitSkillTagMap specialization as a fallback for elite spec skills whose
+  // specialization the profession API leaves unset (e.g. Mechanist's mech command variants).
+  const professionSkillsRaw = professionSkillsRawApi.map((skill) => {
+    const ref = profSkillRefs.get(skill.id);
+    const traitTag = traitSkillTagMap.get(skill.id);
+    return {
+      ...skill,
+      slot: ref?.slot || skill.slot || "",
+      specialization: KNOWN_SKILL_SPEC_OVERRIDES.get(skill.id) || ref?.specialization || traitTag?.specialization || skill.specialization || 0,
+      type: ref?.type || skill.type || "",
+    };
+  });
+
+  // Depth-2 weapon chain IDs (discoverable now that depth-1 extraSkillsRaw is available).
+  const extraSkillIdSet = new Set(extraSkillIds);
+  const weaponChainDepth2Ids = dedupeNumbers(
+    extraSkillsRaw
+      .filter((s) => weaponChainDepth1Ids.includes(s.id))
+      .map((s) => Number(s.flip_skill))
+      .filter((id) => id && !weaponSkillIdSet.has(id) && !extraSkillIdSet.has(id))
+  );
 
   // Build a transform-bundle map: spec_id → weapon-slot skill IDs.
   // For skills that have transform_skills but no bundle_skills (like Death Shroud), we group the
@@ -371,7 +414,8 @@ async function getProfessionCatalog(professionId, lang = "en") {
     }
   }
 
-  // Third pass: fetch morph pool skills for specs with "Locked" profession slots (e.g. Amalgam F2–F4).
+  // Build morph pool promise (runs concurrently in step 4).
+  // Morph pool fetches skills for specs with "Locked" profession slots (e.g. Amalgam F2–F4).
   // The GW2 profession endpoint only lists "Locked" placeholder skills for these slots; the actual
   // selectable morph skills are not listed there. We find them by fetching all skill IDs from the
   // API, filtering to the ID range of the known Locked skills, and keeping those with matching
@@ -379,50 +423,60 @@ async function getProfessionCatalog(professionId, lang = "en") {
   const lockedSkills = professionSkillsRaw.filter(
     (s) => s.name === "Locked" && s.type === "Profession" && s.specialization
   );
-  let morphPoolSkillsRaw = [];
+  let morphPoolPromise = Promise.resolve([]);
   if (lockedSkills.length > 0) {
     const lockedSpecId = lockedSkills[0].specialization;
     const lockedIds = lockedSkills.map((s) => s.id);
     const idMin = Math.min(...lockedIds) - 1000;
     const idMax = Math.max(...lockedIds) + 1000;
-    const allSkillIds = await fetchCachedJson(
+    const alreadyFetchedForMorph = new Set([...professionSkillsRaw, ...extraSkillsRaw].map((s) => s.id));
+    morphPoolPromise = fetchCachedJson(
       `allSkillIds:${lang}`,
       `${GW2_API_ROOT}/skills?lang=${encodeURIComponent(lang)}`,
       1000 * 60 * 60 * 24
-    );
-    const alreadyFetched = new Set([...professionSkillsRaw, ...extraSkillsRaw].map((s) => s.id));
-    const candidateIds = (Array.isArray(allSkillIds) ? allSkillIds : []).filter(
-      (id) => id >= idMin && id <= idMax && !alreadyFetched.has(id)
-    );
-    if (candidateIds.length > 0) {
+    ).then(async (allSkillIds) => {
+      const candidateIds = (Array.isArray(allSkillIds) ? allSkillIds : []).filter(
+        (id) => id >= idMin && id <= idMax && !alreadyFetchedForMorph.has(id)
+      );
+      if (!candidateIds.length) return [];
       const candidateSkills = await fetchGw2ByIds("skills", candidateIds, lang);
       // Morph pool skills have no type/slot/specialization set in the GW2 API — they are
       // identified solely by their description starting with "Morph." Tag them with the
       // locked spec's ID and type="Profession" so the renderer can find them.
-      morphPoolSkillsRaw = candidateSkills
+      return candidateSkills
         .filter((s) => (s.description || "").startsWith("Morph."))
         .map((s) => ({ ...s, specialization: lockedSpecId, type: "Profession" }));
-    }
+    });
   }
 
-  // Fourth pass: fetch any trait-tagged skills not yet in the catalog.
-  // traitSkillTagMap was already built above; here we fetch the remaining IDs
-  // (those not already covered by profession skills, toolbelt/bundle skills, or morph pool).
-  const alreadyFetchedIds = new Set([
+  // Step 4: fetch depth-2 chains, trait skills, and morph pool skills in parallel.
+  const alreadyFetchedForTraits = new Set([
     ...professionSkillsRaw.map((s) => s.id),
     ...extraSkillsRaw.map((s) => s.id),
-    ...morphPoolSkillsRaw.map((s) => s.id),
   ]);
-  const traitSkillIdsToFetch = [...traitSkillTagMap.keys()].filter((id) => !alreadyFetchedIds.has(id));
-  const traitSkillsRaw = traitSkillIdsToFetch.length
-    ? (await fetchGw2ByIds("skills", traitSkillIdsToFetch, lang)).map((skill) => {
-        const tag = traitSkillTagMap.get(skill.id);
-        // Prefer the skill's own slot from /v2/skills over the trait-tier-inferred fallback.
-        // Trait skills all share the same tier (e.g. DH minor trait 1848 is tier 1), so
-        // the `Profession_${tier}` fallback would incorrectly map F2 and F3 to Profession_1.
-        return tag ? { ...skill, slot: skill.slot || tag.slot, specialization: tag.specialization, type: tag.type } : skill;
-      })
-    : [];
+  const traitSkillIdsToFetch = [...traitSkillTagMap.keys()].filter((id) => !alreadyFetchedForTraits.has(id));
+  const [weaponChainDepth2Raw, traitSkillsRaw, morphPoolSkillsRaw] = await Promise.all([
+    weaponChainDepth2Ids.length ? fetchGw2ByIds("skills", weaponChainDepth2Ids, lang) : Promise.resolve([]),
+    traitSkillIdsToFetch.length
+      ? fetchGw2ByIds("skills", traitSkillIdsToFetch, lang).then((raw) =>
+          raw.map((skill) => {
+            const tag = traitSkillTagMap.get(skill.id);
+            // Prefer the skill's own slot from /v2/skills over the trait-tier-inferred fallback.
+            // Trait skills all share the same tier (e.g. DH minor trait 1848 is tier 1), so
+            // the `Profession_${tier}` fallback would incorrectly map F2 and F3 to Profession_1.
+            return tag ? { ...skill, slot: skill.slot || tag.slot, specialization: tag.specialization, type: tag.type } : skill;
+          })
+        )
+      : Promise.resolve([]),
+    morphPoolPromise,
+  ]);
+
+  // Build weaponSkillsRaw: base slot skills + all chain continuations.
+  const weaponSkillsRaw = [
+    ...weaponSkillsBase,
+    ...extraSkillsRaw.filter((s) => weaponChainDepth1Ids.includes(s.id)),
+    ...weaponChainDepth2Raw,
+  ];
 
   function mapSkill(skill) {
     const specId = KNOWN_SKILL_SPEC_OVERRIDES.get(skill.id) || Number(skill.specialization) || 0;
@@ -471,23 +525,10 @@ async function getProfessionCatalog(professionId, lang = "en") {
 
   // Fifth pass: Revenant legend data.
   // Each legend defines the fixed swap/heal/utility/elite skills Revenant uses when that legend is active.
+  // legendsRawPromise was started in step 2, so this await is typically instant (already in flight).
   let legends = [];
   if (professionId === "Revenant") {
-    // /v2/legends with no parameters returns a list of string IDs (e.g. ["Legend1","Legend2",...]).
-    // We then fetch each legend object using those IDs. The lang param is not relevant for legend
-    // structure (it only contains skill IDs), but we pass it anyway for consistency.
-    const legendIds = await fetchCachedJson(
-      `legendIds`,
-      `${GW2_API_ROOT}/legends`,
-      1000 * 60 * 60 * 24
-    );
-    const legendsRaw = Array.isArray(legendIds) && legendIds.length > 0
-      ? await fetchCachedJson(
-          `legends:${legendIds.join(",")}`,
-          `${GW2_API_ROOT}/legends?ids=${encodeURIComponent(legendIds.join(","))}`,
-          1000 * 60 * 60 * 24
-        )
-      : [];
+    const legendsRaw = await legendsRawPromise;
     if (Array.isArray(legendsRaw) && legendsRaw.length > 0) {
       const alreadyInSkills = new Set([
         ...professionSkillsRaw, ...extraSkillsRaw, ...morphPoolSkillsRaw, ...traitSkillsRaw,
@@ -539,13 +580,10 @@ async function getProfessionCatalog(professionId, lang = "en") {
   // Each pet has a type (family) and a set of skills. The pet's active skill (shown as the pet's
   // unique contribution to the skillbar) is skills[4] (the 5th slot). In Soulbeast, F1/F2 skill
   // resolution matches the skill's weapon_type against the active pet's type field.
+  // petsPromise was started in step 2, so this await is typically instant (already in flight).
   let pets = [];
   if (professionId === "Ranger") {
-    const petsRaw = await fetchCachedJson(
-      `pets:${lang}`,
-      `${GW2_API_ROOT}/pets?ids=all&lang=${encodeURIComponent(lang)}`,
-      1000 * 60 * 60 * 24
-    );
+    const petsRaw = await petsPromise;
     if (Array.isArray(petsRaw)) {
       pets = petsRaw.map((p) => ({
         id: p.id,
@@ -637,6 +675,7 @@ async function getProfessionCatalog(professionId, lang = "en") {
       description: skill.description || "",
       slot: skill.slot || "",
       facts: Array.isArray(skill.facts) ? skill.facts : [],
+      flipSkill: Number(skill.flip_skill) || 0,
     })),
     legends,
     pets,
@@ -684,16 +723,15 @@ async function getWikiSummary(title) {
 async function fetchGw2ByIds(endpoint, ids, lang = "en") {
   if (!Array.isArray(ids) || !ids.length) return [];
   const chunks = chunk(ids, 180);
-  const all = [];
-  for (const idsChunk of chunks) {
-    const query = idsChunk.join(",");
-    const url = `${GW2_API_ROOT}/${endpoint}?ids=${encodeURIComponent(query)}&lang=${encodeURIComponent(lang)}`;
-    const data = await fetchCachedJson(`${endpoint}:${lang}:${query}`, url, 1000 * 60 * 60);
-    if (Array.isArray(data)) {
-      all.push(...data.filter(Boolean));
-    }
-  }
-  return all;
+  const results = await Promise.all(
+    chunks.map((idsChunk) => {
+      const query = idsChunk.join(",");
+      const url = `${GW2_API_ROOT}/${endpoint}?ids=${encodeURIComponent(query)}&lang=${encodeURIComponent(lang)}`;
+      return fetchCachedJson(`${endpoint}:${lang}:${query}`, url, 1000 * 60 * 60)
+        .then((data) => (Array.isArray(data) ? data.filter(Boolean) : []));
+    })
+  );
+  return results.flat();
 }
 
 async function fetchCachedJson(key, url, ttlMs) {
@@ -707,17 +745,27 @@ async function fetchCachedJson(key, url, ttlMs) {
 }
 
 async function fetchJson(url) {
-  const res = await fetch(url, {
-    headers: {
-      Accept: "application/json",
-      "User-Agent": USER_AGENT,
-    },
-  });
-  if (!res.ok) {
+  const RETRYABLE = new Set([429, 500, 502, 503, 504]);
+  let lastErr;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if (attempt > 0) {
+      await new Promise((r) => setTimeout(r, 800 * attempt));
+    }
+    let res;
+    try {
+      res = await fetch(url, {
+        headers: { Accept: "application/json", "User-Agent": USER_AGENT },
+      });
+    } catch (networkErr) {
+      lastErr = networkErr;
+      continue;
+    }
+    if (res.ok) return res.json();
     const text = await res.text().catch(() => "");
-    throw new Error(`Request failed (${res.status}) for ${url}${text ? `: ${text.slice(0, 180)}` : ""}`);
+    lastErr = new Error(`Request failed (${res.status}) for ${url}${text ? `: ${text.slice(0, 180)}` : ""}`);
+    if (!RETRYABLE.has(res.status)) break;
   }
-  return res.json();
+  throw lastErr;
 }
 
 function dedupeNumbers(values) {

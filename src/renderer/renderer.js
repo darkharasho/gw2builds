@@ -3313,27 +3313,49 @@ function bindHoverPreview(node, kind, entityProvider) {
   });
 }
 
-function showHoverPreview(kind, entity, x, y) {
-  if (!entity) return;
-  const icon = String(entity.icon || entity.iconFallback || "");
-  const description = normalizeText(entity.description || "");
+function buildSkillCard(skill, kind, isChained = false) {
+  const icon = String(skill.icon || skill.iconFallback || "");
+  const description = normalizeText(skill.description || "");
   const maxFacts = kind.startsWith("equip-") ? 12 : 4;
-  const facts = (Array.isArray(entity.facts) ? entity.facts : [])
+  const facts = (Array.isArray(skill.facts) ? skill.facts : [])
     .slice(0, maxFacts)
     .map((fact) => formatFactHtml(fact))
     .filter(Boolean);
-  const meta = getHoverMetaLine(kind, entity);
-  el.hoverPreview.innerHTML = `
-    <div class="hover-preview__head">
-      ${icon ? `<img class="hover-preview__icon" src="${escapeHtml(icon)}" alt="${escapeHtml(entity.name || "Icon")}" onerror="this.onerror=null;this.src='${escapeHtml(String(entity.iconFallback || icon))}'" />` : "<div></div>"}
+  const meta = getHoverMetaLine(kind, skill);
+  return `
+    ${isChained ? `<div class="hover-preview__chain-divider">▸</div>` : ""}
+    <div class="hover-preview__head${isChained ? " hover-preview__head--chained" : ""}">
+      ${icon ? `<img class="hover-preview__icon" src="${escapeHtml(icon)}" alt="${escapeHtml(skill.name || "Icon")}" onerror="this.onerror=null;this.src='${escapeHtml(String(skill.iconFallback || icon))}'" />` : "<div></div>"}
       <div>
-        <h4 class="hover-preview__title">${escapeHtml(entity.name || "Unknown")}</h4>
+        <h4 class="hover-preview__title">${escapeHtml(skill.name || "Unknown")}</h4>
         <p class="hover-preview__meta">${escapeHtml(meta)}</p>
       </div>
     </div>
     ${description ? `<p class="hover-preview__desc">${escapeHtml(description)}</p>` : (!facts.length ? `<p class="hover-preview__desc">No description available.</p>` : "")}
     ${facts.length ? `<ul class="hover-preview__facts">${facts.map((entry) => `<li>${entry}</li>`).join("")}</ul>` : ""}
   `;
+}
+
+function showHoverPreview(kind, entity, x, y) {
+  if (!entity) return;
+
+  // For skills, follow flipSkill chain to show chained/charged skills as subsequent cards.
+  // Weapon skills live in weaponSkillById; profession/utility skills in skillById — check both.
+  const chainCards = [buildSkillCard(entity, kind, false)];
+  if (kind === "skill" && entity.flipSkill) {
+    const catalog = state.activeCatalog;
+    const lookupSkill = (id) => catalog?.skillById?.get(id) || catalog?.weaponSkillById?.get(id);
+    const exitPattern = /^(Exit|Leave|Deactivate)\b/i;
+    const seen = new Set([entity.id]);
+    let cur = lookupSkill(entity.flipSkill);
+    while (cur && !seen.has(cur.id) && !exitPattern.test(cur.name || "") && chainCards.length < 5) {
+      seen.add(cur.id);
+      chainCards.push(buildSkillCard(cur, kind, true));
+      cur = cur.flipSkill ? lookupSkill(cur.flipSkill) : null;
+    }
+  }
+
+  el.hoverPreview.innerHTML = chainCards.join("");
   el.hoverPreview.classList.remove("hidden");
   positionHoverPreview(x, y);
 }

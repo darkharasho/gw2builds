@@ -1867,6 +1867,20 @@ label {
   border-radius: 2px;
 }
 
+.hover-preview__chain-divider {
+  text-align: center;
+  color: #5a7ab5;
+  font-size: 0.65rem;
+  margin: 5px 0 1px;
+  letter-spacing: 3px;
+  border-top: 1px solid #1e3158;
+  padding-top: 5px;
+}
+
+.hover-preview__head--chained {
+  margin-top: 2px;
+}
+
 @media (max-width: 1200px) {
   .layout {
     grid-template-columns: 320px 1fr;

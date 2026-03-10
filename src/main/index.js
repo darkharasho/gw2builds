@@ -115,6 +115,22 @@ app.whenReady().then(async () => {
   await store.init();
   createWindow();
 
+  // Pre-warm all profession catalogs in the background so class switching is instant.
+  // Runs sequentially with a short delay between each to avoid hammering the GW2 API.
+  (async () => {
+    const PROFESSION_IDS = ["Guardian","Warrior","Engineer","Ranger","Thief","Elementalist","Mesmer","Necromancer","Revenant"];
+    // Small initial delay to let the window load first
+    await new Promise((r) => setTimeout(r, 3000));
+    for (const id of PROFESSION_IDS) {
+      try {
+        await getProfessionCatalog(id, "en");
+      } catch {
+        // Ignore errors — pre-warming is best-effort
+      }
+      await new Promise((r) => setTimeout(r, 400));
+    }
+  })();
+
   ipcMain.handle("app:get-config", async () => {
     const auth = await getAuthRecord();
     return {
