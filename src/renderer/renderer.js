@@ -2549,57 +2549,87 @@ function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "", active
 // Keys are pet IDs; values are {p1, p2, p3} skill IDs for Profession_1/2/3 (F1/F2/F3).
 // p3 is archetype-based (Ferocious/Stout/Deadly/Versatile/Supportive) — same within a family.
 // p4 (Eternal Bond 59554) is Soulbeast-only and handled separately via eliteSpecId check.
+// F3 (Beast skill) is determined by each pet's individual archetype, not family.
+// Archetype → F3 skill: Stout=45797, Deadly=40588, Versatile=43375, Ferocious=40729, Supportive=44626
+// F1/F2 are shared per family (from Ranger profession API), except newer pets with unique IDs.
 const RANGER_PET_FAMILY_SKILLS = new Map([
-  // Bird / Avian — Deadly archetype (Primal Cry)
-  ...[10, 30, 31, 32, 44].map((id) => [id, { p1: 44991, p2: 42042, p3: 40588 }]),
-  // Bear / Ursine — Ferocious archetype (Worldly Impact, Soulbeast variant)
-  ...[5, 20, 23, 24, 25].map((id) => [id, { p1: 43136, p2: 43060, p3: 42809 }]),
-  // Canine — Deadly archetype (Primal Cry)
-  ...[4, 8, 22, 28, 29].map((id) => [id, { p1: 43726, p2: 42894, p3: 40588 }]),
-  // Devourer — Versatile archetype (Prelude Lash)
-  ...[6, 26, 27].map((id) => [id, { p1: 43068, p2: 41461, p3: 43375 }]),
-  // Drake — Stout archetype (Unflinching Fortitude)
-  ...[7, 12, 18, 19, 45].map((id) => [id, { p1: 41537, p2: 41575, p3: 45797 }]),
-  // Feline — Deadly archetype (Primal Cry)
-  ...[1, 3, 9, 11, 47, 54, 55, 63].map((id) => [id, { p1: 40625, p2: 44514, p3: 40588 }]),
-  // Jellyfish (aquatic) — Supportive archetype (Spiritual Reprieve)
-  ...[41, 42, 43].map((id) => [id, { p1: 43186, p2: 41837, p3: 44626 }]),
-  // Moa — Supportive archetype (Spiritual Reprieve)
-  ...[13, 14, 15, 16, 17].map((id) => [id, { p1: 44617, p2: 43548, p3: 44626 }]),
-  // Porcine — Stout archetype (Unflinching Fortitude)
-  ...[2, 37, 38, 39].map((id) => [id, { p1: 41406, p2: 46432, p3: 45797 }]),
-  // Shark (aquatic) — Supportive archetype
-  [21, { p1: 42797, p2: 44360, p3: 44626 }],
-  // Armor Fish (aquatic) — Supportive archetype
-  [40, { p1: 42717, p2: 44885, p3: 44626 }],
-  // Smokescale — Deadly archetype (Primal Cry)
-  [46, { p1: 42907, p2: 40255, p3: 40588 }],
-  // Spider — Versatile archetype (Prelude Lash)
-  ...[33, 34, 35, 36].map((id) => [id, { p1: 44097, p2: 43671, p3: 43375 }]),
-  // Wyvern — Stout archetype (Unflinching Fortitude)
-  ...[48, 51].map((id) => [id, { p1: 46386, p2: 41908, p3: 45797 }]),
-  // Jacaranda — Supportive archetype (Spiritual Reprieve)
-  [57, { p1: 43788, p2: 43701, p3: 44626 }],
-  // Iboga — Versatile archetype (Prelude Lash)
-  [61, { p1: 44384, p2: 40111, p3: 43375 }],
-  // Bristleback — Versatile archetype (Prelude Lash)
-  [52, { p1: 41206, p2: 45479, p3: 43375 }],
-  // Rock Gazelle — Ferocious archetype (Worldly Impact, core variant)
-  [59, { p1: 41524, p2: 45743, p3: 40729 }],
-  // Phoenix (newer)
-  [65, { p1: 64038, p2: 64882, p3: null }],
-  // Wallow (newer)
-  [64, { p1: 64699, p2: 66258, p3: null }],
-  // Warclaw (newer)
-  [70, { p1: 71282, p2: 67382, p3: null }],
-  // Aether Hunter (newer)
-  [67, { p1: 71499, p2: 70889, p3: null }],
-  // Spinegazer (newer)
-  [69, { p1: 72851, p2: 72636, p3: null }],
-  // Janthiri Bee (newer)
-  [71, { p1: 75771, p2: 75814, p3: null }],
-  // Raptor Swiftwing (newer)
-  [72, { p1: 79203, p2: 78091, p3: null }],
+  // === Avian (p1: Swoop 44991, p2: 42042) ===
+  [44, { p1: 44991, p2: 42042, p3: 40588 }],  // Hawk — Deadly
+  [10, { p1: 44991, p2: 42042, p3: 43375 }],  // Raven — Versatile
+  [32, { p1: 44991, p2: 42042, p3: 43375 }],  // White Raven — Versatile
+  [30, { p1: 44991, p2: 42042, p3: 44626 }],  // Owl — Supportive
+  [31, { p1: 44991, p2: 42042, p3: 40729 }],  // Eagle — Ferocious
+  [72, { p1: 79203, p2: 78091, p3: 43375 }],  // Raptor Swiftwing (newer) — Versatile
+  // === Ursine/Bear (p1: Bite 43136, p2: 43060) ===
+  [23, { p1: 43136, p2: 43060, p3: 45797 }],  // Black Bear — Stout
+  [20, { p1: 43136, p2: 43060, p3: 40588 }],  // Murellow — Deadly
+  [24, { p1: 43136, p2: 43060, p3: 43375 }],  // Polar Bear — Versatile
+  [25, { p1: 43136, p2: 43060, p3: 40729 }],  // Arctodus — Ferocious
+  [5,  { p1: 43136, p2: 43060, p3: 44626 }],  // Brown Bear — Supportive
+  // === Canine (p1: Crippling Leap 43726, p2: 42894) ===
+  [8,  { p1: 43726, p2: 42894, p3: 45797 }],  // Alpine Wolf — Stout
+  [29, { p1: 43726, p2: 42894, p3: 40588 }],  // Wolf — Deadly
+  [4,  { p1: 43726, p2: 42894, p3: 43375 }],  // Krytan Drakehound — Versatile
+  [28, { p1: 43726, p2: 42894, p3: 40729 }],  // Hyena — Ferocious
+  [22, { p1: 43726, p2: 42894, p3: 44626 }],  // Fern Hound — Supportive
+  // === Devourer (p1: Tail Lash 43068, p2: 41461) ===
+  [6,  { p1: 43068, p2: 41461, p3: 40588 }],  // Carrion Devourer — Deadly
+  [26, { p1: 43068, p2: 41461, p3: 43375 }],  // Whiptail Devourer — Versatile
+  [27, { p1: 43068, p2: 41461, p3: 40729 }],  // Lashtail Devourer — Ferocious
+  // === Drake (p1: Chomp 41537, p2: 41575) ===
+  [18, { p1: 41537, p2: 41575, p3: 45797 }],  // Ice Drake — Stout
+  [7,  { p1: 41537, p2: 41575, p3: 40588 }],  // Salamander Drake — Deadly
+  [45, { p1: 41537, p2: 41575, p3: 43375 }],  // Reef Drake — Versatile
+  [19, { p1: 41537, p2: 41575, p3: 40729 }],  // River Drake — Ferocious
+  [12, { p1: 41537, p2: 41575, p3: 44626 }],  // Marsh Drake — Supportive
+  // === Feline (p1: Bite 40625, p2: 44514) ===
+  [9,  { p1: 40625, p2: 44514, p3: 45797 }],  // Snow Leopard — Stout
+  [3,  { p1: 40625, p2: 44514, p3: 40588 }],  // Lynx — Deadly
+  [11, { p1: 40625, p2: 44514, p3: 43375 }],  // Jaguar — Versatile
+  [54, { p1: 40625, p2: 44514, p3: 43375 }],  // Cheetah — Versatile
+  [47, { p1: 40625, p2: 44514, p3: 40729 }],  // Tiger — Ferocious
+  [55, { p1: 40625, p2: 44514, p3: 40729 }],  // Sand Lion — Ferocious
+  [1,  { p1: 40625, p2: 44514, p3: 44626 }],  // Jungle Stalker — Supportive
+  [63, { p1: 40625, p2: 67382, p3: 45797 }],  // White Tiger — Stout, unique F2: Phase Pounce
+  [70, { p1: 73733, p2: 73938, p3: 40729 }],  // Warclaw (newer) — Ferocious, unique F1/F2
+  // === Jellyfish/aquatic (p1: Healing Cloud 43186, p2: 41837) ===
+  [41, { p1: 43186, p2: 41837, p3: 40588 }],  // Blue Jellyfish — Deadly
+  [43, { p1: 43186, p2: 41837, p3: 40588 }],  // Rainbow Jellyfish — Deadly
+  [42, { p1: 43186, p2: 41837, p3: 43375 }],  // Red Jellyfish — Versatile
+  // === Moa (p1: Harmonic Cry 44617, p2: 43548) ===
+  [13, { p1: 44617, p2: 43548, p3: 45797 }],  // Blue Moa — Stout
+  [15, { p1: 44617, p2: 43548, p3: 43375 }],  // Pink Moa — Versatile
+  [16, { p1: 44617, p2: 43548, p3: 43375 }],  // Black Moa — Versatile
+  [17, { p1: 44617, p2: 43548, p3: 40729 }],  // Red Moa — Ferocious
+  [14, { p1: 44617, p2: 43548, p3: 44626 }],  // White Moa — Supportive
+  // === Porcine (p1: Maul 41406, p2: 46432) ===
+  [38, { p1: 41406, p2: 46432, p3: 45797 }],  // Siamoth — Stout
+  [37, { p1: 41406, p2: 46432, p3: 40588 }],  // Warthog — Deadly
+  [2,  { p1: 41406, p2: 46432, p3: 43375 }],  // Boar — Versatile
+  [39, { p1: 41406, p2: 46432, p3: 40729 }],  // Pig — Ferocious
+  [64, { p1: 0,     p2: 64882, p3: 44626 }],  // Wallow (newer) — Supportive; F1 "Vampiric Bite" missing from API
+  // === Spider (p1: Entangling Web 44097, p2: 43671) ===
+  [33, { p1: 44097, p2: 43671, p3: 40588 }],  // Forest Spider — Deadly
+  [34, { p1: 44097, p2: 43671, p3: 43375 }],  // Jungle Spider — Versatile
+  [36, { p1: 44097, p2: 43671, p3: 43375 }],  // Black Widow Spider — Versatile
+  [35, { p1: 44097, p2: 43671, p3: 40729 }],  // Cave Spider — Ferocious
+  // === Wyvern (p1: Tail Lash 46386, p2: Wing Buffet 41908) ===
+  [48, { p1: 46386, p2: 41908, p3: 43375 }],  // Electric Wyvern — Versatile
+  [51, { p1: 46386, p2: 41908, p3: 40588 }],  // Fire Wyvern — Deadly
+  // === Unique pets ===
+  [40, { p1: 42717, p2: 44885, p3: 45797 }],  // Armor Fish — Stout
+  [21, { p1: 42797, p2: 44360, p3: 40588 }],  // Shark — Deadly
+  [52, { p1: 41206, p2: 45479, p3: 40588 }],  // Bristleback — Deadly
+  [61, { p1: 44384, p2: 40111, p3: 40588 }],  // Fanged Iboga — Deadly
+  [69, { p1: 72851, p2: 72636, p3: 40588 }],  // Spinegazer (newer) — Deadly
+  [71, { p1: 75771, p2: 75814, p3: 40588 }],  // Janthiri Bee (newer) — Deadly
+  [67, { p1: 71282, p2: 70889, p3: 43375 }],  // Aether Hunter (newer) — Versatile
+  [46, { p1: 42907, p2: 40255, p3: 40729 }],  // Smokescale — Ferocious
+  [59, { p1: 41524, p2: 45743, p3: 40729 }],  // Rock Gazelle — Ferocious
+  [68, { p1: 71499, p2: 71546, p3: 40729 }],  // Sky-Chak Striker (newer) — Ferocious
+  [65, { p1: 64038, p2: 41908, p3: 40729 }],  // Phoenix (newer) — Ferocious
+  [57, { p1: 43788, p2: 43701, p3: 44626 }],  // Jacaranda — Supportive
+  [66, { p1: 64699, p2: 66258, p3: 44626 }],  // Siege Turtle (newer) — Supportive
 ]);
 
 function renderSkills() {
@@ -2830,6 +2860,7 @@ function renderSkills() {
           isBeastmodeToggle: true,
           leaveIcon: "https://wiki.guildwars2.com/images/2/2a/Leave_Beastmode.png",
           fKeyLabel: "F5",
+          isF5AboveOrb: true,
         });
       }
     } else {
@@ -2857,7 +2888,7 @@ function renderSkills() {
     if (eliteSpecId !== 55) {
       const p5Skill = (options.profession || []).find((s) => s.slot === "Profession_5") || null;
       if (p5Skill) {
-        mechSlots.push({ skill: p5Skill, sourceId: p5Skill.id, isStatic: true, isSelectable: false });
+        mechSlots.push({ skill: p5Skill, sourceId: p5Skill.id, isStatic: true, isSelectable: false, fKeyLabel: "F5", isF5AboveOrb: true });
       }
     }
   } else {
@@ -3008,6 +3039,9 @@ function renderSkills() {
   const weaponCol = document.createElement("div");
   weaponCol.className = "skills-bar__weapon-col";
 
+  // F5 slot (Celestial Avatar / Beastmode / Unleash / Cyclone Bow) is rendered above the health orb.
+  let f5SlotEl = null;
+
   // Always create the mechBar for Ranger (even core Ranger with empty mechSlots) so the
   // pet selector panel can be shown. For all other professions, require at least one skill.
   if (isRanger || (mechSlots.length > 0 && mechSlots.some((s) => s.skill || s.isSelectable))) {
@@ -3015,7 +3049,7 @@ function renderSkills() {
     mechBar.className = "profession-mechanics-bar";
 
     for (let fIdx = 0; fIdx < mechSlots.length; fIdx++) {
-      const { skill, sourceId, sourceSkill, isStatic, isSelectable, morphIndex, mechIconOverride, fakeCommand, isBeastmodeToggle, leaveIcon, fKeyLabel } = mechSlots[fIdx];
+      const { skill, sourceId, sourceSkill, isStatic, isSelectable, morphIndex, mechIconOverride, fakeCommand, isBeastmodeToggle, leaveIcon, fKeyLabel, isF5AboveOrb } = mechSlots[fIdx];
       const slotEl = document.createElement("div");
       slotEl.className = "skill-slot";
       const iconBtn = document.createElement("button");
@@ -3182,7 +3216,11 @@ function renderSkills() {
       }
 
       slotEl.append(iconBtn);
-      mechBar.append(slotEl);
+      if (isF5AboveOrb) {
+        f5SlotEl = slotEl; // rendered above the health orb, not inside mechBar
+      } else {
+        mechBar.append(slotEl);
+      }
     }
     // Ranger: add pet selector directly inside mechBar (right side, pushed by auto-margin spacer)
     if (Array.isArray(catalog.pets) && catalog.pets.length > 0) {
@@ -3330,7 +3368,14 @@ function renderSkills() {
     utilityGroup.append(makeSkillSlot(slot, catalog, options, utilitySelection));
   }
 
-  bar.append(weaponCol, orbEl, utilityGroup);
+  if (f5SlotEl) {
+    const orbCol = document.createElement("div");
+    orbCol.className = "skills-bar__orb-col";
+    orbCol.append(f5SlotEl, orbEl);
+    bar.append(weaponCol, orbCol, utilityGroup);
+  } else {
+    bar.append(weaponCol, orbEl, utilityGroup);
+  }
   el.skillsHost.append(bar);
 }
 

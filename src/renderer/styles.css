@@ -1490,6 +1490,13 @@ label {
 }
 
 
+.skills-bar__orb-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
 .health-orb {
   position: relative;
   width: 110px;
