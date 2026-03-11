@@ -2981,7 +2981,15 @@ function renderSkills() {
         return na - nb;
       });
 
-    mechSlots = sortedSlotKeys.map((slotKey) => {
+    // Thief mechanics: Core/Daredevil/Deadeye only have a fixed F1 profession slot.
+    // Specter (71) and Antiquary (77) are the only Thief specs with persistent F2+ slots.
+    const isThief = (catalog?.profession?.id || state.editor.profession || "") === "Thief";
+    const thiefHasPersistentF2Plus = eliteSpecId === 71 || eliteSpecId === 77;
+    const renderSlotKeys = isThief && !thiefHasPersistentF2Plus
+      ? sortedSlotKeys.filter((slotKey) => slotKey === "Profession_1")
+      : sortedSlotKeys;
+
+    mechSlots = renderSlotKeys.map((slotKey) => {
       const candidates = bySlot.get(slotKey);
       let skill;
       if (candidates.length === 1) {
@@ -3877,10 +3885,17 @@ function getSkillOptionsByType(catalog, specializationSelections) {
     // like Deadeye's Mark (43390) ↔ Steal Time would both pass a flipParentIds check, yet
     // "Steal Time" is a transient post-activation state that must not show as a permanent slot.
     .filter((skill) => !flipSkillIds.has(skill.id) || skill.inProfessionEndpoint)
-    // Exclude stolen-pool skills: Thief's Profession_2 "stolen result" skills (Throw Gunk,
-    // Branch Leap, etc.) have professions=[] in the API — they're context-dependent transient
-    // skills placed in the slot after stealing, not permanent F-slot selections.
+    // Exclude skills that are not tied to any profession.
     .filter((skill) => (skill.professions || []).length > 0)
+    // Thief: unspecialized Profession_2+ entries are transient stolen-result outcomes, not
+    // permanent profession mechanics. Keep only slot-bound elite mechanics (Specter/Antiquary).
+    .filter((skill) => {
+      if (catalog?.profession?.id !== "Thief") return true;
+      const match = /^Profession_(\d+)$/.exec(skill.slot || "");
+      const slotNum = match ? Number(match[1]) : 0;
+      if (slotNum <= 1) return true;
+      return (Number(skill.specialization) || 0) > 0;
+    })
     .filter((skill) => {
       const lockSpec = Number(skill.specialization) || 0;
       return !lockSpec || selectedSpecIds.has(lockSpec);
