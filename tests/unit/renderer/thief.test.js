@@ -7,7 +7,8 @@ createMechanicsSuite("Thief", [
   { specId: 44, expected: ["30423"] },
   { specId: 58, expected: ["43390"] },
   { specId: 71, expected: ["63067", "63155"] },
-  { specId: 77, expected: ["13132", "77288", "78309"] },
+  // Antiquary F1 = Skritt Swipe (77397); F2/F3 empty until artifact draw
+  { specId: 77, expected: ["77397", "empty", "empty"] },
 ]);
 
 describe("renderer mechanics selection — Thief core vs elite F skills", () => {
@@ -31,8 +32,33 @@ describe("renderer mechanics selection — Thief core vs elite F skills", () => 
     expect(specter.signatures).toEqual(["63067", "63155"]);
   });
 
-  test("Antiquary keeps core F1 and adds persistent F2/F3 slots", async () => {
+  test("Antiquary F1 is Skritt Swipe (77397), F2/F3 empty before artifact draw", async () => {
     const antiquary = await resolve({ specId: 77 });
-    expect(antiquary.signatures).toEqual(["13132", "77288", "78309"]);
+    expect(antiquary.signatures).toEqual(["77397", "empty", "empty"]);
+  });
+
+  test("Antiquary F2/F3 show stored artifact IDs when antiquaryArtifacts is set", async () => {
+    const antiquary = await resolve({
+      specId: 77,
+      antiquaryArtifacts: { f2: 76582, f3: 78309 },
+    });
+    expect(antiquary.signatures).toEqual(["77397", "76582", "78309"]);
+  });
+
+  test("Prolific Plunderer (trait 2346) adds an empty F4 slot before artifact draw", async () => {
+    const antiquary = await resolve({
+      specId: 77,
+      majorChoices: { 1: 2346, 2: 0, 3: 0 },
+    });
+    expect(antiquary.signatures).toEqual(["77397", "empty", "empty", "empty"]);
+  });
+
+  test("Prolific Plunderer F4 shows stored artifact when antiquaryArtifacts.f4 is set", async () => {
+    const antiquary = await resolve({
+      specId: 77,
+      majorChoices: { 1: 2346, 2: 0, 3: 0 },
+      antiquaryArtifacts: { f2: 76582, f3: 78309, f4: 76816 },
+    });
+    expect(antiquary.signatures).toEqual(["77397", "76582", "78309", "76816"]);
   });
 });

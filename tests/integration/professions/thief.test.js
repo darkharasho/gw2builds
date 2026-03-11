@@ -93,16 +93,47 @@ describe("Thief — end-to-end profession mechanics", () => {
     expect(specter).toHaveLength(2);
   });
 
-  test("Antiquary (spec 77) keeps core F1 Steal and adds F2 (77288) and F3 (78309)", async () => {
+  test("Antiquary (spec 77) F1 is Skritt Swipe (77397), F2/F3 empty before artifact draw", async () => {
     const catalog = await h.loadCatalog();
     const sigs = h.resolveMechSlots(catalog, 77);
-    expect(sigs).toEqual(["13132", "77288", "78309"]);
-    expect(sigs[0]).toBe("13132"); // F1 = Steal (retained from core)
+    expect(sigs[0]).toBe("77397"); // F1 = Skritt Swipe (replaces Steal for Antiquary)
+    expect(sigs[1]).toBe("empty"); // F2 = no artifact drawn yet
+    expect(sigs[2]).toBe("empty"); // F3 = no artifact drawn yet
+    expect(sigs).toHaveLength(3);
   });
 
-  test("Antiquary has three persistent F-slots (most of any Thief spec)", async () => {
+  test("Antiquary F2/F3 show stored artifact IDs when antiquaryArtifacts is set", async () => {
+    const catalog = await h.loadCatalog();
+    // Simulate a draw: offensive artifact in F2, defensive in F3
+    const sigs = h.resolveMechSlots(catalog, 77, {
+      antiquaryArtifacts: { f2: 76582, f3: 78309 }, // Guitar (F2), Zephyrite Sun Crystal F3
+    });
+    expect(sigs[0]).toBe("77397"); // F1 = Skritt Swipe
+    expect(sigs[1]).toBe("76582"); // F2 = Metal Legion Guitar
+    expect(sigs[2]).toBe("78309"); // F3 = Zephyrite Sun Crystal (F3 variant)
+  });
+
+  test("Antiquary has three persistent F-slots without Prolific Plunderer", async () => {
     const catalog = await h.loadCatalog();
     expect(h.resolveMechSlots(catalog, 77)).toHaveLength(3);
+  });
+
+  test("Prolific Plunderer (trait 2346) adds a 4th F-slot", async () => {
+    const catalog = await h.loadCatalog();
+    const sigs = h.resolveMechSlots(catalog, 77, {
+      majorChoices: { 1: 2346, 2: 0, 3: 0 },
+    });
+    expect(sigs).toHaveLength(4);
+    expect(sigs[3]).toBe("empty"); // F4 empty before draw
+  });
+
+  test("Prolific Plunderer F4 shows stored artifact when antiquaryArtifacts.f4 is set", async () => {
+    const catalog = await h.loadCatalog();
+    const sigs = h.resolveMechSlots(catalog, 77, {
+      majorChoices: { 1: 2346, 2: 0, 3: 0 },
+      antiquaryArtifacts: { f2: 76582, f3: 78309, f4: 76816 },
+    });
+    expect(sigs).toEqual(["77397", "76582", "78309", "76816"]);
   });
 
   // ---------------------------------------------------------------------------

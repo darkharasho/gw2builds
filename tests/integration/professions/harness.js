@@ -57,6 +57,9 @@ function setupHarness(defaultProfession = "") {
 
   function buildEditor(catalog, specId, opts = {}) {
     const specSelections = makeSpecSelections(specId);
+    if (opts.majorChoices && specSelections.length > 0) {
+      specSelections[specSelections.length - 1].majorChoices = opts.majorChoices;
+    }
     const options = ctx.testOnly.getSkillOptionsByType(catalog, specSelections);
     const utilities = [0, 1, 2].map((i) => Number(options.utility?.[i]?.id || 0));
     const weaponKey = Object.keys(catalog.professionWeapons || {})[0] || "";
@@ -87,6 +90,7 @@ function setupHarness(defaultProfession = "") {
       selectedPets: opts.pets || { terrestrial1: 1, terrestrial2: 5, aquatic1: 0, aquatic2: 0 },
       activePetSlot: "terrestrial1",
       morphSkillIds: opts.morphSkillIds || [0, 0, 0],
+      antiquaryArtifacts: opts.antiquaryArtifacts || { f2: 0, f3: 0 },
     };
   }
 

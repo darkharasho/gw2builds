@@ -22,7 +22,7 @@ function slotSignature(slot) {
 
 function buildEditor(caseData, catalog, testOnly) {
   const specSelections = caseData.specId
-    ? [{ specializationId: Number(caseData.specId), majorChoices: { 1: 0, 2: 0, 3: 0 } }]
+    ? [{ specializationId: Number(caseData.specId), majorChoices: caseData.majorChoices || { 1: 0, 2: 0, 3: 0 } }]
     : [];
   const options = testOnly.getSkillOptionsByType(catalog, specSelections);
   const utilities = [0, 1, 2].map((index) => Number(options.utility?.[index]?.id || 0));
@@ -54,6 +54,7 @@ function buildEditor(caseData, catalog, testOnly) {
     selectedPets: { terrestrial1: 1, terrestrial2: 5, aquatic1: 0, aquatic2: 0 },
     activePetSlot: "terrestrial1",
     morphSkillIds: [0, 0, 0],
+    antiquaryArtifacts: caseData.antiquaryArtifacts || { f2: 0, f3: 0 },
   };
 }
 

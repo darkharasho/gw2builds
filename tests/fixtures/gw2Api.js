@@ -168,6 +168,8 @@ const MOCK_PROFESSIONS = {
       // Mercy (Deadeye utility skill, not a profession mechanic)
       { id: 41372, slot: "Utility",          specialization: 0,  type: "Utility" },
       // Specter Siphon at Profession_1 (not actually here — comes from extraSkillIds in gw2Data)
+      // Antiquary (spec=77) F1 — Skritt Swipe replaces Steal; API returns specialization=77 correctly.
+      { id: 77397, slot: "Profession_1",     specialization: 77, type: "Profession" }, // Skritt Swipe
       // Antiquary (spec=77) F2/F3 — API returns specialization=0 for these; KNOWN_SKILL_SPEC_OVERRIDES corrects to 77.
       { id: 77277, slot: "Profession_2",     specialization: 0,  type: "Profession" }, // Mistburn Mortar
       { id: 77288, slot: "Profession_2",     specialization: 0,  type: "Profession" }, // Mistburn Mortar (variant)
@@ -378,7 +380,7 @@ const MOCK_SPECIALIZATIONS = {
   44: { id: 44, name: "Daredevil",     profession: "Thief",         elite: true,  icon: "", background: "", minor_traits: [],  major_traits: [] },
   58: { id: 58, name: "Deadeye",       profession: "Thief",         elite: true,  icon: "", background: "", minor_traits: [],  major_traits: [] },
   71: { id: 71, name: "Specter",       profession: "Thief",         elite: true,  icon: "", background: "", minor_traits: [],  major_traits: [] },
-  77: { id: 77, name: "Antiquary",    profession: "Thief",         elite: true,  icon: "", background: "", minor_traits: [],  major_traits: [] },
+  77: { id: 77, name: "Antiquary",    profession: "Thief",         elite: true,  icon: "", background: "", minor_traits: [],  major_traits: [2346] },
 
   // Elementalist
   26: { id: 26, name: "Fire",          profession: "Elementalist",  elite: false, icon: "", background: "", minor_traits: [],  major_traits: [] },
@@ -432,6 +434,8 @@ const MOCK_TRAITS = {
   1714: { id: 1714, name: "Chilling Nova",     specialization: 34, tier: 1, order: 0, slot: "Minor", icon: "", description: "", facts: [], skills: [] },
   1716: { id: 1716, name: "Soul Eater",        specialization: 34, tier: 2, order: 0, slot: "Minor", icon: "", description: "", facts: [], skills: [] },
   1940: { id: 1940, name: "Decimate Defenses", specialization: 34, tier: 3, order: 0, slot: "Minor", icon: "", description: "", facts: [], skills: [] },
+  // Antiquary (spec 77) major trait: Prolific Plunderer — adds a 3rd artifact slot (F4) on each draw
+  2346: { id: 2346, name: "Prolific Plunderer", specialization: 77, tier: 1, order: 2, slot: "Major", icon: "", description: "", facts: [], skills: [] },
 };
 
 // ---------------------------------------------------------------------------
@@ -594,6 +598,8 @@ const MOCK_SKILLS = {
   63155: makeSkill(63155, { name: "Enter Shadow Shroud", slot: "Profession_2", type: "Profession", specialization: 71, professions: ["Thief"], bundle_skills: [], flip_skill: 63251 }),
   63251: makeSkill(63251, { name: "Exit Shadow Shroud",  slot: "Profession_2", type: "Profession", specialization: 71, professions: ["Thief"] }),
 
+  // Antiquary (spec=77) F1 — spec=77 correct in API, no override needed
+  77397: makeSkill(77397, { name: "Skritt Swipe",         slot: "Profession_1", type: "Profession", specialization: 77, professions: ["Thief"] }),
   // Antiquary (spec=77) profession mechanic skills — specialization=0 in API, overridden to 77
   77277: makeSkill(77277, { name: "Mistburn Mortar",         slot: "Profession_2", type: "Profession", specialization: 0, professions: ["Thief"] }),
   77288: makeSkill(77288, { name: "Mistburn Mortar",         slot: "Profession_2", type: "Profession", specialization: 0, professions: ["Thief"] }),

@@ -490,6 +490,17 @@ function enforceEditorConsistency(options = {}) {
 
   state.editor.specializations = nextSpecs;
 
+  // Clear Antiquary artifact draws when Antiquary is no longer the active elite spec.
+  if (!nextSpecs.some((e) => Number(e?.specializationId) === 77)) {
+    state.editor.antiquaryArtifacts = { f2: 0, f3: 0, f4: 0 };
+  } else if (state.editor.antiquaryArtifacts) {
+    // Antiquary active: clear f4 if Prolific Plunderer is no longer selected.
+    const aqEntry = nextSpecs.find((e) => Number(e?.specializationId) === 77);
+    const prolificActive = Object.values(aqEntry?.majorChoices || {})
+      .some((id) => Number(id) === ANTIQUARY_PROLIFIC_PLUNDERER_TRAIT_ID);
+    if (!prolificActive) state.editor.antiquaryArtifacts.f4 = 0;
+  }
+
   // Revenant: skills are locked to the active legend; skip normal skill-options enforcement.
   // Instead, sync from the selected legend (or set defaults if no legend is selected yet).
   const isRevenant = Array.isArray(catalog.legends) && catalog.legends.length > 0;
@@ -2618,6 +2629,66 @@ function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "", active
   return slots;
 }
 
+// Antiquary (Thief elite spec, spec 77): Skritt Swipe (F1) randomly draws one offensive artifact
+// into F2 and one defensive artifact into F3. Each base pool has four choices.
+// Zephyrite Sun Crystal canonical entry 76733 is the F2 API variant; when drawn into F3 (or F4)
+// the renderer substitutes the dedicated F3-slot variant (78309) instead.
+const ANTIQUARY_OFFENSIVE_ARTIFACTS = [
+  76582,  // Metal Legion Guitar
+  76550,  // Forged Surfer Dash
+  77288,  // Mistburn Mortar
+  77192,  // Summon Kryptis Turret
+];
+const ANTIQUARY_DEFENSIVE_ARTIFACTS = [
+  76702,  // Exalted Hammer
+  76816,  // Chak Shield
+  76800,  // Holo-Dancer Decoy
+  76733,  // Zephyrite Sun Crystal (non-F2 slots use variant 78309 instead)
+];
+// Prolific Plunderer (trait 2346, tier 1): grants an additional artifact slot (F4) on each draw.
+const ANTIQUARY_PROLIFIC_PLUNDERER_TRAIT_ID = 2346;
+
+// Returns the offensive and defensive artifact pools for Antiquary's Skritt Swipe.
+// Currently the pools are fixed; hook is here for future trait-based modifications.
+function getAntiquaryArtifactPools(_catalog, _editor) {
+  return {
+    offensivePool: [...ANTIQUARY_OFFENSIVE_ARTIFACTS],
+    defensivePool: [...ANTIQUARY_DEFENSIVE_ARTIFACTS],
+  };
+}
+
+// Returns true if Prolific Plunderer (trait 2346) is selected for the Antiquary specialization.
+function isAntiquaryProlificPlundererActive(editor) {
+  const antiquaryEntry = (editor.specializations || [])
+    .find((s) => Number(s.specializationId) === 77);
+  return Object.values(antiquaryEntry?.majorChoices || {})
+    .some((id) => Number(id) === ANTIQUARY_PROLIFIC_PLUNDERER_TRAIT_ID);
+}
+
+// Randomly picks one offensive artifact for F2, one defensive for F3, and (when Prolific
+// Plunderer is active) an additional artifact from the combined pool for F4.
+// Stores the result in editor.antiquaryArtifacts. Call when the play badge is clicked.
+function randomizeAntiquaryArtifacts(catalog, editor) {
+  const { offensivePool, defensivePool } = getAntiquaryArtifactPools(catalog, editor);
+  const f2Id = offensivePool[Math.floor(Math.random() * offensivePool.length)];
+  let f3Id = defensivePool[Math.floor(Math.random() * defensivePool.length)];
+  // Zephyrite Sun Crystal canonical ID 76733 is the F2 API variant;
+  // when drawn into any non-F2 slot, substitute the F3-slot variant (78309).
+  if (f3Id === 76733) f3Id = 78309;
+
+  let f4Id = 0;
+  if (isAntiquaryProlificPlundererActive(editor)) {
+    // F4 draws from the combined pool, excluding the canonical IDs already in F2/F3.
+    const f3Canonical = f3Id === 78309 ? 76733 : f3Id;
+    const combined = [...ANTIQUARY_OFFENSIVE_ARTIFACTS, ...ANTIQUARY_DEFENSIVE_ARTIFACTS]
+      .filter((id) => id !== f2Id && id !== f3Canonical);
+    const pick = combined[Math.floor(Math.random() * combined.length)];
+    f4Id = (pick === 76733) ? 78309 : pick;
+  }
+
+  editor.antiquaryArtifacts = { f2: f2Id, f3: f3Id, f4: f4Id };
+}
+
 // Ranger F1–F3 skills are pet-family-dependent. The GW2 API does not expose pet families,
 // and all Ranger Profession_1–3 skills are tagged spec=55 in the API even though they apply
 // to Core Ranger, Druid, and Untamed as well. This map provides the authoritative lookup.
@@ -2996,8 +3067,31 @@ function buildMechanicSlotsForRender({
                || pool[0];
         }
       }
+      // Antiquary (spec=77): F1 gets the randomize play badge; F2/F3 show stored artifact draws.
+      if (eliteSpecId === 77) {
+        if (slotKey === "Profession_1") {
+          return { skill, sourceId: skill?.id || 0, isStatic: true, isSelectable: false, isAntiquarySkritSwipe: true };
+        }
+        if (slotKey === "Profession_2") {
+          const storedId = Number(editor.antiquaryArtifacts?.f2) || 0;
+          const storedSkill = storedId ? catalog.skillById.get(storedId) || null : null;
+          return { skill: storedSkill, sourceId: storedId, isStatic: true, isSelectable: false };
+        }
+        if (slotKey === "Profession_3") {
+          const storedId = Number(editor.antiquaryArtifacts?.f3) || 0;
+          const storedSkill = storedId ? catalog.skillById.get(storedId) || null : null;
+          return { skill: storedSkill, sourceId: storedId, isStatic: true, isSelectable: false };
+        }
+      }
       return { skill, sourceId: skill?.id || 0, isStatic: true, isSelectable: false };
     });
+
+    // Prolific Plunderer (trait 2346): append a virtual F4 artifact slot.
+    if (eliteSpecId === 77 && isAntiquaryProlificPlundererActive(editor)) {
+      const f4Id = Number(editor.antiquaryArtifacts?.f4) || 0;
+      const f4Skill = f4Id ? catalog.skillById.get(f4Id) || null : null;
+      mechSlots.push({ skill: f4Skill, sourceId: f4Id, isStatic: true, isSelectable: false });
+    }
   }
 
   return { mechSlots, options: nextOptions, eliteSpecId, isWeaver, isToolbelt, isRanger };
@@ -3140,7 +3234,7 @@ function renderSkills() {
     mechBar.className = "profession-mechanics-bar";
 
     for (let fIdx = 0; fIdx < mechSlots.length; fIdx++) {
-      const { skill, sourceId, sourceSkill, isStatic, isSelectable, morphIndex, mechIconOverride, fakeCommand, isBeastmodeToggle, leaveIcon, fKeyLabel, isF5AboveOrb, isAllianceTactics } = mechSlots[fIdx];
+      const { skill, sourceId, sourceSkill, isStatic, isSelectable, morphIndex, mechIconOverride, fakeCommand, isBeastmodeToggle, leaveIcon, fKeyLabel, isF5AboveOrb, isAllianceTactics, isAntiquarySkritSwipe } = mechSlots[fIdx];
       const slotEl = document.createElement("div");
       slotEl.className = "skill-slot";
       const iconBtn = document.createElement("button");
@@ -3241,6 +3335,20 @@ function renderSkills() {
       fLabel.textContent = fKeyLabel || `F${fIdx + 1}`;
       iconBtn.append(fLabel);
       markSkillIconRendered(iconBtn, `mech_${fIdx + 1}`, mechIconSignature || (skill ? `${skill.id}:${skill.icon || ""}` : ""));
+
+      // Antiquary F1 (Skritt Swipe): play badge randomizes the F2/F3 artifact draws.
+      if (isAntiquarySkritSwipe) {
+        const rollBadge = document.createElement("span");
+        rollBadge.className = "kit-toggle-indicator";
+        rollBadge.title = "Draw artifacts";
+        rollBadge.textContent = "▸";
+        rollBadge.addEventListener("click", (e) => {
+          e.stopPropagation();
+          randomizeAntiquaryArtifacts(catalog, state.editor);
+          renderSkills();
+        });
+        iconBtn.append(rollBadge);
+      }
 
       // Alliance Tactics F3 gets a toggle badge to show it's clickable.
       if (isAllianceTactics) {
@@ -4390,6 +4498,7 @@ async function loadBuildIntoEditor(build, options = {}) {
     activeAttunement2: "",
     activeKit: 0,
     activeWeaponSet: 1,
+    antiquaryArtifacts: { f2: 0, f3: 0, f4: 0 },
     morphSkillIds: Array.isArray(build.morphSkillIds)
       ? build.morphSkillIds.slice(0, 3).map(Number)
       : [0, 0, 0],
@@ -4688,6 +4797,7 @@ function createEmptyEditor(profession = "") {
     selectedPets: { terrestrial1: 0, terrestrial2: 0, aquatic1: 0, aquatic2: 0 },
     activePetSlot: "terrestrial1",  // "terrestrial1" or "terrestrial2"
     allianceTacticsForm: 0,         // Vindicator: 0 = Archemorus/Kurzick, 1 = Saint Viktor/Luxon
+    antiquaryArtifacts: { f2: 0, f3: 0, f4: 0 }, // Antiquary: stored artifact draws (0 = not yet drawn)
   };
 }
 
