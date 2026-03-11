@@ -95,11 +95,11 @@ a {
   letter-spacing: 0.06em;
 }
 
-.titlebar__dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: radial-gradient(circle at 30% 30%, #b2ffdd, #4fd897 65%, #2e845f);
+.titlebar__logo {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  opacity: 0.9;
 }
 
 .titlebar__controls {

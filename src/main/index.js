@@ -36,6 +36,7 @@ function createWindow() {
     frame: false,
     titleBarStyle: process.platform === "darwin" ? "hiddenInset" : "hidden",
     backgroundColor: "#050910",
+    icon: path.join(__dirname, "../../public/img/build_logo.png"),
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
