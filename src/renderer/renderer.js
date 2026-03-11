@@ -2707,12 +2707,308 @@ const RANGER_PET_FAMILY_SKILLS = new Map([
   [66, { p1: 64699, p2: 66258, p3: 44626 }],  // Siege Turtle (newer) — Supportive
 ]);
 
+function buildMechanicSlotsForRender({
+  catalog,
+  options,
+  editor,
+  utilitySelection,
+  equippedWeapons,
+  mhKey,
+  ohKey,
+  activeAttunement,
+  activeKit,
+}) {
+  const nextOptions = options;
+  const isToolbelt = catalog.skills.some((s) => s.toolbeltSkill > 0);
+
+  let mechSlots;
+  const eliteSpecEntry = (editor.specializations || [])
+    .find((e) => catalog.specializationById.get(Number(e?.specializationId))?.elite);
+  const eliteSpecId = Number(eliteSpecEntry?.specializationId) || 0;
+  const isWeaver = eliteSpecId === 56;
+  // Ranger and all Ranger elite specs (Druid/Soulbeast/Untamed) use catalog.pets.
+  const isRanger = Array.isArray(catalog.pets) && catalog.pets.length > 0;
+
+  // Collect elite spec's static profession mechanic skills (type "Profession", not "Toolbelt").
+  // Deduplicate by slot: some skills have multiple contextual variants at the same slot
+  // (e.g. Scrapper's "Function Gyro" has 3 toggle-phase variants, Mechanist's F4 has
+  // "Crash Down / Mech Support / Recall Mech"). Keep only the first occurrence per slot.
+  const eliteSpecOptionsRaw = (nextOptions.profession || []).filter((s) =>
+    Number(s.specialization) === eliteSpecId && (s.type || "").toLowerCase() !== "toolbelt"
+  );
+  const seenSlot = new Set();
+  const eliteSpecOptions = eliteSpecOptionsRaw.filter((s) => {
+    if (seenSlot.has(s.slot)) return false;
+    seenSlot.add(s.slot);
+    return true;
+  });
+
+  // "Locked" placeholder slots indicate player-selectable morph slots (Amalgam F2–F4).
+  // All other unique slots are fixed static mechanics.
+  const morphSlotSkills = eliteSpecOptions.filter((s) => s.name.toLowerCase() === "locked");
+  const eliteFixedSkills = eliteSpecOptions.filter((s) => s.name.toLowerCase() !== "locked");
+
+  // Mechanist (spec 70) is the only toolbelt engineer whose F1-F3 are trait-gated mech commands
+  // rather than toolbelt skills. Detect explicitly by spec ID to avoid false positives from
+  // trait skills that may be incorrectly tagged as Profession_1 for other engineer elite specs.
+  const eliteOverridesToolbelt = isToolbelt && eliteSpecId === 70;
+  const isSelectablePool = isToolbelt && morphSlotSkills.length > 0;
+
+  if (eliteOverridesToolbelt) {
+    // Mechanist: F1-F3 are trait-gated mech commands; F4 is Crash Down/Recall toggle.
+    // For each tier slot (Profession_1/2/3), use the skill granted by the selected major trait.
+    // Fall back to the first available skill in that slot if no trait is selected.
+    const mechSpecEntry = (editor.specializations || [])
+      .find((e) => Number(e?.specializationId) === eliteSpecId);
+    const mechMajorChoices = mechSpecEntry?.majorChoices || {};
+    const selectedMajorTraitIds = new Set(Object.values(mechMajorChoices).map(Number).filter(Boolean));
+
+    mechSlots = [];
+    for (const tier of [1, 2, 3]) {
+      const slot = `Profession_${tier}`;
+      const traitsForTier = catalog.traits.filter(
+        (t) => t.specialization === eliteSpecId && t.tier === tier
+      );
+      const selectedTrait = traitsForTier.find((t) => selectedMajorTraitIds.has(t.id));
+      let skill = null;
+      let mechIconOverride = "";
+      if (selectedTrait) {
+        const skillId = selectedTrait.traitSkillIds[0];
+        skill = catalog.skillById.get(skillId) || null;
+        // If skill is missing or has no icon, use the icon embedded in the trait data
+        if (skillId && (!skill || !skill.icon)) {
+          mechIconOverride = (selectedTrait.traitSkillIcons || {})[skillId] || "";
+        }
+      }
+      if (!skill) {
+        // Try skills tagged with the elite spec first, then any unspecced Profession_N skill
+        skill = eliteSpecOptions.find((s) => s.slot === slot)
+          || (nextOptions.profession || []).find((s) => s.slot === slot)
+          || null;
+      }
+      mechSlots.push({ skill, sourceId: 0, isStatic: true, isSelectable: false, mechIconOverride });
+    }
+    // F4: Crash Down (first Profession_4 entry)
+    const f4 = eliteFixedSkills.find((s) => s.slot === "Profession_4");
+    if (f4) mechSlots.push({ skill: f4, sourceId: 0, isStatic: true, isSelectable: false });
+  } else if (isSelectablePool) {
+    // Amalgam: F1 = heal toolbelt; F2–F4 = "Locked" morph slots (player-selectable); F5 = Evolve
+    const healSrc = catalog.skillById.get(Number(editor.skills?.healId) || 0);
+    const healToolbelt = healSrc?.toolbeltSkill ? (catalog.skillById.get(healSrc.toolbeltSkill) || null) : null;
+    const morphIds = Array.isArray(editor.morphSkillIds)
+      ? editor.morphSkillIds.map(Number) : [0, 0, 0];
+
+    mechSlots = [
+      { skill: healToolbelt, sourceId: Number(editor.skills?.healId) || 0, isStatic: false, isSelectable: false },
+      ...morphSlotSkills.map((lockedSkill, morphIndex) => ({
+        // Show the selected morph skill if one is chosen; fall back to "Locked" placeholder
+        skill: morphIds[morphIndex] ? (catalog.skillById.get(morphIds[morphIndex]) || lockedSkill) : lockedSkill,
+        sourceId: morphIds[morphIndex] || 0,
+        isStatic: false,
+        isSelectable: true,
+        morphIndex,
+      })),
+    ];
+    // Append fixed elite skills (Evolve at Profession_5)
+    for (const skill of eliteFixedSkills) {
+      mechSlots.push({ skill, sourceId: 0, isStatic: true, isSelectable: false });
+    }
+  } else if (isToolbelt) {
+    // Base Engineer / Scrapper / Holosmith: F1–F4 from toolbelt, optional elite F5
+    const toolbeltSourceIds = [
+      Number(editor.skills?.healId) || 0,
+      Number(utilitySelection[0]) || 0,
+      Number(utilitySelection[1]) || 0,
+      Number(utilitySelection[2]) || 0,
+    ];
+    mechSlots = toolbeltSourceIds.map((id) => {
+      const src = catalog.skillById.get(id);
+      const fskill = src?.toolbeltSkill ? (catalog.skillById.get(src.toolbeltSkill) || null) : null;
+      return { skill: fskill, sourceId: id, sourceSkill: src || null, isStatic: false, isSelectable: false };
+    });
+    // Fixed F5 from elite spec (Scrapper → Function Gyro, Holosmith → Photon Forge)
+    const staticF5 = eliteFixedSkills.find((s) => s.slot === "Profession_5");
+    if (staticF5) mechSlots.push({ skill: staticF5, sourceId: 0, isStatic: true, isSelectable: false });
+  } else if (Array.isArray(catalog.legends) && catalog.legends.length > 0) {
+    // Revenant: F1 is SHARED between both legend stances (clicking either swaps to it).
+    // The legend stack UI handles F1; mech slots only show elite spec skills F2+.
+    const legendSlots = editor.selectedLegends || ["", ""];
+    const activeLegendSlot = Number(editor.activeLegendSlot) || 0;
+    const activeLegendId = legendSlots[activeLegendSlot] || "";
+    const activeLegend = activeLegendId ? catalog.legendById.get(activeLegendId) : null;
+    const isAllianceLegendActive = activeLegendId === "Legend7";
+    const allianceTacticsForm = Number(editor.allianceTacticsForm) || 0; // 0=Archemorus, 1=Saint Viktor
+
+    const eliteByProfSlot = buildRevenantEliteByProfSlot(
+      eliteFixedSkills,
+      eliteSpecId,
+      isAllianceLegendActive,
+      catalog.skillById
+    );
+
+    mechSlots = [];
+    if (eliteSpecId > 0) {
+      for (let n = 2; n <= 5; n++) {
+        const slotKey = `Profession_${n}`;
+        const eliteSkill = eliteByProfSlot.get(slotKey);
+        if (!eliteSkill) continue; // skip gaps (e.g. Vindicator has no Profession_2)
+        const isAllianceTactics = eliteSkill.id === 62729;
+        if (isAllianceTactics && !isAllianceLegendActive) continue;
+        let displaySkill = eliteSkill;
+        if (isAllianceTactics && allianceTacticsForm === 1 && eliteSkill.flipSkill) {
+          displaySkill = catalog.skillById.get(eliteSkill.flipSkill) || eliteSkill;
+        }
+        // Conduit (spec 79) F2 — Release Potential: pick the variant matching the active legend.
+        if (eliteSpecId === 79 && slotKey === "Profession_2") {
+          const activeLegendSwap = activeLegend?.swap || 0;
+          const f2Id = activeLegendSwap ? CONDUIT_F2_BY_SWAP.get(activeLegendSwap) : null;
+          displaySkill = (f2Id && catalog.skillById.get(f2Id)) || eliteSkill;
+        }
+        mechSlots.push({ skill: displaySkill, sourceId: eliteSkill.id, isStatic: true, isSelectable: false, fKeyLabel: `F${n}`, isAllianceTactics });
+      }
+    }
+
+    // Override skill option lists so they show this legend's fixed skills.
+    if (activeLegend) {
+      const ls = (id) => {
+        if (!id) return null;
+        const skill = catalog.skillById.get(id);
+        if (!skill) return null;
+        if (isAllianceLegendActive && allianceTacticsForm === 1 && skill.flipSkill) {
+          return catalog.skillById.get(skill.flipSkill) || skill;
+        }
+        return skill;
+      };
+      nextOptions.heal = [ls(activeLegend.heal)].filter(Boolean);
+      nextOptions.utility = (activeLegend.utilities || []).map(ls).filter(Boolean);
+      nextOptions.elite = [ls(activeLegend.elite)].filter(Boolean);
+    }
+  } else if (isRanger) {
+    const activePetSlotKey = editor.activePetSlot === "terrestrial2" ? "terrestrial2" : "terrestrial1";
+    const activePetId = Number(editor.selectedPets?.[activePetSlotKey]) || 0;
+    const activePet = activePetId && catalog.petById ? catalog.petById.get(activePetId) : null;
+
+    mechSlots = [];
+    if (eliteSpecId === 55) {
+      const p5SoulbeastSkill = (nextOptions.profession || []).find((s) => s.slot === "Profession_5") || null;
+      const beastmodeId = p5SoulbeastSkill?.id || 0;
+      const beastmodeActive = beastmodeId > 0 && activeKit === beastmodeId;
+      if (beastmodeActive) {
+        const petFamilySkills = activePetId ? RANGER_PET_FAMILY_SKILLS.get(activePetId) : null;
+        for (const key of ["p1", "p2", "p3"]) {
+          const skillId = petFamilySkills?.[key] || null;
+          const skill = skillId ? (catalog.skillById.get(skillId) || null) : null;
+          mechSlots.push({ skill, sourceId: skill?.id || 0, isStatic: true, isSelectable: false });
+        }
+      } else {
+        mechSlots.push({ skill: null, sourceId: 0, isStatic: true, isSelectable: false, fakeCommand: "attack" });
+        const f2Skill = (activePet?.skills || [])[0] || null;
+        mechSlots.push({ skill: f2Skill, sourceId: f2Skill?.id || 0, isStatic: true, isSelectable: false });
+        mechSlots.push({ skill: null, sourceId: 0, isStatic: true, isSelectable: false, fakeCommand: "return" });
+      }
+      if (p5SoulbeastSkill) {
+        mechSlots.push({
+          skill: p5SoulbeastSkill, sourceId: p5SoulbeastSkill.id, isStatic: true, isSelectable: false,
+          isBeastmodeToggle: true,
+          leaveIcon: "https://wiki.guildwars2.com/images/2/2a/Leave_Beastmode.png",
+          fKeyLabel: "F5",
+          isF5AboveOrb: true,
+        });
+      }
+    } else {
+      mechSlots.push({ skill: null, sourceId: 0, isStatic: true, isSelectable: false, fakeCommand: "attack" });
+      const petSkills = activePet?.skills || [];
+      const isAquaticSlot = activePetSlotKey === "aquatic1" || activePetSlotKey === "aquatic2";
+      const f2SkillIdx = isAquaticSlot && petSkills.length > 1 ? 1 : 0;
+      const f2Skill = petSkills[f2SkillIdx] || null;
+      mechSlots.push({ skill: f2Skill, sourceId: f2Skill?.id || 0, isStatic: true, isSelectable: false });
+      if (eliteSpecId === 72) {
+        const envHaze = catalog.skillById.get(63094) || null;
+        mechSlots.push({ skill: envHaze, sourceId: envHaze?.id || 0, isStatic: true, isSelectable: false });
+      } else {
+        mechSlots.push({ skill: null, sourceId: 0, isStatic: true, isSelectable: false, fakeCommand: "return" });
+      }
+    }
+    if (eliteSpecId !== 55) {
+      const p5Skill = (nextOptions.profession || []).find((s) => s.slot === "Profession_5") || null;
+      if (p5Skill) {
+        mechSlots.push({ skill: p5Skill, sourceId: p5Skill.id, isStatic: true, isSelectable: false, fKeyLabel: "F5", isF5AboveOrb: true });
+      }
+    }
+  } else {
+    // Non-toolbelt professions (warrior, necro, guardian, mesmer, ele, thief, etc.)
+    const activeMainhand = (equippedWeapons[mhKey] || "").toLowerCase();
+    const activeOffhand = (equippedWeapons[ohKey] || "").toLowerCase();
+
+    const bySlot = new Map(); // slotKey → skill[]
+    for (const skill of (nextOptions.profession || [])) {
+      if (!skill.slot) continue;
+      if (!bySlot.has(skill.slot)) bySlot.set(skill.slot, []);
+      bySlot.get(skill.slot).push(skill);
+    }
+
+    const sortedSlotKeys = [...bySlot.keys()]
+      .filter((k) => !isWeaver || parseInt(k.replace("Profession_", ""), 10) <= 4)
+      .sort((a, b) => {
+        const na = parseInt(a.replace("Profession_", ""), 10) || 0;
+        const nb = parseInt(b.replace("Profession_", ""), 10) || 0;
+        return na - nb;
+      });
+
+    // Thief mechanics: Core/Daredevil/Deadeye only have a fixed F1 profession slot.
+    // Specter (71) and Antiquary (77) are the only Thief specs with persistent F2+ slots.
+    const isThief = (catalog?.profession?.id || editor.profession || "") === "Thief";
+    const thiefHasPersistentF2Plus = eliteSpecId === 71 || eliteSpecId === 77;
+    const renderSlotKeys = isThief && !thiefHasPersistentF2Plus
+      ? sortedSlotKeys.filter((slotKey) => slotKey === "Profession_1")
+      : sortedSlotKeys;
+
+    mechSlots = renderSlotKeys.map((slotKey) => {
+      const candidates = bySlot.get(slotKey);
+      let skill;
+      if (candidates.length === 1) {
+        skill = candidates[0];
+      } else {
+        // Split into elite-spec and base pools; prefer elite-spec when active.
+        // Weaver is excluded: its F skills are the standard ele attunement swaps.
+        const eliteCandidates = eliteSpecId && !isWeaver
+          ? candidates.filter((s) => Number(s.specialization) === eliteSpecId)
+          : [];
+        // Sort by ID descending: when the API lists multiple skill variants at the same slot
+        // the higher ID is the more recently added/updated skill and should be preferred.
+        const pool = [...(eliteCandidates.length > 0 ? eliteCandidates : candidates)]
+          .sort((a, b) => b.id - a.id);
+        const wt = (s) => (s.weaponType || "").toLowerCase();
+        const attunementSkill = !isWeaver && activeAttunement
+          ? pool.find((s) => s.attunement && s.attunement.toLowerCase() === activeAttunement.toLowerCase())
+          : null;
+        if (isWeaver) {
+          // Weaver F slots are always attunement swap buttons (Fire/Water/Air/Earth).
+          const stdName = /^(?:Fire|Water|Air|Earth)\s+Attunement\b/i;
+          skill = pool.find((s) => Number(s.specialization) === 56 && stdName.test(s.name || ""))
+               || pool.find((s) => stdName.test(s.name || ""))
+               || pool[0];
+        } else {
+          skill = pool.find((s) => wt(s) && wt(s) === activeMainhand)
+               || pool.find((s) => wt(s) && wt(s) === activeOffhand)
+               || attunementSkill
+               || pool.find((s) => !s.weaponType && !s.attunement)
+               || pool[0];
+        }
+      }
+      return { skill, sourceId: skill?.id || 0, isStatic: true, isSelectable: false };
+    });
+  }
+
+  return { mechSlots, options: nextOptions, eliteSpecId, isWeaver, isToolbelt, isRanger };
+}
+
 function renderSkills() {
   const catalog = state.activeCatalog;
   el.skillsHost.innerHTML = "";
   if (!catalog) return;
 
-  const options = getSkillOptionsByType(catalog, state.editor.specializations);
+  let options = getSkillOptionsByType(catalog, state.editor.specializations);
   const utilitySelection = Array.isArray(state.editor.skills?.utilityIds)
     ? state.editor.skills.utilityIds.map((value) => Number(value) || 0)
     : [0, 0, 0];
@@ -2741,340 +3037,19 @@ function renderSkills() {
   const ohKey = activeWeaponSet === 2 ? "offhand2" : "offhand1";
   const hasWeaponSet2 = !!(equippedWeapons.mainhand2 || equippedWeapons.offhand2);
 
-  // Build mechanic slot descriptors: { skill, sourceId, isStatic }
-  // isStatic = true means the slot is a fixed profession mechanic (not toolbelt-derived), so kit toggling doesn't apply
-  const isToolbelt = catalog.skills.some((s) => s.toolbeltSkill > 0);
-
-  // For attunement highlight (non-toolbelt professions like Elementalist)
-  const allWeaponRefs = [
-    ...(catalog.professionWeapons?.[equippedWeapons.mainhand1 || ""]?.skills || []),
-    ...(catalog.professionWeapons?.[equippedWeapons.offhand1 || ""]?.skills || []),
-  ];
-  const weaponHasAttunements = allWeaponRefs.some((r) => r.attunement);
-  const availableAttunements = [...new Set(allWeaponRefs.map((r) => r.attunement).filter(Boolean))];
-  const effectiveAttunement = availableAttunements.includes(activeAttunement)
-    ? activeAttunement : (availableAttunements[0] || "");
-
-  // Each slot descriptor: { skill, sourceId, isStatic, isSelectable, morphIndex? }
-  let mechSlots;
-
-  // Find selected elite spec
-  const eliteSpecEntry = (state.editor.specializations || [])
-    .find((e) => catalog.specializationById.get(Number(e?.specializationId))?.elite);
-  const eliteSpecId = Number(eliteSpecEntry?.specializationId) || 0;
-  const isWeaver = eliteSpecId === 56;
-  // Ranger and all Ranger elite specs (Druid/Soulbeast/Untamed) use catalog.pets.
-  const isRanger = Array.isArray(catalog.pets) && catalog.pets.length > 0;
-
-  // Collect elite spec's static profession mechanic skills (type "Profession", not "Toolbelt").
-  // Deduplicate by slot: some skills have multiple contextual variants at the same slot
-  // (e.g. Scrapper's "Function Gyro" has 3 toggle-phase variants, Mechanist's F4 has
-  // "Crash Down / Mech Support / Recall Mech"). Keep only the first occurrence per slot.
-  const eliteSpecOptionsRaw = (options.profession || []).filter((s) =>
-    Number(s.specialization) === eliteSpecId && (s.type || "").toLowerCase() !== "toolbelt"
-  );
-  const seenSlot = new Set();
-  const eliteSpecOptions = eliteSpecOptionsRaw.filter((s) => {
-    if (seenSlot.has(s.slot)) return false;
-    seenSlot.add(s.slot);
-    return true;
+  const mechanicState = buildMechanicSlotsForRender({
+    catalog,
+    options,
+    editor: state.editor,
+    utilitySelection,
+    equippedWeapons,
+    mhKey,
+    ohKey,
+    activeAttunement,
+    activeKit,
   });
-
-  // "Locked" placeholder slots indicate player-selectable morph slots (Amalgam F2–F4).
-  // All other unique slots are fixed static mechanics.
-  const morphSlotSkills = eliteSpecOptions.filter((s) => s.name.toLowerCase() === "locked");
-  const eliteFixedSkills = eliteSpecOptions.filter((s) => s.name.toLowerCase() !== "locked");
-
-  // Mechanist (spec 70) is the only toolbelt engineer whose F1-F3 are trait-gated mech commands
-  // rather than toolbelt skills. Detect explicitly by spec ID to avoid false positives from
-  // trait skills that may be incorrectly tagged as Profession_1 for other engineer elite specs.
-  const eliteOverridesToolbelt = isToolbelt && eliteSpecId === 70;
-  const isSelectablePool = isToolbelt && morphSlotSkills.length > 0;
-
-  if (eliteOverridesToolbelt) {
-    // Mechanist: F1-F3 are trait-gated mech commands; F4 is Crash Down/Recall toggle.
-    // For each tier slot (Profession_1/2/3), use the skill granted by the selected major trait.
-    // Fall back to the first available skill in that slot if no trait is selected.
-    const mechSpecEntry = (state.editor.specializations || [])
-      .find((e) => Number(e?.specializationId) === eliteSpecId);
-    const mechMajorChoices = mechSpecEntry?.majorChoices || {};
-    const selectedMajorTraitIds = new Set(Object.values(mechMajorChoices).map(Number).filter(Boolean));
-
-    mechSlots = [];
-    for (const tier of [1, 2, 3]) {
-      const slot = `Profession_${tier}`;
-      const traitsForTier = catalog.traits.filter(
-        (t) => t.specialization === eliteSpecId && t.tier === tier
-      );
-      const selectedTrait = traitsForTier.find((t) => selectedMajorTraitIds.has(t.id));
-      let skill = null;
-      let mechIconOverride = "";
-      if (selectedTrait) {
-        const skillId = selectedTrait.traitSkillIds[0];
-        skill = catalog.skillById.get(skillId) || null;
-        // If skill is missing or has no icon, use the icon embedded in the trait data
-        if (skillId && (!skill || !skill.icon)) {
-          mechIconOverride = (selectedTrait.traitSkillIcons || {})[skillId] || "";
-        }
-      }
-      if (!skill) {
-        // Try skills tagged with the elite spec first, then any unspecced Profession_N skill
-        skill = eliteSpecOptions.find((s) => s.slot === slot)
-          || (options.profession || []).find((s) => s.slot === slot)
-          || null;
-      }
-      mechSlots.push({ skill, sourceId: 0, isStatic: true, isSelectable: false, mechIconOverride });
-    }
-    // F4: Crash Down (first Profession_4 entry)
-    const f4 = eliteFixedSkills.find((s) => s.slot === "Profession_4");
-    if (f4) mechSlots.push({ skill: f4, sourceId: 0, isStatic: true, isSelectable: false });
-  } else if (isSelectablePool) {
-    // Amalgam: F1 = heal toolbelt; F2–F4 = "Locked" morph slots (player-selectable); F5 = Evolve
-    const healSrc = catalog.skillById.get(Number(state.editor.skills?.healId) || 0);
-    const healToolbelt = healSrc?.toolbeltSkill ? (catalog.skillById.get(healSrc.toolbeltSkill) || null) : null;
-    const morphIds = Array.isArray(state.editor.morphSkillIds)
-      ? state.editor.morphSkillIds.map(Number) : [0, 0, 0];
-
-    mechSlots = [
-      { skill: healToolbelt, sourceId: Number(state.editor.skills?.healId) || 0, isStatic: false, isSelectable: false },
-      ...morphSlotSkills.map((lockedSkill, morphIndex) => ({
-        // Show "Locked" placeholder icon; replace with selected morph skill once pool is available
-        // Show the selected morph skill if one is chosen; fall back to "Locked" placeholder
-        skill: morphIds[morphIndex] ? (catalog.skillById.get(morphIds[morphIndex]) || lockedSkill) : lockedSkill,
-        sourceId: morphIds[morphIndex] || 0,
-        isStatic: false,
-        isSelectable: true,
-        morphIndex,
-      })),
-    ];
-    // Append fixed elite skills (Evolve at Profession_5)
-    for (const skill of eliteFixedSkills) {
-      mechSlots.push({ skill, sourceId: 0, isStatic: true, isSelectable: false });
-    }
-  } else if (isToolbelt) {
-    // Base Engineer / Scrapper / Holosmith: F1–F4 from toolbelt, optional elite F5
-    const toolbeltSourceIds = [
-      Number(state.editor.skills?.healId) || 0,
-      Number(utilitySelection[0]) || 0,
-      Number(utilitySelection[1]) || 0,
-      Number(utilitySelection[2]) || 0,
-    ];
-    mechSlots = toolbeltSourceIds.map((id) => {
-      const src = catalog.skillById.get(id);
-      const fskill = src?.toolbeltSkill ? (catalog.skillById.get(src.toolbeltSkill) || null) : null;
-      return { skill: fskill, sourceId: id, sourceSkill: src || null, isStatic: false, isSelectable: false };
-    });
-    // Fixed F5 from elite spec (Scrapper → Function Gyro, Holosmith → Photon Forge)
-    const staticF5 = eliteFixedSkills.find((s) => s.slot === "Profession_5");
-    if (staticF5) mechSlots.push({ skill: staticF5, sourceId: 0, isStatic: true, isSelectable: false });
-  } else if (Array.isArray(catalog.legends) && catalog.legends.length > 0) {
-    // Revenant: F1 is SHARED between both legend stances (clicking either swaps to it).
-    // The legend stack UI (left of mechBar) handles F1; mechBar only shows elite spec skills F2+.
-    // Elite spec skills: Renegade F2/F3/F4, Vindicator F2, Herald F2+ etc.
-    // Core Revenant has no mechBar slots — just the two F1 legend stack buttons.
-    const legendSlots = state.editor.selectedLegends || ["", ""];
-    const activeLegendSlot = Number(state.editor.activeLegendSlot) || 0;
-    const activeLegendId = legendSlots[activeLegendSlot] || "";
-    const activeLegend = activeLegendId ? catalog.legendById.get(activeLegendId) : null;
-    const isAllianceLegendActive = activeLegendId === "Legend7";
-    const allianceTacticsForm = Number(state.editor.allianceTacticsForm) || 0; // 0=Archemorus, 1=Saint Viktor
-
-    // Build a lookup of elite spec skills by Profession_N slot.
-    const eliteByProfSlot = buildRevenantEliteByProfSlot(
-      eliteFixedSkills,
-      eliteSpecId,
-      isAllianceLegendActive,
-      catalog.skillById
-    );
-
-    mechSlots = [];
-    if (eliteSpecId > 0) {
-      for (let n = 2; n <= 5; n++) {
-        const slotKey = `Profession_${n}`;
-        const eliteSkill = eliteByProfSlot.get(slotKey);
-        if (!eliteSkill) continue; // skip gaps (e.g. Vindicator has no Profession_2)
-        // Alliance Tactics (F3, 62729): only show when Legendary Alliance is the active legend.
-        const isAllianceTactics = eliteSkill.id === 62729;
-        if (isAllianceTactics && !isAllianceLegendActive) continue;
-        // For Alliance Tactics, show the form's skill based on allianceTacticsForm state.
-        let displaySkill = eliteSkill;
-        if (isAllianceTactics && allianceTacticsForm === 1 && eliteSkill.flipSkill) {
-          displaySkill = catalog.skillById.get(eliteSkill.flipSkill) || eliteSkill;
-        }
-        // Conduit (spec 79) F2 — Release Potential: pick the variant matching the active legend.
-        // Look up by the legend's swap skill ID (stable) rather than the legend's string ID.
-        if (eliteSpecId === 79 && slotKey === "Profession_2") {
-          const activeLegendSwap = activeLegend?.swap || 0;
-          const f2Id = activeLegendSwap ? CONDUIT_F2_BY_SWAP.get(activeLegendSwap) : null;
-          displaySkill = (f2Id && catalog.skillById.get(f2Id)) || eliteSkill;
-        }
-        mechSlots.push({ skill: displaySkill, sourceId: eliteSkill.id, isStatic: true, isSelectable: false, fKeyLabel: `F${n}`, isAllianceTactics });
-      }
-    }
-
-    // Override skill option lists so they show this legend's fixed skills (not free-choice catalog).
-    // For Alliance legend in Luxon form, map skills through their flipSkill to show support variants.
-    if (activeLegend) {
-      const ls = (id) => {
-        if (!id) return null;
-        const skill = catalog.skillById.get(id);
-        if (!skill) return null;
-        if (isAllianceLegendActive && allianceTacticsForm === 1 && skill.flipSkill) {
-          return catalog.skillById.get(skill.flipSkill) || skill;
-        }
-        return skill;
-      };
-      options.heal = [ls(activeLegend.heal)].filter(Boolean);
-      options.utility = (activeLegend.utilities || []).map(ls).filter(Boolean);
-      options.elite = [ls(activeLegend.elite)].filter(Boolean);
-    }
-  } else if (isRanger) {
-    // Ranger F skills differ by spec:
-    // - Soulbeast (55): F1–F3 are Profession_1/2/3 beastmode weapon-bar skills (hardcoded
-    //   via RANGER_PET_FAMILY_SKILLS), F4 = Eternal Bond, F5 = Beastmode toggle.
-    // - Core / Druid / Untamed / Galeshot: F1 = "Attack My Target" (client-side command),
-    //   F2 = the pet's own last skill from /v2/pets (unique per pet), F3 = "Return to Me"
-    //   (client-side command). Untamed replaces F3 with Enveloping Haze (spec=72).
-    const activePetSlotKey = state.editor.activePetSlot === "terrestrial2" ? "terrestrial2" : "terrestrial1";
-    const activePetId = Number(state.editor.selectedPets?.[activePetSlotKey]) || 0;
-    const activePet = activePetId && catalog.petById ? catalog.petById.get(activePetId) : null;
-
-    mechSlots = [];
-    if (eliteSpecId === 55) {
-      // Soulbeast: F5 is Beastmode toggle. Default state (not in beastmode) mirrors Core Ranger;
-      // when beastmode is active, F1–F3 show the merged pet skills from RANGER_PET_FAMILY_SKILLS.
-      const p5SoulbeastSkill = (options.profession || []).find((s) => s.slot === "Profession_5") || null;
-      const beastmodeId = p5SoulbeastSkill?.id || 0;
-      const beastmodeActive = beastmodeId > 0 && activeKit === beastmodeId;
-      if (beastmodeActive) {
-        const petFamilySkills = activePetId ? RANGER_PET_FAMILY_SKILLS.get(activePetId) : null;
-        for (const key of ["p1", "p2", "p3"]) {
-          const skillId = petFamilySkills?.[key] || null;
-          const skill = skillId ? (catalog.skillById.get(skillId) || null) : null;
-          mechSlots.push({ skill, sourceId: skill?.id || 0, isStatic: true, isSelectable: false });
-        }
-      } else {
-        // Default: same as Core Ranger (fake commands + live pet F2 skill)
-        mechSlots.push({ skill: null, sourceId: 0, isStatic: true, isSelectable: false, fakeCommand: "attack" });
-        const f2Skill = (activePet?.skills || [])[0] || null;
-        mechSlots.push({ skill: f2Skill, sourceId: f2Skill?.id || 0, isStatic: true, isSelectable: false });
-        mechSlots.push({ skill: null, sourceId: 0, isStatic: true, isSelectable: false, fakeCommand: "return" });
-      }
-      if (p5SoulbeastSkill) {
-        mechSlots.push({
-          skill: p5SoulbeastSkill, sourceId: p5SoulbeastSkill.id, isStatic: true, isSelectable: false,
-          isBeastmodeToggle: true,
-          leaveIcon: "https://wiki.guildwars2.com/images/2/2a/Leave_Beastmode.png",
-          fKeyLabel: "F5",
-          isF5AboveOrb: true,
-        });
-      }
-    } else {
-      // Core / Druid / Untamed / Galeshot
-      // F1: fake "Attack My Target" (client-side command, no API skill)
-      mechSlots.push({ skill: null, sourceId: 0, isStatic: true, isSelectable: false, fakeCommand: "attack" });
-      // F2: the pet's own special skill from /v2/pets — unique per individual pet.
-      // The skills array is ordered: [terrestrial, aquatic] (land pets have 1 entry; amphibious
-      // pets have 2). Use index 0 for terrestrial slots, index 1 for aquatic slots.
-      const petSkills = activePet?.skills || [];
-      const isAquaticSlot = activePetSlotKey === "aquatic1" || activePetSlotKey === "aquatic2";
-      const f2SkillIdx = isAquaticSlot && petSkills.length > 1 ? 1 : 0;
-      const f2Skill = petSkills[f2SkillIdx] || null;
-      mechSlots.push({ skill: f2Skill, sourceId: f2Skill?.id || 0, isStatic: true, isSelectable: false });
-      // F3: Enveloping Haze for Untamed; fake "Return to Me" for all others
-      if (eliteSpecId === 72) {
-        const envHaze = catalog.skillById.get(63094) || null;
-        mechSlots.push({ skill: envHaze, sourceId: envHaze?.id || 0, isStatic: true, isSelectable: false });
-      } else {
-        mechSlots.push({ skill: null, sourceId: 0, isStatic: true, isSelectable: false, fakeCommand: "return" });
-      }
-    }
-    // P5: elite-spec toggle for non-Soulbeast specs (Celestial Avatar/Unleash/Cyclone Bow).
-    // Soulbeast (55) handles its own P5 (Beastmode) above with isBeastmodeToggle.
-    if (eliteSpecId !== 55) {
-      const p5Skill = (options.profession || []).find((s) => s.slot === "Profession_5") || null;
-      if (p5Skill) {
-        mechSlots.push({ skill: p5Skill, sourceId: p5Skill.id, isStatic: true, isSelectable: false, fKeyLabel: "F5", isF5AboveOrb: true });
-      }
-    }
-  } else {
-    // Non-toolbelt professions (warrior, necro, guardian, mesmer, ele, thief, etc.)
-    // Group by slot, then pick the best candidate per slot:
-    //   - If an elite spec skill exists for this slot, prefer it (e.g. berserker primal burst over
-    //     base warrior burst, spellbreaker Full Counter over all weapon bursts, etc.)
-    //   - Among the preferred pool, pick the skill whose weaponType matches the equipped mainhand
-    //     (falls back to offhand, weapon-agnostic, then first available).
-    const activeMainhand = (equippedWeapons[mhKey] || "").toLowerCase();
-    const activeOffhand = (equippedWeapons[ohKey] || "").toLowerCase();
-
-    const bySlot = new Map(); // slotKey → skill[]
-    for (const skill of (options.profession || [])) {
-      if (!skill.slot) continue;
-      if (!bySlot.has(skill.slot)) bySlot.set(skill.slot, []);
-      bySlot.get(skill.slot).push(skill);
-    }
-
-    const sortedSlotKeys = [...bySlot.keys()]
-      .filter((k) => !isWeaver || parseInt(k.replace("Profession_", ""), 10) <= 4)
-      .sort((a, b) => {
-        const na = parseInt(a.replace("Profession_", ""), 10) || 0;
-        const nb = parseInt(b.replace("Profession_", ""), 10) || 0;
-        return na - nb;
-      });
-
-    // Thief mechanics: Core/Daredevil/Deadeye only have a fixed F1 profession slot.
-    // Specter (71) and Antiquary (77) are the only Thief specs with persistent F2+ slots.
-    const isThief = (catalog?.profession?.id || state.editor.profession || "") === "Thief";
-    const thiefHasPersistentF2Plus = eliteSpecId === 71 || eliteSpecId === 77;
-    const renderSlotKeys = isThief && !thiefHasPersistentF2Plus
-      ? sortedSlotKeys.filter((slotKey) => slotKey === "Profession_1")
-      : sortedSlotKeys;
-
-    mechSlots = renderSlotKeys.map((slotKey) => {
-      const candidates = bySlot.get(slotKey);
-      let skill;
-      if (candidates.length === 1) {
-        skill = candidates[0];
-      } else {
-        // Split into elite-spec and base pools; prefer elite-spec when active.
-        // Weaver is excluded: its F skills are the standard ele attunement swaps.
-        const eliteCandidates = eliteSpecId && !isWeaver
-          ? candidates.filter((s) => Number(s.specialization) === eliteSpecId)
-          : [];
-        // Sort by ID descending: when the API lists multiple skill variants at the same slot
-        // (e.g. Troubadour's Lively Lute has an old and updated version with the same name),
-        // the higher ID is the more recently added/updated skill and should be preferred.
-        const pool = [...(eliteCandidates.length > 0 ? eliteCandidates : candidates)]
-          .sort((a, b) => b.id - a.id);
-        const wt = (s) => (s.weaponType || "").toLowerCase();
-        // Attunement-keyed skills (e.g. Catalyst "Deploy Jade Sphere", Tempest overloads):
-        // prefer the variant whose attunement field matches the currently active attunement.
-        // Weaver is excluded: its attunement skills have attunement set to the *source* (current)
-        // attunement rather than the target, which would cause skills to appear at the wrong F slot.
-        const attunementSkill = !isWeaver && activeAttunement
-          ? pool.find((s) => s.attunement && s.attunement.toLowerCase() === activeAttunement.toLowerCase())
-          : null;
-        if (isWeaver) {
-          // Weaver F slots are always attunement swap buttons (Fire/Water/Air/Earth).
-          // The pool may contain dual-attunement combo variants whose `attunement` field is set
-          // to the *source* attunement (not the target), causing wrong icons if selected by
-          // attunement match or highest-ID. Pick by standard "X Attunement" name instead:
-          // prefer the Weaver-spec (56) version, fall back to any standard-named attunement.
-          const stdName = /^(?:Fire|Water|Air|Earth)\s+Attunement\b/i;
-          skill = pool.find((s) => Number(s.specialization) === 56 && stdName.test(s.name || ""))
-               || pool.find((s) => stdName.test(s.name || ""))
-               || pool[0];
-        } else {
-          skill = pool.find((s) => wt(s) && wt(s) === activeMainhand)
-               || pool.find((s) => wt(s) && wt(s) === activeOffhand)
-               || attunementSkill
-               || pool.find((s) => !s.weaponType && !s.attunement)
-               || pool[0];
-        }
-      }
-      return { skill, sourceId: skill?.id || 0, isStatic: true, isSelectable: false };
-    });
-  }
+  const { mechSlots, eliteSpecId, isWeaver, isToolbelt, isRanger } = mechanicState;
+  options = mechanicState.options;
 
   // If activeKit refers to a static shroud/bundle skill, ensure it still exists in current mechSlots.
   // This prevents stale shroud state when switching elite specs (e.g. Reaper → Scourge).
@@ -4868,6 +4843,9 @@ function escapeHtml(value) {
 
 if (typeof module !== "undefined" && module.exports) {
   module.exports.__testOnly = {
+    buildMechanicSlotsForRender,
     buildRevenantEliteByProfSlot,
+    getSkillOptionsByType,
+    getEquippedWeaponSkills,
   };
 }

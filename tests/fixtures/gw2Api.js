@@ -88,7 +88,7 @@ const MOCK_PROFESSIONS = {
     id: "Guardian", name: "Guardian",
     icon: "https://render.guildwars2.com/file/guardian-icon.png",
     icon_big: "https://render.guildwars2.com/file/guardian-icon-big.png",
-    specializations: [16, 46, 49, 27, 62, 65],
+    specializations: [16, 46, 49, 27, 62, 65, 81],
     skills: [
       { id: 9083, slot: "Heal",           specialization: null, type: "Heal" },
       { id: 9168, slot: "Utility",        specialization: null, type: "Utility" },
@@ -223,7 +223,18 @@ const MOCK_PROFESSIONS = {
       Staff: {
         flags: ["TwoHand"],
         specialization: 0,
-        skills: [{ id: 5507, slot: "Weapon_1", offhand: "", attunement: "Fire" }],
+        skills: [
+          // One Weapon_1 ref per attunement so availableAttunements covers all four
+          { id: 5507, slot: "Weapon_1", offhand: "", attunement: "Fire" },
+          { id: 5508, slot: "Weapon_1", offhand: "", attunement: "Water" },
+          { id: 5509, slot: "Weapon_1", offhand: "", attunement: "Air" },
+          { id: 5510, slot: "Weapon_1", offhand: "", attunement: "Earth" },
+          // Weaver dual-attack slot-3 skills referenced here so they land in weaponSkillById
+          { id: 76585, slot: "Weapon_3", offhand: "", attunement: "" }, // Aqua Surge (Water+Fire)
+          { id: 76811, slot: "Weapon_3", offhand: "", attunement: "" }, // Earthen Vortex (Earth+Air)
+          { id: 77089, slot: "Weapon_3", offhand: "", attunement: "" }, // Plasma Burst (Fire+Air)
+          { id: 76707, slot: "Weapon_3", offhand: "", attunement: "" }, // Seismic Impact (Earth+Water)
+        ],
       },
       Scepter: {
         flags: ["Mainhand"],
@@ -492,7 +503,7 @@ const MOCK_SKILLS = {
   6089:  makeSkill(6089,  { name: "Toss Elixir U", slot: "Profession_1", type: "Profession", professions: ["Engineer"] }),
 
   // Photon Forge — no bundle_skills in API; gw2Data hardcodes the bundle
-  42938: makeSkill(42938, { name: "Photon Forge", slot: "Profession_5", type: "Profession", specialization: 57, professions: ["Engineer"], bundle_skills: [] }),
+  42938: makeSkill(42938, { name: "Photon Forge", slot: "Profession_5", type: "Profession", specialization: 57, professions: ["Engineer"], bundle_skills: [], flip_skill: 41123 }),
 
   // Photon Forge weapon skills (must exist in MOCK_SKILLS so fetch resolves them)
   44588: makeSkill(44588, { name: "Light Strike",             slot: "Weapon_1", type: "Weapon", specialization: 57 }),
@@ -610,20 +621,24 @@ const MOCK_SKILLS = {
   // ---- Elementalist ----
   5504:  makeSkill(5504,  { name: "Glyph of Elemental Harmony", slot: "Heal",    type: "Heal",    professions: ["Elementalist"] }),
   5505:  makeSkill(5505,  { name: "Tornado",        slot: "Elite",   type: "Elite",   professions: ["Elementalist"] }),
-  5507:  makeSkill(5507,  { name: "Fire Attunement (Staff)", slot: "Weapon_1", type: "Weapon", weapon_type: "Staff", attunement: "Fire" }),
-  5470:  makeSkill(5470,  { name: "Dragon's Tooth", slot: "Weapon_1", type: "Weapon", weapon_type: "Scepter", attunement: "Fire" }),
+  5507:  makeSkill(5507,  { name: "Fire Attunement (Staff)",  slot: "Weapon_1", type: "Weapon", weapon_type: "Staff",  attunement: "Fire"  }),
+  5508:  makeSkill(5508,  { name: "Water Attunement (Staff)", slot: "Weapon_1", type: "Weapon", weapon_type: "Staff",  attunement: "Water" }),
+  5509:  makeSkill(5509,  { name: "Air Attunement (Staff)",   slot: "Weapon_1", type: "Weapon", weapon_type: "Staff",  attunement: "Air"   }),
+  5510:  makeSkill(5510,  { name: "Earth Attunement (Staff)", slot: "Weapon_1", type: "Weapon", weapon_type: "Staff",  attunement: "Earth" }),
+  5470:  makeSkill(5470,  { name: "Dragon's Tooth",           slot: "Weapon_1", type: "Weapon", weapon_type: "Scepter", attunement: "Fire"  }),
 
   // Weaver attunement buttons (API assigns wrong slots; gw2Data overrides them)
-  76703: makeSkill(76703, { name: "Fire Attunement",   slot: "Profession_2", type: "Profession", specialization: 56, weapon_type: "None", attunement: "None" }),
-  76988: makeSkill(76988, { name: "Water Attunement",  slot: "Profession_1", type: "Profession", specialization: 56, weapon_type: "None", attunement: "None" }),
-  76580: makeSkill(76580, { name: "Air Attunement",    slot: "Profession_1", type: "Profession", specialization: 56, weapon_type: "None", attunement: "None" }),
-  77082: makeSkill(77082, { name: "Earth Attunement",  slot: "Profession_1", type: "Profession", specialization: 56, weapon_type: "None", attunement: "None" }),
+  76703: makeSkill(76703, { name: "Fire Attunement",   slot: "Profession_2", type: "Profession", specialization: 56, professions: ["Elementalist"], weapon_type: "None", attunement: "None" }),
+  76988: makeSkill(76988, { name: "Water Attunement",  slot: "Profession_1", type: "Profession", specialization: 56, professions: ["Elementalist"], weapon_type: "None", attunement: "None" }),
+  76580: makeSkill(76580, { name: "Air Attunement",    slot: "Profession_1", type: "Profession", specialization: 56, professions: ["Elementalist"], weapon_type: "None", attunement: "None" }),
+  77082: makeSkill(77082, { name: "Earth Attunement",  slot: "Profession_1", type: "Profession", specialization: 56, professions: ["Elementalist"], weapon_type: "None", attunement: "None" }),
 
   // Weaver dual attack skills (spec=56 via override, dual_attunement used for dualWield)
-  76585: makeSkill(76585, { name: "Aqua Surge",        slot: "Weapon_3", type: "Weapon", specialization: 56, attunement: "Water", dual_attunement: "Fire" }),
-  76811: makeSkill(76811, { name: "Earthen Vortex",    slot: "Weapon_3", type: "Weapon", specialization: 56, attunement: "Earth", dual_attunement: "Air" }),
-  77089: makeSkill(77089, { name: "Plasma Burst",      slot: "Weapon_3", type: "Weapon", specialization: 56, attunement: "Fire",  dual_attunement: "Air" }),
-  76707: makeSkill(76707, { name: "Seismic Impact",    slot: "Weapon_3", type: "Weapon", specialization: 56, attunement: "Earth", dual_attunement: "Water" }),
+  // weapon_type must be set so getEquippedWeaponSkills can match by mainhand key
+  76585: makeSkill(76585, { name: "Aqua Surge",        slot: "Weapon_3", type: "Weapon", specialization: 56, weapon_type: "Staff", attunement: "Water", dual_attunement: "Fire" }),
+  76811: makeSkill(76811, { name: "Earthen Vortex",    slot: "Weapon_3", type: "Weapon", specialization: 56, weapon_type: "Staff", attunement: "Earth", dual_attunement: "Air" }),
+  77089: makeSkill(77089, { name: "Plasma Burst",      slot: "Weapon_3", type: "Weapon", specialization: 56, weapon_type: "Staff", attunement: "Fire",  dual_attunement: "Air" }),
+  76707: makeSkill(76707, { name: "Seismic Impact",    slot: "Weapon_3", type: "Weapon", specialization: 56, weapon_type: "Staff", attunement: "Earth", dual_attunement: "Water" }),
 
   // Twin Strike (Sword/Fire+Water, id 42271) — used in dual-attack tests
   42271: makeSkill(42271, { name: "Twin Strike",       slot: "Weapon_3", type: "Weapon", specialization: 56, weapon_type: "Sword", attunement: "Fire", dual_attunement: "Water" }),

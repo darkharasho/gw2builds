@@ -1,0 +1,129 @@
+"use strict";
+
+const { createGw2MockFetch } = require("../../helpers/mockFetch");
+
+function normalizeCatalog(raw) {
+  return {
+    ...raw,
+    specializationById: new Map((raw.specializations || []).map((entry) => [Number(entry.id), entry])),
+    traitById: new Map((raw.traits || []).map((entry) => [Number(entry.id), entry])),
+    skillById: new Map((raw.skills || []).map((entry) => [Number(entry.id), entry])),
+    weaponSkillById: new Map((raw.weaponSkills || []).map((entry) => [Number(entry.id), entry])),
+    legendById: new Map((raw.legends || []).map((entry) => [String(entry.id), entry])),
+    petById: new Map((raw.pets || []).map((entry) => [Number(entry.id), entry])),
+  };
+}
+
+function slotSignature(slot) {
+  if (slot?.fakeCommand) return `fake:${slot.fakeCommand}`;
+  if (slot?.skill?.id) return String(slot.skill.id);
+  return "empty";
+}
+
+function buildEditor(caseData, catalog, testOnly) {
+  const specSelections = caseData.specId
+    ? [{ specializationId: Number(caseData.specId), majorChoices: { 1: 0, 2: 0, 3: 0 } }]
+    : [];
+  const options = testOnly.getSkillOptionsByType(catalog, specSelections);
+  const utilities = [0, 1, 2].map((index) => Number(options.utility?.[index]?.id || 0));
+  const weaponKey = Object.keys(catalog.professionWeapons || {})[0] || "";
+
+  return {
+    profession: caseData.profession,
+    specializations: specSelections,
+    skills: {
+      healId: Number(options.heal?.[0]?.id || 0),
+      utilityIds: utilities,
+      eliteId: Number(options.elite?.[0]?.id || 0),
+    },
+    activeAttunement: "Fire",
+    activeAttunement2: "",
+    activeKit: Number(caseData.activeKit || 0),
+    activeWeaponSet: 1,
+    equipment: {
+      weapons: {
+        mainhand1: weaponKey,
+        offhand1: "",
+        mainhand2: "",
+        offhand2: "",
+      },
+    },
+    selectedLegends: caseData.legendSlots || ["Legend1", "Legend2"],
+    activeLegendSlot: Number(caseData.activeLegendSlot || 0),
+    allianceTacticsForm: Number(caseData.allianceTacticsForm || 0),
+    selectedPets: { terrestrial1: 1, terrestrial2: 5, aquatic1: 0, aquatic2: 0 },
+    activePetSlot: "terrestrial1",
+    morphSkillIds: [0, 0, 0],
+  };
+}
+
+function setupMechanicsHarness(defaultProfession = "") {
+  const context = {
+    gw2Data: null,
+    testOnly: null,
+  };
+
+  beforeAll(() => {
+    context.gw2Data = require("../../../src/main/gw2Data");
+    context.testOnly = require("../../../src/renderer/renderer").__testOnly;
+  });
+
+  beforeEach(() => {
+    global.fetch = createGw2MockFetch();
+  });
+
+  afterEach(() => {
+    delete global.fetch;
+  });
+
+  return async function resolve(entry) {
+    const caseData = { profession: defaultProfession, ...(entry || {}) };
+    const rawCatalog = await context.gw2Data.getProfessionCatalog(caseData.profession);
+    const catalog = normalizeCatalog(rawCatalog);
+    const editor = buildEditor(caseData, catalog, context.testOnly);
+    const options = context.testOnly.getSkillOptionsByType(catalog, editor.specializations);
+
+    const result = context.testOnly.buildMechanicSlotsForRender({
+      catalog,
+      options: { ...options },
+      editor,
+      utilitySelection: editor.skills.utilityIds,
+      equippedWeapons: editor.equipment.weapons,
+      mhKey: "mainhand1",
+      ohKey: "offhand1",
+      activeAttunement: editor.activeAttunement,
+      activeKit: editor.activeKit,
+    });
+
+    const signatures = (result.mechSlots || []).map(slotSignature);
+    const skillIds = (result.mechSlots || [])
+      .map((slot) => Number(slot?.skill?.id) || 0)
+      .filter(Boolean);
+
+    return {
+      caseData,
+      catalog,
+      editor,
+      options,
+      result,
+      signatures,
+      skillIds,
+    };
+  };
+}
+
+function createMechanicsSuite(profession, cases) {
+  describe(`renderer mechanics selection — ${profession}`, () => {
+    const resolve = setupMechanicsHarness(profession);
+
+    test.each(cases)("spec $specId mechanics slots", async (entry) => {
+      const { signatures } = await resolve(entry);
+      expect(signatures).toEqual(entry.expected);
+    });
+  });
+}
+
+module.exports = {
+  createMechanicsSuite,
+  setupMechanicsHarness,
+};
