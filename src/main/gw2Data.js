@@ -149,7 +149,7 @@ async function getProfessionCatalog(professionId, lang = "en") {
     [30792, 34],  // Reaper's Shroud → Reaper
     [62567, 64],  // Harbinger Shroud → Harbinger
     [77238, 76],  // Ritualist's Shroud → Ritualist (API returns spec=0)
-    [77397, 71],  // Specter Siphon (API name "Skritt Swipe") → Specter
+    [63067, 71],  // Specter Siphon → Specter (77397 is Antiquary spec=77, unrelated)
     // Weaver attunement button skills — /v2/skills returns spec=80 but Weaver spec is 56
     [76580, 56], [76988, 56], [76703, 56], [77082, 56],
     // Weaver F5 dual-attunement combo skills (Conflagration, Buoyant Deluge, Lightning Blitz, Seismic Impact)
@@ -158,8 +158,28 @@ async function getProfessionCatalog(professionId, lang = "en") {
     // but /v2/skills correctly returns spec=43 (Scrapper). Without override, they could appear at
     // Holosmith's F5 slot instead of Photon Forge (42938).
     [72103, 43], [72114, 43],
-    // Alliance Tactics (Vindicator F3) — both forms; ensure spec=69 (Vindicator) is set.
-    [62749, 69], [62891, 69],
+    // Alliance Tactics (Vindicator F3) — API says Profession_2 but in-game it's F3; spec=69.
+    [62729, 69],
+    // Specter Shadow Shroud weapon skills — may have Profession_N slots in API; ensure spec=71
+    // so they're filtered out of profMechanics and only appear in the bundle weapon bar.
+    [63066, 71], [63351, 71], [63154, 71],
+    // Specter Enter/Exit Shadow Shroud — ensure spec=71.
+    [63155, 71], [63251, 71],
+    // Antiquary (spec 77) profession mechanic skills — API returns spec=0 or null for these.
+    // Mistburn Mortar (F2): two variants (ground-targeted and non-targeted).
+    [77277, 77], [77288, 77],
+    // Zephyrite Sun Crystal (F2 and F3 variants).
+    [76733, 77], [78309, 77],
+    // Summon Kryptis Turret (F2): two variants (ground-targeted and non-targeted).
+    [77192, 77], [76900, 77],
+    // Additional Antiquary stolen skills (Profession_2) — API returns spec=null for all of these.
+    [76550, 77],  // Forged Surfer Dash
+    [76582, 77],  // Metal Legion Guitar
+    [76601, 77],  // Exalted Hammer (variant 1)
+    [76702, 77],  // Exalted Hammer (variant 2)
+    [76800, 77],  // Holo-Dancer Decoy
+    [76816, 77],  // Chak Shield
+    [76909, 77],  // Unstable Skritt Bomb
     // Conduit (spec 79) Release Potential variants — one per legend (API may return spec=0 or wrong spec).
     [78845, 79], [78501, 79], [78615, 79], [78661, 79], [78895, 79],
     // Conduit F3 Cosmic Wisdom — ensure spec=79.
@@ -174,8 +194,10 @@ async function getProfessionCatalog(professionId, lang = "en") {
     [76988, "Profession_2"], // Weaver Water Attunement (API wrongly says Profession_1)
     [76580, "Profession_3"], // Weaver Air Attunement   (API wrongly says Profession_1)
     [77082, "Profession_4"], // Weaver Earth Attunement (API wrongly says Profession_1)
-    [62749, "Profession_3"], // Alliance Tactics Kurzick form (Vindicator F3) — ensure correct slot
-    [62891, "Profession_3"], // Alliance Tactics Luxon form (Vindicator F3) — same slot
+    [62729, "Profession_3"], // Alliance Tactics (Vindicator F3) — API says Profession_2, in-game is F3
+    // Shadow Shroud weapon skills — override to Weapon_N so they don't appear as standalone F slots.
+    // (In-shroud weapon skills; only shown in bundle weapon bar when Shadow Shroud is active.)
+    [63066, "Weapon_1"], [63351, "Weapon_2"], [63154, "Weapon_3"],
     // Conduit Release Potential variants — all have Profession_2 slot; slot override ensures correct placement.
     [78845, "Profession_2"], [78501, "Profession_2"], [78615, "Profession_2"],
     [78661, "Profession_2"], [78895, "Profession_2"],
@@ -219,6 +241,13 @@ async function getProfessionCatalog(professionId, lang = "en") {
   const LICH_FORM_SKILL_ID = 10550;
   const LICH_FORM_BUNDLE = [10634, 10635, 10633, 10636, 10632];
   const LICH_FORM_FLIP_SKILLS = [45780]; // March of Undeath (flip of Ripple of Horror)
+
+  // Shadow Shroud (Specter elite spec, spec 71) — Enter (63155) / Exit (63251) both sit at
+  // Profession_2. The GW2 API has no bundle_skills on the Enter skill; hardcode the 3 in-shroud
+  // weapon skills. Only 3 weapon slots in Shadow Shroud (W1-W3).
+  // Skills: Shadow Bolt (63066), Shadow Sap (63351), Triple Threat (63154).
+  const SHADOW_SHROUD_SKILL_ID = 63155;
+  const SHADOW_SHROUD_BUNDLE = [63066, 63351, 63154];
 
   // Firebrand tome chapter skills — the GW2 public API does not expose these via bundle_skills
   // or any other field. Skill data sourced from community tools (GW2EI, discretize-ui).
@@ -403,8 +432,10 @@ async function getProfessionCatalog(professionId, lang = "en") {
   ]);
 
   // GW2 API omits flip_skill for Facet of Elements (27014); hardcode the missing link.
+  // Shadow Shroud Enter (63155) needs a flip to its Exit skill (63251) for the active-icon toggle.
   const LEGEND_FLIP_OVERRIDES = new Map([
     [27014, 27162], // Facet of Elements → Elemental Blast
+    [63155, 63251], // Enter Shadow Shroud → Exit Shadow Shroud
   ]);
 
   // Step 3: compute extraSkillIds from raw API data and fetch traits + extra skills in parallel.
@@ -426,9 +457,13 @@ async function getProfessionCatalog(professionId, lang = "en") {
     ...(professionId === "Guardian" ? [...RADIANT_FORGE_BUNDLE, ...RADIANT_FORGE_FLIP_SKILLS] : []),
     // Include flip_skills of Death Shroud and Lich Form transform children (not auto-fetched).
     ...(professionId === "Necromancer" ? [...DEATH_SHROUD_FLIP_SKILLS, ...LICH_FORM_FLIP_SKILLS] : []),
-    // Alliance Tactics forms (Vindicator F3) — ensure both are fetched.
+    // Alliance Tactics (Vindicator F3, 62729) — ensure it's fetched (not in profession endpoint).
     // Conduit Release Potential variants (F2, one per legend) + Cosmic Wisdom (F3) — ensure all are fetched.
-    ...(professionId === "Revenant" ? [62749, 62891, 78845, 78501, 78615, 78661, 78895, 77371] : []),
+    ...(professionId === "Revenant" ? [62729, 78845, 78501, 78615, 78661, 78895, 77371] : []),
+    // Thief extras:
+    // - Specter Siphon (63067, spec=71) — not in Thief profession endpoint
+    // - Shadow Shroud Enter/Exit (63155/63251) + weapon skills (for bundle display)
+    ...(professionId === "Thief" ? [63067, 63155, 63251, ...SHADOW_SHROUD_BUNDLE] : []),
     // Weapon auto-attack chain continuations (depth 1): merged here to avoid an extra round-trip.
     ...weaponChainDepth1Ids,
   ]);
@@ -619,6 +654,8 @@ async function getProfessionCatalog(professionId, lang = "en") {
           ? LICH_FORM_BUNDLE
           : skill.id === DEATH_SHROUD_SKILL_ID
           ? DEATH_SHROUD_BUNDLE
+          : skill.id === SHADOW_SHROUD_SKILL_ID
+          ? SHADOW_SHROUD_BUNDLE
           : FIREBRAND_TOME_CHAPTERS.has(skill.id)
           ? FIREBRAND_TOME_CHAPTERS.get(skill.id).map((c) => c.id)
           : (transformOpenerSlots.has(skill.slot || "") ? (transformBundleBySpecId.get(specId) || []) : []);
@@ -645,6 +682,13 @@ async function getProfessionCatalog(professionId, lang = "en") {
       toolbeltSkill: ELIXIR_TOOLBELT_OVERRIDES.get(skill.id) || Number(skill.toolbelt_skill) || 0,
       flipSkill: LEGEND_FLIP_OVERRIDES.get(skill.id) || Number(skill.flip_skill) || 0,
       bundleSkills,
+      transformSkills: Array.isArray(skill.transform_skills) ? skill.transform_skills.map(Number).filter(Boolean) : [],
+      // True for skills explicitly listed in the profession endpoint (profession.skills).
+      // Used by the renderer to distinguish legitimate F-slot mechanics that happen to be
+      // flip_skill targets (e.g. Deadeye's Mark 43390, the flip of Steal 13014) from
+      // transient flip states (e.g. "Steal Time", the flip of Deadeye's Mark) that should
+      // not appear as permanent F-slot selections.
+      inProfessionEndpoint: profSkillRefs.has(skill.id),
     };
   }
 
@@ -778,11 +822,11 @@ async function getProfessionCatalog(professionId, lang = "en") {
     traits: traits.map((trait) => ({
       id: trait.id,
       name: trait.name || "",
-      // Skip wiki path for names containing colons — MediaWiki treats ":" as a namespace
-      // separator, so "Mech Frame: Conductive Alloys.png" resolves to nothing on the wiki,
-      // causing a failed load + onerror fallback blink. Use the render URL directly instead.
-      icon: (!(trait.name || "").includes(":") && buildWikiFilePath(`${trait.name || ""}.png`)) || trait.icon || "",
-      iconFallback: trait.icon || "",
+      // Use the render CDN icon directly — wiki FilePath lookups by trait name are unreliable
+      // because multiple traits across different professions can share the same name (e.g.
+      // "Deadly Aim", "No Quarter"), causing the wrong profession's icon to be served.
+      icon: trait.icon || "",
+      iconFallback: "",
       description: trait.description || "",
       tier: Number(trait.tier) || 0,
       order: Number(trait.order) || 0,

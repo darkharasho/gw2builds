@@ -2852,8 +2852,8 @@ function renderSkills() {
         const slotKey = `Profession_${n}`;
         const eliteSkill = eliteByProfSlot.get(slotKey);
         if (!eliteSkill) continue; // skip gaps (e.g. Vindicator has no Profession_2)
-        // Alliance Tactics (F3, 62749/62891): only show when Legendary Alliance is the active legend.
-        const isAllianceTactics = eliteSkill.id === 62749 || eliteSkill.id === 62891;
+        // Alliance Tactics (F3, 62729): only show when Legendary Alliance is the active legend.
+        const isAllianceTactics = eliteSkill.id === 62729;
         if (isAllianceTactics && !isAllianceLegendActive) continue;
         // For Alliance Tactics, show the form's skill based on allianceTacticsForm state.
         let displaySkill = eliteSkill;
@@ -3854,8 +3854,8 @@ function getSkillOptionsByType(catalog, specializationSelections) {
 
   const allSkills = Array.isArray(catalog.skills) ? catalog.skills : [];
 
-  // Build a set of flip_skill IDs — these are in-combat replacement skills (e.g. "Detonate Turret",
-  // "Deploy Mine") that appear in the API as type "Utility" but are never base equippable skills.
+  // Build a set of flip_skill IDs — in-combat replacement skills (e.g. "Detonate Turret",
+  // "Steal Time") that are flip targets and should not appear as base equippable skills.
   const flipSkillIds = new Set(allSkills.flatMap((s) => s.flipSkill ? [s.flipSkill] : []));
 
   const filtered = allSkills.filter((skill) => {
@@ -3872,8 +3872,15 @@ function getSkillOptionsByType(catalog, specializationSelections) {
   const profMechanics = allSkills
     .filter((skill) => /^Profession_\d/.test(skill.slot || ""))
     .filter((skill) => !exitLeavePattern.test(skill.name || ""))
-    // NOTE: do NOT filter by flipSkillIds here — some Profession_N skills are mutual flip forms
-    // (e.g. Vindicator's Alliance Tactics 62749/62891) and must remain in the mechanic bar.
+    // Exclude flip targets unless they are explicitly in the profession endpoint.
+    // Using inProfessionEndpoint (not flipParentIds) as the gate because mutual flip pairs
+    // like Deadeye's Mark (43390) ↔ Steal Time would both pass a flipParentIds check, yet
+    // "Steal Time" is a transient post-activation state that must not show as a permanent slot.
+    .filter((skill) => !flipSkillIds.has(skill.id) || skill.inProfessionEndpoint)
+    // Exclude stolen-pool skills: Thief's Profession_2 "stolen result" skills (Throw Gunk,
+    // Branch Leap, etc.) have professions=[] in the API — they're context-dependent transient
+    // skills placed in the slot after stealing, not permanent F-slot selections.
+    .filter((skill) => (skill.professions || []).length > 0)
     .filter((skill) => {
       const lockSpec = Number(skill.specialization) || 0;
       return !lockSpec || selectedSpecIds.has(lockSpec);
