@@ -781,7 +781,9 @@ const MOCK_LEGEND_SKILLS = {
   62832: makeSkill(62832, { name: "Phantom's Onslaught", slot: "Utility", type: "Utility", specialization: 69 }),
   62667: makeSkill(62667, { name: "Scavenger Burst",    slot: "Utility", type: "Utility", specialization: 69 }),
   62711: makeSkill(62711, { name: "Warding Rift",       slot: "Utility", type: "Utility", specialization: 69 }),
-  62891: MOCK_SKILLS[62891],
+  62891: makeSkill(62891, { name: "Legendary Alliance Stance", slot: "Profession_1", type: "Profession", specialization: 69, flip_skill: 62687 }),
+  62687: makeSkill(62687, { name: "Urn of Saint Viktor",       slot: "Elite",        type: "Elite",      specialization: 69, flip_skill: 62738 }),
+  62738: makeSkill(62738, { name: "Drop Urn of Saint Viktor",  slot: "Elite",        type: "Elite",      specialization: 69 }),
   27162: MOCK_SKILLS[27162], // Elemental Blast (Facet of Elements flip)
 };
 

@@ -919,6 +919,15 @@ describe("Revenant — legends catalog", () => {
     const alliance = catalog.legends.find((l) => l.id === "Legend7");
     expect(alliance).toBeTruthy();
   });
+
+  test("Alliance elite flip chain includes Urn of Saint Viktor -> Drop Urn of Saint Viktor", async () => {
+    const catalog = await gw2Data.getProfessionCatalog("Revenant");
+    const urn = findSkill(catalog, 62687);
+    const dropUrn = findSkill(catalog, 62738);
+    expect(urn).toBeTruthy();
+    expect(dropUrn).toBeTruthy();
+    expect(urn.flipSkill).toBe(62738);
+  });
 });
 
 // ---------------------------------------------------------------------------

@@ -1,3 +1,7 @@
+function q(selector) {
+  return typeof document !== "undefined" ? document.querySelector(selector) : null;
+}
+
 const state = {
   user: null,
   onboarding: null,
@@ -29,39 +33,52 @@ const state = {
 };
 
 const el = {
-  setupGate: document.querySelector("#setupGate"),
-  authRow: document.querySelector("#authRow"),
-  onboarding: document.querySelector("#onboarding"),
-  workspaceBtn: document.querySelector("#workspaceBtn"),
-  workspaceMenu: document.querySelector("#workspaceMenu"),
-  subnav: document.querySelector("#subnav"),
-  appLayout: document.querySelector(".app-layout"),
-  buildList: document.querySelector("#buildList"),
-  buildSearch: document.querySelector("#buildSearch"),
-  editorTitle: document.querySelector("#editorTitle"),
-  professionSelect: document.querySelector("#professionSelect"),
-  tagsInput: document.querySelector("#tagsInput"),
-  equipmentPanel: document.querySelector("#equipmentPanel"),
-  newBuildBtn: document.querySelector("#newBuildBtn"),
-  saveBuildBtn: document.querySelector("#saveBuildBtn"),
-  duplicateBuildBtn: document.querySelector("#duplicateBuildBtn"),
-  copyBuildBtn: document.querySelector("#copyBuildBtn"),
-  pasteBuildBtn: document.querySelector("#pasteBuildBtn"),
-  editorDirtyBadge: document.querySelector("#editorDirtyBadge"),
-  buildSummary: document.querySelector("#buildSummary"),
-  publishSiteBtn: document.querySelector("#publishSiteBtn"),
-  specializationsHost: document.querySelector("#specializationsHost"),
-  skillsHost: document.querySelector("#skillsHost"),
-  detailHost: document.querySelector("#detailHost"),
-  publishStatus: document.querySelector("#publishStatus"),
-  hoverPreview: document.querySelector("#hoverPreview"),
-  winMin: document.querySelector("#winMin"),
-  winMax: document.querySelector("#winMax"),
-  winClose: document.querySelector("#winClose"),
-  titlebar: document.querySelector("#titlebar"),
+  setupGate: q("#setupGate"),
+  authRow: q("#authRow"),
+  onboarding: q("#onboarding"),
+  workspaceBtn: q("#workspaceBtn"),
+  workspaceMenu: q("#workspaceMenu"),
+  subnav: q("#subnav"),
+  appLayout: q(".app-layout"),
+  buildList: q("#buildList"),
+  buildSearch: q("#buildSearch"),
+  editorTitle: q("#editorTitle"),
+  professionSelect: q("#professionSelect"),
+  tagsInput: q("#tagsInput"),
+  equipmentPanel: q("#equipmentPanel"),
+  newBuildBtn: q("#newBuildBtn"),
+  saveBuildBtn: q("#saveBuildBtn"),
+  duplicateBuildBtn: q("#duplicateBuildBtn"),
+  copyBuildBtn: q("#copyBuildBtn"),
+  pasteBuildBtn: q("#pasteBuildBtn"),
+  editorDirtyBadge: q("#editorDirtyBadge"),
+  buildSummary: q("#buildSummary"),
+  publishSiteBtn: q("#publishSiteBtn"),
+  specializationsHost: q("#specializationsHost"),
+  skillsHost: q("#skillsHost"),
+  detailHost: q("#detailHost"),
+  publishStatus: q("#publishStatus"),
+  hoverPreview: q("#hoverPreview"),
+  winMin: q("#winMin"),
+  winMax: q("#winMax"),
+  winClose: q("#winClose"),
+  titlebar: q("#titlebar"),
 };
 
-init().catch((err) => showError(err));
+if (typeof window !== "undefined" && !window.__GW2_RENDERER_TEST__) {
+  init().catch((err) => showError(err));
+}
+
+function buildRevenantEliteByProfSlot(eliteFixedSkills, eliteSpecId, isAllianceLegendActive, skillById) {
+  const eliteByProfSlot = new Map((eliteFixedSkills || []).map((s) => [s.slot, s]));
+  // Vindicator + Legendary Alliance should always expose Alliance Tactics at F3.
+  // Keep this as a defensive fallback in case upstream skill selection misses 62729.
+  if (Number(eliteSpecId) === 69 && isAllianceLegendActive) {
+    const allianceTactics = skillById?.get(62729);
+    if (allianceTactics) eliteByProfSlot.set("Profession_3", allianceTactics);
+  }
+  return eliteByProfSlot;
+}
 
 async function init() {
   wireWindowControls();
@@ -2843,8 +2860,13 @@ function renderSkills() {
     const isAllianceLegendActive = activeLegendId === "Legend7";
     const allianceTacticsForm = Number(state.editor.allianceTacticsForm) || 0; // 0=Archemorus, 1=Saint Viktor
 
-    // Build a lookup of elite spec skills by Profession_N slot
-    const eliteByProfSlot = new Map(eliteFixedSkills.map((s) => [s.slot, s]));
+    // Build a lookup of elite spec skills by Profession_N slot.
+    const eliteByProfSlot = buildRevenantEliteByProfSlot(
+      eliteFixedSkills,
+      eliteSpecId,
+      isAllianceLegendActive,
+      catalog.skillById
+    );
 
     mechSlots = [];
     if (eliteSpecId > 0) {
@@ -4810,4 +4832,10 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll("\"", "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports.__testOnly = {
+    buildRevenantEliteByProfSlot,
+  };
 }

@@ -466,7 +466,7 @@ async function getProfessionCatalog(professionId, lang = "en") {
   const traitIds = dedupeNumbers(
     specializations.flatMap((spec) => [...(spec?.minor_traits || []), ...(spec?.major_traits || [])])
   );
-  const [traits, extraSkillsRaw] = await Promise.all([
+  const [traits, extraSkillsRawInitial] = await Promise.all([
     fetchGw2ByIds("traits", traitIds, lang),
     extraSkillIds.length ? fetchGw2ByIds("skills", extraSkillIds, lang) : Promise.resolve([]),
   ]);
@@ -514,6 +514,26 @@ async function getProfessionCatalog(professionId, lang = "en") {
       type: ref?.type || skill.type || "",
     };
   });
+
+  // Follow flip_skill chains for extra skills beyond one level.
+  // Needed for chains like Spear of Archemorus -> Urn of Saint Viktor -> Drop Urn of Saint Viktor.
+  let extraSkillsRaw = [...extraSkillsRawInitial];
+  const seenExtraSkillIds = new Set([
+    ...professionSkillsRaw.map((s) => s.id),
+    ...extraSkillsRaw.map((s) => s.id),
+  ]);
+  let extraFlipFrontier = dedupeNumbers(
+    extraSkillsRaw.map((s) => Number(s.flip_skill)).filter((id) => id && !seenExtraSkillIds.has(id))
+  );
+  while (extraFlipFrontier.length > 0) {
+    const extraFlipRaw = await fetchGw2ByIds("skills", extraFlipFrontier, lang);
+    if (!extraFlipRaw.length) break;
+    extraSkillsRaw = [...extraSkillsRaw, ...extraFlipRaw];
+    for (const s of extraFlipRaw) seenExtraSkillIds.add(s.id);
+    extraFlipFrontier = dedupeNumbers(
+      extraFlipRaw.map((s) => Number(s.flip_skill)).filter((id) => id && !seenExtraSkillIds.has(id))
+    );
+  }
 
   // Depth-2 weapon chain IDs (discoverable now that depth-1 extraSkillsRaw is available).
   const extraSkillIdSet = new Set(extraSkillIds);
@@ -706,15 +726,21 @@ async function getProfessionCatalog(professionId, lang = "en") {
       legendSkillsRaw = legendSkillIds.length
         ? await fetchGw2ByIds("skills", legendSkillIds, lang)
         : [];
-      // Also fetch flip_skill children of legend skills + hardcoded overrides (e.g. Elemental Blast).
-      const alreadyAfterLegend = new Set([...alreadyInSkills, ...legendSkillsRaw.map((s) => s.id)]);
-      const legendFlipIds = dedupeNumbers([
-        ...legendSkillsRaw.map((s) => Number(s.flip_skill)).filter((id) => id && !alreadyAfterLegend.has(id)),
-        ...[...LEGEND_FLIP_OVERRIDES.values()].filter((id) => !alreadyAfterLegend.has(id)),
-      ]);
-      if (legendFlipIds.length) {
-        const legendFlipRaw = await fetchGw2ByIds("skills", legendFlipIds, lang);
+      // Also fetch flip_skill descendants of legend skills + hardcoded overrides (e.g. Elemental Blast).
+      // Some legend skills chain more than one flip level (e.g. Urn of Saint Viktor -> Drop Urn).
+      const seenLegendSkillIds = new Set([...alreadyInSkills, ...legendSkillsRaw.map((s) => s.id)]);
+      let frontierFlipIds = dedupeNumbers([
+        ...legendSkillsRaw.map((s) => Number(s.flip_skill)).filter(Boolean),
+        ...[...LEGEND_FLIP_OVERRIDES.values()],
+      ]).filter((id) => !seenLegendSkillIds.has(id));
+      while (frontierFlipIds.length > 0) {
+        const legendFlipRaw = await fetchGw2ByIds("skills", frontierFlipIds, lang);
+        if (!legendFlipRaw.length) break;
         legendSkillsRaw = [...legendSkillsRaw, ...legendFlipRaw];
+        for (const s of legendFlipRaw) seenLegendSkillIds.add(s.id);
+        frontierFlipIds = dedupeNumbers(
+          legendFlipRaw.map((s) => Number(s.flip_skill)).filter((id) => id && !seenLegendSkillIds.has(id))
+        );
       }
       const legendSkillMap = new Map([
         ...[...professionSkillsRaw, ...extraSkillsRaw, ...morphPoolSkillsRaw, ...traitSkillsRaw, ...legendSkillsRaw].map((s) => [s.id, s]),
