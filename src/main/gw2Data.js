@@ -160,9 +160,6 @@ async function getProfessionCatalog(professionId, lang = "en") {
     [72103, 43], [72114, 43],
     // Alliance Tactics (Vindicator F3) — API says Profession_2 but in-game it's F3; spec=69.
     [62729, 69],
-    // Specter Shadow Shroud weapon skills — may have Profession_N slots in API; ensure spec=71
-    // so they're filtered out of profMechanics and only appear in the bundle weapon bar.
-    [63066, 71], [63351, 71], [63154, 71],
     // Specter Enter/Exit Shadow Shroud — ensure spec=71.
     [63155, 71], [63251, 71],
     // Antiquary (spec 77) profession mechanic skills — API returns spec=0 or null for these.
@@ -195,9 +192,6 @@ async function getProfessionCatalog(professionId, lang = "en") {
     [76580, "Profession_3"], // Weaver Air Attunement   (API wrongly says Profession_1)
     [77082, "Profession_4"], // Weaver Earth Attunement (API wrongly says Profession_1)
     [62729, "Profession_3"], // Alliance Tactics (Vindicator F3) — API says Profession_2, in-game is F3
-    // Shadow Shroud weapon skills — override to Weapon_N so they don't appear as standalone F slots.
-    // (In-shroud weapon skills; only shown in bundle weapon bar when Shadow Shroud is active.)
-    [63066, "Weapon_1"], [63351, "Weapon_2"], [63154, "Weapon_3"],
     // Conduit Release Potential variants — all have Profession_2 slot; slot override ensures correct placement.
     [78845, "Profession_2"], [78501, "Profession_2"], [78615, "Profession_2"],
     [78661, "Profession_2"], [78895, "Profession_2"],
@@ -243,11 +237,13 @@ async function getProfessionCatalog(professionId, lang = "en") {
   const LICH_FORM_FLIP_SKILLS = [45780]; // March of Undeath (flip of Ripple of Horror)
 
   // Shadow Shroud (Specter elite spec, spec 71) — Enter (63155) / Exit (63251) both sit at
-  // Profession_2. The GW2 API has no bundle_skills on the Enter skill; hardcode the 3 in-shroud
-  // weapon skills. Only 3 weapon slots in Shadow Shroud (W1-W3).
-  // Skills: Shadow Bolt (63066), Shadow Sap (63351), Triple Threat (63154).
+  // Profession_2. The GW2 API has no bundle_skills on the Enter skill; hardcode the in-shroud
+  // weapon skills so the active bundle shows full slots 1-5.
+  // Slots 2/3 include two API variants each; include both and let slot-based dedup choose one.
+  // Skills: Haunt Shot (63362), Grasping Shadows (63107/63167), Dawn's Repose (63220/63227),
+  //         Eternal Night (63160), Mind Shock (63249).
   const SHADOW_SHROUD_SKILL_ID = 63155;
-  const SHADOW_SHROUD_BUNDLE = [63066, 63351, 63154];
+  const SHADOW_SHROUD_BUNDLE = [63362, 63107, 63167, 63220, 63227, 63160, 63249];
 
   // Firebrand tome chapter skills — the GW2 public API does not expose these via bundle_skills
   // or any other field. Skill data sourced from community tools (GW2EI, discretize-ui).

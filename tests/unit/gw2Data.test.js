@@ -390,12 +390,11 @@ describe("KNOWN_SKILL_SPEC_OVERRIDES", () => {
       expect(skill.specialization).toBe(71);
     });
 
-    test("Shadow Shroud weapon skills (63066/63351/63154) get spec=71", async () => {
+    test("Shadow Shroud bundle weapon skills are present", async () => {
       const catalog = await gw2Data.getProfessionCatalog("Thief");
-      for (const id of [63066, 63351, 63154]) {
+      for (const id of [63362, 63107, 63167, 63220, 63227, 63160, 63249]) {
         const skill = findSkill(catalog, id);
         expect(skill).toBeTruthy();
-        expect(skill.specialization).toBe(71);
       }
     });
 
@@ -521,28 +520,38 @@ describe("KNOWN_SKILL_SLOT_OVERRIDES", () => {
     });
   });
 
-  describe("Thief — Shadow Shroud weapon skill slot corrections", () => {
+  describe("Thief — Shadow Shroud weapon skill slots", () => {
     beforeEach(() => { freshLoad(); global.fetch = createGw2MockFetch(); });
 
-    test("Shadow Bolt (63066) slot overridden to Weapon_1", async () => {
+    test("Haunt Shot (63362) has Weapon_1 slot", async () => {
       const catalog = await gw2Data.getProfessionCatalog("Thief");
-      const skill = findSkill(catalog, 63066);
+      const skill = findSkill(catalog, 63362);
       expect(skill).toBeTruthy();
       expect(skill.slot).toBe("Weapon_1");
     });
 
-    test("Shadow Sap (63351) slot overridden to Weapon_2", async () => {
+    test("Grasping Shadows (63107) has Weapon_2 slot", async () => {
       const catalog = await gw2Data.getProfessionCatalog("Thief");
-      const skill = findSkill(catalog, 63351);
+      const skill = findSkill(catalog, 63107);
       expect(skill).toBeTruthy();
       expect(skill.slot).toBe("Weapon_2");
     });
 
-    test("Triple Threat (63154) slot overridden to Weapon_3", async () => {
+    test("Dawn's Repose (63220) has Weapon_3 slot", async () => {
       const catalog = await gw2Data.getProfessionCatalog("Thief");
-      const skill = findSkill(catalog, 63154);
+      const skill = findSkill(catalog, 63220);
       expect(skill).toBeTruthy();
       expect(skill.slot).toBe("Weapon_3");
+    });
+
+    test("Eternal Night (63160) and Mind Shock (63249) fill Weapon_4/Weapon_5", async () => {
+      const catalog = await gw2Data.getProfessionCatalog("Thief");
+      const skill4 = findSkill(catalog, 63160);
+      const skill5 = findSkill(catalog, 63249);
+      expect(skill4).toBeTruthy();
+      expect(skill4.slot).toBe("Weapon_4");
+      expect(skill5).toBeTruthy();
+      expect(skill5.slot).toBe("Weapon_5");
     });
   });
 });
@@ -705,22 +714,28 @@ describe("Bundle assignments — Thief (Shadow Shroud)", () => {
   beforeEach(() => { freshLoad(); global.fetch = createGw2MockFetch(); });
   afterEach(() => { delete global.fetch; });
 
-  test("Enter Shadow Shroud (63155) has bundleSkills = [63066, 63351, 63154]", async () => {
+  test("Enter Shadow Shroud (63155) has bundleSkills with slots 1-5", async () => {
     const catalog = await gw2Data.getProfessionCatalog("Thief");
     const skill = findSkill(catalog, 63155);
     expect(skill).toBeTruthy();
-    expect(skill.bundleSkills).toEqual([63066, 63351, 63154]);
+    expect(skill.bundleSkills).toEqual([63362, 63107, 63167, 63220, 63227, 63160, 63249]);
   });
 
-  test("Shadow Shroud bundle has exactly 3 weapon skills", async () => {
+  test("Shadow Shroud bundle covers all 5 weapon slots", async () => {
     const catalog = await gw2Data.getProfessionCatalog("Thief");
     const skill = findSkill(catalog, 63155);
-    expect(skill.bundleSkills).toHaveLength(3);
+    const slotSet = new Set(
+      skill.bundleSkills
+        .map((id) => findSkill(catalog, id))
+        .filter(Boolean)
+        .map((s) => s.slot)
+    );
+    expect(slotSet).toEqual(new Set(["Weapon_1", "Weapon_2", "Weapon_3", "Weapon_4", "Weapon_5"]));
   });
 
   test("Shadow Shroud weapon skills appear in catalog", async () => {
     const catalog = await gw2Data.getProfessionCatalog("Thief");
-    for (const id of [63066, 63351, 63154]) {
+    for (const id of [63362, 63107, 63167, 63220, 63227, 63160, 63249]) {
       expect(findSkill(catalog, id)).toBeTruthy();
     }
   });

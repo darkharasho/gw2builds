@@ -598,10 +598,14 @@ const MOCK_SKILLS = {
   76816: makeSkill(76816, { name: "Chak Shield",             slot: "Profession_2", type: "Profession", specialization: 0, professions: ["Thief"] }),
   76909: makeSkill(76909, { name: "Unstable Skritt Bomb",    slot: "Profession_2", type: "Profession", specialization: 0, professions: ["Thief"] }),
 
-  // Shadow Shroud weapon skills
-  63066: makeSkill(63066, { name: "Shadow Bolt",   slot: "Weapon_1", type: "Weapon", specialization: 71, professions: ["Thief"] }),
-  63351: makeSkill(63351, { name: "Shadow Sap",    slot: "Weapon_2", type: "Weapon", specialization: 71, professions: ["Thief"] }),
-  63154: makeSkill(63154, { name: "Triple Threat", slot: "Weapon_3", type: "Weapon", specialization: 71, professions: ["Thief"] }),
+  // Shadow Shroud weapon skills (current 5-slot bundle)
+  63362: makeSkill(63362, { name: "Haunt Shot",        slot: "Weapon_1", type: "Weapon", weapon_type: "Staff", specialization: 0, professions: ["Thief"] }),
+  63107: makeSkill(63107, { name: "Grasping Shadows",  slot: "Weapon_2", type: "Weapon", weapon_type: "Staff", specialization: 0, professions: ["Thief"] }),
+  63167: makeSkill(63167, { name: "Grasping Shadows",  slot: "Weapon_2", type: "Weapon", weapon_type: "Staff", specialization: 0, professions: ["Thief"] }),
+  63220: makeSkill(63220, { name: "Dawn's Repose",     slot: "Weapon_3", type: "Weapon", weapon_type: "Staff", specialization: 0, professions: ["Thief"] }),
+  63227: makeSkill(63227, { name: "Dawn's Repose",     slot: "Weapon_3", type: "Weapon", weapon_type: "Staff", specialization: 0, professions: ["Thief"] }),
+  63160: makeSkill(63160, { name: "Eternal Night",     slot: "Weapon_4", type: "Weapon", weapon_type: "Staff", specialization: 0, professions: ["Thief"] }),
+  63249: makeSkill(63249, { name: "Mind Shock",        slot: "Weapon_5", type: "Weapon", weapon_type: "Staff", specialization: 0, professions: ["Thief"] }),
 
   // ---- Elementalist ----
   5504:  makeSkill(5504,  { name: "Glyph of Elemental Harmony", slot: "Heal",    type: "Heal",    professions: ["Elementalist"] }),
