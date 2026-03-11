@@ -1198,10 +1198,11 @@ label {
   padding-left: 40px; /* align over weapon icons, past swap button (34px + 6px gap) */
 }
 
-/* When legend stack sits left of mechBar, no extra padding needed — legend stack provides offset */
-.skills-bar__mech-area > .profession-mechanics-bar {
-  padding-left: 0;
+/* Revenant: push first elite F slot (F2+) to align above slot 3, past the legend F1 stack */
+.profession-mechanics-bar .legend-stack + * {
+  margin-left: 94px;
 }
+
 
 .skill-icon--profession {
   position: relative;
@@ -1319,24 +1320,18 @@ label {
   color: #fff;
 }
 
-/* Revenant legend stack — sits to the left of the mechBar */
-.skills-bar__mech-area {
-  display: flex;
-  align-items: flex-end;
-  gap: 4px;
-}
 
 .legend-stack {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 4px;
   align-items: center;
 }
 
 .legend-slot-btn {
   position: relative;
-  width: 42px;
-  height: 42px;
+  width: 36px;
+  height: 36px;
   border: 2px solid rgba(160, 120, 60, 0.6);
   border-radius: 3px;
   background: rgba(4, 12, 22, 0.85);
@@ -1930,6 +1925,17 @@ label {
   height: 18px;
   flex-shrink: 0;
   border-radius: 2px;
+}
+
+.fact-section-header {
+  color: #8ab4e8;
+  font-style: italic;
+}
+
+.fact-item--section {
+  margin-top: 6px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(74, 113, 170, 0.25);
 }
 
 .hover-preview__chain-divider {

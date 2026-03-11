@@ -107,6 +107,42 @@ async function getProfessionCatalog(professionId, lang = "en") {
     weaponSkillsBase.map((s) => Number(s.flip_skill)).filter((id) => id && !weaponSkillIdSet.has(id))
   );
 
+  // Skill description patches for skills the GW2 API returns with missing/empty description.
+  const KNOWN_SKILL_DESCRIPTION_OVERRIDES = new Map([
+    [78661, "Slam your scythe down, creating a shock wave that damages enemies in front of you. This skill gains bonus effects based on the other legend equipped in your other slot. For each point of affinity, deal additional damage and gain another bonus effect from a legend you don't have equipped (gain all effects at three affinity or higher)."],
+  ]);
+
+  // Render CDN icon URLs for standard GW2 skill fact types.
+  const _IC = "https://render.guildwars2.com/file";
+  const FACT_ICONS = {
+    damage:   `${_IC}/61AA4919C4A7990903241B680A69530121E994C7/156657.png`,
+    targets:  `${_IC}/BBE8191A494B0352259C10EADFDACCE177E6DA5B/1770208.png`,
+    number:   `${_IC}/9352ED3244417304995F26CB01AE76BB7E547052/156661.png`,
+    radius:   `${_IC}/B0CD8077991E4FB1622D2930337ED7F9B54211D5/156665.png`,
+    percent:  `${_IC}/AAB7C5387A08367C2F023F19FEE70E1556AD4375/1770202.png`,
+  };
+
+  // Fact list patches for skills the GW2 API returns with missing or incomplete facts.
+  // Durations are in seconds (matching GW2 API fact format). Icons use render CDN URLs.
+  const KNOWN_SKILL_FACTS_OVERRIDES = new Map([
+    [78661, [
+      { type: "Damage",   text: "Damage",                       icon: FACT_ICONS.damage,  dmg_multiplier: 1.98, hit_count: 1 },
+      { type: "Percent",  text: "Damage increase per Affinity", icon: FACT_ICONS.percent, percent: 10 },
+      { type: "Number",   text: "Number of Targets",            icon: FACT_ICONS.targets, value: 5 },
+      { type: "Distance", text: "Radius",                       icon: FACT_ICONS.radius,  distance: 240 },
+      { type: "NoData",   text: "Legendary Assassin Stance: Remove boons from enemies struck." },
+      { type: "Number",   text: "Boons Removed",                icon: FACT_ICONS.number,  value: 3 },
+      { type: "NoData",   text: "Legendary Demon Stance: Apply conditions to enemies struck." },
+      { type: "ApplyBuffCondition", text: "Bleeding", status: "Bleeding", apply_count: 3, duration: 6 },
+      { type: "NoData",   text: "Legendary Centaur Stance: Apply boons to allies around you if an enemy is struck." },
+      { type: "Buff",     text: "Might",                        status: "Might", apply_count: 10, duration: 8 },
+      { type: "Buff",     text: "Fury",                         status: "Fury",  duration: 8 },
+      { type: "Number",   text: "Number of allied targets",     icon: FACT_ICONS.targets, value: 5 },
+      { type: "NoData",   text: "Legendary Dwarf Stance: Gain barrier if an enemy is struck." },
+      { type: "Number",   text: "Barrier",                      icon: FACT_ICONS.number,  value: 1292 },
+    ]],
+  ]);
+
   // Some GW2 skills have specialization: null in /v2/skills despite belonging to an elite spec,
   // or their spec is inconsistent between API endpoints. Override the specialization for known skills.
   const KNOWN_SKILL_SPEC_OVERRIDES = new Map([
@@ -122,6 +158,12 @@ async function getProfessionCatalog(professionId, lang = "en") {
     // but /v2/skills correctly returns spec=43 (Scrapper). Without override, they could appear at
     // Holosmith's F5 slot instead of Photon Forge (42938).
     [72103, 43], [72114, 43],
+    // Alliance Tactics (Vindicator F3) — both forms; ensure spec=69 (Vindicator) is set.
+    [62749, 69], [62891, 69],
+    // Conduit (spec 79) Release Potential variants — one per legend (API may return spec=0 or wrong spec).
+    [78845, 79], [78501, 79], [78615, 79], [78661, 79], [78895, 79],
+    // Conduit F3 Cosmic Wisdom — ensure spec=79.
+    [77371, 79],
   ]);
 
   // The GW2 profession API assigns incorrect slot values to Weaver's 4 attunement button skills.
@@ -132,6 +174,13 @@ async function getProfessionCatalog(professionId, lang = "en") {
     [76988, "Profession_2"], // Weaver Water Attunement (API wrongly says Profession_1)
     [76580, "Profession_3"], // Weaver Air Attunement   (API wrongly says Profession_1)
     [77082, "Profession_4"], // Weaver Earth Attunement (API wrongly says Profession_1)
+    [62749, "Profession_3"], // Alliance Tactics Kurzick form (Vindicator F3) — ensure correct slot
+    [62891, "Profession_3"], // Alliance Tactics Luxon form (Vindicator F3) — same slot
+    // Conduit Release Potential variants — all have Profession_2 slot; slot override ensures correct placement.
+    [78845, "Profession_2"], [78501, "Profession_2"], [78615, "Profession_2"],
+    [78661, "Profession_2"], [78895, "Profession_2"],
+    // Conduit Cosmic Wisdom — Profession_3 slot.
+    [77371, "Profession_3"],
   ]);
 
   // Photon Forge (skill 42938) has no bundle_skills in the GW2 API, but in-game it grants
@@ -353,6 +402,11 @@ async function getProfessionCatalog(professionId, lang = "en") {
     // Elixir X (5832) keeps Detonate Elixir X (29722) — no Toss Elixir X exists.
   ]);
 
+  // GW2 API omits flip_skill for Facet of Elements (27014); hardcode the missing link.
+  const LEGEND_FLIP_OVERRIDES = new Map([
+    [27014, 27162], // Facet of Elements → Elemental Blast
+  ]);
+
   // Step 3: compute extraSkillIds from raw API data and fetch traits + extra skills in parallel.
   // extraSkillIds only uses toolbelt_skill/flip_skill/bundle_skills/transform_skills — fields that
   // come directly from the GW2 API and are unaffected by the profSkillRefs/traitSkillTagMap merge.
@@ -372,6 +426,9 @@ async function getProfessionCatalog(professionId, lang = "en") {
     ...(professionId === "Guardian" ? [...RADIANT_FORGE_BUNDLE, ...RADIANT_FORGE_FLIP_SKILLS] : []),
     // Include flip_skills of Death Shroud and Lich Form transform children (not auto-fetched).
     ...(professionId === "Necromancer" ? [...DEATH_SHROUD_FLIP_SKILLS, ...LICH_FORM_FLIP_SKILLS] : []),
+    // Alliance Tactics forms (Vindicator F3) — ensure both are fetched.
+    // Conduit Release Potential variants (F2, one per legend) + Cosmic Wisdom (F3) — ensure all are fetched.
+    ...(professionId === "Revenant" ? [62749, 62891, 78845, 78501, 78615, 78661, 78895, 77371] : []),
     // Weapon auto-attack chain continuations (depth 1): merged here to avoid an extra round-trip.
     ...weaponChainDepth1Ids,
   ]);
@@ -575,8 +632,8 @@ async function getProfessionCatalog(professionId, lang = "en") {
       id: skill.id,
       name: skill.name || "",
       icon: skill.icon || "",
-      description: skill.description || "",
-      slot: skill.slot || "",
+      description: KNOWN_SKILL_DESCRIPTION_OVERRIDES.get(skill.id) || skill.description || "",
+      slot: KNOWN_SKILL_SLOT_OVERRIDES.get(skill.id) || skill.slot || "",
       type: skill.type || "",
       specialization: specId,
       professions: Array.isArray(skill.professions) ? skill.professions : [],
@@ -584,9 +641,9 @@ async function getProfessionCatalog(professionId, lang = "en") {
       attunement,
       dualWield,
       categories: Array.isArray(skill.categories) ? skill.categories : [],
-      facts: Array.isArray(skill.facts) ? skill.facts : [],
+      facts: KNOWN_SKILL_FACTS_OVERRIDES.get(skill.id) || (Array.isArray(skill.facts) ? skill.facts : []),
       toolbeltSkill: ELIXIR_TOOLBELT_OVERRIDES.get(skill.id) || Number(skill.toolbelt_skill) || 0,
-      flipSkill: Number(skill.flip_skill) || 0,
+      flipSkill: LEGEND_FLIP_OVERRIDES.get(skill.id) || Number(skill.flip_skill) || 0,
       bundleSkills,
     };
   }
@@ -609,6 +666,16 @@ async function getProfessionCatalog(professionId, lang = "en") {
       legendSkillsRaw = legendSkillIds.length
         ? await fetchGw2ByIds("skills", legendSkillIds, lang)
         : [];
+      // Also fetch flip_skill children of legend skills + hardcoded overrides (e.g. Elemental Blast).
+      const alreadyAfterLegend = new Set([...alreadyInSkills, ...legendSkillsRaw.map((s) => s.id)]);
+      const legendFlipIds = dedupeNumbers([
+        ...legendSkillsRaw.map((s) => Number(s.flip_skill)).filter((id) => id && !alreadyAfterLegend.has(id)),
+        ...[...LEGEND_FLIP_OVERRIDES.values()].filter((id) => !alreadyAfterLegend.has(id)),
+      ]);
+      if (legendFlipIds.length) {
+        const legendFlipRaw = await fetchGw2ByIds("skills", legendFlipIds, lang);
+        legendSkillsRaw = [...legendSkillsRaw, ...legendFlipRaw];
+      }
       const legendSkillMap = new Map([
         ...[...professionSkillsRaw, ...extraSkillsRaw, ...morphPoolSkillsRaw, ...traitSkillsRaw, ...legendSkillsRaw].map((s) => [s.id, s]),
       ]);

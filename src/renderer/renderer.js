@@ -477,12 +477,36 @@ function enforceEditorConsistency(options = {}) {
   const isRevenant = Array.isArray(catalog.legends) && catalog.legends.length > 0;
   if (isRevenant) {
     if (!state.editor.selectedLegends) state.editor.selectedLegends = ["", ""];
-    // Default to first two legends if none selected
-    if (!state.editor.selectedLegends[0] && catalog.legends[0]) {
-      state.editor.selectedLegends[0] = catalog.legends[0].id;
+    // Clear legends that require an elite spec the player no longer has
+    const selectedSpecIds = new Set(
+      (state.editor.specializations || []).map((s) => Number(s?.specializationId) || 0).filter(Boolean)
+    );
+    const isLegendValid = (legendId) => {
+      if (!legendId) return false;
+      const legend = catalog.legendById.get(legendId);
+      if (!legend) return false;
+      const swapSkill = legend.swap ? catalog.skillById.get(legend.swap) : null;
+      const reqSpec = Number(swapSkill?.specialization) || 0;
+      return !reqSpec || selectedSpecIds.has(reqSpec);
+    };
+    if (!isLegendValid(state.editor.selectedLegends[0])) state.editor.selectedLegends[0] = "";
+    if (!isLegendValid(state.editor.selectedLegends[1])) state.editor.selectedLegends[1] = "";
+    // Reset Alliance form if Alliance legend is no longer selected
+    const allianceSelected = state.editor.selectedLegends[0] === "Legend7" || state.editor.selectedLegends[1] === "Legend7";
+    if (!allianceSelected) state.editor.allianceTacticsForm = 0;
+    // Default to first two valid legends if none selected
+    const validLegends = (catalog.legends || []).filter((l) => {
+      const swapSkill = l.swap ? catalog.skillById.get(l.swap) : null;
+      const reqSpec = Number(swapSkill?.specialization) || 0;
+      return !reqSpec || selectedSpecIds.has(reqSpec);
+    });
+    if (!state.editor.selectedLegends[0]) {
+      const pick = validLegends.find((l) => l.id !== state.editor.selectedLegends[1]);
+      if (pick) state.editor.selectedLegends[0] = pick.id;
     }
-    if (!state.editor.selectedLegends[1] && catalog.legends[1]) {
-      state.editor.selectedLegends[1] = catalog.legends[1].id;
+    if (!state.editor.selectedLegends[1]) {
+      const pick = validLegends.find((l) => l.id !== state.editor.selectedLegends[0]);
+      if (pick) state.editor.selectedLegends[1] = pick.id;
     }
     syncRevenantSkillsFromLegend(catalog);
   } else {
@@ -901,6 +925,18 @@ function renderBuildList() {
   }
 }
 
+// Conduit (spec 79) F2 — Release Potential variant to show based on the active legend.
+// Keyed by the legend's swap skill ID (stable, confirmed values) rather than legend IDs
+// (Legend1-8) which may not reliably map to stances across API versions.
+// Each stance has two known swap skill IDs (active/inactive forms); both map to the same variant.
+const CONDUIT_F2_BY_SWAP = new Map([
+  [27659, 78845], [28134, 78845], // Legendary Assassin Stance → Release Potential: Assassin
+  [26650, 78895], [28419, 78895], // Legendary Dwarf Stance    → Release Potential: Warrior
+  [28376, 78615], [28494, 78615], // Legendary Demon Stance    → Release Potential: Mesmer
+  [28141, 78501], [28195, 78501], // Legendary Centaur Stance  → Release Potential: Monk
+  [76610, 78661],                 // Legendary Entity Stance   → Release Potential: Dervish
+]);
+
 const STAT_COMBOS = [
   { label: "Berserker's",   stats: ["Power", "Precision", "Ferocity"] },
   { label: "Marauder's",    stats: ["Power", "Precision", "Vitality", "Ferocity"] },
@@ -1305,13 +1341,27 @@ function openSlotPicker(anchorEl, currentValue, onSelect, { items = null, search
 
   const onOutside = (e) => { if (!picker.contains(e.target) && !anchorEl.contains(e.target)) closeSlotPicker(); };
   const onEsc = (e) => { if (e.key === "Escape") closeSlotPicker(); };
+  // Prevent the page from scrolling when the wheel is used over the picker.
+  // If the event is over the scrollable list, only block when the list is already at its scroll limit.
+  picker.addEventListener("wheel", (e) => {
+    const inList = list.contains(e.target);
+    if (inList) {
+      const atTop = list.scrollTop === 0 && e.deltaY < 0;
+      const atBottom = list.scrollTop + list.clientHeight >= list.scrollHeight - 1 && e.deltaY > 0;
+      if (!atTop && !atBottom) return;
+    }
+    e.preventDefault();
+  }, { passive: false });
+  const onOutsideWheel = (e) => { if (!picker.contains(e.target)) closeSlotPicker(); };
   setTimeout(() => {
     document.addEventListener("pointerdown", onOutside);
     document.addEventListener("keydown", onEsc);
+    document.addEventListener("wheel", onOutsideWheel, { capture: true, passive: true });
   }, 0);
   _slotPickerCleanup = () => {
     document.removeEventListener("pointerdown", onOutside);
     document.removeEventListener("keydown", onEsc);
+    document.removeEventListener("wheel", onOutsideWheel, { capture: true });
   };
 }
 
@@ -2782,42 +2832,57 @@ function renderSkills() {
     const staticF5 = eliteFixedSkills.find((s) => s.slot === "Profession_5");
     if (staticF5) mechSlots.push({ skill: staticF5, sourceId: 0, isStatic: true, isSelectable: false });
   } else if (Array.isArray(catalog.legends) && catalog.legends.length > 0) {
-    // Revenant: F1 = active legend swap, subsequent slots from elite spec or inactive legend swap.
-    // Elite spec skills (Renegade F2/F3/F4, Vindicator F2, etc.) take priority over the inactive
-    // legend swap. If no elite spec occupies Profession_2, the inactive legend's swap goes there.
+    // Revenant: F1 is SHARED between both legend stances (clicking either swaps to it).
+    // The legend stack UI (left of mechBar) handles F1; mechBar only shows elite spec skills F2+.
+    // Elite spec skills: Renegade F2/F3/F4, Vindicator F2, Herald F2+ etc.
+    // Core Revenant has no mechBar slots — just the two F1 legend stack buttons.
     const legendSlots = state.editor.selectedLegends || ["", ""];
     const activeLegendSlot = Number(state.editor.activeLegendSlot) || 0;
     const activeLegendId = legendSlots[activeLegendSlot] || "";
-    const inactiveLegendId = legendSlots[1 - activeLegendSlot] || "";
     const activeLegend = activeLegendId ? catalog.legendById.get(activeLegendId) : null;
-    const inactiveLegend = inactiveLegendId ? catalog.legendById.get(inactiveLegendId) : null;
-
-    const activeSwapSkill = activeLegend?.swap ? catalog.skillById.get(activeLegend.swap) : null;
-    const inactiveSwapSkill = inactiveLegend?.swap ? catalog.skillById.get(inactiveLegend.swap) : null;
+    const isAllianceLegendActive = activeLegendId === "Legend7";
+    const allianceTacticsForm = Number(state.editor.allianceTacticsForm) || 0; // 0=Archemorus, 1=Saint Viktor
 
     // Build a lookup of elite spec skills by Profession_N slot
     const eliteByProfSlot = new Map(eliteFixedSkills.map((s) => [s.slot, s]));
 
-    mechSlots = [
-      { skill: activeSwapSkill, sourceId: activeSwapSkill?.id || 0, isStatic: true, isSelectable: false },
-    ];
-    for (let n = 2; n <= 5; n++) {
-      const slotKey = `Profession_${n}`;
-      const eliteSkill = eliteByProfSlot.get(slotKey);
-      if (eliteSkill) {
-        mechSlots.push({ skill: eliteSkill, sourceId: eliteSkill.id, isStatic: true, isSelectable: false });
-      } else if (n === 2 && inactiveSwapSkill) {
-        // Core/Herald: inactive legend swap lives at Profession_2 when no elite spec overrides it
-        mechSlots.push({ skill: inactiveSwapSkill, sourceId: inactiveSwapSkill.id, isStatic: true, isSelectable: false });
-        break;
-      } else {
-        break;
+    mechSlots = [];
+    if (eliteSpecId > 0) {
+      for (let n = 2; n <= 5; n++) {
+        const slotKey = `Profession_${n}`;
+        const eliteSkill = eliteByProfSlot.get(slotKey);
+        if (!eliteSkill) continue; // skip gaps (e.g. Vindicator has no Profession_2)
+        // Alliance Tactics (F3, 62749/62891): only show when Legendary Alliance is the active legend.
+        const isAllianceTactics = eliteSkill.id === 62749 || eliteSkill.id === 62891;
+        if (isAllianceTactics && !isAllianceLegendActive) continue;
+        // For Alliance Tactics, show the form's skill based on allianceTacticsForm state.
+        let displaySkill = eliteSkill;
+        if (isAllianceTactics && allianceTacticsForm === 1 && eliteSkill.flipSkill) {
+          displaySkill = catalog.skillById.get(eliteSkill.flipSkill) || eliteSkill;
+        }
+        // Conduit (spec 79) F2 — Release Potential: pick the variant matching the active legend.
+        // Look up by the legend's swap skill ID (stable) rather than the legend's string ID.
+        if (eliteSpecId === 79 && slotKey === "Profession_2") {
+          const activeLegendSwap = activeLegend?.swap || 0;
+          const f2Id = activeLegendSwap ? CONDUIT_F2_BY_SWAP.get(activeLegendSwap) : null;
+          displaySkill = (f2Id && catalog.skillById.get(f2Id)) || eliteSkill;
+        }
+        mechSlots.push({ skill: displaySkill, sourceId: eliteSkill.id, isStatic: true, isSelectable: false, fKeyLabel: `F${n}`, isAllianceTactics });
       }
     }
 
     // Override skill option lists so they show this legend's fixed skills (not free-choice catalog).
+    // For Alliance legend in Luxon form, map skills through their flipSkill to show support variants.
     if (activeLegend) {
-      const ls = (id) => (id ? catalog.skillById.get(id) : null);
+      const ls = (id) => {
+        if (!id) return null;
+        const skill = catalog.skillById.get(id);
+        if (!skill) return null;
+        if (isAllianceLegendActive && allianceTacticsForm === 1 && skill.flipSkill) {
+          return catalog.skillById.get(skill.flipSkill) || skill;
+        }
+        return skill;
+      };
       options.heal = [ls(activeLegend.heal)].filter(Boolean);
       options.utility = (activeLegend.utilities || []).map(ls).filter(Boolean);
       options.elite = [ls(activeLegend.elite)].filter(Boolean);
@@ -3043,13 +3108,14 @@ function renderSkills() {
   let f5SlotEl = null;
 
   // Always create the mechBar for Ranger (even core Ranger with empty mechSlots) so the
-  // pet selector panel can be shown. For all other professions, require at least one skill.
-  if (isRanger || (mechSlots.length > 0 && mechSlots.some((s) => s.skill || s.isSelectable))) {
+  // pet selector panel can be shown. Same for Revenant so the legend stack is always rendered.
+  const isRevenant = Array.isArray(catalog.legends) && catalog.legends.length > 0;
+  if (isRanger || isRevenant || (mechSlots.length > 0 && mechSlots.some((s) => s.skill || s.isSelectable))) {
     const mechBar = document.createElement("div");
     mechBar.className = "profession-mechanics-bar";
 
     for (let fIdx = 0; fIdx < mechSlots.length; fIdx++) {
-      const { skill, sourceId, sourceSkill, isStatic, isSelectable, morphIndex, mechIconOverride, fakeCommand, isBeastmodeToggle, leaveIcon, fKeyLabel, isF5AboveOrb } = mechSlots[fIdx];
+      const { skill, sourceId, sourceSkill, isStatic, isSelectable, morphIndex, mechIconOverride, fakeCommand, isBeastmodeToggle, leaveIcon, fKeyLabel, isF5AboveOrb, isAllianceTactics } = mechSlots[fIdx];
       const slotEl = document.createElement("div");
       slotEl.className = "skill-slot";
       const iconBtn = document.createElement("button");
@@ -3068,6 +3134,8 @@ function renderSkills() {
         // Amalgam morph slot — always interactive, never "active" in the attunement/kit sense
       } else if (!isStatic && isToolbelt) {
         isActive = isKit && resolvedKit === sourceId;
+      } else if (isAllianceTactics) {
+        isActive = (Number(state.editor.allianceTacticsForm) || 0) === 1;
       } else if (isStatic && ((skill?.bundleSkills?.length ?? 0) > 0 || isBeastmodeToggle)) {
         // Static bundle skills: shroud, celestial avatar, Photon Forge, beastmode, etc.
         isActive = resolvedKit === skill?.id;
@@ -3139,6 +3207,14 @@ function renderSkills() {
       fLabel.textContent = fKeyLabel || `F${fIdx + 1}`;
       iconBtn.append(fLabel);
 
+      // Alliance Tactics F3 gets a toggle badge to show it's clickable.
+      if (isAllianceTactics) {
+        const toggleBadge = document.createElement("span");
+        toggleBadge.className = "kit-toggle-indicator" + (isActive ? " kit-toggle-indicator--active" : "");
+        toggleBadge.textContent = isActive ? "✕" : "▸";
+        iconBtn.append(toggleBadge);
+      }
+
       // Static kit slots (tomes, Photon Forge, shrouds) get a toggle badge bottom-right.
       if (isKit && isStatic) {
         const toggleBadge = document.createElement("span");
@@ -3189,6 +3265,14 @@ function renderSkills() {
         if (skill) iconBtn.addEventListener("click", () => selectDetail("skill", skill));
       } else {
         iconBtn.addEventListener("click", () => {
+          if (isAllianceTactics) {
+            state.editor.allianceTacticsForm = (Number(state.editor.allianceTacticsForm) || 0) === 0 ? 1 : 0;
+            syncRevenantSkillsFromLegend(catalog);
+            markEditorChanged();
+            renderSkills();
+            if (skill) selectDetail("skill", skill);
+            return;
+          }
           if (isStatic && ((skill?.bundleSkills?.length ?? 0) > 0 || isBeastmodeToggle)) {
             // Static bundle skill (shroud, Photon Forge, beastmode, etc.): toggle active state.
             state.editor.activeKit = resolvedKit === skill.id ? 0 : skill.id;
@@ -3266,7 +3350,8 @@ function renderSkills() {
       mechBar.append(spacer, petWrapper, petSwapBtn);
     }
 
-    // Revenant: build a legend stack to the LEFT of the mechBar
+    // Revenant: prepend legend buttons into mechBar so they sit inline before any F2+ elite slots.
+    // This avoids a separate wrapper div that would stretch to full column width.
     if (Array.isArray(catalog.legends) && catalog.legends.length > 0) {
       const legendSlots = state.editor.selectedLegends || ["", ""];
       const activeLegendSlot = Number(state.editor.activeLegendSlot) || 0;
@@ -3283,13 +3368,13 @@ function renderSkills() {
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "legend-slot-btn" + (isActive ? " legend-slot-btn--active" : "");
-        btn.title = legendName + (isActive ? " (active)" : " — click to activate, right-click to change");
+        btn.title = legendName + (isActive ? " (active — right-click to change)" : " — click to swap, right-click to change");
         if (legendIcon) {
           btn.innerHTML = `<img src="${escapeHtml(legendIcon)}" alt="${escapeHtml(legendName)}" />`;
         }
         const slotLabel = document.createElement("span");
         slotLabel.className = "legend-slot-btn__label";
-        slotLabel.textContent = isActive ? "F1" : "F2";
+        slotLabel.textContent = "F1";
         btn.append(slotLabel);
         btn.addEventListener("click", () => {
           if (isActive || !legendId) {
@@ -3297,6 +3382,8 @@ function renderSkills() {
           } else {
             if (!state.editor.selectedLegends) state.editor.selectedLegends = ["", ""];
             state.editor.activeLegendSlot = slotIdx;
+            // Reset Alliance form when switching to a non-Alliance legend
+            if (legendId !== "Legend7") state.editor.allianceTacticsForm = 0;
             syncRevenantSkillsFromLegend(catalog);
             markEditorChanged();
             renderSkills();
@@ -3309,13 +3396,9 @@ function renderSkills() {
         legendStack.append(btn);
       }
 
-      const mechArea = document.createElement("div");
-      mechArea.className = "skills-bar__mech-area";
-      mechArea.append(legendStack, mechBar);
-      weaponCol.append(mechArea);
-    } else {
-      weaponCol.append(mechBar);
+      mechBar.prepend(legendStack);
     }
+    weaponCol.append(mechBar);
   }
 
   const swapBtn = document.createElement("button");
@@ -3382,11 +3465,17 @@ function renderSkills() {
 function openLegendPicker(anchorEl, slotIdx, catalog) {
   const legendSlots = state.editor.selectedLegends || ["", ""];
   const otherLegendId = legendSlots[1 - slotIdx] || "";
+  const selectedSpecIds = new Set(
+    (state.editor.specializations || []).map((s) => Number(s?.specializationId) || 0).filter(Boolean)
+  );
   const items = [
     { value: "", label: "— None —" },
-    ...(catalog.legends || []).map((l) => {
+    ...(catalog.legends || []).flatMap((l) => {
       const swapSkill = l.swap ? catalog.skillById.get(l.swap) : null;
-      return { value: l.id, label: swapSkill?.name || l.id, icon: swapSkill?.icon || "" };
+      // Elite-spec-only legends: swap skill has a non-zero specialization requirement
+      const reqSpec = Number(swapSkill?.specialization) || 0;
+      if (reqSpec && !selectedSpecIds.has(reqSpec)) return [];
+      return [{ value: l.id, label: swapSkill?.name || l.id, icon: swapSkill?.icon || "" }];
     }).filter((item) => item.value !== otherLegendId),
   ];
   openSlotPicker(anchorEl, legendSlots[slotIdx] || "", (newVal) => {
@@ -3426,12 +3515,22 @@ function syncRevenantSkillsFromLegend(catalog) {
   const activeLegend = activeLegendId ? catalog.legendById.get(activeLegendId) : null;
   if (!activeLegend) return;
   if (!state.editor.skills) state.editor.skills = { healId: 0, utilityIds: [0, 0, 0], eliteId: 0 };
-  state.editor.skills.healId = activeLegend.heal || 0;
+  // Alliance legend: apply Saint Viktor (Luxon) flip skills when form=1
+  const useFlip = activeLegendId === "Legend7" && (Number(state.editor.allianceTacticsForm) || 0) === 1;
+  const resolveId = (id) => {
+    if (!id) return 0;
+    if (useFlip) {
+      const skill = catalog.skillById.get(id);
+      return skill?.flipSkill || id;
+    }
+    return id;
+  };
+  state.editor.skills.healId = resolveId(activeLegend.heal) || 0;
   state.editor.skills.utilityIds = [
-    ...(activeLegend.utilities || []).slice(0, 3),
+    ...(activeLegend.utilities || []).slice(0, 3).map(resolveId),
     ...Array(3).fill(0),
   ].slice(0, 3);
-  state.editor.skills.eliteId = activeLegend.elite || 0;
+  state.editor.skills.eliteId = resolveId(activeLegend.elite) || 0;
 }
 
 function renderDetailPanel() {
@@ -3441,7 +3540,7 @@ function renderDetailPanel() {
     return;
   }
 
-  const facts = Array.isArray(detail.facts) ? detail.facts.slice(0, 6) : [];
+  const facts = Array.isArray(detail.facts) ? detail.facts.slice(0, 16) : [];
   const detailDmgStats = (() => {
     if (detail.kindLabel === "Trait") return null;
     const computed = computeEquipmentStats();
@@ -3458,7 +3557,10 @@ function renderDetailPanel() {
   })();
   const factsHtml = facts.length
     ? facts
-        .map((fact) => `<li>${formatFactHtml(fact, detailDmgStats)}</li>`)
+        .map((fact) => {
+          const cls = fact.type === "NoData" ? ' class="fact-item--section"' : '';
+          return `<li${cls}>${formatFactHtml(fact, detailDmgStats)}</li>`;
+        })
         .join("")
     : "<li>No fact entries.</li>";
 
@@ -3569,10 +3671,15 @@ function bindHoverPreview(node, kind, entityProvider) {
 function buildSkillCard(skill, kind, isChained = false, dmgStats = null) {
   const icon = String(skill.icon || skill.iconFallback || "");
   const description = normalizeText(skill.description || "");
-  const maxFacts = kind.startsWith("equip-") ? 12 : 4;
-  const facts = (Array.isArray(skill.facts) ? skill.facts : [])
-    .slice(0, maxFacts)
-    .map((fact) => formatFactHtml(fact, dmgStats))
+  const maxFacts = kind.startsWith("equip-") ? 12 : 16;
+  const rawFacts = (Array.isArray(skill.facts) ? skill.facts : []).slice(0, maxFacts);
+  const factsItems = rawFacts
+    .map((fact) => {
+      const html = formatFactHtml(fact, dmgStats);
+      if (!html) return null;
+      const cls = fact.type === "NoData" ? ' class="fact-item--section"' : '';
+      return `<li${cls}>${html}</li>`;
+    })
     .filter(Boolean);
   const meta = getHoverMetaLine(kind, skill);
   return `
@@ -3584,8 +3691,8 @@ function buildSkillCard(skill, kind, isChained = false, dmgStats = null) {
         <p class="hover-preview__meta">${escapeHtml(meta)}</p>
       </div>
     </div>
-    ${description ? `<p class="hover-preview__desc">${escapeHtml(description)}</p>` : (!facts.length ? `<p class="hover-preview__desc">No description available.</p>` : "")}
-    ${facts.length ? `<ul class="hover-preview__facts">${facts.map((entry) => `<li>${entry}</li>`).join("")}</ul>` : ""}
+    ${description ? `<p class="hover-preview__desc">${escapeHtml(description)}</p>` : (!factsItems.length ? `<p class="hover-preview__desc">No description available.</p>` : "")}
+    ${factsItems.length ? `<ul class="hover-preview__facts">${factsItems.join("")}</ul>` : ""}
   `;
 }
 
@@ -3765,7 +3872,8 @@ function getSkillOptionsByType(catalog, specializationSelections) {
   const profMechanics = allSkills
     .filter((skill) => /^Profession_\d/.test(skill.slot || ""))
     .filter((skill) => !exitLeavePattern.test(skill.name || ""))
-    .filter((skill) => !flipSkillIds.has(skill.id))
+    // NOTE: do NOT filter by flipSkillIds here — some Profession_N skills are mutual flip forms
+    // (e.g. Vindicator's Alliance Tactics 62749/62891) and must remain in the mechanic bar.
     .filter((skill) => {
       const lockSpec = Number(skill.specialization) || 0;
       return !lockSpec || selectedSpecIds.has(lockSpec);
@@ -4528,6 +4636,7 @@ function createEmptyEditor(profession = "") {
     // Ranger/Soulbeast: two pet slots (terrestrial + aquatic) per legend slot (A/B)
     selectedPets: { terrestrial1: 0, terrestrial2: 0, aquatic1: 0, aquatic2: 0 },
     activePetSlot: "terrestrial1",  // "terrestrial1" or "terrestrial2"
+    allianceTacticsForm: 0,         // Vindicator: 0 = Archemorus/Kurzick, 1 = Saint Viktor/Luxon
   };
 }
 
@@ -4611,6 +4720,10 @@ const BUFF_FACT_TYPES = new Set(["Buff", "ApplyBuffCondition", "PrefixedBuff"]);
 
 function formatFactHtml(fact, dmgStats = null) {
   if (!fact || typeof fact !== "object") return "Unknown fact";
+  // NoData facts are section headers (e.g. conditional legend-stance effects).
+  if (fact.type === "NoData") {
+    return `<span class="fact-section-header">${escapeHtml(String(fact.text || ""))}</span>`;
+  }
   if (fact.type === "Damage" && fact.dmg_multiplier != null) {
     const label = String(fact.text || fact.type || "Fact");
     const hits = Number(fact.hit_count) || 1;
