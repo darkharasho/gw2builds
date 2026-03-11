@@ -13,16 +13,16 @@ describe("Warrior — end-to-end profession mechanics", () => {
     const catalog = await h.loadCatalog();
     expect(catalog.profession.id).toBe("Warrior");
     expect(catalog.skills.length).toBeGreaterThan(0);
-    expect(catalog.specializationById.has(51)).toBe(true); // Berserker
-    expect(catalog.specializationById.has(3)).toBe(true);  // Spellbreaker
+    expect(catalog.specializationById.has(18)).toBe(true); // Berserker
+    expect(catalog.specializationById.has(61)).toBe(true); // Spellbreaker
   });
 
   test("catalog contains core Warrior specializations", async () => {
     const catalog = await h.loadCatalog();
-    // Core specs: Strength(4), Tactics(22), Defense(18), Arms(42), Discipline(31)
+    // Core specs: Strength(4), Tactics(22), Discipline(51)
     expect(catalog.specializationById.has(4)).toBe(true);
     expect(catalog.specializationById.has(22)).toBe(true);
-    expect(catalog.specializationById.has(18)).toBe(true);
+    expect(catalog.specializationById.has(51)).toBe(true);
   });
 
   // ---------------------------------------------------------------------------
@@ -39,62 +39,99 @@ describe("Warrior — end-to-end profession mechanics", () => {
 
   test("Berserker spec does not expose spec-locked skills from Spellbreaker", async () => {
     const catalog = await h.loadCatalog();
-    const berserkerOpts = h.skillOptions(catalog, 51);
-    const spellbreakerOpts = h.skillOptions(catalog, 3);
-    // With different elite specs selected, the option sets should not differ
-    // for this fixture (no spec-gated utility skills in fixture for either spec)
+    const berserkerOpts = h.skillOptions(catalog, 18);
+    const spellbreakerOpts = h.skillOptions(catalog, 61);
     expect(berserkerOpts.heal).toEqual(spellbreakerOpts.heal);
   });
 
   // ---------------------------------------------------------------------------
-  // Mechanic slots — core and all elite specs
+  // Mechanic slots — core and Spellbreaker
   // ---------------------------------------------------------------------------
 
-  test("core Warrior has no persistent profession mechanic F-slots", async () => {
+  test("core Warrior F1 burst matches equipped mainhand weapon", async () => {
     const catalog = await h.loadCatalog();
-    expect(h.resolveMechSlots(catalog, 0)).toEqual([]);
+    // Sword equipped → Sword core burst (14367 Flurry)
+    const swordSlots = h.resolveMechSlots(catalog, 0, { weapon: "Sword" });
+    expect(swordSlots).toEqual(["14367"]);
+    // Greatsword equipped → Greatsword core burst (14375 Arcing Slice)
+    const gsSlots = h.resolveMechSlots(catalog, 0, { weapon: "Greatsword" });
+    expect(gsSlots).toEqual(["14375"]);
   });
 
-  test("Berserker (spec 51) has no persistent profession mechanic F-slots", async () => {
+  test("core Warrior F1 is blank when no weapon is equipped", async () => {
     const catalog = await h.loadCatalog();
-    expect(h.resolveMechSlots(catalog, 51)).toEqual([]);
+    const slots = h.resolveMechSlots(catalog, 0, { weapon: "" });
+    expect(slots).toEqual(["empty"]);
   });
 
-  test("Spellbreaker (spec 3) has no persistent profession mechanic F-slots", async () => {
+  test("Spellbreaker F1 shows Spellbreaker Sword burst", async () => {
     const catalog = await h.loadCatalog();
-    expect(h.resolveMechSlots(catalog, 3)).toEqual([]);
+    const slots = h.resolveMechSlots(catalog, 61, { weapon: "Sword" });
+    expect(slots).toEqual(["42494"]);
   });
 
-  test("all Warrior specs share the same empty mechanic slot footprint", async () => {
+  // ---------------------------------------------------------------------------
+  // Berserker — Berserk toggle
+  // ---------------------------------------------------------------------------
+
+  test("Berserker shows F1 core burst + F2 Berserk toggle when Berserk is off", async () => {
     const catalog = await h.loadCatalog();
-    const core = h.resolveMechSlots(catalog, 0);
-    expect(h.resolveMechSlots(catalog, 51)).toEqual(core);
-    expect(h.resolveMechSlots(catalog, 3)).toEqual(core);
+    // Sword equipped, Berserk not toggled (activeKit: 0)
+    const slots = h.resolveMechSlots(catalog, 18, { weapon: "Sword", activeKit: 0 });
+    // F1 = core sword burst (14367 Flurry), F2 = Berserk toggle (30185)
+    expect(slots).toEqual(["14367", "30185"]);
+  });
+
+  test("Berserker shows F1 primal burst when Berserk is active", async () => {
+    const catalog = await h.loadCatalog();
+    // Sword equipped, Berserk toggled on (activeKit: 30185)
+    const slots = h.resolveMechSlots(catalog, 18, { weapon: "Sword", activeKit: 30185 });
+    // F1 = primal sword burst (30682 Flaming Flurry), F2 = Berserk toggle (30185)
+    expect(slots).toEqual(["30682", "30185"]);
+  });
+
+  test("Berserker F1 is blank when no weapon is equipped (Berserk off)", async () => {
+    const catalog = await h.loadCatalog();
+    const slots = h.resolveMechSlots(catalog, 18, { weapon: "", activeKit: 0 });
+    // F1 blank, F2 Berserk toggle still present
+    expect(slots).toEqual(["empty", "30185"]);
+  });
+
+  test("Berserker F1 is blank when no weapon is equipped (Berserk on)", async () => {
+    const catalog = await h.loadCatalog();
+    const slots = h.resolveMechSlots(catalog, 18, { weapon: "", activeKit: 30185 });
+    expect(slots).toEqual(["empty", "30185"]);
+  });
+
+  test("Berserker Greatsword primal burst shown when Berserk active", async () => {
+    const catalog = await h.loadCatalog();
+    const slots = h.resolveMechSlots(catalog, 18, { weapon: "Greatsword", activeKit: 30185 });
+    expect(slots).toEqual(["29852", "30185"]);
   });
 
   // ---------------------------------------------------------------------------
   // Weapon skill resolution
   // ---------------------------------------------------------------------------
 
-  test("Sword Weapon_1 resolves to Sever Artery", async () => {
+  test("Sword Weapon_1 resolves correctly", async () => {
     const catalog = await h.loadCatalog();
     const slots = h.resolveWeaponSlots(catalog, "sword", "", "");
     expect(slots[0]).not.toBeNull();
-    expect(slots[0].id).toBe(14360); // Sever Artery
+    expect(slots[0].id).toBe(14360);
   });
 
-  test("Greatsword (TwoHand) Weapon_1 resolves to Whirlwind Attack", async () => {
+  test("Greatsword (TwoHand) Weapon_1 resolves correctly", async () => {
     const catalog = await h.loadCatalog();
     const slots = h.resolveWeaponSlots(catalog, "greatsword", "", "");
     expect(slots[0]).not.toBeNull();
-    expect(slots[0].id).toBe(14447); // Whirlwind Attack
+    expect(slots[0].id).toBe(14447);
   });
 
-  test("Shield offhand Weapon_4 resolves to Shield Bash", async () => {
+  test("Shield offhand Weapon_4 resolves correctly", async () => {
     const catalog = await h.loadCatalog();
     const slots = h.resolveWeaponSlots(catalog, "sword", "shield", "");
     expect(slots[3]).not.toBeNull();
-    expect(slots[3].id).toBe(14521); // Shield Bash
+    expect(slots[3].id).toBe(14521);
   });
 
   test("Greatsword (TwoHand) ignores offhand slot", async () => {

@@ -14,11 +14,17 @@ const MOCK_PROFESSIONS = {
     id: "Warrior", name: "Warrior",
     icon: "https://render.guildwars2.com/file/warrior-icon.png",
     icon_big: "https://render.guildwars2.com/file/warrior-icon-big.png",
-    specializations: [4, 22, 51, 18, 42, 18, 31, 3],
+    specializations: [4, 22, 51, 18, 61],
     skills: [
-      { id: 14402, slot: "Heal",       specialization: 0, type: "Heal" },
-      { id: 14516, slot: "Utility",    specialization: 0, type: "Utility" },
-      { id: 14404, slot: "Elite",      specialization: 0, type: "Elite" },
+      { id: 14402, slot: "Heal",         specialization: 0,  type: "Heal" },
+      { id: 14516, slot: "Utility",      specialization: 0,  type: "Utility" },
+      { id: 14404, slot: "Elite",        specialization: 0,  type: "Elite" },
+      { id: 14367, slot: "Profession_1", specialization: 0,  type: "Profession" }, // Sword core burst (Flurry)
+      { id: 14375, slot: "Profession_1", specialization: 0,  type: "Profession" }, // Greatsword core burst (Arcing Slice)
+      { id: 30682, slot: "Profession_1", specialization: 18, type: "Profession" }, // Sword primal burst (Flaming Flurry)
+      { id: 29852, slot: "Profession_1", specialization: 18, type: "Profession" }, // Greatsword primal burst (Arc Divider)
+      { id: 30185, slot: "Profession_2", specialization: 18, type: "Profession" }, // Berserk toggle
+      { id: 42494, slot: "Profession_1", specialization: 61, type: "Profession" }, // Spellbreaker Sword burst (Flurry)
     ],
     weapons: {
       Sword: {
@@ -338,13 +344,11 @@ const MOCK_PROFESSIONS = {
 
 const MOCK_SPECIALIZATIONS = {
   // Warrior
-  4:  { id: 4,  name: "Strength",      profession: "Warrior",       elite: false, icon: "", background: "", minor_traits: [214, 180, 92],  major_traits: [1444, 1338, 1451, 1340, 1454, 1457, 1379] },
+  4:  { id: 4,  name: "Strength",      profession: "Warrior",       elite: false, icon: "", background: "", minor_traits: [214, 180, 92],   major_traits: [1444, 1338, 1451, 1340, 1454, 1457, 1379] },
   22: { id: 22, name: "Tactics",       profession: "Warrior",       elite: false, icon: "", background: "", minor_traits: [386, 396, 394],  major_traits: [1471, 1469, 1484, 1486, 1487, 1489, 1485] },
-  51: { id: 51, name: "Berserker",     profession: "Warrior",       elite: true,  icon: "", background: "", minor_traits: [1692, 1835, 1831], major_traits: [1831, 1855, 1862, 1841, 1848, 1836, 2039] },
-  18: { id: 18, name: "Defense",       profession: "Warrior",       elite: false, icon: "", background: "", minor_traits: [],                major_traits: [] },
-  42: { id: 42, name: "Arms",          profession: "Warrior",       elite: false, icon: "", background: "", minor_traits: [],                major_traits: [] },
-  31: { id: 31, name: "Discipline",    profession: "Warrior",       elite: false, icon: "", background: "", minor_traits: [],                major_traits: [] },
-  3:  { id: 3,  name: "Spellbreaker",  profession: "Warrior",       elite: true,  icon: "", background: "", minor_traits: [],                major_traits: [] },
+  18: { id: 18, name: "Berserker",     profession: "Warrior",       elite: true,  icon: "", background: "", minor_traits: [1692, 1835, 1831], major_traits: [1831, 1855, 1862, 1841, 1848, 1836, 2039] },
+  51: { id: 51, name: "Discipline",    profession: "Warrior",       elite: false, icon: "", background: "", minor_traits: [],                major_traits: [] },
+  61: { id: 61, name: "Spellbreaker",  profession: "Warrior",       elite: true,  icon: "", background: "", minor_traits: [],                major_traits: [] },
 
   // Engineer
   6:  { id: 6,  name: "Firearms",      profession: "Engineer",      elite: false, icon: "", background: "", minor_traits: [],  major_traits: [] },
@@ -473,6 +477,13 @@ const MOCK_SKILLS = {
   14521: makeSkill(14521, { name: "Shield Bash",  slot: "Weapon_4", type: "Weapon", weapon_type: "Shield" }),
   14447: makeSkill(14447, { name: "Whirlwind Attack", slot: "Weapon_1", type: "Weapon", weapon_type: "Greatsword" }),
   14489: makeSkill(14489, { name: "Harpoon Pull", slot: "Weapon_1", type: "Weapon", weapon_type: "HarpoonGun" }),
+  // Warrior profession mechanics (burst / primal burst / Berserk toggle)
+  14367: makeSkill(14367, { name: "Flurry",                 slot: "Profession_1", type: "Profession", weapon_type: "Sword",       professions: ["Warrior"] }),
+  14375: makeSkill(14375, { name: "Arcing Slice",           slot: "Profession_1", type: "Profession", weapon_type: "Greatsword",  professions: ["Warrior"] }),
+  30682: makeSkill(30682, { name: "Flaming Flurry",         slot: "Profession_1", type: "Profession", weapon_type: "Sword",       professions: ["Warrior"], specialization: 18 }),
+  29852: makeSkill(29852, { name: "Arc Divider",            slot: "Profession_1", type: "Profession", weapon_type: "Greatsword",  professions: ["Warrior"], specialization: 18 }),
+  30185: makeSkill(30185, { name: "Berserk",                slot: "Profession_2", type: "Profession",                             professions: ["Warrior"], specialization: 18 }),
+  42494: makeSkill(42494, { name: "Flurry",                 slot: "Profession_1", type: "Profession", weapon_type: "Sword",       professions: ["Warrior"], specialization: 61 }),
 
   // ---- Engineer ----
   5802:  makeSkill(5802,  { name: "Healing Turret", slot: "Heal", type: "Heal", professions: ["Engineer"] }),

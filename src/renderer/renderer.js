@@ -2297,11 +2297,11 @@ function renderSpecializations() {
   }
 
   cancelAnimationFrame(_connectorRafId);
-  _connectorRafId = requestAnimationFrame(() => {
+  _connectorRafId = requestAnimationFrame(() => requestAnimationFrame(() => {
     for (const body of el.specializationsHost.querySelectorAll(".spec-card__body")) {
       drawSpecConnector(body);
     }
-  });
+  }));
 }
 
 function drawSpecConnector(body) {
@@ -2326,6 +2326,7 @@ function drawSpecConnector(body) {
   svg.setAttribute("class", "spec-connector");
   svg.setAttribute("viewBox", `0 0 ${Math.max(1, bodyRect.width)} ${Math.max(1, bodyRect.height)}`);
   svg.setAttribute("preserveAspectRatio", "none");
+  svg.setAttribute("overflow", "hidden");
 
   const corePath = document.createElementNS(svgNS, "path");
   corePath.setAttribute("d", pathData);
@@ -3034,6 +3035,12 @@ function buildMechanicSlotsForRender({
       ? sortedSlotKeys.filter((slotKey) => slotKey === "Profession_1")
       : sortedSlotKeys;
 
+    const isWarrior = (catalog?.profession?.id || editor.profession || "") === "Warrior";
+    const isBerserker = isWarrior && eliteSpecId === 18;
+    // Berserk (F2 toggle for Berserker): resolve the Berserk skill from the Profession_2 slot.
+    const berserkSkillId = isBerserker ? (bySlot.get("Profession_2")?.[0]?.id || 0) : 0;
+    const berserkActive = berserkSkillId > 0 && activeKit === berserkSkillId;
+
     mechSlots = renderSlotKeys.map((slotKey) => {
       const candidates = bySlot.get(slotKey);
       let skill;
@@ -3042,13 +3049,24 @@ function buildMechanicSlotsForRender({
       } else {
         // Split into elite-spec and base pools; prefer elite-spec when active.
         // Weaver is excluded: its F skills are the standard ele attunement swaps.
-        const eliteCandidates = eliteSpecId && !isWeaver
+        // Berserker F1: handled separately — core vs primal burst depends on Berserk toggle.
+        const isBerserkerBurstSlot = isBerserker && slotKey === "Profession_1";
+        const eliteCandidates = eliteSpecId && !isWeaver && !isBerserkerBurstSlot
           ? candidates.filter((s) => Number(s.specialization) === eliteSpecId)
           : [];
         // Sort by ID descending: when the API lists multiple skill variants at the same slot
         // the higher ID is the more recently added/updated skill and should be preferred.
-        const pool = [...(eliteCandidates.length > 0 ? eliteCandidates : candidates)]
-          .sort((a, b) => b.id - a.id);
+        let pool;
+        if (isBerserkerBurstSlot) {
+          // When Berserk is active show primal bursts (spec=51); otherwise show core bursts.
+          const primalPool = candidates.filter((s) => Number(s.specialization) === 51);
+          const corePool = candidates.filter((s) => !Number(s.specialization));
+          const base = berserkActive ? primalPool : corePool;
+          pool = (base.length > 0 ? base : candidates).sort((a, b) => b.id - a.id);
+        } else {
+          pool = [...(eliteCandidates.length > 0 ? eliteCandidates : candidates)]
+            .sort((a, b) => b.id - a.id);
+        }
         const wt = (s) => (s.weaponType || "").toLowerCase();
         const attunementSkill = !isWeaver && activeAttunement
           ? pool.find((s) => s.attunement && s.attunement.toLowerCase() === activeAttunement.toLowerCase())
@@ -3066,6 +3084,15 @@ function buildMechanicSlotsForRender({
                || pool.find((s) => !s.weaponType && !s.attunement)
                || pool[0];
         }
+      }
+      // Warrior: F1 burst slot is blank when no weapon is equipped (all burst skills are
+      // weapon-specific; show nothing rather than an arbitrary burst for an empty hand).
+      if (isWarrior && slotKey === "Profession_1" && candidates.every((s) => s.weaponType) && !activeMainhand) {
+        return { skill: null, sourceId: 0, isStatic: true, isSelectable: false };
+      }
+      // Berserker: F2 "Berserk" is toggleable — clicking it switches F1 between core and primal burst.
+      if (isBerserker && slotKey === "Profession_2") {
+        return { skill, sourceId: skill?.id || 0, isStatic: true, isSelectable: false, isBerserkToggle: true };
       }
       // Antiquary (spec=77): F1 gets the randomize play badge; F2/F3 show stored artifact draws.
       if (eliteSpecId === 77) {
@@ -3162,7 +3189,8 @@ function renderSkills() {
     const isEquippedSlotKit = (kitSkill?.bundleSkills?.length ?? 0) > 0 && equippedIds.has(activeKit);
     // Soulbeast Beastmode has no bundle_skills in the API; allow it to persist via isBeastmodeToggle.
     const isBeastmodeKit = mechSlots.some((s) => s.isBeastmodeToggle && s.skill?.id === activeKit);
-    if (!isStaticBundle && !isToolbeltSource && !isEquippedSlotKit && !isBeastmodeKit) {
+    const isBerserkKit = mechSlots.some((s) => s.isBerserkToggle && s.skill?.id === activeKit);
+    if (!isStaticBundle && !isToolbeltSource && !isEquippedSlotKit && !isBeastmodeKit && !isBerserkKit) {
       state.editor.activeKit = 0;
     }
   }
@@ -3234,7 +3262,7 @@ function renderSkills() {
     mechBar.className = "profession-mechanics-bar";
 
     for (let fIdx = 0; fIdx < mechSlots.length; fIdx++) {
-      const { skill, sourceId, sourceSkill, isStatic, isSelectable, morphIndex, mechIconOverride, fakeCommand, isBeastmodeToggle, leaveIcon, fKeyLabel, isF5AboveOrb, isAllianceTactics, isAntiquarySkritSwipe } = mechSlots[fIdx];
+      const { skill, sourceId, sourceSkill, isStatic, isSelectable, morphIndex, mechIconOverride, fakeCommand, isBeastmodeToggle, isBerserkToggle, leaveIcon, fKeyLabel, isF5AboveOrb, isAllianceTactics, isAntiquarySkritSwipe } = mechSlots[fIdx];
       const slotEl = document.createElement("div");
       slotEl.className = "skill-slot";
       const iconBtn = document.createElement("button");
@@ -3246,7 +3274,7 @@ function renderSkills() {
       const srcSkillForKit = (!isStatic && isToolbelt) ? catalog.skillById.get(sourceId) : null;
       const isKit = !isStatic && isToolbelt
         ? (srcSkillForKit?.bundleSkills?.length ?? 0) > 0
-        : isStatic && ((skill?.bundleSkills?.length ?? 0) > 0 || !!isBeastmodeToggle);
+        : isStatic && ((skill?.bundleSkills?.length ?? 0) > 0 || !!isBeastmodeToggle || !!isBerserkToggle);
 
       let isActive = false;
       if (isSelectable) {
@@ -3255,8 +3283,8 @@ function renderSkills() {
         isActive = isKit && resolvedKit === sourceId;
       } else if (isAllianceTactics) {
         isActive = (Number(state.editor.allianceTacticsForm) || 0) === 1;
-      } else if (isStatic && ((skill?.bundleSkills?.length ?? 0) > 0 || isBeastmodeToggle)) {
-        // Static bundle skills: shroud, celestial avatar, Photon Forge, beastmode, etc.
+      } else if (isStatic && ((skill?.bundleSkills?.length ?? 0) > 0 || isBeastmodeToggle || isBerserkToggle)) {
+        // Static bundle skills: shroud, celestial avatar, Photon Forge, beastmode, Berserk, etc.
         isActive = resolvedKit === skill?.id;
       } else if (isStatic && !isToolbelt) {
         // Attunement-keyed skills: check name pattern ("Fire Attunement") or attunement field
@@ -3813,11 +3841,85 @@ function bindHoverPreview(node, kind, entityProvider) {
   });
 }
 
+/**
+ * Merge base facts with applicable traited_facts for the current build's active traits.
+ *
+ * GW2 API trait/skill objects have two fact sources:
+ *   - `facts[]`: base facts, pre-filtered to exclude entries with requires_trait
+ *   - `traitedFacts[]`: conditional overrides, each with:
+ *       requires_trait  – ID of the major trait that enables this entry
+ *       overrides       – 0-based index into facts[] to replace (required; see below)
+ *       …fact fields    – type, text, value, etc.
+ *
+ * Only traited_facts WITH an `overrides` index are applied — they replace the base fact at
+ * that index with an updated value (e.g., a stat that improves when a trait is active).
+ * Entries without `overrides` would append extra facts representing conditional gameplay
+ * states (e.g., "while in berserk mode") that are too context-dependent for a tooltip and
+ * would otherwise cause fact bloat when any matching trait is selected.
+ */
+function resolveEntityFacts(entity) {
+  const baseFacts = Array.isArray(entity.facts) ? entity.facts : [];
+  const traitedFacts = Array.isArray(entity.traitedFacts) ? entity.traitedFacts : [];
+
+  // Apply traited_facts overrides when the required trait is active.
+  let result = baseFacts;
+  if (traitedFacts.length) {
+    const activeTraitIds = new Set(
+      (state.editor.specializations || [])
+        .flatMap((s) => Object.values(s?.majorChoices || {}))
+        .map(Number)
+        .filter(Boolean)
+    );
+    if (activeTraitIds.size) {
+      result = [...baseFacts];
+      for (const tf of traitedFacts) {
+        if (!activeTraitIds.has(Number(tf.requires_trait))) continue;
+        const { requires_trait: _r, overrides, ...factData } = tf;
+        // Only apply replacements (overrides set); skip appended facts.
+        if (overrides !== undefined && overrides !== null && overrides >= 0 && overrides < result.length) {
+          result[overrides] = factData;
+        }
+      }
+    }
+  }
+
+  // Deduplicate — always runs regardless of traitedFacts.
+  // The GW2 API places both the base value AND a conditional variant in facts[] without
+  // requires_trait markers. After overrides are applied above, the first entry already
+  // holds the correct value; later duplicates are conditional variants to be dropped.
+  //
+  // Two dedup strategies:
+  //   Buff/condition facts (status field present): key = status only. The same boon
+  //     (e.g. Quickness) can appear with different durations across Buff/PrefixedBuff
+  //     types — deduplicate by status regardless of type so both variants collapse.
+  //   All other facts: key = text + type + target + source. Distinct facts that happen
+  //     to share text (e.g. two AttributeConversion entries for different stats) differ
+  //     by target/source and are preserved.
+  // NoData facts (section separators) and facts with no identifying field are always kept.
+  const seen = new Set();
+  return result.filter((f) => {
+    if (f.type === "NoData") return true;
+    const statusKey = (f.status || "").trim();
+    if (statusKey) {
+      const key = `status:${statusKey}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }
+    const text = (f.text || "").trim();
+    if (!text) return true;
+    const key = `${text}|${f.type || ""}|${f.target || ""}|${f.source || ""}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function buildSkillCard(skill, kind, isChained = false, dmgStats = null) {
   const icon = String(skill.icon || skill.iconFallback || "");
   const description = normalizeText(skill.description || "");
   const maxFacts = kind.startsWith("equip-") ? 12 : 16;
-  const rawFacts = (Array.isArray(skill.facts) ? skill.facts : []).slice(0, maxFacts);
+  const rawFacts = resolveEntityFacts(skill).slice(0, maxFacts);
   const factsItems = rawFacts
     .map((fact) => {
       const html = formatFactHtml(fact, dmgStats);
@@ -3946,7 +4048,7 @@ async function selectDetail(kind, entity) {
     icon: entity.icon || "",
     iconFallback: entity.iconFallback || "",
     description: entity.description || "",
-    facts: Array.isArray(entity.facts) ? entity.facts : [],
+    facts: resolveEntityFacts(entity),
     wiki: { loading: true, summary: "", url: "" },
   };
   state.detail = detail;
@@ -4902,6 +5004,33 @@ function formatFactHtml(fact, dmgStats = null) {
     const iconUrl = fact.icon || (fact.status && BOON_CONDITION_ICONS[fact.status]) || "";
     return iconUrl ? `<img class="fact-status-icon" src="${escapeHtml(iconUrl)}" alt="" aria-hidden="true">${escapeHtml(text)}` : escapeHtml(text);
   }
+  // AttributeConversion: converts a % of one attribute into another (e.g. Precision → Ferocity).
+  // API fields: source, target, percent. text is often the raw type name.
+  // Detect by structure (source + target present) as well as by type — the API sometimes
+  // omits or varies the type field for these facts.
+  if (fact.type === "AttributeConversion" || (fact.source && fact.target)) {
+    const toWords = (s) => String(s || "").replace(/([A-Z])/g, " $1").trim();
+    const source = toWords(fact.source);
+    const target = toWords(fact.target);
+    const pct = fact.percent ?? "";
+    const label = source && target
+      ? `Gain ${target} Based on a Percentage of ${source}`
+      : (fact.text && fact.text !== "AttributeConversion" ? fact.text : "Attribute Conversion");
+    const text = pct === "" ? label : `${label}: ${pct}%`;
+    const iconUrl = fact.icon || "";
+    return iconUrl ? `<img class="fact-status-icon" src="${escapeHtml(iconUrl)}" alt="" aria-hidden="true">${escapeHtml(text)}` : escapeHtml(text);
+  }
+  // AttributeAdjust: the API sometimes gives the raw type name as text instead of a
+  // human-readable label. Build one from the target attribute (e.g. "ConditionDamage" → "Condition Damage").
+  if (fact.type === "AttributeAdjust") {
+    const rawTarget = String(fact.target || "");
+    const targetLabel = rawTarget.replace(/([A-Z])/g, " $1").trim();
+    const label = (fact.text && fact.text !== "AttributeAdjust") ? fact.text : (targetLabel || "Attribute");
+    const val = fact.value ?? "";
+    const text = val === "" ? label : `${label}: ${val > 0 ? "+" : ""}${val}`;
+    const iconUrl = fact.icon || "";
+    return iconUrl ? `<img class="fact-status-icon" src="${escapeHtml(iconUrl)}" alt="" aria-hidden="true">${escapeHtml(text)}` : escapeHtml(text);
+  }
   const label = String(fact.text || fact.type || "Fact");
   const value =
     fact.value ??
@@ -4957,5 +5086,7 @@ if (typeof module !== "undefined" && module.exports) {
     buildRevenantEliteByProfSlot,
     getSkillOptionsByType,
     getEquippedWeaponSkills,
+    resolveEntityFacts,
+    _state: state,
   };
 }

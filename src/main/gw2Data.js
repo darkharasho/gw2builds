@@ -694,7 +694,9 @@ async function getProfessionCatalog(professionId, lang = "en") {
       attunement,
       dualWield,
       categories: Array.isArray(skill.categories) ? skill.categories : [],
-      facts: KNOWN_SKILL_FACTS_OVERRIDES.get(skill.id) || (Array.isArray(skill.facts) ? skill.facts : []),
+      // Filter out conditional facts (requires_trait) from the base array — same as traits.
+      facts: KNOWN_SKILL_FACTS_OVERRIDES.get(skill.id) || (Array.isArray(skill.facts) ? skill.facts.filter((f) => !f.requires_trait) : []),
+      traitedFacts: Array.isArray(skill.traited_facts) ? skill.traited_facts : [],
       toolbeltSkill: ELIXIR_TOOLBELT_OVERRIDES.get(skill.id) || Number(skill.toolbelt_skill) || 0,
       flipSkill: LEGEND_FLIP_OVERRIDES.get(skill.id) || Number(skill.flip_skill) || 0,
       bundleSkills,
@@ -854,7 +856,8 @@ async function getProfessionCatalog(professionId, lang = "en") {
       order: Number(trait.order) || 0,
       slot: trait.slot || "",
       specialization: Number(trait.specialization) || 0,
-      facts: Array.isArray(trait.facts) ? trait.facts : [],
+      facts: Array.isArray(trait.facts) ? trait.facts.filter((f) => !f.requires_trait) : [],
+      traitedFacts: Array.isArray(trait.traited_facts) ? trait.traited_facts : [],
       traitSkillIds: Array.isArray(trait.skills)
         ? trait.skills.map((s) => Number(s?.id)).filter(Boolean)
         : [],
