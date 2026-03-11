@@ -1595,6 +1595,25 @@ label {
   overflow: hidden;
 }
 
+@keyframes skillFlipSwap {
+  0% {
+    transform: perspective(280px) rotateX(-86deg) scale(0.92);
+    filter: brightness(1.35);
+  }
+  100% {
+    transform: perspective(280px) rotateX(0deg) scale(1);
+    filter: brightness(1);
+  }
+}
+
+.skill-icon-large.skill-icon--flip-anim,
+.skill-icon--profession.skill-icon--flip-anim,
+.legend-slot-btn.skill-icon--flip-anim {
+  animation: skillFlipSwap 560ms cubic-bezier(0.33, 1, 0.68, 1);
+  transform-origin: center center;
+  backface-visibility: hidden;
+}
+
 .skill-icon-large__keylabel {
   position: absolute;
   bottom: -1px;

@@ -24,6 +24,7 @@ const state = {
   skillSearch: "",
   catalogCache: new Map(),
   activeCatalog: null,
+  renderedSkillIconIds: new Map(),
   editor: createEmptyEditor(),
   editorBaselineSignature: "",
   editorDirty: false,
@@ -2358,7 +2359,7 @@ const PROFESSION_BASE_HP = {
   Thief: 11645, Daredevil: 11645, Deadeye: 11645, Specter: 11645,
 };
 
-function makeSkillSlot(slot, catalog, options, utilitySelection) {
+function makeSkillSlot(slot, catalog, options, utilitySelection, markSkillIconRendered = null) {
   const query = "";
   const selectedId =
     slot.index === undefined
@@ -2385,6 +2386,13 @@ function makeSkillSlot(slot, catalog, options, utilitySelection) {
   iconBtn.title = selectedSkill?.name || slot.label;
   if (selectedSkill?.icon) {
     iconBtn.innerHTML = `<img src="${escapeHtml(selectedSkill.icon)}" alt="${escapeHtml(selectedSkill.name || "")}" />`;
+  }
+  if (typeof markSkillIconRendered === "function") {
+    markSkillIconRendered(
+      iconBtn,
+      slot.flipKey || slot.key,
+      selectedSkill ? `${selectedSkill.id}:${selectedSkill.icon || ""}` : ""
+    );
   }
   if (selectedSkill) {
     bindHoverPreview(iconBtn, "skill", () => selectedSkill);
@@ -2708,6 +2716,17 @@ function renderSkills() {
   const utilitySelection = Array.isArray(state.editor.skills?.utilityIds)
     ? state.editor.skills.utilityIds.map((value) => Number(value) || 0)
     : [0, 0, 0];
+  const prevRenderedSkillIconIds = state.renderedSkillIconIds || new Map();
+  const nextRenderedSkillIconIds = new Map();
+  const markSkillIconRendered = (node, key, skillId) => {
+    if (!node || !key) return;
+    const prevSig = String(prevRenderedSkillIconIds.get(key) || "");
+    const nextSig = String(skillId || "");
+    if (prevSig && nextSig && prevSig !== nextSig) {
+      node.classList.add("skill-icon--flip-anim");
+    }
+    nextRenderedSkillIconIds.set(key, nextSig);
+  };
 
   const bar = document.createElement("div");
   bar.className = "skills-bar";
@@ -3123,6 +3142,7 @@ function renderSkills() {
       bindHoverPreview(iconBtn, "skill", () => wSkill);
       iconBtn.addEventListener("click", () => selectDetail("skill", wSkill));
     }
+    markSkillIconRendered(iconBtn, `weapon_${i + 1}`, wSkill ? `${wSkill.id}:${wSkill.icon || ""}` : "");
     const wKeyLabel = document.createElement("span");
     wKeyLabel.className = "skill-icon-large__keylabel";
     wKeyLabel.textContent = String(i + 1);
@@ -3191,6 +3211,7 @@ function renderSkills() {
         : (isActive && leaveIcon) ? "Leave Beastmode"
         : skill?.name || (isSelectable ? "Choose morph skill…" : "");
 
+      let mechIconSignature = "";
       if (fakeCommand) {
         // Ranger client-side pet commands — no API skill, render a placeholder icon
         iconBtn.disabled = true;
@@ -3207,6 +3228,7 @@ function renderSkills() {
                <path d="M26 7 L26 18 C26 22 22 25 18 25 L9 25" stroke="rgba(240,220,100,0.9)" stroke-width="2" fill="none" stroke-linecap="round"/>
                <polyline points="13,19 9,25 15,29" stroke="rgba(240,220,100,0.9)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
              </svg>`;
+        mechIconSignature = `fake:${fakeCommand}`;
       } else {
         // When a static bundle skill (e.g. Photon Forge) is active, show the flip_skill icon.
         const flipSkillId = isActive && isStatic && (skill?.flipSkill ?? 0);
@@ -3224,6 +3246,13 @@ function renderSkills() {
         if (displayIcon) {
           iconBtn.innerHTML = `<img src="${escapeHtml(displayIcon)}" alt="${escapeHtml(displayName)}" />`;
         }
+        mechIconSignature = (isActive && leaveIcon)
+          ? `leave:${leaveIcon}`
+          : flipSkill
+            ? `flip:${flipSkill.id}:${displayIcon || ""}`
+            : skill
+              ? `${skill.id}:${displayIcon || ""}`
+              : "";
         if (flipSkill) {
           bindHoverPreview(iconBtn, "skill", () => flipSkill);
         } else if (skill) {
@@ -3236,6 +3265,7 @@ function renderSkills() {
       fLabel.className = "skill-icon--profession-flabel";
       fLabel.textContent = fKeyLabel || `F${fIdx + 1}`;
       iconBtn.append(fLabel);
+      markSkillIconRendered(iconBtn, `mech_${fIdx + 1}`, mechIconSignature || (skill ? `${skill.id}:${skill.icon || ""}` : ""));
 
       // Alliance Tactics F3 gets a toggle badge to show it's clickable.
       if (isAllianceTactics) {
@@ -3402,6 +3432,7 @@ function renderSkills() {
         if (legendIcon) {
           btn.innerHTML = `<img src="${escapeHtml(legendIcon)}" alt="${escapeHtml(legendName)}" />`;
         }
+        markSkillIconRendered(btn, `legend_${slotIdx + 1}`, legend ? `${legend.swap || 0}:${legendIcon}` : legendId);
         const slotLabel = document.createElement("span");
         slotLabel.className = "legend-slot-btn__label";
         slotLabel.textContent = "F1";
@@ -3471,14 +3502,14 @@ function renderSkills() {
   const utilityGroup = document.createElement("div");
   utilityGroup.className = "skill-group skill-group--utilities";
   const utilitySlots = [
-    { key: "healId", label: "Heal", list: options.heal || [], keybind: "6" },
-    { key: "utilityIds", index: 0, label: "Utility", list: options.utility || [], keybind: "7" },
-    { key: "utilityIds", index: 1, label: "Utility", list: options.utility || [], keybind: "8" },
-    { key: "utilityIds", index: 2, label: "Utility", list: options.utility || [], keybind: "9" },
-    { key: "eliteId", label: "Elite", list: options.elite || [], keybind: "0" },
+    { key: "healId", label: "Heal", list: options.heal || [], keybind: "6", flipKey: "utility_heal" },
+    { key: "utilityIds", index: 0, label: "Utility", list: options.utility || [], keybind: "7", flipKey: "utility_1" },
+    { key: "utilityIds", index: 1, label: "Utility", list: options.utility || [], keybind: "8", flipKey: "utility_2" },
+    { key: "utilityIds", index: 2, label: "Utility", list: options.utility || [], keybind: "9", flipKey: "utility_3" },
+    { key: "eliteId", label: "Elite", list: options.elite || [], keybind: "0", flipKey: "utility_elite" },
   ];
   for (const slot of utilitySlots) {
-    utilityGroup.append(makeSkillSlot(slot, catalog, options, utilitySelection));
+    utilityGroup.append(makeSkillSlot(slot, catalog, options, utilitySelection, markSkillIconRendered));
   }
 
   if (f5SlotEl) {
@@ -3490,6 +3521,7 @@ function renderSkills() {
     bar.append(weaponCol, orbEl, utilityGroup);
   }
   el.skillsHost.append(bar);
+  state.renderedSkillIconIds = nextRenderedSkillIconIds;
 }
 
 function openLegendPicker(anchorEl, slotIdx, catalog) {
