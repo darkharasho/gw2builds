@@ -334,7 +334,7 @@ export function renderBuildList() {
     card.className = `build-card ${active ? "build-card--active" : ""}`;
     card.innerHTML = `
       <h3>${escapeHtml(build.title || "Untitled Build")}</h3>
-      <p>${escapeHtml(build.profession || "Unknown Profession")} | Updated ${escapeHtml(formatDate(build.updatedAt))}${escapeHtml(dirtySuffix)}</p>
+      <p>${escapeHtml(build.profession || "Unknown Profession")} | ${escapeHtml((build.gameMode || "pve").toUpperCase())} | Updated ${escapeHtml(formatDate(build.updatedAt))}${escapeHtml(dirtySuffix)}</p>
     `;
 
     const actions = document.createElement("div");

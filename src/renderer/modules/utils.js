@@ -39,6 +39,7 @@ export function matchesBuildQuery(build, query) {
     build.notes || "",
     ...(build.tags || []),
     ...((build.specializations || []).map((entry) => entry.name || "")),
+    build.gameMode || "",
   ]
     .join(" ")
     .toLowerCase();
