@@ -49,15 +49,37 @@ describe("seed.js parsing functions", () => {
       });
     });
 
-    test("unknown type defaults to Buff with apply_count 1", () => {
+    test("unknown type with no duration or stacks returns null", () => {
       const fact = mapWikiFactToApiFact("unknown", ["unknown"], {}, true, false);
+      expect(fact).toBeNull();
+    });
+
+    test("maps gain to AttributeConversion", () => {
+      const fact = mapWikiFactToApiFact("gain", ["gain", "Precision", "Vitality", "13"], {}, true, false);
+      expect(fact).toEqual({
+        type: "AttributeConversion",
+        text: "Gain Precision Based on a Percentage of Vitality",
+        source: "Vitality",
+        target: "Precision",
+        percent: 13,
+      });
+    });
+
+    test("maps effect to Buff with description and duration", () => {
+      const fact = mapWikiFactToApiFact("effect", ["effect", "Elements of Rage (effect)", "8"], { desc: "+5% Damage" }, true, false);
       expect(fact).toEqual({
         type: "Buff",
-        text: "Unknown",
-        status: "Unknown",
-        duration: 0,
+        text: "+5% Damage",
+        status: "Elements of Rage (effect)",
+        duration: 8,
         apply_count: 1,
       });
+    });
+
+    test("skips wiki-only fact types", () => {
+      expect(mapWikiFactToApiFact("pierces", ["pierces"], {}, true, false)).toBeNull();
+      expect(mapWikiFactToApiFact("text", ["text"], {}, true, false)).toBeNull();
+      expect(mapWikiFactToApiFact("blocks missiles", ["blocks missiles"], {}, true, false)).toBeNull();
     });
   });
 
