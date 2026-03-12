@@ -486,23 +486,28 @@ function wireEvents() {
   // Game mode toggle
   document.querySelectorAll(".game-mode-toggle__btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      const mode = btn.dataset.mode;
-      if (!mode || mode === state.editor.gameMode) return;
+      try {
+        const mode = btn.dataset.mode;
+        if (!mode || mode === state.editor.gameMode) return;
 
-      state.editor.gameMode = mode;
-      _lastGameMode = mode;
-      window.desktopApi.setSetting("lastGameMode", mode);
+        state.editor.gameMode = mode;
+        _lastGameMode = mode;
+        window.desktopApi.setSetting("lastGameMode", mode);
 
-      // Re-fetch catalog for the new mode (cache key includes mode)
-      if (state.editor.profession) {
-        const catalog = await getCatalog(state.editor.profession, mode);
-        state.activeCatalog = catalog;
-        enforceEditorConsistency();
+        // Re-fetch catalog for the new mode (cache key includes mode)
+        if (state.editor.profession) {
+          const catalog = await getCatalog(state.editor.profession, mode);
+          state.activeCatalog = catalog;
+          enforceEditorConsistency();
+        }
+
+        markEditorChanged();
+        syncGameModeToggleUI(mode);
+        renderEditor();
+      } catch (err) {
+        console.error("Game mode toggle error:", err);
+        showError(err);
       }
-
-      markEditorChanged();
-      syncGameModeToggleUI(mode);
-      renderEditor();
     });
   });
 }
