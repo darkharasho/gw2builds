@@ -264,16 +264,21 @@ export const PROFESSION_CONCEPT_ART = {
   Revenant:     `${_WK}/1/18/Revenant_02_concept_art.jpg`,
 };
 
+// Base HP at level 80 EXCLUDING base vitality contribution.
+// Formula: totalHP = baseHP + (Vitality * 10), where base Vitality = 1000.
+// High (9212): Warrior, Necromancer → 9212 + 10000 = 19212
+// Medium (5922): Revenant, Engineer, Ranger, Mesmer → 5922 + 10000 = 15922
+// Low (1645): Guardian, Thief, Elementalist → 1645 + 10000 = 11645
 export const PROFESSION_BASE_HP = {
-  Warrior: 20212, Berserker: 20212, Spellbreaker: 20212, Bladesworn: 20212, Paragon: 20212,
-  Revenant: 21894, Herald: 21894, Renegade: 21894, Vindicator: 21894,
-  Necromancer: 17985, Reaper: 17985, Scourge: 17985, Harbinger: 17985,
-  Ranger: 15922, Druid: 15922, Soulbeast: 15922, Untamed: 15922,
-  Guardian: 14462, Dragonhunter: 14462, Firebrand: 14462, Willbender: 14462,
-  Engineer: 14462, Scrapper: 14462, Holosmith: 14462, Mechanist: 14462,
-  Elementalist: 11645, Tempest: 11645, Weaver: 11645, Catalyst: 11645,
-  Mesmer: 11645, Chronomancer: 11645, Mirage: 11645, Virtuoso: 11645,
-  Thief: 11645, Daredevil: 11645, Deadeye: 11645, Specter: 11645, Antiquary: 11645,
+  Warrior: 9212, Berserker: 9212, Spellbreaker: 9212, Bladesworn: 9212, Paragon: 9212,
+  Necromancer: 9212, Reaper: 9212, Scourge: 9212, Harbinger: 9212,
+  Revenant: 5922, Herald: 5922, Renegade: 5922, Vindicator: 5922,
+  Engineer: 5922, Scrapper: 5922, Holosmith: 5922, Mechanist: 5922,
+  Ranger: 5922, Druid: 5922, Soulbeast: 5922, Untamed: 5922,
+  Mesmer: 5922, Chronomancer: 5922, Mirage: 5922, Virtuoso: 5922,
+  Guardian: 1645, Dragonhunter: 1645, Firebrand: 1645, Willbender: 1645,
+  Thief: 1645, Daredevil: 1645, Deadeye: 1645, Specter: 1645, Antiquary: 1645,
+  Elementalist: 1645, Tempest: 1645, Weaver: 1645, Catalyst: 1645,
 };
 
 export const ANTIQUARY_OFFENSIVE_ARTIFACTS = [
