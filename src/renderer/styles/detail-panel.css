@@ -246,6 +246,37 @@
   color: #e8b84a;
 }
 
+@keyframes facts-list-refresh {
+  0%   { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.facts-list--refresh {
+  animation: facts-list-refresh 0.25s ease-out forwards;
+}
+
+@keyframes fact-split-flash {
+  0%   { background: rgba(232, 184, 74, 0.4); border-radius: 3px; transform: translateX(-8px); color: #ffd97a; }
+  30%  { transform: translateX(0); }
+  60%  { background: rgba(232, 184, 74, 0.2); }
+  100% { background: transparent; color: #e8b84a; }
+}
+
+.fact-item--split--flash {
+  animation: fact-split-flash 0.9s ease-out forwards;
+}
+
+@keyframes fact-new-in-mode-flash {
+  0%   { background: rgba(74, 170, 113, 0.35); border-radius: 3px; transform: translateX(-8px); }
+  30%  { transform: translateX(0); }
+  60%  { background: rgba(74, 170, 113, 0.15); }
+  100% { background: transparent; }
+}
+
+.fact-item--new-in-mode--flash {
+  animation: fact-new-in-mode-flash 0.9s ease-out forwards;
+}
+
 .hover-preview__chain-divider {
   text-align: center;
   color: #5a7ab5;

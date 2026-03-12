@@ -182,13 +182,22 @@ function applyBalanceSplit(mapped, entityType, gameMode) {
     // ── Complete mode ─────────────────────────────────────────────────────────
     // Iterate over the WvW split facts (authoritative). Enrich each with its
     // matching PvE base label. PvE facts with no WvW counterpart are dropped.
-    mapped.facts = splitFacts.map((sf, si) => {
+    const wvwFacts = splitFacts.map((sf, si) => {
       const bi = splitToBase.get(si);
-      if (bi === undefined) return sf; // WvW-only fact (no PvE counterpart)
+      if (bi === undefined) return { ...sf, _splitFact: true }; // WvW-only fact (added in WvW)
       const merged = _mergeSplitValues(baseFacts[bi], sf);
       if (_splitValueChanged(baseFacts[bi], merged)) merged._splitFact = true;
       return merged;
     });
+    // The wiki represents Recharge changes via infobox params, never template facts,
+    // so Recharge is always absent from complete-mode WvW splits even when unchanged.
+    // Preserve the base PvE Recharge facts unless the WvW split already has one.
+    if (!wvwFacts.some((f) => f.type === "Recharge")) {
+      const pveRecharge = baseFacts.filter((f) => f.type === "Recharge");
+      mapped.facts = [...pveRecharge, ...wvwFacts];
+    } else {
+      mapped.facts = wvwFacts;
+    }
   } else {
     // ── Partial mode ──────────────────────────────────────────────────────────
     // Iterate over the PvE base facts. Apply split overrides where matched.

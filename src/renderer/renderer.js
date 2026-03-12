@@ -9,7 +9,7 @@ let _lastGameMode = "pve";
 import { initCustomSelect, closeCustomSelect } from "./modules/custom-select.js";
 import {
   initDetailPanel, bindHoverPreview, hideHoverPreview,
-  renderDetailPanel, selectDetail,
+  renderDetailPanel, selectDetail, triggerDetailPanelAnimation,
 } from "./modules/detail-panel.js";
 import {
   initSpecializations, initSpecializationsCallbacks, renderSpecializations,
@@ -500,11 +500,42 @@ function wireEvents() {
           const catalog = await getCatalog(state.editor.profession, mode);
           state.activeCatalog = catalog;
           enforceEditorConsistency();
+
+          // Refresh the detail panel facts from the new catalog if an entity is selected
+          if (state.detail?.entityId) {
+            const { kind, entityId } = state.detail;
+            const freshEntity = kind === "trait"
+              ? catalog.traitById?.get(entityId)
+              : (catalog.skillById?.get(entityId) || catalog.weaponSkillById?.get(entityId));
+            if (freshEntity) {
+              const oldFacts = state.detail.facts || [];
+              const newFacts = resolveEntityFacts(freshEntity);
+              // Key by type+status for buffs/conditions (wiki uses boon name as text,
+              // GW2 API uses "Apply Buff/Condition"), or type+text for everything else.
+              const factKey = (f) => f.status
+                ? `${f.type}:${f.status}`
+                : `${f.type}:${(f.text || "").toLowerCase()}`;
+              const oldKeys = new Set(oldFacts.map(factKey));
+              // _splitFact = value changed (already flagged by catalog) → yellow text + flash
+              // _newFact   = fact newly appeared/disappeared in this mode → flash only, no yellow
+              const annotatedFacts = newFacts.map((f) => {
+                if (oldKeys.has(factKey(f))) return f;
+                if (f._splitFact) return f; // catalog already flagged as value-changed
+                return { ...f, _newFact: true };
+              });
+              state.detail = {
+                ...state.detail,
+                facts: annotatedFacts,
+                hasSplit: Boolean(freshEntity.hasSplit),
+              };
+            }
+          }
         }
 
         markEditorChanged();
         syncGameModeToggleUI(mode);
         renderEditor();
+        if (state.detail) triggerDetailPanelAnimation();
       } catch (err) {
         console.error("Game mode toggle error:", err);
         showError(err);

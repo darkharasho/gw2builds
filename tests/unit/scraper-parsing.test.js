@@ -30,7 +30,7 @@ describe("seed.js parsing functions", () => {
 
     test("extracts healing with base value", () => {
       const fact = mapWikiFactToApiFact("healing", ["healing", "300"], {}, true, false);
-      expect(fact).toEqual({ type: "AttributeAdjust", text: "Healing", value: 300 });
+      expect(fact).toEqual({ type: "AttributeAdjust", text: "Healing", value: 300, target: "Healing", hit_count: 1 });
     });
 
     test("extracts targets", () => {
@@ -64,36 +64,38 @@ describe("seed.js parsing functions", () => {
   describe("parseWikitextFacts", () => {
     test("extracts WvW-specific skill facts from wikitext", () => {
       const wikitext = `{{skill fact|damage|coefficient=1.35|game mode=wvw}}`;
-      const facts = parseWikitextFacts(wikitext);
+      const { facts } = parseWikitextFacts(wikitext);
       expect(facts).toHaveLength(1);
       expect(facts[0].type).toBe("Damage");
       expect(facts[0].dmg_multiplier).toBe(1.35);
     });
 
-    test("skips PvE-only facts", () => {
+    test("skips PvE-only facts and sets hasPveOnly", () => {
       const wikitext = `{{skill fact|damage|coefficient=1.81|game mode=pve}}`;
-      const facts = parseWikitextFacts(wikitext);
+      const { facts, hasPveOnly } = parseWikitextFacts(wikitext);
       expect(facts).toEqual([]);
+      expect(hasPveOnly).toBe(true);
     });
 
     test("includes universal facts (no game mode)", () => {
       const wikitext = `{{skill fact|targets|5}}`;
-      const facts = parseWikitextFacts(wikitext);
+      const { facts } = parseWikitextFacts(wikitext);
       expect(facts).toHaveLength(1);
       expect(facts[0].type).toBe("Number");
     });
 
     test("handles pvp wvw combined mode", () => {
       const wikitext = `{{skill fact|blindness|3|game mode=pvp wvw}}`;
-      const facts = parseWikitextFacts(wikitext);
+      const { facts } = parseWikitextFacts(wikitext);
       expect(facts).toHaveLength(1);
       expect(facts[0].type).toBe("Buff");
       expect(facts[0].status).toBe("Blindness");
     });
 
-    test("returns empty for no skill facts", () => {
-      const facts = parseWikitextFacts("just some regular wikitext");
+    test("returns empty facts and hasPveOnly=false for no skill facts", () => {
+      const { facts, hasPveOnly } = parseWikitextFacts("just some regular wikitext");
       expect(facts).toEqual([]);
+      expect(hasPveOnly).toBe(false);
     });
   });
 
@@ -126,7 +128,7 @@ describe("seed.js parsing functions", () => {
   describe("parseWikitextFacts with wvwGroupedWithPvp", () => {
     test("treats pvp-only facts as wvw when grouped", () => {
       const wikitext = `{{skill fact|Endurance gained|8|game mode = pve}}{{skill fact|Endurance gained|5|game mode = pvp}}`;
-      const facts = parseWikitextFacts(wikitext, true);
+      const { facts } = parseWikitextFacts(wikitext, true);
       expect(facts).toHaveLength(1);
       expect(facts[0]._wvwSpecific).toBe(true);
       expect(facts[0].type).toBe("Buff");
@@ -134,7 +136,7 @@ describe("seed.js parsing functions", () => {
 
     test("skips pvp-only facts when NOT grouped", () => {
       const wikitext = `{{skill fact|Endurance gained|8|game mode = pve}}{{skill fact|Endurance gained|5|game mode = pvp}}`;
-      const facts = parseWikitextFacts(wikitext, false);
+      const { facts } = parseWikitextFacts(wikitext, false);
       expect(facts).toEqual([]);
     });
   });

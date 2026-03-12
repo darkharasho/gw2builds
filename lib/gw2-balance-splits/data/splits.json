@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-03-12T16:46:17.529Z",
+  "updatedAt": "2026-03-12T17:53:51.911Z",
   "skills": {
     "985": {
       "name": "Drop Stim Brew",
@@ -626,13 +626,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Chilled",
               "status": "Chilled",
               "duration": 1,
@@ -816,13 +809,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Stun",
               "status": "Stun",
               "duration": 1,
@@ -916,13 +902,6 @@
               "type": "Range",
               "text": "Range",
               "value": 1200
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -1004,13 +983,6 @@
               "text": "Defiance break",
               "status": "Defiance break",
               "duration": 232,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -1797,13 +1769,6 @@
               "text": "Chilled",
               "status": "Chilled",
               "duration": 3,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -2851,13 +2816,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Resistance",
               "status": "Resistance",
               "duration": 4,
@@ -3683,37 +3641,6 @@
         }
       }
     },
-    "5832": {
-      "name": "Elixir X",
-      "modes": {
-        "wvw": {
-          "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            }
-          ],
-          "complete": true
-        }
-      }
-    },
     "5842": {
       "name": "Bomb",
       "modes": {
@@ -4531,13 +4458,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Breaks stun",
               "status": "Breaks stun",
               "duration": 0,
@@ -5031,13 +4951,6 @@
               "type": "Range",
               "text": "Range",
               "value": 1200
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -5631,13 +5544,6 @@
               "hit_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 3
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -6082,13 +5988,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Knockdown",
               "status": "Knockdown",
               "duration": 3,
@@ -6269,13 +6168,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Burning",
@@ -6670,13 +6562,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Launch",
               "status": "Launch",
               "duration": 750,
@@ -7022,20 +6907,6 @@
               "hit_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -7071,13 +6942,6 @@
               "text": "Damage",
               "dmg_multiplier": 0.25,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -9437,13 +9301,6 @@
               "status": "Block",
               "duration": 0,
               "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -9529,13 +9386,6 @@
               "text": "Damage",
               "dmg_multiplier": 0.5,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -9675,13 +9525,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Slow",
               "status": "Slow",
               "duration": 1,
@@ -9723,6 +9566,46 @@
               "type": "Unblockable",
               "text": "Unblockable",
               "value": true
+            }
+          ],
+          "complete": true
+        }
+      }
+    },
+    "10314": {
+      "name": "Counterspell",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Damage",
+              "text": "Damage",
+              "dmg_multiplier": 0.1,
+              "hit_count": 1
+            },
+            {
+              "type": "Buff",
+              "text": "Blinded",
+              "status": "Blinded",
+              "duration": 5,
+              "apply_count": 1
+            },
+            {
+              "type": "Number",
+              "text": "Number of Targets",
+              "value": 5
+            },
+            {
+              "type": "Range",
+              "text": "Range",
+              "value": 900
+            },
+            {
+              "type": "Buff",
+              "text": "Pierces",
+              "status": "Pierces",
+              "duration": 0,
+              "apply_count": 1
             }
           ],
           "complete": true
@@ -9860,13 +9743,6 @@
               "text": "Damage",
               "dmg_multiplier": 1.024,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Number",
@@ -10631,13 +10507,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Conditions transferred",
               "status": "Conditions transferred",
               "duration": 3,
@@ -10705,13 +10574,6 @@
               "type": "Buff",
               "text": "Breaks stun",
               "status": "Breaks stun",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
               "duration": 0,
               "apply_count": 1
             }
@@ -10895,11 +10757,9 @@
               "distance": 240
             },
             {
-              "type": "Buff",
+              "type": "Number",
               "text": "Blast radius",
-              "status": "Blast radius",
-              "duration": 300,
-              "apply_count": 1
+              "value": 300
             },
             {
               "type": "ComboField",
@@ -11144,13 +11004,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Boons removed",
               "status": "Boons removed",
               "duration": 1,
@@ -11188,13 +11041,6 @@
               "text": "Damage",
               "dmg_multiplier": 1,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -11391,13 +11237,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Swiftness",
               "status": "Swiftness",
               "duration": 30,
@@ -11421,13 +11260,6 @@
               "type": "Buff",
               "text": "Breaks stun",
               "status": "Breaks stun",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
               "duration": 0,
               "apply_count": 1
             },
@@ -12904,21 +12736,12 @@
         "wvw": {
           "facts": [
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 40
             }
           ],
-          "complete": true
+          "complete": false
         }
       }
     },
@@ -13165,13 +12988,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Fury",
               "status": "Fury",
               "duration": 12,
@@ -13343,13 +13159,6 @@
               "apply_count": 5
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -13445,13 +13254,6 @@
               "text": "Quickness",
               "status": "Quickness",
               "duration": 4,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -14943,13 +14745,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 2
-            },
-            {
-              "type": "Buff",
               "text": "Distance",
               "status": "Distance",
               "duration": 600,
@@ -15127,13 +14922,6 @@
               "type": "Unblockable",
               "text": "Unblockable",
               "value": true
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -15511,13 +15299,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 3
-            },
-            {
-              "type": "Buff",
               "text": "Poisoned",
               "status": "Poisoned",
               "duration": 6,
@@ -15710,13 +15491,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 4
-            },
-            {
-              "type": "Buff",
               "text": "Vulnerability",
               "status": "Vulnerability",
               "duration": 6,
@@ -15761,13 +15535,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Number",
               "text": "Conditions Removed",
@@ -16988,13 +16755,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Might",
               "status": "Might",
               "duration": 5,
@@ -18054,13 +17814,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Breakstun",
               "status": "Breakstun",
               "duration": 0,
@@ -18413,20 +18166,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 10
-            },
-            {
-              "type": "Buff",
               "text": "Might",
               "status": "Might",
               "duration": 6,
@@ -18546,13 +18285,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Stability",
               "status": "Stability",
               "duration": 5,
@@ -18643,13 +18375,6 @@
               "target": "Healing",
               "hit_count": 1,
               "coefficient": 0.35
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -19178,11 +18903,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
+              "type": "Number",
               "text": "Blast radius",
-              "status": "Blast radius",
-              "duration": 180,
-              "apply_count": 1
+              "value": 180
             },
             {
               "type": "Buff",
@@ -19321,13 +19044,6 @@
               "type": "Duration",
               "text": "Duration",
               "duration": 10
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -19600,6 +19316,34 @@
               "type": "Range",
               "text": "Range",
               "value": 130
+            }
+          ],
+          "complete": true
+        }
+      }
+    },
+    "14501": {
+      "name": "Rip",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Damage",
+              "text": "Damage",
+              "dmg_multiplier": 2,
+              "hit_count": 1
+            },
+            {
+              "type": "Buff",
+              "text": "Might",
+              "status": "Might",
+              "duration": 5,
+              "apply_count": 10
+            },
+            {
+              "type": "Range",
+              "text": "Range",
+              "value": 150
             }
           ],
           "complete": true
@@ -20602,11 +20346,9 @@
               "distance": 240
             },
             {
-              "type": "Buff",
+              "type": "Number",
               "text": "Blast radius",
-              "status": "Blast radius",
-              "duration": 300,
-              "apply_count": 1
+              "value": 300
             },
             {
               "type": "Range",
@@ -20669,11 +20411,9 @@
               "distance": 240
             },
             {
-              "type": "Buff",
+              "type": "Number",
               "text": "Blast radius",
-              "status": "Blast radius",
-              "duration": 300,
-              "apply_count": 1
+              "value": 300
             },
             {
               "type": "Range",
@@ -20958,13 +20698,6 @@
               "coefficient": 0.3
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 5
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -21162,13 +20895,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Might",
               "status": "Might",
               "duration": 6,
@@ -21263,13 +20989,6 @@
               "text": "Damage reduced",
               "status": "Damage reduced",
               "duration": 33,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -21657,13 +21376,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Movement speed increase",
               "status": "Movement speed increase",
               "duration": 50,
@@ -22024,13 +21736,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Protection",
               "status": "Protection",
               "duration": 2,
@@ -22288,13 +21993,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Launch",
               "status": "Launch",
               "duration": 360,
@@ -22386,13 +22084,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Number of impacts",
               "status": "Number of impacts",
               "duration": 2,
@@ -22423,13 +22114,6 @@
               "text": "Damage",
               "dmg_multiplier": 1,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 2
             },
             {
               "type": "Buff",
@@ -22520,13 +22204,6 @@
               "type": "Radius",
               "text": "Radius",
               "distance": 360
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -22681,13 +22358,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Fury",
               "status": "Fury",
               "duration": 3,
@@ -22732,13 +22402,6 @@
               "status": "Vulnerability",
               "duration": 6,
               "apply_count": 10
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Number",
@@ -23261,13 +22924,6 @@
               "target": "Healing",
               "hit_count": 1,
               "coefficient": 0.05
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Number",
@@ -23967,13 +23623,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Protection",
               "status": "Protection",
               "duration": 0.5,
@@ -24149,20 +23798,6 @@
               "type": "Range",
               "text": "Range",
               "value": 1200
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -24434,13 +24069,6 @@
               "type": "Range",
               "text": "Range",
               "value": 600
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -24613,13 +24241,6 @@
               "status": "Vulnerability",
               "duration": 6,
               "apply_count": 5
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Range",
@@ -24957,20 +24578,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 10
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Vulnerability",
               "status": "Vulnerability",
               "duration": 6,
@@ -25179,13 +24786,6 @@
               "text": "Damage",
               "dmg_multiplier": 0.612,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -25857,13 +25457,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Burning",
               "status": "Burning",
               "duration": 4,
@@ -25881,13 +25474,6 @@
               "text": "Crippled",
               "status": "Crippled",
               "duration": 1,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -26228,13 +25814,6 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -26334,13 +25913,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Allied targets",
               "status": "Allied targets",
               "duration": 5,
@@ -26361,13 +25933,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 10
-            },
             {
               "type": "Buff",
               "text": "Might",
@@ -26401,13 +25966,6 @@
               "text": "Swiftness",
               "status": "Swiftness",
               "duration": 10,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -26555,13 +26113,6 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -26596,20 +26147,6 @@
               "status": "Block",
               "duration": 0,
               "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -26621,13 +26158,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Swiftness",
@@ -26678,13 +26208,6 @@
               "text": "Stability",
               "status": "Stability",
               "duration": 2,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -26941,13 +26464,6 @@
               "type": "Range",
               "text": "Range",
               "value": 600
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -27077,13 +26593,6 @@
               "type": "Duration",
               "text": "Duration",
               "duration": 5
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -27930,13 +27439,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Protection",
               "status": "Protection",
               "duration": 3,
@@ -27962,11 +27464,9 @@
               "value": 5
             },
             {
-              "type": "Buff",
+              "type": "Number",
               "text": "Blast radius",
-              "status": "Blast radius",
-              "duration": 240,
-              "apply_count": 1
+              "value": 240
             },
             {
               "type": "ComboFinisher",
@@ -28153,6 +27653,125 @@
             }
           ],
           "complete": true
+        }
+      }
+    },
+    "30461": {
+      "name": "Signet of Courage",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "AttributeAdjust",
+              "text": "Healing",
+              "value": 202,
+              "target": "Healing",
+              "hit_count": 1,
+              "coefficient": 0.15
+            },
+            {
+              "type": "AttributeAdjust",
+              "text": "Healing",
+              "value": 650,
+              "target": "Healing",
+              "hit_count": 1,
+              "coefficient": 0.2
+            },
+            {
+              "type": "AttributeAdjust",
+              "text": "Healing",
+              "value": 3250,
+              "target": "Healing",
+              "hit_count": 1,
+              "coefficient": 2
+            },
+            {
+              "type": "Buff",
+              "text": "Protection",
+              "status": "Protection",
+              "duration": 1,
+              "apply_count": 6
+            },
+            {
+              "type": "Buff",
+              "text": "Resolution",
+              "status": "Resolution",
+              "duration": 1,
+              "apply_count": 6
+            },
+            {
+              "type": "Number",
+              "text": "Number of Targets",
+              "value": 5
+            },
+            {
+              "type": "Buff",
+              "text": "Pulses",
+              "status": "Pulses",
+              "duration": 6,
+              "apply_count": 1
+            },
+            {
+              "type": "Buff",
+              "text": "Interval",
+              "status": "Interval",
+              "duration": 3,
+              "apply_count": 1
+            },
+            {
+              "type": "Radius",
+              "text": "Radius",
+              "distance": 300
+            },
+            {
+              "type": "Radius",
+              "text": "Radius",
+              "distance": 600
+            },
+            {
+              "type": "Buff",
+              "text": "Combat only",
+              "status": "Combat only",
+              "duration": 0,
+              "apply_count": 1
+            },
+            {
+              "type": "Buff",
+              "text": "Breaks stun",
+              "status": "Breaks stun",
+              "duration": 0,
+              "apply_count": 1
+            }
+          ],
+          "complete": true
+        },
+        "pve": {
+          "facts": [
+            {
+              "type": "AttributeAdjust",
+              "text": "Healing",
+              "value": 202,
+              "target": "Healing",
+              "hit_count": 1,
+              "coefficient": 0.15
+            },
+            {
+              "type": "AttributeAdjust",
+              "text": "Healing",
+              "value": 650,
+              "target": "Healing",
+              "hit_count": 1,
+              "coefficient": 0.2
+            },
+            {
+              "type": "AttributeAdjust",
+              "text": "Healing",
+              "value": 3250,
+              "target": "Healing",
+              "hit_count": 1,
+              "coefficient": 2
+            }
+          ]
         }
       }
     },
@@ -28747,13 +28366,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Health threshold",
               "status": "Health threshold",
               "duration": 50,
@@ -28781,13 +28393,6 @@
               "text": "Damage",
               "dmg_multiplier": 0.25,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -29006,13 +28611,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Defiance break",
               "status": "Defiance break",
               "duration": 150,
@@ -29047,13 +28645,6 @@
               "status": "Might",
               "duration": 15,
               "apply_count": 5
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Number",
@@ -29143,13 +28734,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Burning",
               "status": "Burning",
               "duration": 4,
@@ -29161,11 +28745,9 @@
               "value": 5
             },
             {
-              "type": "Buff",
+              "type": "Number",
               "text": "Blast radius",
-              "status": "Blast radius",
-              "duration": 600,
-              "apply_count": 1
+              "value": 600
             }
           ],
           "complete": true
@@ -29395,13 +28977,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 2
-            },
-            {
-              "type": "Buff",
               "text": "Stun",
               "status": "Stun",
               "duration": 2,
@@ -29519,13 +29094,6 @@
               "text": "Protection",
               "status": "Protection",
               "duration": 2.5,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -29821,27 +29389,6 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 5
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -30110,11 +29657,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
+              "type": "Number",
               "text": "Healing radius",
-              "status": "Healing radius",
-              "duration": 360,
-              "apply_count": 1
+              "value": 360
             },
             {
               "type": "ComboFinisher",
@@ -30652,12 +30197,29 @@
         "wvw": {
           "facts": [
             {
-              "type": "Recharge",
-              "text": "Recharge",
-              "value": 30
+              "type": "Number",
+              "text": "Conditions Removed",
+              "value": 2
+            },
+            {
+              "type": "Number",
+              "text": "Number of Targets",
+              "value": 5
+            },
+            {
+              "type": "Radius",
+              "text": "Radius",
+              "distance": 600
+            },
+            {
+              "type": "Buff",
+              "text": "Breaks stun",
+              "status": "Breaks stun",
+              "duration": 0,
+              "apply_count": 1
             }
           ],
-          "complete": false
+          "complete": true
         }
       }
     },
@@ -30778,6 +30340,73 @@
         }
       }
     },
+    "31503": {
+      "name": "Natural Convergence",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Damage",
+              "text": "Damage",
+              "dmg_multiplier": 0.75,
+              "hit_count": 1
+            },
+            {
+              "type": "Damage",
+              "text": "Damage",
+              "dmg_multiplier": 2,
+              "hit_count": 1
+            },
+            {
+              "type": "Buff",
+              "text": "Crippled",
+              "status": "Crippled",
+              "duration": 1,
+              "apply_count": 1
+            },
+            {
+              "type": "Buff",
+              "text": "Slow",
+              "status": "Slow",
+              "duration": 1,
+              "apply_count": 1
+            },
+            {
+              "type": "Buff",
+              "text": "Immobilize",
+              "status": "Immobilize",
+              "duration": 2,
+              "apply_count": 4
+            },
+            {
+              "type": "Buff",
+              "text": "Stability",
+              "status": "Stability",
+              "duration": 2,
+              "apply_count": 2
+            },
+            {
+              "type": "Number",
+              "text": "Number of Targets",
+              "value": 5
+            },
+            {
+              "type": "Buff",
+              "text": "Pulses",
+              "status": "Pulses",
+              "duration": 4,
+              "apply_count": 1
+            },
+            {
+              "type": "Radius",
+              "text": "Radius",
+              "distance": 360
+            }
+          ],
+          "complete": true
+        }
+      }
+    },
     "31535": {
       "name": "Ancestral Grace",
       "modes": {
@@ -30825,13 +30454,6 @@
               "type": "Range",
               "text": "Range",
               "value": 1200
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -31932,13 +31554,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Daze",
               "status": "Daze",
               "duration": 1,
@@ -32057,13 +31672,6 @@
               "text": "Damage",
               "dmg_multiplier": 1,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -32823,13 +32431,6 @@
               "apply_count": 2
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -33068,12 +32669,65 @@
         "wvw": {
           "facts": [
             {
-              "type": "Recharge",
-              "text": "Recharge",
-              "value": 40
+              "type": "Damage",
+              "text": "Damage",
+              "dmg_multiplier": 0.55,
+              "hit_count": 1
+            },
+            {
+              "type": "Buff",
+              "text": "Swiftness",
+              "status": "Swiftness",
+              "duration": 6,
+              "apply_count": 1
+            },
+            {
+              "type": "Buff",
+              "text": "Stability",
+              "status": "Stability",
+              "duration": 6,
+              "apply_count": 1
+            },
+            {
+              "type": "Buff",
+              "text": "Torment",
+              "status": "Torment",
+              "duration": 8,
+              "apply_count": 3
+            },
+            {
+              "type": "Buff",
+              "text": "Burning",
+              "status": "Burning",
+              "duration": 4,
+              "apply_count": 1
+            },
+            {
+              "type": "Buff",
+              "text": "Boons converted to conditions",
+              "status": "Boons converted to conditions",
+              "duration": 1,
+              "apply_count": 1
+            },
+            {
+              "type": "Number",
+              "text": "Number of Targets",
+              "value": 10
+            },
+            {
+              "type": "Duration",
+              "text": "Duration",
+              "duration": 6
+            },
+            {
+              "type": "Buff",
+              "text": "Breaks stun",
+              "status": "Breaks stun",
+              "duration": 0,
+              "apply_count": 1
             }
           ],
-          "complete": false
+          "complete": true
         }
       }
     },
@@ -33328,20 +32982,6 @@
               "text": "Chilled",
               "status": "Chilled",
               "duration": 4,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -33980,13 +33620,6 @@
               "apply_count": 6
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 3
@@ -34263,13 +33896,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Poisoned",
               "status": "Poisoned",
               "duration": 10,
@@ -34358,13 +33984,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Stability",
@@ -34631,12 +34250,28 @@
         "wvw": {
           "facts": [
             {
-              "type": "Recharge",
-              "text": "Recharge",
-              "value": 30
+              "type": "Buff",
+              "text": "Initiative",
+              "status": "Initiative",
+              "duration": 3,
+              "apply_count": 1
+            },
+            {
+              "type": "Buff",
+              "text": "Initiative",
+              "status": "Initiative",
+              "duration": 1,
+              "apply_count": 1
+            },
+            {
+              "type": "Buff",
+              "text": "Breaks stun",
+              "status": "Breaks stun",
+              "duration": 0,
+              "apply_count": 1
             }
           ],
-          "complete": false
+          "complete": true
         }
       }
     },
@@ -35104,18 +34739,14 @@
               "distance": 240
             },
             {
-              "type": "Buff",
+              "type": "Number",
               "text": "Radius increase",
-              "status": "Radius increase",
-              "duration": 120,
-              "apply_count": 1
+              "value": 120
             },
             {
-              "type": "Buff",
+              "type": "Number",
               "text": "Blast radius",
-              "status": "Blast radius",
-              "duration": 120,
-              "apply_count": 1
+              "value": 120
             },
             {
               "type": "Buff",
@@ -35883,23 +35514,6 @@
         }
       }
     },
-    "42470": {
-      "name": "Lesser Signet of Stone",
-      "modes": {
-        "wvw": {
-          "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            }
-          ],
-          "complete": true
-        }
-      }
-    },
     "42475": {
       "name": "Bright Slash—Storm",
       "modes": {
@@ -36255,13 +35869,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 3
-            },
-            {
-              "type": "Buff",
               "text": "Burning",
               "status": "Burning",
               "duration": 3,
@@ -36355,13 +35962,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Conditions converted to boons",
@@ -36478,13 +36078,6 @@
               "status": "Bleeding",
               "duration": 8,
               "apply_count": 3
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 4
             },
             {
               "type": "Buff",
@@ -37272,13 +36865,6 @@
               "status": "Might",
               "duration": 6,
               "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 8
             },
             {
               "type": "Buff",
@@ -38089,13 +37675,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Might",
               "status": "Might",
               "duration": 6,
@@ -38155,13 +37734,6 @@
               "text": "Damage increase",
               "status": "Damage increase",
               "duration": 10,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -38378,13 +37950,6 @@
               "coefficient": 0.2
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -38455,13 +38020,6 @@
               "text": "Quickness",
               "status": "Quickness",
               "duration": 2,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             }
           ],
@@ -38908,13 +38466,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Protection",
               "status": "Protection",
               "duration": 5,
@@ -39251,13 +38802,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Recharge reduced",
               "status": "Recharge reduced",
               "duration": 100,
@@ -39392,11 +38936,9 @@
               "distance": 240
             },
             {
-              "type": "Buff",
+              "type": "Number",
               "text": "Radius increase",
-              "status": "Radius increase",
-              "duration": 120,
-              "apply_count": 1
+              "value": 120
             },
             {
               "type": "ComboField",
@@ -39661,13 +39203,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Stability",
               "status": "Stability",
               "duration": 3,
@@ -39811,35 +39346,12 @@
         "wvw": {
           "facts": [
             {
-              "type": "AttributeAdjust",
-              "text": "Healing",
-              "value": 4963,
-              "target": "Healing",
-              "hit_count": 1,
-              "coefficient": 0.4
-            },
-            {
-              "type": "AttributeAdjust",
-              "text": "Healing",
-              "value": 408,
-              "target": "Healing",
-              "hit_count": 1,
-              "coefficient": 0.4
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Number",
-              "text": "Conditions Removed",
-              "value": 2
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 30
             }
           ],
-          "complete": true
+          "complete": false
         },
         "pve": {
           "facts": [
@@ -39888,20 +39400,6 @@
               "text": "Damage",
               "dmg_multiplier": 0.33,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -40184,24 +39682,10 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Might",
               "status": "Might",
               "duration": 6,
               "apply_count": 2
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -40660,13 +40144,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Boons removed",
               "status": "Boons removed",
               "duration": 1,
@@ -40728,13 +40205,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Resistance",
@@ -41146,13 +40616,6 @@
               "apply_count": 5
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Range",
               "text": "Range",
               "value": 1200
@@ -41172,13 +40635,6 @@
               "text": "Damage",
               "dmg_multiplier": 0.5,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Duration",
@@ -41304,13 +40760,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Evade",
               "status": "Evade",
               "duration": 1,
@@ -41407,13 +40856,6 @@
               "target": "Healing",
               "hit_count": 1,
               "coefficient": 0.25
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -41520,49 +40962,12 @@
         "wvw": {
           "facts": [
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Stability",
-              "status": "Stability",
-              "duration": 6,
-              "apply_count": 6
-            },
-            {
-              "type": "Buff",
-              "text": "Condition",
-              "status": "Condition",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Condition",
-              "status": "Condition",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Condition",
-              "status": "Condition",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Breaks stun",
-              "status": "Breaks stun",
-              "duration": 0,
-              "apply_count": 1
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 30
             }
           ],
-          "complete": true
+          "complete": false
         }
       }
     },
@@ -41666,13 +41071,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Protection",
@@ -41920,11 +41318,9 @@
               "distance": 45
             },
             {
-              "type": "Buff",
+              "type": "Number",
               "text": "Blast radius",
-              "status": "Blast radius",
-              "duration": 180,
-              "apply_count": 1
+              "value": 180
             },
             {
               "type": "Buff",
@@ -42351,13 +41747,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Stability",
               "status": "Stability",
               "duration": 3,
@@ -42409,13 +41798,6 @@
               "text": "Damage",
               "dmg_multiplier": 1.5,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -42496,20 +41878,6 @@
               "text": "Damage",
               "dmg_multiplier": 0.3,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -43505,13 +42873,6 @@
               "coefficient": 0.1
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Number",
               "text": "Conditions Removed",
               "value": 2
@@ -43759,11 +43120,9 @@
               "distance": 180
             },
             {
-              "type": "Buff",
+              "type": "Number",
               "text": "Barrier radius",
-              "status": "Barrier radius",
-              "duration": 300,
-              "apply_count": 1
+              "value": 300
             }
           ],
           "complete": true
@@ -43821,13 +43180,6 @@
               "text": "Revive",
               "status": "Revive",
               "duration": 5,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -44109,13 +43461,6 @@
               "hit_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -44303,13 +43648,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Might",
@@ -45081,103 +44419,12 @@
         "wvw": {
           "facts": [
             {
-              "type": "Buff",
-              "text": "Text",
-              "status": "Text",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Resolution",
-              "status": "Resolution",
-              "duration": 5,
-              "apply_count": 1
-            },
-            {
-              "type": "Number",
-              "text": "Conditions Removed",
-              "value": 5
-            },
-            {
-              "type": "Buff",
-              "text": "Life force",
-              "status": "Life force",
-              "duration": 3,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Text",
-              "status": "Text",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Damage",
-              "text": "Damage",
-              "dmg_multiplier": 0.8,
-              "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 10
-            },
-            {
-              "type": "Buff",
-              "text": "Boons converted to conditions",
-              "status": "Boons converted to conditions",
-              "duration": 1,
-              "apply_count": 1
-            },
-            {
-              "type": "Number",
-              "text": "Number of Targets",
-              "value": 5
-            },
-            {
-              "type": "Radius",
-              "text": "Radius",
-              "distance": 240
-            },
-            {
-              "type": "Buff",
-              "text": "Blight threshold",
-              "status": "Blight threshold",
-              "duration": 5,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Text",
-              "status": "Text",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Damage increase",
-              "status": "Damage increase",
-              "duration": 100,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Boons converted to conditions",
-              "status": "Boons converted to conditions",
-              "duration": 2,
-              "apply_count": 1
-            },
-            {
-              "type": "Range",
-              "text": "Range",
-              "value": 900
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 20
             }
           ],
-          "complete": true
+          "complete": false
         }
       }
     },
@@ -45467,13 +44714,6 @@
               "status": "Weakness",
               "duration": 5,
               "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 10
             },
             {
               "type": "Number",
@@ -46103,20 +45343,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Condition",
               "status": "Condition",
               "duration": 0,
@@ -46247,13 +45473,6 @@
               "text": "Damage",
               "dmg_multiplier": 2,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Range",
@@ -46460,13 +45679,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Count recharge",
               "status": "Count recharge",
               "duration": 20,
@@ -46510,98 +45722,12 @@
         "wvw": {
           "facts": [
             {
-              "type": "Buff",
-              "text": "Text",
-              "status": "Text",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Resistance",
-              "status": "Resistance",
-              "duration": 5,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Protection",
-              "status": "Protection",
-              "duration": 4,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Text",
-              "status": "Text",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Damage",
-              "text": "Damage",
-              "dmg_multiplier": 0.8,
-              "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Blindness",
-              "status": "Blindness",
-              "duration": 2,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 10
-            },
-            {
-              "type": "Number",
-              "text": "Number of Targets",
-              "value": 5
-            },
-            {
-              "type": "Radius",
-              "text": "Radius",
-              "distance": 240
-            },
-            {
-              "type": "Buff",
-              "text": "Blight threshold",
-              "status": "Blight threshold",
-              "duration": 5,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Text",
-              "status": "Text",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Damage and condition duration increase",
-              "status": "Damage and condition duration increase",
-              "duration": 100,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Breaks stun",
-              "status": "Breaks stun",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Range",
-              "text": "Range",
-              "value": 900
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 20
             }
           ],
-          "complete": true
+          "complete": false
         }
       }
     },
@@ -46723,20 +45849,6 @@
               "status": "Torment",
               "duration": 5,
               "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 15
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 15
             },
             {
               "type": "Number",
@@ -46943,13 +46055,6 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 10
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -47038,13 +46143,6 @@
               "apply_count": 3
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 10
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -47107,13 +46205,6 @@
               "text": "Damage",
               "dmg_multiplier": 1.2,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -47365,20 +46456,6 @@
               "coefficient": 0.22
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -47459,13 +46536,6 @@
               "coefficient": 0.2
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -47542,13 +46612,6 @@
               "status": "Vulnerability",
               "duration": 10,
               "apply_count": 5
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Number",
@@ -47689,13 +46752,6 @@
               "type": "Radius",
               "text": "Radius",
               "distance": 180
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -47792,11 +46848,9 @@
               "value": 5
             },
             {
-              "type": "Buff",
+              "type": "Number",
               "text": "Blast radius",
-              "status": "Blast radius",
-              "duration": 180,
-              "apply_count": 1
+              "value": 180
             },
             {
               "type": "Buff",
@@ -47923,13 +46977,6 @@
               "text": "Recharge time reduced",
               "status": "Recharge time reduced",
               "duration": 25,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             }
           ],
@@ -48140,13 +47187,6 @@
               "text": "Damage",
               "dmg_multiplier": 0.15,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -48651,13 +47691,6 @@
               "status": "Interval",
               "duration": 1,
               "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -48776,13 +47809,6 @@
               "text": "Damage",
               "dmg_multiplier": 0.15,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -49408,13 +48434,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Weakness",
               "status": "Weakness",
               "duration": 1,
@@ -50028,13 +49047,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Knockdown",
               "status": "Knockdown",
               "duration": 2,
@@ -50479,13 +49491,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Bleeding",
               "status": "Bleeding",
               "duration": 3.5,
@@ -50566,13 +49571,6 @@
               "target": "Healing",
               "hit_count": 1,
               "coefficient": 0.5
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -50708,13 +49706,6 @@
               "target": "Healing",
               "hit_count": 1,
               "coefficient": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -50918,13 +49909,6 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1428,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -51912,13 +50896,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Vigor",
               "status": "Vigor",
               "duration": 6,
@@ -51943,13 +50920,6 @@
               "text": "Resolution",
               "status": "Resolution",
               "duration": 6,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -52898,13 +51868,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Cripple",
               "status": "Cripple",
               "duration": 5,
@@ -53615,23 +52578,9 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Stability",
               "status": "Stability",
               "duration": 3,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             }
           ],
@@ -54977,20 +53926,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 5
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 5
-            },
-            {
-              "type": "Buff",
               "text": "Maximum count",
               "status": "Maximum count",
               "duration": 2,
@@ -55049,23 +53984,9 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Burning",
               "status": "Burning",
               "duration": 1.5,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -55258,23 +54179,9 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Burning",
               "status": "Burning",
               "duration": 1.5,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -55364,23 +54271,9 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Vulnerability",
               "status": "Vulnerability",
               "duration": 6,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -55471,23 +54364,9 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Weakness",
               "status": "Weakness",
               "duration": 1,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -55772,13 +54651,6 @@
               "hit_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "ComboFinisher",
               "text": "Combo Finisher",
               "finisher_type": "Projectile",
@@ -55820,23 +54692,9 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Burning",
               "status": "Burning",
               "duration": 1.5,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -56063,23 +54921,9 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Vulnerability",
               "status": "Vulnerability",
               "duration": 6,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -56926,23 +55770,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Range",
               "text": "Range",
               "value": 900
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -57030,20 +55860,6 @@
               "text": "Damage",
               "dmg_multiplier": 0.96,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 2
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -57371,13 +56187,6 @@
               "type": "Range",
               "text": "Range",
               "value": 900
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -57403,13 +56212,6 @@
               "status": "Protection",
               "duration": 3,
               "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 3
             },
             {
               "type": "Buff",
@@ -57484,13 +56286,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Text",
               "status": "Text",
               "duration": 0,
@@ -57507,20 +56302,6 @@
               "type": "Range",
               "text": "Range",
               "value": 900
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -57973,13 +56754,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Cripple",
               "status": "Cripple",
               "duration": 2,
@@ -58022,13 +56796,6 @@
               "text": "Damage",
               "dmg_multiplier": 0.01,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -58426,20 +57193,6 @@
               "type": "Range",
               "text": "Range",
               "value": 900
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -58469,20 +57222,6 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1410,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -58555,34 +57294,6 @@
               "text": "Damage",
               "dmg_multiplier": 0.8,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -58888,13 +57599,6 @@
               "type": "Unblockable",
               "text": "Unblockable",
               "value": true
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -58940,13 +57644,6 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -58971,13 +57668,6 @@
               "type": "Range",
               "text": "Range",
               "value": 900
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -59171,22 +57861,8 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Text",
               "status": "Text",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
               "duration": 0,
               "apply_count": 1
             },
@@ -59195,20 +57871,6 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.75,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             }
           ],
@@ -59229,30 +57891,9 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Protection",
               "status": "Protection",
               "duration": 3,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -59384,13 +58025,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Recharge reduced",
               "status": "Recharge reduced",
               "duration": 33,
@@ -59407,13 +58041,6 @@
               "type": "Range",
               "text": "Range",
               "value": 900
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -59604,20 +58231,6 @@
               "type": "Range",
               "text": "Range",
               "value": 900
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -59701,20 +58314,6 @@
               "text": "Regeneration",
               "status": "Regeneration",
               "duration": 3,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -60080,20 +58679,6 @@
               "type": "Range",
               "text": "Range",
               "value": 900
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -60216,13 +58801,6 @@
               "type": "Range",
               "text": "Range",
               "value": 900
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -60320,13 +58898,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 3
-            },
-            {
-              "type": "Buff",
               "text": "Bleeding",
               "status": "Bleeding",
               "duration": 5,
@@ -60336,13 +58907,6 @@
               "type": "Range",
               "text": "Range",
               "value": 900
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -60719,20 +59283,6 @@
               "type": "Range",
               "text": "Range",
               "value": 900
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -60875,13 +59425,6 @@
               "target": "Healing",
               "hit_count": 1,
               "coefficient": 0.8
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -61188,13 +59731,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Recharge reduced",
               "status": "Recharge reduced",
               "duration": 100,
@@ -61339,13 +59875,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Crippled",
               "status": "Crippled",
               "duration": 4,
@@ -61389,20 +59918,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Recharge reduced",
@@ -61497,27 +60012,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Recharge reduced",
@@ -61684,13 +60178,6 @@
               "status": "Vulnerability",
               "duration": 6,
               "apply_count": 2
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -61942,13 +60429,6 @@
               "text": "Weakness",
               "status": "Weakness",
               "duration": 4,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -62358,13 +60838,6 @@
               "coefficient": 0.5
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Number",
               "text": "Conditions Removed",
               "value": 3
@@ -62601,13 +61074,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Fury",
               "status": "Fury",
               "duration": 10,
@@ -62833,13 +61299,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Immobilized",
               "status": "Immobilized",
               "duration": 2,
@@ -62850,13 +61309,6 @@
               "text": "Crippled",
               "status": "Crippled",
               "duration": 1,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -63032,13 +61484,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Maximum stacks",
               "status": "Maximum stacks",
               "duration": 12,
@@ -63164,20 +61609,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 2
-            },
-            {
-              "type": "Buff",
               "text": "Boons removed",
               "status": "Boons removed",
               "duration": 2,
@@ -63223,20 +61654,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Swiftness",
@@ -63427,13 +61844,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 2
-            },
-            {
-              "type": "Buff",
               "text": "Immobilize",
               "status": "Immobilize",
               "duration": 1.5,
@@ -63608,13 +62018,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Daze",
               "status": "Daze",
               "duration": 0.25,
@@ -63709,13 +62112,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Vulnerability",
               "status": "Vulnerability",
               "duration": 8,
@@ -63746,13 +62142,6 @@
               "text": "Damage",
               "dmg_multiplier": 0.8,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Number",
@@ -63873,13 +62262,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Lifeforce",
               "status": "Lifeforce",
               "duration": 5,
@@ -63905,13 +62287,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Number",
               "text": "Conditions Removed",
@@ -64046,13 +62421,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Maximum count",
               "status": "Maximum count",
               "duration": 3,
@@ -64183,13 +62551,6 @@
               "target": "Healing",
               "hit_count": 1,
               "coefficient": 0.2
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -64596,20 +62957,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Vulnerability",
               "status": "Vulnerability",
               "duration": 6,
@@ -64700,13 +63047,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Might",
               "status": "Might",
               "duration": 6,
@@ -64771,13 +63111,6 @@
               "target": "Healing",
               "hit_count": 1,
               "coefficient": 0.3
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Number",
@@ -64934,27 +63267,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 3
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Recharge reduced",
@@ -65175,13 +63487,6 @@
               "apply_count": 2
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -65236,13 +63541,6 @@
               "text": "Weakness",
               "status": "Weakness",
               "duration": 1,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -65523,13 +63821,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Daze",
               "status": "Daze",
               "duration": 2,
@@ -65601,13 +63892,6 @@
               "target": "Healing",
               "hit_count": 1,
               "coefficient": 0.1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Number",
@@ -66046,13 +64330,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 3
-            },
-            {
-              "type": "Buff",
               "text": "Burning",
               "status": "Burning",
               "duration": 4,
@@ -66103,13 +64380,6 @@
               "target": "Healing",
               "hit_count": 1,
               "coefficient": 0.5
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -66165,20 +64435,6 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -66231,13 +64487,6 @@
               "text": "Damage",
               "dmg_multiplier": 0.01,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 3
             },
             {
               "type": "Buff",
@@ -66320,11 +64569,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
+              "type": "Number",
               "text": "Blast radius",
-              "status": "Blast radius",
-              "duration": 360,
-              "apply_count": 1
+              "value": 360
             },
             {
               "type": "Range",
@@ -66437,13 +64684,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Stability",
               "status": "Stability",
               "duration": 4,
@@ -66496,13 +64736,6 @@
               "status": "Barrier",
               "duration": 2250,
               "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -66515,12 +64748,33 @@
         "wvw": {
           "facts": [
             {
-              "type": "Recharge",
-              "text": "Recharge",
-              "value": 25
+              "type": "Buff",
+              "text": "Arrows restored",
+              "status": "Arrows restored",
+              "duration": 1,
+              "apply_count": 1
+            },
+            {
+              "type": "Buff",
+              "text": "Evade",
+              "status": "Evade",
+              "duration": 0.75,
+              "apply_count": 1
+            },
+            {
+              "type": "Range",
+              "text": "Range",
+              "value": 600
+            },
+            {
+              "type": "Buff",
+              "text": "Breaks stun",
+              "status": "Breaks stun",
+              "duration": 0,
+              "apply_count": 1
             }
           ],
-          "complete": false
+          "complete": true
         }
       }
     },
@@ -66534,13 +64788,6 @@
               "text": "Damage",
               "dmg_multiplier": 1.2,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -66585,13 +64832,6 @@
               "type": "Buff",
               "text": "[[attribute",
               "status": "[[attribute",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
               "duration": 0,
               "apply_count": 1
             }
@@ -66696,13 +64936,6 @@
               "text": "Damage",
               "dmg_multiplier": 0.03,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -66875,13 +65108,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Stun",
               "status": "Stun",
               "duration": 2,
@@ -66983,13 +65209,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Text",
               "status": "Text",
               "duration": 0,
@@ -67061,13 +65280,6 @@
               "text": "Protection",
               "status": "Protection",
               "duration": 3,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -67145,13 +65357,6 @@
               "text": "Protection",
               "status": "Protection",
               "duration": 4,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -67279,13 +65484,6 @@
               "text": "Damage",
               "dmg_multiplier": 1.3,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 2
             },
             {
               "type": "Number",
@@ -67485,13 +65683,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 5
-            },
-            {
-              "type": "Buff",
               "text": "Vulnerability",
               "status": "Vulnerability",
               "duration": 8,
@@ -67640,13 +65831,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Daze",
               "status": "Daze",
               "duration": 0.5,
@@ -67684,13 +65868,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 3
-            },
             {
               "type": "Buff",
               "text": "Regeneration",
@@ -68010,20 +66187,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Alacrity",
               "status": "Alacrity",
               "duration": 8,
@@ -68141,13 +66304,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Might",
               "status": "Might",
               "duration": 6,
@@ -68194,20 +66350,6 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 3973,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -68328,13 +66470,6 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 394,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -68528,13 +66663,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Text",
               "status": "Text",
               "duration": 0,
@@ -68595,13 +66723,6 @@
               "text": "Damage",
               "dmg_multiplier": 1.2,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 2
             },
             {
               "type": "Buff",
@@ -68670,13 +66791,6 @@
               "text": "Damage increase",
               "status": "Damage increase",
               "duration": 15,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -68787,13 +66901,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Knockback",
               "status": "Knockback",
               "duration": 180,
@@ -68864,13 +66971,6 @@
               "text": "Damage",
               "dmg_multiplier": 0.6,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -68945,13 +67045,6 @@
               "type": "Buff",
               "text": "Text",
               "status": "Text",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
               "duration": 0,
               "apply_count": 1
             },
@@ -69104,13 +67197,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 2
-            },
-            {
-              "type": "Buff",
               "text": "Stability",
               "status": "Stability",
               "duration": 4,
@@ -69202,20 +67288,6 @@
               "target": "Healing",
               "hit_count": 1,
               "coefficient": 0.6
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -69423,13 +67495,6 @@
               "text": "Damage",
               "dmg_multiplier": 0.35,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 5
             },
             {
               "type": "Number",
@@ -69699,13 +67764,6 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -69739,13 +67797,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Condition",
@@ -69819,13 +67870,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 4
-            },
-            {
-              "type": "Buff",
               "text": "Swiftness",
               "status": "Swiftness",
               "duration": 10,
@@ -69836,13 +67880,6 @@
               "text": "Endurance gained",
               "status": "Endurance gained",
               "duration": 50,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -69946,13 +67983,6 @@
               "target": "Healing",
               "hit_count": 1,
               "coefficient": 0.1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -70142,13 +68172,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Stun",
               "status": "Stun",
               "duration": 2,
@@ -70224,13 +68247,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Daze",
               "status": "Daze",
               "duration": 1.5,
@@ -70282,13 +68298,6 @@
               "text": "Damage",
               "dmg_multiplier": 0.75,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -70368,13 +68377,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Number of hits",
               "status": "Number of hits",
               "duration": 5,
@@ -70443,13 +68445,6 @@
               "type": "Buff",
               "text": "Text",
               "status": "Text",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
               "duration": 0,
               "apply_count": 1
             },
@@ -70758,13 +68753,6 @@
               "hit_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -70793,13 +68781,6 @@
               "text": "Damage",
               "dmg_multiplier": 0.3,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -70883,20 +68864,6 @@
               "text": "Damage",
               "dmg_multiplier": 1.8,
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 2
             },
             {
               "type": "Buff",
@@ -71040,13 +69007,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Torment",
               "status": "Torment",
               "duration": 3,
@@ -71074,13 +69034,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Aegis",
               "status": "Aegis",
               "duration": 4,
@@ -71095,13 +69048,6 @@
               "type": "Duration",
               "text": "Duration",
               "duration": 2
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -71125,13 +69071,6 @@
               "status": "Burning",
               "duration": 5,
               "apply_count": 4
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Number",
@@ -71356,13 +69295,6 @@
               "status": "Damage reduced",
               "duration": 50,
               "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -71549,13 +69481,6 @@
               "type": "Radius",
               "text": "Radius",
               "distance": 300
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -71655,13 +69580,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 5
-            },
-            {
-              "type": "Buff",
               "text": "Burning",
               "status": "Burning",
               "duration": 2,
@@ -71746,13 +69664,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Arrow cost",
               "status": "Arrow cost",
               "duration": 1,
@@ -71819,13 +69730,6 @@
               "type": "Radius",
               "text": "Radius",
               "distance": 300
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -71864,13 +69768,6 @@
               "status": "Immobile",
               "duration": 2,
               "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 2
             },
             {
               "type": "Number",
@@ -71922,20 +69819,6 @@
               "text": "Fury",
               "status": "Fury",
               "duration": 6,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -72158,13 +70041,6 @@
               "text": "Damage increase",
               "status": "Damage increase",
               "duration": 5,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -72457,13 +70333,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Resistance",
               "status": "Resistance",
               "duration": 4,
@@ -72536,13 +70405,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Resistance",
@@ -72618,20 +70480,6 @@
               "target": "Healing",
               "hit_count": 1,
               "coefficient": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Number",
@@ -73296,13 +71144,6 @@
               "status": "Protection",
               "duration": 3,
               "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -73549,58 +71390,6 @@
         }
       }
     },
-    "287": {
-      "name": "Written in Stone",
-      "modes": {
-        "wvw": {
-          "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            }
-          ],
-          "complete": true
-        }
-      }
-    },
     "294": {
       "name": "Pyromancer's Puissance",
       "modes": {
@@ -73676,11 +71465,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
+              "type": "Number",
               "text": "Radius increase",
-              "status": "Radius increase",
-              "duration": 60,
-              "apply_count": 1
+              "value": 60
             }
           ],
           "complete": true
@@ -73768,13 +71555,6 @@
         "wvw": {
           "facts": [
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -73790,20 +71570,6 @@
               "type": "Radius",
               "text": "Radius",
               "distance": 600
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "AttributeAdjust",
@@ -74100,13 +71866,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Incoming healing increase",
               "status": "Incoming healing increase",
               "duration": 10,
@@ -74143,13 +71902,6 @@
               "type": "Buff",
               "text": "Misc",
               "status": "Misc",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
               "duration": 0,
               "apply_count": 1
             }
@@ -74304,11 +72056,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
+              "type": "Number",
               "text": "Radius increase",
-              "status": "Radius increase",
-              "duration": 60,
-              "apply_count": 1
+              "value": 60
             }
           ],
           "complete": true
@@ -74743,20 +72493,6 @@
         "wvw": {
           "facts": [
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Duration",
               "text": "Maximum Effect Duration",
               "duration": 15
@@ -75010,23 +72746,6 @@
         }
       }
     },
-    "722": {
-      "name": "Escape Artist",
-      "modes": {
-        "wvw": {
-          "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            }
-          ],
-          "complete": true
-        }
-      }
-    },
     "729": {
       "name": "Phantasmal Haste",
       "modes": {
@@ -75056,13 +72775,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Might",
@@ -75313,13 +73025,6 @@
               "text": "Life siphon healing",
               "status": "Life siphon healing",
               "duration": 229,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -75699,13 +73404,6 @@
               "status": "Fury",
               "duration": 10,
               "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -75889,13 +73587,6 @@
               "text": "Damage increase",
               "status": "Damage increase",
               "duration": 5,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -76226,13 +73917,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Duration increase",
               "status": "Duration increase",
               "duration": 10,
@@ -76304,23 +73988,6 @@
         }
       }
     },
-    "1112": {
-      "name": "Instant Reflexes",
-      "modes": {
-        "wvw": {
-          "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            }
-          ],
-          "complete": true
-        }
-      }
-    },
     "1130": {
       "name": "Leeching Venoms",
       "modes": {
@@ -76338,13 +74005,6 @@
               "text": "Life siphon healing",
               "status": "Life siphon healing",
               "duration": 325,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -76989,27 +74649,6 @@
               "status": "Quickness",
               "duration": 2.5,
               "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 4
             }
           ],
           "complete": true
@@ -77131,13 +74770,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Adrenaline",
@@ -77363,13 +74995,6 @@
               "text": "Damage increase",
               "status": "Damage increase",
               "duration": 3,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             }
           ],
@@ -77676,13 +75301,6 @@
               "type": "Radius",
               "text": "Radius",
               "distance": 300
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -77812,23 +75430,9 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Quickness",
               "status": "Quickness",
               "duration": 3,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -77933,13 +75537,6 @@
         "wvw": {
           "facts": [
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Duration",
               "text": "Duration on Entering",
               "duration": 4
@@ -77963,13 +75560,6 @@
               "type": "Buff",
               "text": "Misc",
               "status": "Misc",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
               "duration": 0,
               "apply_count": 1
             }
@@ -78069,13 +75659,6 @@
               "text": "Healing increase to others per 100 vitality",
               "status": "Healing increase to others per 100 vitality",
               "duration": 0.5,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             }
           ],
@@ -78216,13 +75799,6 @@
               "text": "Weakness",
               "status": "Weakness",
               "duration": 3,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -78494,13 +76070,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Attribute",
@@ -78808,13 +76377,6 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Unblockable",
               "text": "Unblockable",
               "value": true
@@ -79051,13 +76613,6 @@
               "status": "Life siphon healing",
               "duration": 58,
               "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 5
             }
           ],
           "complete": true
@@ -79208,13 +76763,6 @@
               "status": "Gain",
               "duration": 0,
               "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -79226,48 +76774,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Duration",
               "text": "Duration",
@@ -79330,13 +76836,6 @@
               "text": "Vigor",
               "status": "Vigor",
               "duration": 4,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -79859,33 +77358,9 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Percent",
               "status": "Percent",
               "duration": 10,
-              "apply_count": 1
-            }
-          ],
-          "complete": true
-        }
-      }
-    },
-    "1833": {
-      "name": "Lotus Training",
-      "modes": {
-        "wvw": {
-          "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             }
           ],
@@ -79939,13 +77414,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Recharge reduced",
@@ -80041,30 +77509,9 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Quickness",
               "status": "Quickness",
               "duration": 5,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -80133,13 +77580,6 @@
               "type": "Buff",
               "text": "Swiftness",
               "status": "Swiftness",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
               "duration": 0,
               "apply_count": 1
             }
@@ -80515,13 +77955,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Weakness",
               "status": "Weakness",
               "duration": 2,
@@ -80629,13 +78062,6 @@
               "apply_count": 3
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -80701,13 +78127,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Maximum count",
@@ -80941,13 +78360,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Allied targets",
@@ -81224,11 +78636,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
+              "type": "Number",
               "text": "Radius increase",
-              "status": "Radius increase",
-              "duration": 33,
-              "apply_count": 1
+              "value": 33
             }
           ],
           "complete": true
@@ -81272,13 +78682,6 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -81303,20 +78706,6 @@
               "text": "Damage increase",
               "status": "Damage increase",
               "duration": 10,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             }
           ],
@@ -81477,27 +78866,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Condition",
               "status": "Condition",
               "duration": 0,
@@ -81570,13 +78938,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Resistance",
               "status": "Resistance",
               "duration": 2,
@@ -81609,13 +78970,6 @@
               "text": "Stability",
               "status": "Stability",
               "duration": 3,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -81655,13 +79009,6 @@
               "text": "Health threshold",
               "status": "Health threshold",
               "duration": 75,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -81742,13 +79089,6 @@
               "status": "Fury",
               "duration": 6,
               "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -81765,13 +79105,6 @@
               "text": "Damage increase",
               "status": "Damage increase",
               "duration": 5,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             }
           ],
@@ -81883,13 +79216,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Attribute",
               "status": "Attribute",
               "duration": 0,
@@ -81938,13 +79264,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Critical damage increase",
               "status": "Critical damage increase",
               "duration": 10,
@@ -81984,20 +79303,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Radius",
               "text": "Radius",
@@ -82232,13 +79537,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Duration increase",
               "status": "Duration increase",
               "duration": 10,
@@ -82299,23 +79597,6 @@
               "type": "Buff",
               "text": "Attribute",
               "status": "Attribute",
-              "duration": 0,
-              "apply_count": 1
-            }
-          ],
-          "complete": true
-        }
-      }
-    },
-    "2047": {
-      "name": "Bounding Dodger",
-      "modes": {
-        "wvw": {
-          "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
               "duration": 0,
               "apply_count": 1
             }
@@ -82398,13 +79679,6 @@
             },
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Allied targets",
               "status": "Allied targets",
               "duration": 5,
@@ -82472,23 +79746,6 @@
         }
       }
     },
-    "2056": {
-      "name": "Natural Balance",
-      "modes": {
-        "wvw": {
-          "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            }
-          ],
-          "complete": true
-        }
-      }
-    },
     "2057": {
       "name": "Grace of the Land",
       "modes": {
@@ -82525,13 +79782,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Healing increase to others",
@@ -82586,13 +79836,6 @@
               "status": "Pages",
               "duration": 1,
               "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -82646,13 +79889,6 @@
               "text": "Combo Finisher",
               "finisher_type": "Blast",
               "percent": 100
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -82846,44 +80082,6 @@
         }
       }
     },
-    "2081": {
-      "name": "Elemental Polyphony",
-      "modes": {
-        "wvw": {
-          "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            }
-          ],
-          "complete": true
-        }
-      }
-    },
     "2082": {
       "name": "Renewing Oasis",
       "modes": {
@@ -83068,38 +80266,10 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Maximum stacks",
               "status": "Maximum stacks",
               "duration": 4,
               "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 4
             }
           ],
           "complete": true
@@ -83111,13 +80281,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Might",
@@ -83219,27 +80382,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 2
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 2
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 6
-            },
-            {
-              "type": "Buff",
               "text": "Burning",
               "status": "Burning",
               "duration": 2,
@@ -83291,13 +80433,6 @@
               "text": "Protection",
               "status": "Protection",
               "duration": 3,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -83425,11 +80560,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
+              "type": "Number",
               "text": "Radius increase",
-              "status": "Radius increase",
-              "duration": 120,
-              "apply_count": 1
+              "value": 120
             }
           ],
           "complete": true
@@ -83589,23 +80722,6 @@
         }
       }
     },
-    "2127": {
-      "name": "Twice as Vicious",
-      "modes": {
-        "wvw": {
-          "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            }
-          ],
-          "complete": true
-        }
-      }
-    },
     "2128": {
       "name": "Leader of the Pack",
       "modes": {
@@ -83649,13 +80765,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Maximum stacks",
               "status": "Maximum stacks",
               "duration": 5,
@@ -83692,13 +80801,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Gain",
@@ -84078,13 +81180,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Immobilize",
               "status": "Immobilize",
               "duration": 0,
@@ -84149,13 +81244,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Recharge time reduced",
@@ -84228,23 +81316,6 @@
         }
       }
     },
-    "2180": {
-      "name": "Weaver's Prowess",
-      "modes": {
-        "wvw": {
-          "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            }
-          ],
-          "complete": true
-        }
-      }
-    },
     "2185": {
       "name": "Septic Corruption",
       "modes": {
@@ -84300,13 +81371,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Maximum count",
               "status": "Maximum count",
               "duration": 5,
@@ -84351,13 +81415,6 @@
               "text": "Stability",
               "status": "Stability",
               "duration": 3,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             },
             {
@@ -84476,13 +81533,6 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Duration",
               "text": "Justice Duration Increase",
               "duration": 2
@@ -84491,13 +81541,6 @@
               "type": "Duration",
               "text": "Lethal Tempo Duration Reduction",
               "duration": 2
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 5
             }
           ],
           "complete": true
@@ -84538,13 +81581,6 @@
               "text": "Vulnerability",
               "status": "Vulnerability",
               "duration": 5,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             }
           ],
@@ -84822,51 +81858,6 @@
         }
       }
     },
-    "2231": {
-      "name": "Elemental Epitome",
-      "modes": {
-        "wvw": {
-          "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            }
-          ],
-          "complete": true
-        }
-      }
-    },
     "2233": {
       "name": "Elemental Synergy",
       "modes": {
@@ -85093,30 +82084,6 @@
         }
       }
     },
-    "2247": {
-      "name": "Empowering Auras",
-      "modes": {
-        "wvw": {
-          "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Maximum count",
-              "status": "Maximum count",
-              "duration": 5,
-              "apply_count": 1
-            }
-          ],
-          "complete": true
-        }
-      }
-    },
     "2248": {
       "name": "Amnesty of Shing Jea",
       "modes": {
@@ -85279,23 +82246,6 @@
         }
       }
     },
-    "2257": {
-      "name": "Forerunner of Death",
-      "modes": {
-        "wvw": {
-          "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            }
-          ],
-          "complete": true
-        }
-      }
-    },
     "2259": {
       "name": "Reaver's Curse",
       "modes": {
@@ -85328,13 +82278,6 @@
               "value": 100,
               "target": "Healing",
               "hit_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             },
             {
               "type": "Buff",
@@ -85476,13 +82419,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Torment",
               "status": "Torment",
               "duration": 2,
@@ -85507,13 +82443,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Maximum stacks",
               "status": "Maximum stacks",
               "duration": 5,
@@ -85525,6 +82454,49 @@
               "status": "Movement speed increase",
               "duration": 5,
               "apply_count": 1
+            }
+          ],
+          "complete": true
+        }
+      }
+    },
+    "2275": {
+      "name": "Consume Shadows",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Buff",
+              "text": "Healing per stack",
+              "status": "Healing per stack",
+              "duration": 0,
+              "apply_count": 1
+            },
+            {
+              "type": "Buff",
+              "text": "Maximum count",
+              "status": "Maximum count",
+              "duration": 5,
+              "apply_count": 1
+            },
+            {
+              "type": "Buff",
+              "text": "Allied targets",
+              "status": "Allied targets",
+              "duration": 5,
+              "apply_count": 1
+            },
+            {
+              "type": "Buff",
+              "text": "Interval",
+              "status": "Interval",
+              "duration": 1,
+              "apply_count": 1
+            },
+            {
+              "type": "Radius",
+              "text": "Radius",
+              "distance": 600
             }
           ],
           "complete": true
@@ -86040,41 +83012,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Effectiveness increased",
               "status": "Effectiveness increased",
               "duration": 100,
@@ -86092,27 +83029,6 @@
           "facts": [
             {
               "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Life force drain per second",
               "status": "Life force drain per second",
               "duration": 3,
@@ -86122,13 +83038,6 @@
               "type": "Duration",
               "text": "Base Lingering Duration",
               "duration": 3
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -86152,30 +83061,6 @@
               "text": "Recharge time",
               "status": "Recharge time",
               "duration": 15,
-              "apply_count": 1
-            }
-          ],
-          "complete": true
-        }
-      }
-    },
-    "2336": {
-      "name": "Gale Force",
-      "modes": {
-        "wvw": {
-          "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             }
           ],
@@ -86216,44 +83101,6 @@
         }
       }
     },
-    "2342": {
-      "name": "Familiar's Focus",
-      "modes": {
-        "wvw": {
-          "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            }
-          ],
-          "complete": true
-        }
-      }
-    },
     "2343": {
       "name": "Shredding",
       "modes": {
@@ -86264,13 +83111,6 @@
               "text": "Damage increase",
               "status": "Damage increase",
               "duration": 10,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
               "apply_count": 1
             }
           ],
@@ -86301,13 +83141,6 @@
         "wvw": {
           "facts": [
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Duration",
               "text": "Maximum Duration",
               "duration": 20
@@ -86322,34 +83155,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Max duration",
@@ -86489,40 +83294,6 @@
               "type": "Range",
               "text": "Range",
               "value": 240
-            }
-          ],
-          "complete": true
-        }
-      }
-    },
-    "2356": {
-      "name": "Willing Host",
-      "modes": {
-        "wvw": {
-          "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            }
-          ],
-          "complete": true
-        }
-      }
-    },
-    "2357": {
-      "name": "Liberating Liaise",
-      "modes": {
-        "wvw": {
-          "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -86813,37 +83584,6 @@
         }
       }
     },
-    "2375": {
-      "name": "Brisk Pacing",
-      "modes": {
-        "wvw": {
-          "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            }
-          ],
-          "complete": true
-        }
-      }
-    },
     "2378": {
       "name": "Spirit's Gift",
       "modes": {
@@ -86963,44 +83703,6 @@
         }
       }
     },
-    "2382": {
-      "name": "Enhanced Potency",
-      "modes": {
-        "wvw": {
-          "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            }
-          ],
-          "complete": true
-        }
-      }
-    },
     "2383": {
       "name": "Carbolic Composition",
       "modes": {
@@ -87044,37 +83746,6 @@
               "type": "Radius",
               "text": "Radius",
               "distance": 300
-            }
-          ],
-          "complete": true
-        }
-      }
-    },
-    "2385": {
-      "name": "Strengthening Stanzas",
-      "modes": {
-        "wvw": {
-          "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -87234,13 +83905,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Attribute",
@@ -87546,34 +84210,6 @@
         "wvw": {
           "facts": [
             {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
               "type": "Number",
               "text": "Number of Targets",
               "value": 5
@@ -87712,34 +84348,6 @@
               "status": "Damage reduced",
               "duration": 10,
               "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
             }
           ],
           "complete": true
@@ -87803,13 +84411,6 @@
       "modes": {
         "wvw": {
           "facts": [
-            {
-              "type": "Buff",
-              "text": "Effect",
-              "status": "Effect",
-              "duration": 0,
-              "apply_count": 1
-            },
             {
               "type": "Buff",
               "text": "Confusion",

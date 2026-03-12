@@ -7,6 +7,30 @@ import { computeEquipmentStats } from "./stats.js";
 // importable in Node.js test environments (no document.querySelector at module scope).
 let _el = { detailHost: null, hoverPreview: null };
 
+export function triggerDetailPanelAnimation() {
+  if (!_el.detailHost) return;
+  requestAnimationFrame(() => {
+    // Animate the whole facts list (always fires on mode switch)
+    const ul = _el.detailHost.querySelector(".facts-list");
+    if (ul) {
+      ul.classList.remove("facts-list--refresh");
+      void ul.offsetWidth; // force reflow to restart animation
+      ul.classList.add("facts-list--refresh");
+    }
+    // Flash each changed/added fact individually
+    _el.detailHost.querySelectorAll(".fact-item--split").forEach((el) => {
+      el.classList.remove("fact-item--split--flash");
+      void el.offsetWidth;
+      el.classList.add("fact-item--split--flash");
+    });
+    _el.detailHost.querySelectorAll(".fact-item--new-in-mode").forEach((el) => {
+      el.classList.remove("fact-item--new-in-mode--flash");
+      void el.offsetWidth;
+      el.classList.add("fact-item--new-in-mode--flash");
+    });
+  });
+}
+
 export function initDetailPanel(domRefs) {
   _el = { ..._el, ...domRefs };
 }
@@ -36,7 +60,7 @@ export function renderDetailPanel() {
   const factsHtml = facts.length
     ? facts
         .map((fact) => {
-          const cls = fact.type === "NoData" ? "fact-item--section" : fact._splitFact ? "fact-item--split" : "";
+          const cls = fact.type === "NoData" ? "fact-item--section" : fact._splitFact ? "fact-item--split" : fact._newFact ? "fact-item--new-in-mode" : "";
           return `<li${cls ? ` class="${cls}"` : ""}>${formatFactHtml(fact, detailDmgStats)}</li>`;
         })
         .join("")
@@ -75,7 +99,7 @@ export function renderDetailPanel() {
         </section>
         <section>
           <h4>Facts</h4>
-          <ul>${factsHtml}</ul>
+          <ul class="facts-list">${factsHtml}</ul>
         </section>
       </article>
     `;
@@ -318,6 +342,7 @@ export async function selectDetail(kind, entity) {
   if (!entity) return;
   const detail = {
     kind,
+    entityId: Number(entity.id) || null,
     kindLabel: kind === "trait" ? "Trait" : "Skill",
     title: entity.name || "Unknown",
     icon: entity.icon || "",
