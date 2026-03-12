@@ -32,7 +32,8 @@ export function initSkillsCallbacks({ renderEditor, markEditorChanged, enforceEd
   _openSlotPicker = openSlotPicker;
 }
 
-// Base HP per profession (used to compute the health orb value in the skillbar).
+// Matches GW2 API profession mechanic slot names ("Profession_1" … "Profession_5").
+const PROFESSION_SLOT_RE = /^Profession_\d/;
 
 export function buildRevenantEliteByProfSlot(eliteFixedSkills, eliteSpecId, isAllianceLegendActive, skillById) {
   const eliteByProfSlot = new Map((eliteFixedSkills || []).map((s) => [s.slot, s]));
@@ -70,7 +71,7 @@ export function getSkillOptionsByType(catalog, specializationSelections) {
   // the toggle-off skill IDs that appear as bundleSkills children, not standalone F-slot entries.
   const exitLeavePattern = /^(Exit|Leave)\b/i;
   const profMechanics = allSkills
-    .filter((skill) => /^Profession_\d/.test(skill.slot || ""))
+    .filter((skill) => PROFESSION_SLOT_RE.test(skill.slot || ""))
     .filter((skill) => !exitLeavePattern.test(skill.name || ""))
     // Exclude flip targets unless they are explicitly in the profession endpoint.
     // Using inProfessionEndpoint (not flipParentIds) as the gate because mutual flip pairs

@@ -362,33 +362,6 @@ function formatBuffConditionText(fact) {
   return `${name}${stackPart}${duration}`;
 }
 
-export function formatFact(fact, dmgStats = null) {
-  if (!fact || typeof fact !== "object") return "Unknown fact";
-  const label = String(fact.text || fact.type || "Fact");
-  if (fact.type === "Damage" && fact.dmg_multiplier != null) {
-    const hits = Number(fact.hit_count) || 1;
-    const coeff = (Number(fact.dmg_multiplier) * hits).toFixed(2);
-    let text = hits > 1 ? `${label}: ×${coeff} (${hits} hits)` : `${label}: ×${coeff}`;
-    if (dmgStats) {
-      const dmg = Math.round(dmgStats.weaponStrength * dmgStats.effectivePower * Number(fact.dmg_multiplier) * hits / 2597);
-      text += ` ≈ ${dmg.toLocaleString()}`;
-    }
-    return text;
-  }
-  if (BUFF_FACT_TYPES.has(fact.type)) return formatBuffConditionText(fact);
-  const value =
-    fact.value ??
-    fact.percent ??
-    fact.distance ??
-    fact.duration ??
-    fact.hit_count ??
-    fact.apply_count ??
-    fact.status ??
-    fact.description ??
-    "";
-  return value === "" ? label : `${label}: ${value}`;
-}
-
 export function formatFactHtml(fact, dmgStats = null) {
   if (!fact || typeof fact !== "object") return "Unknown fact";
   // NoData facts are section headers (e.g. conditional legend-stance effects).

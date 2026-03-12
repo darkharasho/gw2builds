@@ -1,8 +1,9 @@
 import { state } from "./state.js";
 import {
-  STAT_COMBOS, SLOT_WEIGHTS, EQUIP_ARMOR_SLOTS, EQUIP_WEAPON_SETS,
-  EQUIP_TRINKET_SLOTS, EQUIP_UNDERWATER_SLOTS, GW2_WEAPONS,
-  GW2_RELICS, GW2_FOOD, GW2_UTILITY, PROFESSION_WEIGHT,
+  STAT_COMBOS_BY_LABEL, SLOT_WEIGHTS, EQUIP_ARMOR_SLOTS, EQUIP_WEAPON_SETS,
+  EQUIP_TRINKET_SLOTS, EQUIP_UNDERWATER_SLOTS, GW2_WEAPONS, GW2_WEAPONS_BY_ID,
+  GW2_RELICS, GW2_RELICS_BY_LABEL, GW2_FOOD, GW2_FOOD_BY_LABEL,
+  GW2_UTILITY, GW2_UTILITY_BY_LABEL, PROFESSION_WEIGHT,
   LEGENDARY_ARMOR_ICONS, _WK,
   PROFESSION_BASE_HP, PROFESSION_CONCEPT_ART,
 } from "./constants.js";
@@ -86,7 +87,11 @@ export function openSlotPicker(anchorEl, currentValue, onSelect, { items = null,
   }
 
   renderPickerList("");
-  search.addEventListener("input", () => renderPickerList(search.value));
+  let _searchDebounce = null;
+  search.addEventListener("input", () => {
+    clearTimeout(_searchDebounce);
+    _searchDebounce = setTimeout(() => renderPickerList(search.value), 80);
+  });
   picker.append(search, list);
   document.body.append(picker);
   _slotPickerEl = picker;
@@ -192,7 +197,7 @@ export function renderEquipmentPanel() {
     const valueEl = document.createElement("div");
     valueEl.className = "equip-slot__value" + (currentCombo ? "" : " equip-slot__value--empty");
     if (currentCombo) {
-      const combo = STAT_COMBOS.find((c) => c.label === currentCombo);
+      const combo = STAT_COMBOS_BY_LABEL.get(currentCombo);
       valueEl.innerHTML = `<span class="equip-slot__combo-name">${escapeHtml(currentCombo)}</span>${combo ? `<span class="equip-slot__combo-stats">${combo.stats.join(" · ")}</span>` : ""}`;
     } else {
       valueEl.textContent = "Select stats…";
@@ -211,7 +216,7 @@ export function renderEquipmentPanel() {
 
     bindHoverPreview(wrapper, "equip-stat", () => {
       if (!currentCombo) return null;
-      const combo = STAT_COMBOS.find((c) => c.label === currentCombo);
+      const combo = STAT_COMBOS_BY_LABEL.get(currentCombo);
       if (!combo) return null;
       const facts = computeSlotStats(currentCombo, slotDef.key)
         .map(({ stat, value }) => ({ text: stat, value: `+${value}` }));
@@ -221,24 +226,26 @@ export function renderEquipmentPanel() {
     return wrapper;
   }
 
-  function makeWeaponSlot(slotDef) {
+  function makeWeaponSlot(slotDef, { isAquatic = false } = {}) {
     const isOffhand = slotDef.hand === "off";
     const mainhandKey = slotDef.key.replace("offhand", "mainhand");
-    const mainhandWeaponId = weapons[mainhandKey] || "";
-    const mainhandProfFlags = (state.activeCatalog?.professionWeapons?.[mainhandWeaponId]?.flags) || [];
-    const lockedByTwoHanded = isOffhand && (
+    const mainhandWeaponId = !isAquatic ? (weapons[mainhandKey] || "") : "";
+    const mainhandProfFlags = !isAquatic ? (state.activeCatalog?.professionWeapons?.[mainhandWeaponId]?.flags || []) : [];
+    const lockedByTwoHanded = !isAquatic && isOffhand && (
       mainhandProfFlags.includes("TwoHand") ||
-      GW2_WEAPONS.find((w) => w.id === mainhandWeaponId)?.hand === "two"
+      GW2_WEAPONS_BY_ID.get(mainhandWeaponId)?.hand === "two"
     );
 
     const currentWeapon = weapons[slotDef.key] || "";
     const currentCombo = slots[slotDef.key] || "";
-    const weaponDef = GW2_WEAPONS.find((w) => w.id === currentWeapon);
+    const weaponDef = GW2_WEAPONS_BY_ID.get(currentWeapon);
+    const emptyIcon = isAquatic
+      ? `${_WK}/3/3f/Aquatic_weapon_slot.png`
+      : "https://wiki.guildwars2.com/images/d/de/Sword_slot.png";
 
     const wrapper = document.createElement("div");
     wrapper.className = "equip-slot equip-slot--weapon" + (lockedByTwoHanded ? " equip-slot--disabled" : "");
 
-    // Weapon type button (left side: icon + name)
     const weaponBtn = document.createElement("button");
     weaponBtn.type = "button";
     weaponBtn.className = "equip-weapon-type-btn";
@@ -247,26 +254,23 @@ export function renderEquipmentPanel() {
     const iconDiv = document.createElement("div");
     iconDiv.className = "equip-slot__icon equip-slot__icon--weapon" + (currentWeapon ? " equip-slot__icon--filled" : "");
     const img = document.createElement("img");
-    img.src = weaponDef ? weaponDef.icon : "https://wiki.guildwars2.com/images/d/de/Sword_slot.png";
+    img.src = weaponDef ? weaponDef.icon : emptyIcon;
     img.alt = weaponDef ? weaponDef.label : slotDef.label;
     img.draggable = false;
     img.addEventListener("error", () => img.remove());
     iconDiv.append(img);
+
     const weaponNameSpan = document.createElement("span");
     weaponNameSpan.className = "equip-weapon-name" + (currentWeapon ? "" : " equip-weapon-name--empty");
-    weaponNameSpan.textContent = lockedByTwoHanded
-      ? "— Two-Handed —"
-      : (weaponDef?.label || slotDef.label);
-
+    weaponNameSpan.textContent = lockedByTwoHanded ? "— Two-Handed —" : (weaponDef?.label || slotDef.label);
     weaponBtn.append(iconDiv, weaponNameSpan);
 
-    // Stat button (right side)
     const statBtn = document.createElement("button");
     statBtn.type = "button";
     statBtn.className = "equip-stat-pick-btn" + (currentCombo ? "" : " equip-stat-pick-btn--empty");
     statBtn.disabled = lockedByTwoHanded;
     if (currentCombo) {
-      const combo = STAT_COMBOS.find((c) => c.label === currentCombo);
+      const combo = STAT_COMBOS_BY_LABEL.get(currentCombo);
       statBtn.innerHTML = `<span class="equip-slot__combo-name">${escapeHtml(currentCombo)}</span>${combo ? `<span class="equip-slot__combo-stats">${combo.stats.join(" · ")}</span>` : ""}`;
     } else {
       statBtn.textContent = "Select stats…";
@@ -275,55 +279,69 @@ export function renderEquipmentPanel() {
     wrapper.append(weaponBtn, statBtn);
 
     bindHoverPreview(weaponBtn, "equip-weapon", () => {
-      const wDef = GW2_WEAPONS.find((w) => w.id === (equip.weapons?.[slotDef.key] || ""));
+      const wDef = GW2_WEAPONS_BY_ID.get(equip.weapons?.[slotDef.key] || "");
       if (!wDef) return null;
       return { name: wDef.label, icon: wDef.icon, description: "", hand: wDef.hand };
     });
 
     bindHoverPreview(statBtn, "equip-stat", () => {
       const curCombo = equip.slots?.[slotDef.key] || "";
-      const combo = curCombo ? STAT_COMBOS.find((c) => c.label === curCombo) : null;
+      const combo = curCombo ? STAT_COMBOS_BY_LABEL.get(curCombo) : null;
       if (!combo) return null;
       const facts = computeSlotStats(curCombo, slotDef.key).map(({ stat, value }) => ({ text: stat, value: `+${value}` }));
       return { name: combo.label, icon: "", description: "", facts, slot: slotDef.label };
     });
 
     if (!lockedByTwoHanded) {
-      // Filter weapons for this slot type, restricted to what this profession can equip
-      const profWeapons = state.activeCatalog?.professionWeapons || {};
-      const weaponItems = [
-        { value: "", label: "— Empty —", subtitle: "" },
-        ...GW2_WEAPONS.filter((w) => {
-          if (w.hand === "aquatic") return false; // aquatic weapons belong in the underwater section
-          const wData = profWeapons[w.id];
-          if (!wData) return false;
-          // Elite spec weapons are now usable by all specs (GW2 balance change)
-          if (isOffhand) return wData.flags.includes("Offhand");
-          return wData.flags.includes("Mainhand") || wData.flags.includes("TwoHand");
-        }).map((w) => {
-          const flags = profWeapons[w.id]?.flags || [];
-          const subtitle = flags.includes("TwoHand") ? "Two-handed"
-            : flags.includes("Mainhand") && flags.includes("Offhand") ? "Main / Off Hand"
-            : "";
-          return { value: w.id, label: w.label, subtitle, icon: w.icon };
-        }),
-      ];
-      weaponBtn.addEventListener("click", () => {
-        openSlotPicker(weaponBtn, currentWeapon, (newVal) => {
-          if (!equip.weapons) equip.weapons = {};
-          equip.weapons[slotDef.key] = newVal || "";
-          // If two-handed selected for mainhand, clear the offhand weapon
-          const newFlags = profWeapons[newVal]?.flags || [];
-          if (newFlags.includes("TwoHand")) {
-            const ofKey = slotDef.key.replace("mainhand", "offhand");
-            equip.weapons[ofKey] = "";
-            equip.slots[ofKey] = "";
-          }
-          _markEditorChanged();
-          renderEquipmentPanel();
-          _renderSkills();
-        }, { items: weaponItems, searchPlaceholder: "Search weapons…" });
-      });
+      if (isAquatic) {
+        const aquaticItems = [
+          { value: "", label: "— Empty —" },
+          ...GW2_WEAPONS.filter((w) => w.hand === "aquatic").map((w) => ({
+            value: w.id, label: w.label, icon: w.icon,
+          })),
+        ];
+        weaponBtn.addEventListener("click", () => {
+          openSlotPicker(weaponBtn, currentWeapon, (newVal) => {
+            if (!equip.weapons) equip.weapons = {};
+            equip.weapons[slotDef.key] = newVal || "";
+            _markEditorChanged();
+            renderEquipmentPanel();
+          }, { items: aquaticItems, searchPlaceholder: "Search aquatic weapons…" });
+        });
+      } else {
+        const profWeapons = state.activeCatalog?.professionWeapons || {};
+        const weaponItems = [
+          { value: "", label: "— Empty —", subtitle: "" },
+          ...GW2_WEAPONS.filter((w) => {
+            if (w.hand === "aquatic") return false;
+            const wData = profWeapons[w.id];
+            if (!wData) return false;
+            if (isOffhand) return wData.flags.includes("Offhand");
+            return wData.flags.includes("Mainhand") || wData.flags.includes("TwoHand");
+          }).map((w) => {
+            const flags = profWeapons[w.id]?.flags || [];
+            const subtitle = flags.includes("TwoHand") ? "Two-handed"
+              : flags.includes("Mainhand") && flags.includes("Offhand") ? "Main / Off Hand"
+              : "";
+            return { value: w.id, label: w.label, subtitle, icon: w.icon };
+          }),
+        ];
+        weaponBtn.addEventListener("click", () => {
+          openSlotPicker(weaponBtn, currentWeapon, (newVal) => {
+            if (!equip.weapons) equip.weapons = {};
+            equip.weapons[slotDef.key] = newVal || "";
+            const newFlags = profWeapons[newVal]?.flags || [];
+            if (newFlags.includes("TwoHand")) {
+              const ofKey = slotDef.key.replace("mainhand", "offhand");
+              equip.weapons[ofKey] = "";
+              equip.slots[ofKey] = "";
+            }
+            _markEditorChanged();
+            renderEquipmentPanel();
+            _renderSkills();
+          }, { items: weaponItems, searchPlaceholder: "Search weapons…" });
+        });
+      }
 
       statBtn.addEventListener("click", () => {
         openSlotPicker(statBtn, currentCombo, (newVal) => {
@@ -333,70 +351,6 @@ export function renderEquipmentPanel() {
         });
       });
     }
-
-    return wrapper;
-  }
-
-  function makeAquaticWeaponSlot(slotDef) {
-    const currentWeapon = weapons[slotDef.key] || "";
-    const currentCombo = slots[slotDef.key] || "";
-    const weaponDef = GW2_WEAPONS.find((w) => w.id === currentWeapon);
-
-    const wrapper = document.createElement("div");
-    wrapper.className = "equip-slot equip-slot--weapon";
-
-    const weaponBtn = document.createElement("button");
-    weaponBtn.type = "button";
-    weaponBtn.className = "equip-weapon-type-btn";
-
-    const iconDiv = document.createElement("div");
-    iconDiv.className = "equip-slot__icon equip-slot__icon--weapon" + (currentWeapon ? " equip-slot__icon--filled" : "");
-    {
-      const img = document.createElement("img");
-      img.src = weaponDef ? weaponDef.icon : `${_WK}/3/3f/Aquatic_weapon_slot.png`;
-      img.alt = weaponDef ? weaponDef.label : slotDef.label;
-      img.draggable = false;
-      img.addEventListener("error", () => img.remove());
-      iconDiv.append(img);
-    }
-    const weaponNameSpan = document.createElement("span");
-    weaponNameSpan.className = "equip-weapon-name" + (currentWeapon ? "" : " equip-weapon-name--empty");
-    weaponNameSpan.textContent = weaponDef?.label || slotDef.label;
-    weaponBtn.append(iconDiv, weaponNameSpan);
-
-    const statBtn = document.createElement("button");
-    statBtn.type = "button";
-    statBtn.className = "equip-stat-pick-btn" + (currentCombo ? "" : " equip-stat-pick-btn--empty");
-    if (currentCombo) {
-      const combo = STAT_COMBOS.find((c) => c.label === currentCombo);
-      statBtn.innerHTML = `<span class="equip-slot__combo-name">${escapeHtml(currentCombo)}</span>${combo ? `<span class="equip-slot__combo-stats">${combo.stats.join(" · ")}</span>` : ""}`;
-    } else {
-      statBtn.textContent = "Select stats…";
-    }
-
-    wrapper.append(weaponBtn, statBtn);
-
-    const aquaticItems = [
-      { value: "", label: "— Empty —" },
-      ...GW2_WEAPONS.filter((w) => w.hand === "aquatic").map((w) => ({
-        value: w.id, label: w.label, icon: w.icon,
-      })),
-    ];
-    weaponBtn.addEventListener("click", () => {
-      openSlotPicker(weaponBtn, currentWeapon, (newVal) => {
-        if (!equip.weapons) equip.weapons = {};
-        equip.weapons[slotDef.key] = newVal || "";
-        _markEditorChanged();
-        renderEquipmentPanel();
-      }, { items: aquaticItems, searchPlaceholder: "Search aquatic weapons…" });
-    });
-    statBtn.addEventListener("click", () => {
-      openSlotPicker(statBtn, currentCombo, (newVal) => {
-        equip.slots[slotDef.key] = newVal || "";
-        _markEditorChanged();
-        renderEquipmentPanel();
-      });
-    });
 
     return wrapper;
   }
@@ -470,71 +424,24 @@ export function renderEquipmentPanel() {
     { value: "", label: "— None —" },
     ...GW2_FOOD.map((f) => ({ value: f.label, label: f.label, icon: f.icon, subtitle: f.buff.replace(/\|/g, "·") })),
   ];
-
-  function makeFoodSlot() {
-    const currentFood = equip.food || "";
-    const foodDef = GW2_FOOD.find((f) => f.label === currentFood);
-    const wrapper = document.createElement("div");
-    wrapper.className = "equip-slot equip-slot--compact";
-    wrapper.setAttribute("role", "button");
-    wrapper.tabIndex = 0;
-
-    const iconDiv = document.createElement("div");
-    iconDiv.className = "equip-slot__icon equip-slot__icon--weapon" + (currentFood ? " equip-slot__icon--filled" : "");
-    const img = document.createElement("img");
-    img.src = foodDef ? foodDef.icon : `${_WK}/6/6b/Nourishment.png`;
-    img.alt = foodDef ? foodDef.label : "Food";
-    img.draggable = false;
-    img.addEventListener("error", () => img.remove());
-    iconDiv.append(img);
-
-    const info = document.createElement("div");
-    info.className = "equip-slot__info";
-    const labelEl = document.createElement("div");
-    labelEl.className = "equip-slot__label";
-    labelEl.textContent = "Food";
-    const valueEl = document.createElement("div");
-    valueEl.className = "equip-slot__combo-name" + (currentFood ? "" : " equip-slot__value--empty");
-    valueEl.style.fontSize = "10px";
-    valueEl.textContent = currentFood || "Select…";
-    info.append(labelEl, valueEl);
-    wrapper.append(iconDiv, info);
-
-    const doOpen = () => openSlotPicker(wrapper, currentFood, (newVal) => {
-      equip.food = newVal || "";
-      _markEditorChanged();
-      renderEquipmentPanel();
-    }, { items: foodItems, searchPlaceholder: "Search food…" });
-    wrapper.addEventListener("click", doOpen);
-    wrapper.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); doOpen(); } });
-
-    bindHoverPreview(wrapper, "equip-food", () => {
-      const fDef = GW2_FOOD.find((f) => f.label === (equip.food || ""));
-      if (!fDef) return null;
-      return { name: fDef.label, icon: fDef.icon, description: fDef.buff.split(" | ").join("\n") };
-    });
-
-    return wrapper;
-  }
-
   const utilityItems = [
     { value: "", label: "— None —" },
     ...GW2_UTILITY.map((u) => ({ value: u.label, label: u.label, icon: u.icon, subtitle: u.buff.replace(/\|/g, "·") })),
   ];
 
-  function makeUtilitySlot() {
-    const currentUtility = equip.utility || "";
-    const utilityDef = GW2_UTILITY.find((u) => u.label === currentUtility);
+  function makeConsumableSlot({ field, label, items, searchPlaceholder, hoverKind, defaultIcon, getDefByLabel }) {
+    const current = equip[field] || "";
+    const def = getDefByLabel(current);
     const wrapper = document.createElement("div");
     wrapper.className = "equip-slot equip-slot--compact";
     wrapper.setAttribute("role", "button");
     wrapper.tabIndex = 0;
 
     const iconDiv = document.createElement("div");
-    iconDiv.className = "equip-slot__icon equip-slot__icon--weapon" + (currentUtility ? " equip-slot__icon--filled" : "");
+    iconDiv.className = "equip-slot__icon equip-slot__icon--weapon" + (current ? " equip-slot__icon--filled" : "");
     const img = document.createElement("img");
-    img.src = utilityDef ? utilityDef.icon : `${_WK}/d/d6/Enhancement.png`;
-    img.alt = utilityDef ? utilityDef.label : "Utility";
+    img.src = def ? def.icon : defaultIcon;
+    img.alt = def ? def.label : label;
     img.draggable = false;
     img.addEventListener("error", () => img.remove());
     iconDiv.append(img);
@@ -543,32 +450,43 @@ export function renderEquipmentPanel() {
     info.className = "equip-slot__info";
     const labelEl = document.createElement("div");
     labelEl.className = "equip-slot__label";
-    labelEl.textContent = "Utility";
+    labelEl.textContent = label;
     const valueEl = document.createElement("div");
-    valueEl.className = "equip-slot__combo-name" + (currentUtility ? "" : " equip-slot__value--empty");
+    valueEl.className = "equip-slot__combo-name" + (current ? "" : " equip-slot__value--empty");
     valueEl.style.fontSize = "10px";
-    valueEl.textContent = currentUtility || "Select…";
+    valueEl.textContent = current || "Select…";
     info.append(labelEl, valueEl);
     wrapper.append(iconDiv, info);
 
-    const doOpen = () => openSlotPicker(wrapper, currentUtility, (newVal) => {
-      equip.utility = newVal || "";
+    const doOpen = () => openSlotPicker(wrapper, current, (newVal) => {
+      equip[field] = newVal || "";
       _markEditorChanged();
       renderEquipmentPanel();
-    }, { items: utilityItems, searchPlaceholder: "Search utility…" });
+    }, { items, searchPlaceholder });
     wrapper.addEventListener("click", doOpen);
     wrapper.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); doOpen(); } });
 
-    bindHoverPreview(wrapper, "equip-utility", () => {
-      const uDef = GW2_UTILITY.find((u) => u.label === (equip.utility || ""));
-      if (!uDef) return null;
-      return { name: uDef.label, icon: uDef.icon, description: uDef.buff.split(" | ").join("\n") };
+    bindHoverPreview(wrapper, hoverKind, () => {
+      const d = getDefByLabel(equip[field] || "");
+      if (!d) return null;
+      return { name: d.label, icon: d.icon, description: d.buff.split(" | ").join("\n") };
     });
 
     return wrapper;
   }
 
-  consumeSection.append(makeFoodSlot(), makeUtilitySlot());
+  consumeSection.append(
+    makeConsumableSlot({
+      field: "food", label: "Food", items: foodItems, searchPlaceholder: "Search food…",
+      hoverKind: "equip-food", defaultIcon: `${_WK}/6/6b/Nourishment.png`,
+      getDefByLabel: (v) => GW2_FOOD_BY_LABEL.get(v),
+    }),
+    makeConsumableSlot({
+      field: "utility", label: "Utility", items: utilityItems, searchPlaceholder: "Search utility…",
+      hoverKind: "equip-utility", defaultIcon: `${_WK}/d/d6/Enhancement.png`,
+      getDefByLabel: (v) => GW2_UTILITY_BY_LABEL.get(v),
+    }),
+  );
   leftCol.append(consumeSection);
 
   // Notes
@@ -653,7 +571,7 @@ export function renderEquipmentPanel() {
 
   function makeRelicSlot() {
     const currentRelic = equip.relic || "";
-    const relicDef = GW2_RELICS.find((r) => r.label === currentRelic);
+    const relicDef = GW2_RELICS_BY_LABEL.get(currentRelic);
     const wrapper = document.createElement("div");
     wrapper.className = "equip-slot equip-slot--compact";
     wrapper.setAttribute("role", "button");
@@ -693,7 +611,7 @@ export function renderEquipmentPanel() {
     wrapper.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); doOpen(); } });
 
     bindHoverPreview(wrapper, "equip-relic", () => {
-      const rDef = GW2_RELICS.find((r) => r.label === (equip.relic || ""));
+      const rDef = GW2_RELICS_BY_LABEL.get(equip.relic || "");
       if (!rDef) return null;
       return { name: rDef.label, icon: rDef.icon, description: "" };
     });
@@ -725,7 +643,7 @@ export function renderEquipmentPanel() {
   // Underwater
   const underwaterSection = makeSection("Underwater");
   for (const slotDef of EQUIP_UNDERWATER_SLOTS) {
-    underwaterSection.append(slotDef.hand === "aquatic" ? makeAquaticWeaponSlot(slotDef) : makeSlot(slotDef));
+    underwaterSection.append(slotDef.hand === "aquatic" ? makeWeaponSlot(slotDef, { isAquatic: true }) : makeSlot(slotDef));
   }
   rightCol.append(underwaterSection);
 

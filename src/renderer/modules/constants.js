@@ -36,6 +36,8 @@ export const STAT_COMBOS = [
   { label: "Celestial",     stats: ["Power", "Precision", "Toughness", "Vitality", "ConditionDamage", "Ferocity", "HealingPower", "Expertise", "Concentration"] },
 ];
 
+export const STAT_COMBOS_BY_LABEL = new Map(STAT_COMBOS.map((c) => [c.label, c]));
+
 export const SLOT_WEIGHTS = {
   head:       { p: 60,  s: 43 },
   shoulders:  { p: 45,  s: 32 },
@@ -244,6 +246,11 @@ export const GW2_UTILITY = [
   { id: 67528, label: "Bountiful Maintenance Oil",  icon: `${_RW}/BA57FF7A052FFE37669F97A815BD28089FCFF0AD/219367.png`, buff: "Gain 0.6% Healing to Allies per 100 Healing Power | Gain 0.8% per 100 Concentration" },
   { id: 67529, label: "Furious Maintenance Oil",    icon: `${_RW}/BA57FF7A052FFE37669F97A815BD28089FCFF0AD/219367.png`, buff: "Gain Concentration Equal to 3% of Your Precision | Gain Healing Power Equal to 3% of Your Precision" },
 ];
+
+export const GW2_WEAPONS_BY_ID    = new Map(GW2_WEAPONS.map((w) => [w.id, w]));
+export const GW2_RELICS_BY_LABEL  = new Map(GW2_RELICS.map((r) => [r.label, r]));
+export const GW2_FOOD_BY_LABEL    = new Map(GW2_FOOD.map((f) => [f.label, f]));
+export const GW2_UTILITY_BY_LABEL = new Map(GW2_UTILITY.map((u) => [u.label, u]));
 
 export const PROFESSION_CONCEPT_ART = {
   Elementalist: `${_WK}/5/5e/Elementalist_04_concept_art.png`,

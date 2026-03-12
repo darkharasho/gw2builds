@@ -1,0 +1,230 @@
+"use strict";
+
+/**
+ * Tests for stats.js — computeSlotStats() and computeEquipmentStats().
+ *
+ * These functions drive the attributes panel, health orb, and detail panel
+ * damage estimates, so correctness is critical.
+ */
+
+const { computeSlotStats, computeEquipmentStats } = require("../../../src/renderer/modules/stats");
+const { state } = require("../../../src/renderer/modules/state");
+
+// ---------------------------------------------------------------------------
+// Helpers — reset state.editor before each test
+// ---------------------------------------------------------------------------
+
+function makeEditor(slots = {}, food = "") {
+  return {
+    profession: "Warrior",
+    equipment: { slots, food, weapons: {}, utility: "" },
+    specializations: [],
+    skills: { healId: 0, utilityIds: [0, 0, 0], eliteId: 0 },
+  };
+}
+
+beforeEach(() => {
+  state.editor = makeEditor();
+});
+
+// ---------------------------------------------------------------------------
+// computeSlotStats
+// ---------------------------------------------------------------------------
+
+describe("computeSlotStats — 3-stat combos", () => {
+  test("Berserker's chest returns Power primary, Precision+Ferocity secondary", () => {
+    const result = computeSlotStats("Berserker's", "chest");
+    expect(result).toHaveLength(3);
+    expect(result[0]).toEqual({ stat: "Power",     value: 134 });
+    expect(result[1]).toEqual({ stat: "Precision",  value: 96  });
+    expect(result[2]).toEqual({ stat: "Ferocity",   value: 96  });
+  });
+
+  test("Berserker's head returns correct head weights", () => {
+    const result = computeSlotStats("Berserker's", "head");
+    expect(result[0]).toEqual({ stat: "Power",    value: 60 });
+    expect(result[1]).toEqual({ stat: "Precision", value: 43 });
+    expect(result[2]).toEqual({ stat: "Ferocity",  value: 43 });
+  });
+
+  test("returns empty for unknown combo", () => {
+    expect(computeSlotStats("Nonexistent Combo", "chest")).toEqual([]);
+  });
+
+  test("returns empty for unknown slot", () => {
+    expect(computeSlotStats("Berserker's", "unknownSlot")).toEqual([]);
+  });
+
+  test("Sinister mainhand1 — 3 stats with ConditionDamage primary", () => {
+    const result = computeSlotStats("Sinister", "mainhand1");
+    expect(result).toHaveLength(3);
+    expect(result[0].stat).toBe("ConditionDamage");
+    expect(result[0].value).toBe(120); // p weight for mainhand1
+    expect(result[1].stat).toBe("Power");
+    expect(result[1].value).toBe(85);  // s weight for mainhand1
+  });
+});
+
+describe("computeSlotStats — 4-stat combos", () => {
+  test("Viper's chest applies 4-stat scaling formula", () => {
+    // Viper's: Power, ConditionDamage, Precision, Expertise
+    // chest weights: p=134, s=96
+    const result = computeSlotStats("Viper's", "chest");
+    expect(result).toHaveLength(4);
+    expect(result[0]).toEqual({ stat: "Power",          value: Math.round(134 * 0.895) });
+    expect(result[1]).toEqual({ stat: "ConditionDamage", value: Math.round(96  * 0.889) });
+    expect(result[2]).toEqual({ stat: "Precision",       value: Math.round(96  * 0.889) });
+    expect(result[3]).toEqual({ stat: "Expertise",       value: Math.round(134 * 0.452) });
+  });
+
+  test("Marauder's ring1 applies 4-stat formula", () => {
+    // ring1 weights: p=126, s=85 (trinket)
+    const result = computeSlotStats("Marauder's", "ring1");
+    expect(result).toHaveLength(4);
+    expect(result[0].stat).toBe("Power");
+    expect(result[3].stat).toBe("Ferocity");
+    // Each value should be a positive integer
+    for (const r of result) expect(r.value).toBeGreaterThan(0);
+  });
+});
+
+describe("computeSlotStats — 9-stat combo (Celestial)", () => {
+  test("Celestial chest distributes evenly across 9 stats", () => {
+    // chest: p=134, s=96; each = Math.round((134 + 2*96) / 9)
+    const each = Math.round((134 + 2 * 96) / 9);
+    const result = computeSlotStats("Celestial", "chest");
+    expect(result).toHaveLength(9);
+    for (const r of result) expect(r.value).toBe(each);
+    const stats = result.map((r) => r.stat);
+    expect(stats).toContain("Power");
+    expect(stats).toContain("HealingPower");
+    expect(stats).toContain("Expertise");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// computeEquipmentStats
+// ---------------------------------------------------------------------------
+
+describe("computeEquipmentStats — base values", () => {
+  test("returns base stats when no equipment is selected", () => {
+    state.editor = makeEditor({});
+    const result = computeEquipmentStats();
+    expect(result.Power).toBe(1000);
+    expect(result.Precision).toBe(1000);
+    expect(result.Toughness).toBe(1000);
+    expect(result.Vitality).toBe(1000);
+    expect(result.Ferocity).toBe(0);
+    expect(result.ConditionDamage).toBe(0);
+    expect(result.HealingPower).toBe(0);
+    expect(result.Expertise).toBe(0);
+    expect(result.Concentration).toBe(0);
+  });
+});
+
+describe("computeEquipmentStats — single slot contributions", () => {
+  test("Berserker's chest adds Power/Precision/Ferocity correctly", () => {
+    state.editor = makeEditor({ chest: "Berserker's" });
+    const result = computeEquipmentStats();
+    expect(result.Power).toBe(1000 + 134);
+    expect(result.Precision).toBe(1000 + 96);
+    expect(result.Ferocity).toBe(96);
+  });
+
+  test("Cleric's amulet adds HealingPower primary, Toughness+Power secondary", () => {
+    // Cleric's: HealingPower, Toughness, Power
+    // amulet weights: p=157, s=108
+    state.editor = makeEditor({ amulet: "Cleric's" });
+    const result = computeEquipmentStats();
+    expect(result.HealingPower).toBe(157);
+    expect(result.Toughness).toBe(1000 + 108);
+    expect(result.Power).toBe(1000 + 108);
+  });
+
+  test("unknown combo label is silently ignored", () => {
+    state.editor = makeEditor({ chest: "Fake Stats That Do Not Exist" });
+    const result = computeEquipmentStats();
+    expect(result.Power).toBe(1000); // base unchanged
+  });
+
+  test("empty slot value is skipped", () => {
+    state.editor = makeEditor({ chest: "", head: "" });
+    const result = computeEquipmentStats();
+    expect(result.Power).toBe(1000);
+  });
+});
+
+describe("computeEquipmentStats — multiple slot accumulation", () => {
+  test("full Berserker's armor set accumulates all 6 armor slots", () => {
+    // armor: head(p60,s43), shoulders(p45,s32), chest(p134,s96), hands(p45,s32), legs(p90,s64), feet(p45,s32)
+    const armorSlots = { head: "Berserker's", shoulders: "Berserker's", chest: "Berserker's",
+                         hands: "Berserker's", legs: "Berserker's",  feet: "Berserker's" };
+    state.editor = makeEditor(armorSlots);
+    const result = computeEquipmentStats();
+    const totalPrimary   = 60 + 45 + 134 + 45 + 90 + 45;  // = 419
+    const totalSecondary = 43 + 32 +  96 + 32 + 64 + 32;  // = 299
+    expect(result.Power).toBe(1000 + totalPrimary);
+    expect(result.Precision).toBe(1000 + totalSecondary);
+    expect(result.Ferocity).toBe(totalSecondary);
+  });
+
+  test("dual weapon set adds mainhand1 + mainhand2", () => {
+    // mainhand1 and mainhand2 each: p=120, s=85
+    state.editor = makeEditor({ mainhand1: "Berserker's", mainhand2: "Berserker's" });
+    const result = computeEquipmentStats();
+    expect(result.Power).toBe(1000 + 120 + 120);
+    expect(result.Precision).toBe(1000 + 85 + 85);
+    expect(result.Ferocity).toBe(85 + 85);
+  });
+});
+
+describe("computeEquipmentStats — food contributions", () => {
+  test("Peppercorn-Crusted Sous-Vide Steak adds Power and Ferocity", () => {
+    // buff: "-10% Incoming Damage | +100 Power | +70 Ferocity"
+    state.editor = makeEditor({}, "Peppercorn-Crusted Sous-Vide Steak");
+    const result = computeEquipmentStats();
+    expect(result.Power).toBe(1000 + 100);
+    expect(result.Ferocity).toBe(70);
+  });
+
+  test("Bowl of Fruit Salad with Mint Garnish adds HealingPower and Concentration", () => {
+    // buff: "+10% Outgoing Healing | +100 Healing Power | +70 Concentration"
+    state.editor = makeEditor({}, "Bowl of Fruit Salad with Mint Garnish");
+    const result = computeEquipmentStats();
+    expect(result.HealingPower).toBe(100);
+    expect(result.Concentration).toBe(70);
+  });
+
+  test("unknown food label adds nothing", () => {
+    state.editor = makeEditor({}, "Pizza That Does Not Exist");
+    const result = computeEquipmentStats();
+    expect(result.Power).toBe(1000);
+  });
+
+  test("empty food string adds nothing", () => {
+    state.editor = makeEditor({}, "");
+    const result = computeEquipmentStats();
+    expect(result.Power).toBe(1000);
+  });
+
+  test("food stacks on top of equipment stats", () => {
+    // Berserker's chest + food with +100 Power
+    state.editor = makeEditor({ chest: "Berserker's" }, "Peppercorn-Crusted Sous-Vide Steak");
+    const result = computeEquipmentStats();
+    expect(result.Power).toBe(1000 + 134 + 100);
+    expect(result.Ferocity).toBe(96 + 70);
+  });
+});
+
+describe("computeEquipmentStats — 4-stat combo accumulation", () => {
+  test("Viper's chest applies 4-stat scaling and accumulates correctly", () => {
+    state.editor = makeEditor({ chest: "Viper's" });
+    const result = computeEquipmentStats();
+    // Viper's: Power(0), ConditionDamage(1), Precision(2), Expertise(3)
+    // chest: p=134, s=96
+    expect(result.Power).toBe(1000 + Math.round(134 * 0.895));
+    expect(result.ConditionDamage).toBe(Math.round(96 * 0.889));
+    expect(result.Precision).toBe(1000 + Math.round(96 * 0.889));
+    expect(result.Expertise).toBe(Math.round(134 * 0.452));
+  });
+});

@@ -1,9 +1,9 @@
 // Equipment stat computation — pure logic over state + constants, no DOM deps.
 import { state } from "./state.js";
-import { STAT_COMBOS, SLOT_WEIGHTS, GW2_FOOD } from "./constants.js";
+import { STAT_COMBOS_BY_LABEL, SLOT_WEIGHTS, GW2_FOOD_BY_LABEL } from "./constants.js";
 
 export function computeSlotStats(comboLabel, slotKey) {
-  const combo = STAT_COMBOS.find((c) => c.label === comboLabel);
+  const combo = STAT_COMBOS_BY_LABEL.get(comboLabel);
   const w = SLOT_WEIGHTS[slotKey];
   if (!combo || !w) return [];
   const n = combo.stats.length;
@@ -31,7 +31,7 @@ export function computeEquipmentStats() {
   };
   for (const [slotKey, comboLabel] of Object.entries(slots)) {
     if (!comboLabel) continue;
-    const combo = STAT_COMBOS.find((c) => c.label === comboLabel);
+    const combo = STAT_COMBOS_BY_LABEL.get(comboLabel);
     const w = SLOT_WEIGHTS[slotKey];
     if (!combo || !w) continue;
     const n = combo.stats.length;
@@ -56,7 +56,7 @@ export function computeEquipmentStats() {
   // Food flat stat contributions (+N StatName patterns)
   const foodLabel = state.editor.equipment?.food;
   if (foodLabel) {
-    const foodDef = GW2_FOOD.find((f) => f.label === foodLabel);
+    const foodDef = GW2_FOOD_BY_LABEL.get(foodLabel);
     if (foodDef) {
       const foodStatMap = {
         "Condition Damage": "ConditionDamage", "Healing Power": "HealingPower",
