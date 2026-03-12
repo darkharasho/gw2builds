@@ -72,6 +72,10 @@ const KNOWN_SKILL_SPEC_OVERRIDES = new Map([
   [78845, 79], [78501, 79], [78615, 79], [78661, 79], [78895, 79],
   // Conduit F3 Cosmic Wisdom — ensure spec=79.
   [77371, 79],
+  // Paragon (spec 74) burst skills — API returns spec=null for these weapon-specific variants.
+  // Without overrides they pass the spec filter for all warrior builds (lockSpec=0 → !lockSpec=true).
+  [71922, 74], [71932, 74], [71950, 74], [72029, 74],  // Path to Victory variants
+  [72911, 74], [73006, 74], [73024, 74], [73042, 74],  // Harrier's Toss variants
 ]);
 
 // The GW2 profession API assigns incorrect slot values to Weaver's 4 attunement button skills.

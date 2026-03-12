@@ -78,8 +78,11 @@ export function getSkillOptionsByType(catalog, specializationSelections) {
     // like Deadeye's Mark (43390) ↔ Steal Time would both pass a flipParentIds check, yet
     // "Steal Time" is a transient post-activation state that must not show as a permanent slot.
     .filter((skill) => !flipSkillIds.has(skill.id) || skill.inProfessionEndpoint)
-    // Exclude skills that are not tied to any profession.
-    .filter((skill) => (skill.professions || []).length > 0)
+    // Exclude skills that are not tied to any profession, unless they are explicitly listed
+    // in the profession endpoint (inProfessionEndpoint). Some legitimate F-slot mechanics
+    // (e.g. Chant of Freedom 77155) have professions:[] in /v2/skills due to an API bug
+    // but are confirmed profession mechanics via the profession endpoint.
+    .filter((skill) => (skill.professions || []).length > 0 || skill.inProfessionEndpoint)
     // Thief: unspecialized Profession_2+ entries are transient stolen-result outcomes, not
     // permanent profession mechanics. Keep only slot-bound elite mechanics (Specter/Antiquary).
     .filter((skill) => {
@@ -540,13 +543,16 @@ export function buildMechanicSlotsForRender({
       } else {
         // Split into elite-spec and base pools; prefer elite-spec when active.
         // Weaver is excluded: its F skills are the standard ele attunement swaps.
-        // Berserker F1: handled separately — core vs primal burst depends on Berserk toggle.
+        // Warrior F1 is excluded: F1 is always just "pick the burst for the equipped weapon"
+        // regardless of elite spec. Berserker is handled separately for its primal/core toggle.
         const isBerserkerBurstSlot = isBerserker && slotKey === "Profession_1";
-        const eliteCandidates = eliteSpecId && !isWeaver && !isBerserkerBurstSlot
+        const isWarriorBurstSlot = isWarrior && slotKey === "Profession_1";
+        const eliteCandidates = eliteSpecId && !isWeaver && !isWarriorBurstSlot
           ? candidates.filter((s) => Number(s.specialization) === eliteSpecId)
           : [];
         // Sort by ID descending: when the API lists multiple skill variants at the same slot
         // the higher ID is the more recently added/updated skill and should be preferred.
+        const wt = (s) => (s.weaponType || "").toLowerCase();
         let pool;
         if (isBerserkerBurstSlot) {
           // When Berserk is active show primal bursts (spec=51); otherwise show core bursts.
@@ -558,7 +564,6 @@ export function buildMechanicSlotsForRender({
           pool = [...(eliteCandidates.length > 0 ? eliteCandidates : candidates)]
             .sort((a, b) => b.id - a.id);
         }
-        const wt = (s) => (s.weaponType || "").toLowerCase();
         const attunementSkill = !isWeaver && activeAttunement
           ? pool.find((s) => s.attunement && s.attunement.toLowerCase() === activeAttunement.toLowerCase())
           : null;

@@ -265,7 +265,7 @@ export const PROFESSION_CONCEPT_ART = {
 };
 
 export const PROFESSION_BASE_HP = {
-  Warrior: 20212, Berserker: 20212, Spellbreaker: 20212, Bladesworn: 20212,
+  Warrior: 20212, Berserker: 20212, Spellbreaker: 20212, Bladesworn: 20212, Paragon: 20212,
   Revenant: 21894, Herald: 21894, Renegade: 21894, Vindicator: 21894,
   Necromancer: 17985, Reaper: 17985, Scourge: 17985, Harbinger: 17985,
   Ranger: 15922, Druid: 15922, Soulbeast: 15922, Untamed: 15922,
@@ -273,7 +273,7 @@ export const PROFESSION_BASE_HP = {
   Engineer: 14462, Scrapper: 14462, Holosmith: 14462, Mechanist: 14462,
   Elementalist: 11645, Tempest: 11645, Weaver: 11645, Catalyst: 11645,
   Mesmer: 11645, Chronomancer: 11645, Mirage: 11645, Virtuoso: 11645,
-  Thief: 11645, Daredevil: 11645, Deadeye: 11645, Specter: 11645,
+  Thief: 11645, Daredevil: 11645, Deadeye: 11645, Specter: 11645, Antiquary: 11645,
 };
 
 export const ANTIQUARY_OFFENSIVE_ARTIFACTS = [
