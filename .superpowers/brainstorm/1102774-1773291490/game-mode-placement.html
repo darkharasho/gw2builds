@@ -1,0 +1,146 @@
+<h2>Where should the Game Mode toggle live?</h2>
+<p class="subtitle">PvE / WvW toggle — always visible, persisted per build</p>
+
+<div class="cards">
+
+  <!-- Option A: Toolbar row -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#1a1a2e; border-radius:6px; overflow:hidden; font-family:monospace; font-size:11px; color:#ccc;">
+        <!-- Titlebar -->
+        <div style="background:#0d0d1a; padding:6px 10px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #333;">
+          <span style="color:#c5a855; font-weight:bold; font-size:10px;">GW2Builds Editor</span>
+          <span style="font-size:9px; color:#666;">- + x</span>
+        </div>
+        <!-- Toolbar -->
+        <div style="padding:8px 10px; display:grid; grid-template-columns: 1.2fr 0.8fr 0.8fr 0.6fr; gap:6px; align-items:end; border-bottom:1px solid #333;">
+          <div>
+            <div style="font-size:8px; color:#888; margin-bottom:2px;">Build Title</div>
+            <div style="background:#2a2a3e; padding:3px 6px; border-radius:3px; font-size:9px;">Power Reaper Roamer</div>
+          </div>
+          <div>
+            <div style="font-size:8px; color:#888; margin-bottom:2px;">Profession</div>
+            <div style="background:#2a2a3e; padding:3px 6px; border-radius:3px; font-size:9px;">Necromancer</div>
+          </div>
+          <div>
+            <div style="font-size:8px; color:#888; margin-bottom:2px;">Tags</div>
+            <div style="background:#2a2a3e; padding:3px 6px; border-radius:3px; font-size:9px;">wvw, roaming</div>
+          </div>
+          <div>
+            <div style="font-size:8px; color:#888; margin-bottom:2px;">Game Mode</div>
+            <div style="display:flex; gap:0; border-radius:3px; overflow:hidden;">
+              <div style="background:#2a2a3e; padding:3px 5px; font-size:8px; color:#888;">PvE</div>
+              <div style="background:#c5a855; padding:3px 5px; font-size:8px; color:#1a1a2e; font-weight:bold;">WvW</div>
+            </div>
+          </div>
+        </div>
+        <!-- Content placeholder -->
+        <div style="padding:12px 10px; color:#555; font-size:9px; text-align:center;">
+          [ Skillbar / Specializations / Equipment ]
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A: Toolbar Row</h3>
+      <p>Add as a 4th column in the existing toolbar grid alongside Title, Profession, and Tags. Most discoverable — always visible alongside other build metadata.</p>
+    </div>
+  </div>
+
+  <!-- Option B: Subnav -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#1a1a2e; border-radius:6px; overflow:hidden; font-family:monospace; font-size:11px; color:#ccc;">
+        <!-- Titlebar -->
+        <div style="background:#0d0d1a; padding:6px 10px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #333;">
+          <span style="color:#c5a855; font-weight:bold; font-size:10px;">GW2Builds Editor</span>
+          <span style="font-size:9px; color:#666;">- + x</span>
+        </div>
+        <!-- Left nav + subnav area -->
+        <div style="display:flex;">
+          <div style="width:30px; background:#111; padding:6px 2px; text-align:center; font-size:7px; border-right:1px solid #333;">
+            <div style="margin-bottom:8px;">Ed</div><div style="margin-bottom:8px;">Lib</div><div>Co</div>
+          </div>
+          <div style="flex:1;">
+            <!-- Subnav with toggle -->
+            <div style="padding:6px 10px; display:flex; align-items:center; gap:12px; border-bottom:1px solid #333; background:#151528;">
+              <span style="color:#c5a855; font-size:9px; font-weight:bold;">Build</span>
+              <span style="color:#666; font-size:9px;">Equipment</span>
+              <div style="margin-left:auto; display:flex; gap:0; border-radius:3px; overflow:hidden; border:1px solid #444;">
+                <div style="background:#2a2a3e; padding:2px 6px; font-size:8px; color:#888;">PvE</div>
+                <div style="background:#c5a855; padding:2px 6px; font-size:8px; color:#1a1a2e; font-weight:bold;">WvW</div>
+              </div>
+            </div>
+            <!-- Toolbar -->
+            <div style="padding:6px 10px; display:grid; grid-template-columns: 1.4fr 1fr 1fr; gap:6px; border-bottom:1px solid #333;">
+              <div>
+                <div style="font-size:8px; color:#888; margin-bottom:2px;">Build Title</div>
+                <div style="background:#2a2a3e; padding:3px 6px; border-radius:3px; font-size:9px;">Power Reaper Roamer</div>
+              </div>
+              <div>
+                <div style="font-size:8px; color:#888; margin-bottom:2px;">Profession</div>
+                <div style="background:#2a2a3e; padding:3px 6px; border-radius:3px; font-size:9px;">Necromancer</div>
+              </div>
+              <div>
+                <div style="font-size:8px; color:#888; margin-bottom:2px;">Tags</div>
+                <div style="background:#2a2a3e; padding:3px 6px; border-radius:3px; font-size:9px;">wvw, roaming</div>
+              </div>
+            </div>
+            <!-- Content placeholder -->
+            <div style="padding:12px 10px; color:#555; font-size:9px; text-align:center;">
+              [ Skillbar / Specializations / Equipment ]
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B: Subnav (right-aligned)</h3>
+      <p>Toggle sits in the subnav bar, right-aligned next to Build/Equipment tabs. Keeps the toolbar clean but still visible. Disappears when not in editor.</p>
+    </div>
+  </div>
+
+  <!-- Option C: Below toolbar, full-width banner -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#1a1a2e; border-radius:6px; overflow:hidden; font-family:monospace; font-size:11px; color:#ccc;">
+        <!-- Titlebar -->
+        <div style="background:#0d0d1a; padding:6px 10px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #333;">
+          <span style="color:#c5a855; font-weight:bold; font-size:10px;">GW2Builds Editor</span>
+          <span style="font-size:9px; color:#666;">- + x</span>
+        </div>
+        <!-- Toolbar -->
+        <div style="padding:6px 10px; display:grid; grid-template-columns: 1.4fr 1fr 1fr; gap:6px; border-bottom:1px solid #333;">
+          <div>
+            <div style="font-size:8px; color:#888; margin-bottom:2px;">Build Title</div>
+            <div style="background:#2a2a3e; padding:3px 6px; border-radius:3px; font-size:9px;">Power Reaper Roamer</div>
+          </div>
+          <div>
+            <div style="font-size:8px; color:#888; margin-bottom:2px;">Profession</div>
+            <div style="background:#2a2a3e; padding:3px 6px; border-radius:3px; font-size:9px;">Necromancer</div>
+          </div>
+          <div>
+            <div style="font-size:8px; color:#888; margin-bottom:2px;">Tags</div>
+            <div style="background:#2a2a3e; padding:3px 6px; border-radius:3px; font-size:9px;">wvw, roaming</div>
+          </div>
+        </div>
+        <!-- Game mode banner -->
+        <div style="padding:4px 10px; display:flex; align-items:center; justify-content:center; gap:8px; background:#151528; border-bottom:1px solid #333;">
+          <span style="font-size:8px; color:#888;">Game Mode:</span>
+          <div style="display:flex; gap:0; border-radius:3px; overflow:hidden; border:1px solid #444;">
+            <div style="background:#2a2a3e; padding:3px 10px; font-size:9px; color:#888;">PvE</div>
+            <div style="background:#c5a855; padding:3px 10px; font-size:9px; color:#1a1a2e; font-weight:bold;">WvW</div>
+          </div>
+        </div>
+        <!-- Content placeholder -->
+        <div style="padding:12px 10px; color:#555; font-size:9px; text-align:center;">
+          [ Skillbar / Specializations / Equipment ]
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C: Mode Banner</h3>
+      <p>Dedicated row below the toolbar — centered, prominent. Makes game mode feel like a first-class concept. Takes more vertical space.</p>
+    </div>
+  </div>
+
+</div>
