@@ -4,7 +4,7 @@ const { createMechanicsSuite, setupMechanicsHarness } = require("./mechanicsSuit
 
 createMechanicsSuite("Engineer", [
   { specId: 0, expected: ["empty", "6092", "6077", "6118"] },
-  { specId: 43, expected: ["empty", "6092", "6077", "6118"] },
+  { specId: 43, expected: ["empty", "6092", "6077", "6118", "72103"] },
   { specId: 57, expected: ["empty", "6092", "6077", "6118", "42938"] },
   { specId: 70, expected: ["6119", "empty", "empty"] },
   { specId: 80, expected: ["empty", "6092", "6077", "6118"] },
@@ -18,10 +18,11 @@ describe("renderer mechanics selection — Engineer core vs elite F skills", () 
     expect(core.signatures).toEqual(["empty", "6092", "6077", "6118"]);
   });
 
-  test("Scrapper matches core in this fixture's persistent F slots", async () => {
+  test("Scrapper preserves core F1–F4 toolbelt slots and adds Function Gyro as F5", async () => {
     const core = await resolve({ specId: 0 });
     const scrapper = await resolve({ specId: 43 });
-    expect(scrapper.signatures).toEqual(core.signatures);
+    expect(scrapper.signatures.slice(0, 4)).toEqual(core.signatures);
+    expect(scrapper.signatures[4]).toBe("72103");
   });
 
   test("Holosmith adds Photon Forge as an extra F5 while preserving core F1-F4", async () => {

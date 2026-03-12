@@ -64,11 +64,13 @@ describe("Engineer — end-to-end profession mechanics", () => {
     expect(elixirH.toolbeltSkill).toBe(6118); // Toss Elixir H
   });
 
-  test("Scrapper (spec 43) matches core toolbelt footprint", async () => {
+  test("Scrapper (spec 43) preserves core F1–F4 toolbelt slots and adds Function Gyro (72103) as F5", async () => {
     const catalog = await h.loadCatalog();
     const core = h.resolveMechSlots(catalog, 0);
     const scrapper = h.resolveMechSlots(catalog, 43);
-    expect(scrapper).toEqual(core);
+    expect(scrapper).toHaveLength(5);
+    expect(scrapper.slice(0, 4)).toEqual(core);
+    expect(scrapper[4]).toBe("72103");
   });
 
   test("Holosmith (spec 57) adds Photon Forge (42938) as a 5th F-slot", async () => {
