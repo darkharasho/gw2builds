@@ -32,7 +32,7 @@ export const state = {
   openCustomSelect: null,
 };
 
-export function createEmptyEditor(profession = "") {
+export function createEmptyEditor(profession = "", gameMode = "pve") {
   return {
     id: "",
     title: "",
@@ -74,6 +74,7 @@ export function createEmptyEditor(profession = "") {
     activePetSlot: "terrestrial1",  // "terrestrial1" or "terrestrial2"
     allianceTacticsForm: 0,         // Vindicator: 0 = Archemorus/Kurzick, 1 = Saint Viktor/Luxon
     antiquaryArtifacts: { f2: 0, f3: 0, f4: 0 }, // Antiquary: stored artifact draws (0 = not yet drawn)
+    gameMode: gameMode || "pve",
   };
 }
 
