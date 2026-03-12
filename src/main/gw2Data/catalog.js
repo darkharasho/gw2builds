@@ -24,6 +24,12 @@ const {
   SHADOW_SHROUD_SKILL_ID,
   SHADOW_SHROUD_BUNDLE,
   FIREBRAND_TOME_CHAPTERS,
+  GUNSABER_SKILL_ID,
+  GUNSABER_BUNDLE,
+  GUNSABER_BUNDLE_SKILLS,
+  DRAGON_TRIGGER_SKILL_ID,
+  DRAGON_TRIGGER_BUNDLE,
+  DRAGON_TRIGGER_BUNDLE_SKILLS,
   ELIXIR_TOOLBELT_OVERRIDES,
   LEGEND_FLIP_OVERRIDES,
 } = require("./overrides");
@@ -369,6 +375,10 @@ async function getProfessionCatalog(professionId, lang = "en") {
           ? DEATH_SHROUD_BUNDLE
           : skill.id === SHADOW_SHROUD_SKILL_ID
           ? SHADOW_SHROUD_BUNDLE
+          : skill.id === GUNSABER_SKILL_ID
+          ? GUNSABER_BUNDLE
+          : skill.id === DRAGON_TRIGGER_SKILL_ID
+          ? DRAGON_TRIGGER_BUNDLE
           : FIREBRAND_TOME_CHAPTERS.has(skill.id)
           ? FIREBRAND_TOME_CHAPTERS.get(skill.id).map((c) => c.id)
           : (transformOpenerSlots.has(skill.slot || "") ? (transformBundleBySpecId.get(specId) || []) : []);
@@ -475,6 +485,20 @@ async function getProfessionCatalog(professionId, lang = "en") {
           toolbelt_skill: 0, flip_skill: 0, description: ch.description || "",
         });
       }
+    }
+  }
+
+  // Bladesworn Gunsaber and Dragon Trigger bundle skills are not in the GW2 API — inject synthetic
+  // raw skill objects so mapSkill can include them in the catalog for weapon-bar display.
+  if (professionId === "Warrior") {
+    for (const s of [...GUNSABER_BUNDLE_SKILLS, ...DRAGON_TRIGGER_BUNDLE_SKILLS]) {
+      skills.push({
+        id: s.id, name: s.name, icon: s.icon, slot: s.slot,
+        type: "Weapon", specialization: 68, professions: ["Warrior"],
+        weapon_type: "None", attunement: "None", dual_attunement: "None",
+        categories: [], facts: [], bundle_skills: [], transform_skills: [],
+        toolbelt_skill: 0, flip_skill: 0, description: "",
+      });
     }
   }
 

@@ -527,6 +527,7 @@ export function buildMechanicSlotsForRender({
     const isWarrior = (catalog?.profession?.id || editor.profession || "") === "Warrior";
     const isBerserker = isWarrior && eliteSpecId === 18;
     const isSpellbreaker = isWarrior && eliteSpecId === 61;
+    const isBladesworn = isWarrior && eliteSpecId === 68;
     // Berserk (F2 toggle for Berserker): resolve the Berserk skill from the Profession_2 slot.
     const berserkSkillId = isBerserker ? (bySlot.get("Profession_2")?.[0]?.id || 0) : 0;
     const berserkActive = berserkSkillId > 0 && activeKit === berserkSkillId;
@@ -585,6 +586,20 @@ export function buildMechanicSlotsForRender({
       if (isSpellbreaker && slotKey === "Profession_2") {
         const fullCounter = candidates.find((s) => s.id === 44165) || skill;
         return { skill: fullCounter, sourceId: fullCounter?.id || 0, isStatic: true, isSelectable: false };
+      }
+      // Bladesworn: F1 = Gunsaber toggle (Unsheathe 62745 / Sheathe 62861 flip icon).
+      // F2 = Dragon Trigger toggle (62803 when inactive, cancel 62857 flip icon when active).
+      // Both are static bundles: F1 controls Gunsaber weapon skills, F2 controls Dragon Slash skills.
+      if (isBladesworn && slotKey === "Profession_1") {
+        const gunsaberDrawn = activeKit === 62745;
+        const displaySkill = catalog.skillById.get(gunsaberDrawn ? 62861 : 62745) || skill;
+        return { skill: displaySkill, sourceId: 62745, isStatic: true, isSelectable: false, isGunsaberToggle: true };
+      }
+      if (isBladesworn && slotKey === "Profession_2") {
+        // Always show Dragon Trigger (62803) as the skill — the flip-icon mechanism handles
+        // showing the cancel icon when active, keeping the detail panel correct.
+        const displaySkill = catalog.skillById.get(62803) || skill;
+        return { skill: displaySkill, sourceId: 62803, isStatic: true, isSelectable: false, isDragonTriggerToggle: true };
       }
       // Berserker: F2 "Berserk" is toggleable — clicking it switches F1 between core and primal burst.
       if (isBerserker && slotKey === "Profession_2") {
@@ -844,7 +859,11 @@ export function renderSkills() {
     // Soulbeast Beastmode has no bundle_skills in the API; allow it to persist via isBeastmodeToggle.
     const isBeastmodeKit = mechSlots.some((s) => s.isBeastmodeToggle && s.skill?.id === activeKit);
     const isBerserkKit = mechSlots.some((s) => s.isBerserkToggle && s.skill?.id === activeKit);
-    if (!isStaticBundle && !isToolbeltSource && !isEquippedSlotKit && !isBeastmodeKit && !isBerserkKit) {
+    // Bladesworn: Gunsaber (62745) and Dragon Trigger (62803) are both valid active kits; the
+    // displayed skill changes to the flip variant when active so we can't match by skill.id.
+    const isBladeswornKit = (mechSlots.some((s) => s.isGunsaberToggle) || mechSlots.some((s) => s.isDragonTriggerToggle))
+      && (activeKit === 62745 || activeKit === 62803);
+    if (!isStaticBundle && !isToolbeltSource && !isEquippedSlotKit && !isBeastmodeKit && !isBerserkKit && !isBladeswornKit) {
       state.editor.activeKit = 0;
     }
   }
@@ -916,7 +935,7 @@ export function renderSkills() {
     mechBar.className = "profession-mechanics-bar";
 
     for (let fIdx = 0; fIdx < mechSlots.length; fIdx++) {
-      const { skill, sourceId, sourceSkill, isStatic, isSelectable, morphIndex, mechIconOverride, fakeCommand, isBeastmodeToggle, isBerserkToggle, leaveIcon, fKeyLabel, isF5AboveOrb, isAllianceTactics, isAntiquarySkritSwipe } = mechSlots[fIdx];
+      const { skill, sourceId, sourceSkill, isStatic, isSelectable, morphIndex, mechIconOverride, fakeCommand, isBeastmodeToggle, isBerserkToggle, isGunsaberToggle, isDragonTriggerToggle, leaveIcon, fKeyLabel, isF5AboveOrb, isAllianceTactics, isAntiquarySkritSwipe } = mechSlots[fIdx];
       const slotEl = document.createElement("div");
       slotEl.className = "skill-slot";
       const iconBtn = document.createElement("button");
@@ -928,7 +947,7 @@ export function renderSkills() {
       const srcSkillForKit = (!isStatic && isToolbelt) ? catalog.skillById.get(sourceId) : null;
       const isKit = !isStatic && isToolbelt
         ? (srcSkillForKit?.bundleSkills?.length ?? 0) > 0
-        : isStatic && ((skill?.bundleSkills?.length ?? 0) > 0 || !!isBeastmodeToggle || !!isBerserkToggle);
+        : isStatic && ((skill?.bundleSkills?.length ?? 0) > 0 || !!isBeastmodeToggle || !!isBerserkToggle || !!isGunsaberToggle || !!isDragonTriggerToggle);
 
       let isActive = false;
       if (isSelectable) {
@@ -937,6 +956,10 @@ export function renderSkills() {
         isActive = isKit && resolvedKit === sourceId;
       } else if (isAllianceTactics) {
         isActive = (Number(state.editor.allianceTacticsForm) || 0) === 1;
+      } else if (isGunsaberToggle) {
+        isActive = resolvedKit === 62745;
+      } else if (isDragonTriggerToggle) {
+        isActive = resolvedKit === 62803;
       } else if (isStatic && ((skill?.bundleSkills?.length ?? 0) > 0 || isBeastmodeToggle || isBerserkToggle)) {
         // Static bundle skills: shroud, celestial avatar, Photon Forge, beastmode, Berserk, etc.
         isActive = resolvedKit === skill?.id;
@@ -982,7 +1005,7 @@ export function renderSkills() {
         mechIconSignature = `fake:${fakeCommand}`;
       } else {
         // When a static bundle skill (e.g. Photon Forge) is active, show the flip_skill icon.
-        const flipSkillId = isActive && isStatic && (skill?.flipSkill ?? 0);
+        const flipSkillId = isActive && isStatic && !isDragonTriggerToggle && (skill?.flipSkill ?? 0);
         const flipSkill = flipSkillId ? catalog.skillById.get(flipSkillId) : null;
         // Elixir toolbelt skills ("Detonate Elixir X") share a generic icon in the API.
         // Fall back to the source elixir's own icon so each slot looks distinct.
@@ -1047,7 +1070,13 @@ export function renderSkills() {
         toggleBadge.textContent = isActive ? "✕" : "▸";
         toggleBadge.addEventListener("click", (e) => {
           e.stopPropagation();
-          state.editor.activeKit = resolvedKit === skill.id ? 0 : skill.id;
+          if (isGunsaberToggle) {
+            state.editor.activeKit = resolvedKit === 62745 ? 0 : 62745;
+          } else if (isDragonTriggerToggle) {
+            state.editor.activeKit = resolvedKit === 62803 ? 0 : 62803;
+          } else {
+            state.editor.activeKit = resolvedKit === skill.id ? 0 : skill.id;
+          }
           renderSkills();
         });
         iconBtn.append(toggleBadge);
@@ -1098,9 +1127,15 @@ export function renderSkills() {
             if (skill) selectDetail("skill", skill);
             return;
           }
-          if (isStatic && ((skill?.bundleSkills?.length ?? 0) > 0 || isBeastmodeToggle)) {
-            // Static bundle skill (shroud, Photon Forge, beastmode, etc.): toggle active state.
-            state.editor.activeKit = resolvedKit === skill.id ? 0 : skill.id;
+          if (isStatic && ((skill?.bundleSkills?.length ?? 0) > 0 || isBeastmodeToggle || isGunsaberToggle || isDragonTriggerToggle)) {
+            // Static bundle skill (shroud, Photon Forge, beastmode, Gunsaber, Dragon Trigger, etc.): toggle active state.
+            if (isGunsaberToggle) {
+              state.editor.activeKit = resolvedKit === 62745 ? 0 : 62745;
+            } else if (isDragonTriggerToggle) {
+              state.editor.activeKit = resolvedKit === 62803 ? 0 : 62803;
+            } else {
+              state.editor.activeKit = resolvedKit === skill.id ? 0 : skill.id;
+            }
             renderSkills();
             if (skill) selectDetail("skill", skill);
             return;

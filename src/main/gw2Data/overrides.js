@@ -318,6 +318,28 @@ const ELIXIR_TOOLBELT_OVERRIDES = new Map([
   // Elixir X (5832) keeps Detonate Elixir X (29722) — no Toss Elixir X exists.
 ]);
 
+// Bladesworn (Warrior elite spec, spec 68) bundle skills — not in GW2 public API.
+// Gunsaber bundle: activated by Unsheathe Gunsaber (F1, skill 62745).
+const GUNSABER_SKILL_ID = 62745;
+const GUNSABER_BUNDLE = [62966, 62930, 62732, 62789, 62885];
+const GUNSABER_BUNDLE_SKILLS = [
+  { id: 62966, name: "Swift Cut",       slot: "Weapon_1", icon: `${_WK}/e/e3/Swift_Cut.png` },
+  { id: 62930, name: "Blooming Fire",   slot: "Weapon_2", icon: `${_WK}/d/d0/Blooming_Fire.png` },
+  { id: 62732, name: "Artillery Slash", slot: "Weapon_3", icon: `${_WK}/6/68/Artillery_Slash.png` },
+  { id: 62789, name: "Cyclone Trigger", slot: "Weapon_4", icon: `${_WK}/6/6c/Cyclone_Trigger.png` },
+  { id: 62885, name: "Break Step",      slot: "Weapon_5", icon: `${_WK}/7/76/Break_Step.png` },
+];
+// Dragon Trigger bundle: activated by Dragon Trigger (F2, skill 62803).
+const DRAGON_TRIGGER_SKILL_ID = 62803;
+const DRAGON_TRIGGER_BUNDLE = [62797, 62980, 62951, 62893, 62926];
+const DRAGON_TRIGGER_BUNDLE_SKILLS = [
+  { id: 62797, name: "Dragon Slash\u2014Force", slot: "Weapon_1", icon: `${_WK}/b/b5/Dragon_Slash%E2%80%94Force.png` },
+  { id: 62980, name: "Dragon Slash\u2014Boost", slot: "Weapon_2", icon: `${_WK}/7/75/Dragon_Slash%E2%80%94Boost.png` },
+  { id: 62951, name: "Dragon Slash\u2014Reach", slot: "Weapon_3", icon: `${_WK}/e/eb/Dragon_Slash%E2%80%94Reach.png` },
+  { id: 62893, name: "Triggerguard",              slot: "Weapon_4", icon: `${_WK}/4/4e/Triggerguard.png` },
+  { id: 62926, name: "Flicker Step",              slot: "Weapon_5", icon: `${_WK}/d/de/Flicker_Step.png` },
+];
+
 // GW2 API omits flip_skill for Facet of Elements (27014); hardcode the missing link.
 // Shadow Shroud Enter (63155) needs a flip to its Exit skill (63251) for the active-icon toggle.
 const LEGEND_FLIP_OVERRIDES = new Map([
@@ -347,6 +369,12 @@ module.exports = {
   SHADOW_SHROUD_BUNDLE,
   _WK,
   FIREBRAND_TOME_CHAPTERS,
+  GUNSABER_SKILL_ID,
+  GUNSABER_BUNDLE,
+  GUNSABER_BUNDLE_SKILLS,
+  DRAGON_TRIGGER_SKILL_ID,
+  DRAGON_TRIGGER_BUNDLE,
+  DRAGON_TRIGGER_BUNDLE_SKILLS,
   ELIXIR_TOOLBELT_OVERRIDES,
   LEGEND_FLIP_OVERRIDES,
 };
