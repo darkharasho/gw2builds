@@ -616,6 +616,60 @@ describe("normalizeBuild — legacy buildUrl field", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Settings persistence
+// ---------------------------------------------------------------------------
+
+describe("BuildStore — settings", () => {
+  let dir;
+
+  afterEach(async () => { if (dir) await cleanupDir(dir); });
+
+  test("getSetting returns null for unknown key", async () => {
+    ({ dir } = (await makeTempStore()));
+    const store = new BuildStore(dir);
+    await store.init();
+    expect(await store.getSetting("nonexistent")).toBeNull();
+  });
+
+  test("setSetting persists and getSetting retrieves", async () => {
+    ({ dir } = (await makeTempStore()));
+    const store = new BuildStore(dir);
+    await store.init();
+    await store.setSetting("lastGameMode", "wvw");
+    expect(await store.getSetting("lastGameMode")).toBe("wvw");
+  });
+
+  test("setSetting overwrites previous value", async () => {
+    ({ dir } = (await makeTempStore()));
+    const store = new BuildStore(dir);
+    await store.init();
+    await store.setSetting("lastGameMode", "wvw");
+    await store.setSetting("lastGameMode", "pve");
+    expect(await store.getSetting("lastGameMode")).toBe("pve");
+  });
+
+  test("settings survive re-instantiation (disk persistence)", async () => {
+    ({ dir } = (await makeTempStore()));
+    const store1 = new BuildStore(dir);
+    await store1.init();
+    await store1.setSetting("lastGameMode", "wvw");
+
+    const store2 = new BuildStore(dir);
+    await store2.init();
+    expect(await store2.getSetting("lastGameMode")).toBe("wvw");
+  });
+
+  test("init creates settings.json if missing", async () => {
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "gw2builds-settings-test-"));
+    dir = tmpDir;
+    const store = new BuildStore(tmpDir);
+    await store.init();
+    const exists = await fs.access(path.join(tmpDir, "settings.json")).then(() => true).catch(() => false);
+    expect(exists).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Concurrent operations
 // ---------------------------------------------------------------------------
 

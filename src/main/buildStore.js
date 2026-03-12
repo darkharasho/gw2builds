@@ -7,12 +7,14 @@ class BuildStore {
     this.baseDir = baseDir;
     this.buildsPath = path.join(baseDir, "builds.json");
     this.authPath = path.join(baseDir, "auth.json");
+    this.settingsPath = path.join(baseDir, "settings.json");
   }
 
   async init() {
     await fs.mkdir(this.baseDir, { recursive: true });
     await this.#ensureFile(this.buildsPath, []);
     await this.#ensureFile(this.authPath, {});
+    await this.#ensureFile(this.settingsPath, {});
   }
 
   async listBuilds() {
@@ -76,6 +78,17 @@ class BuildStore {
 
   async #writeJson(filePath, data) {
     await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf8");
+  }
+
+  async getSetting(key) {
+    const data = await this.#readJson(this.settingsPath, {});
+    return data[key] ?? null;
+  }
+
+  async setSetting(key, value) {
+    const data = await this.#readJson(this.settingsPath, {});
+    data[key] = value;
+    await this.#writeJson(this.settingsPath, data);
   }
 }
 
