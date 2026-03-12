@@ -688,3 +688,37 @@ describe("BuildStore — concurrent operations", () => {
     expect(builds).toHaveLength(titles.length);
   });
 });
+
+// ---------------------------------------------------------------------------
+// BuildStore — gameMode normalization
+// ---------------------------------------------------------------------------
+
+describe("BuildStore — gameMode normalization", () => {
+  let dir;
+
+  afterEach(async () => { if (dir) await cleanupDir(dir); });
+
+  test("build without gameMode defaults to pve", async () => {
+    ({ dir } = (await makeTempStore()));
+    const store = new BuildStore(dir);
+    await store.init();
+    const saved = await store.upsertBuild(makeBuild());
+    expect(saved.gameMode).toBe("pve");
+  });
+
+  test("build with gameMode wvw is preserved", async () => {
+    ({ dir } = (await makeTempStore()));
+    const store = new BuildStore(dir);
+    await store.init();
+    const saved = await store.upsertBuild(makeBuild({ gameMode: "wvw" }));
+    expect(saved.gameMode).toBe("wvw");
+  });
+
+  test("gameMode is truncated to 10 chars", async () => {
+    ({ dir } = (await makeTempStore()));
+    const store = new BuildStore(dir);
+    await store.init();
+    const saved = await store.upsertBuild(makeBuild({ gameMode: "a".repeat(50) }));
+    expect(saved.gameMode.length).toBeLessThanOrEqual(10);
+  });
+});
