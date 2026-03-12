@@ -153,11 +153,13 @@ async function init() {
   wireWindowControls();
   wireEvents();
 
+  try { _lastGameMode = (await window.desktopApi.getSetting("lastGameMode")) || "pve"; } catch { /* first run */ }
+  syncGameModeToggleUI(_lastGameMode);
+
   const [builds, professions] = await Promise.all([
     window.desktopApi.listBuilds(),
     window.desktopApi.listProfessions(),
   ]);
-  try { _lastGameMode = (await window.desktopApi.getSetting("lastGameMode")) || "pve"; } catch { /* first run */ }
   state.builds = Array.isArray(builds) ? builds : [];
   state.professions = Array.isArray(professions) ? professions : [];
   await refreshOnboardingStatus();
