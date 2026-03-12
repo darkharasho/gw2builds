@@ -22,6 +22,21 @@
   letter-spacing: 0.06em;
 }
 
+.titlebar__alpha-badge {
+  font-family: system-ui, sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--accent, #c8a96e) 75%, transparent);
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  padding: 1px 4px;
+  line-height: 1.4;
+  align-self: center;
+  -webkit-font-smoothing: antialiased;
+}
+
 .titlebar__logo {
   width: 18px;
   height: 18px;
