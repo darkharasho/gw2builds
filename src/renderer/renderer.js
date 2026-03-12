@@ -153,12 +153,12 @@ async function init() {
   wireWindowControls();
   wireEvents();
 
-  _lastGameMode = (await window.desktopApi.getSetting("lastGameMode")) || "pve";
-
-  const [builds, professions] = await Promise.all([
+  const [builds, professions, savedGameMode] = await Promise.all([
     window.desktopApi.listBuilds(),
     window.desktopApi.listProfessions(),
+    window.desktopApi.getSetting("lastGameMode"),
   ]);
+  _lastGameMode = savedGameMode || "pve";
   state.builds = Array.isArray(builds) ? builds : [];
   state.professions = Array.isArray(professions) ? professions : [];
   await refreshOnboardingStatus();
