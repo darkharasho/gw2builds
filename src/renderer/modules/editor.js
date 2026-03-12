@@ -340,6 +340,7 @@ export function computeEditorSignature() {
       utilityIds,
       eliteId: Number(editor.skills?.eliteId) || 0,
     },
+    gameMode: String(editor.gameMode || "pve"),
   };
   return JSON.stringify(payload);
 }
@@ -412,6 +413,7 @@ export function parseBuildImportPayload(text) {
     },
     specializations,
     skills,
+    gameMode: String(source.gameMode || "pve"),
   };
 }
 
@@ -552,6 +554,7 @@ export async function loadBuildIntoEditor(build, options = {}) {
       aquatic2: Number(build.selectedPets?.aquatic2) || 0,
     },
     activePetSlot: build.activePetSlot === "terrestrial2" ? "terrestrial2" : "terrestrial1",
+    gameMode: String(build.gameMode || "pve"),
   };
 
   if (profession) {
@@ -673,5 +676,6 @@ export function serializeEditorToBuild() {
       aquatic2: Number(state.editor.selectedPets?.aquatic2) || 0,
     },
     activePetSlot: state.editor.activePetSlot === "terrestrial2" ? "terrestrial2" : "terrestrial1",
+    gameMode: String(state.editor.gameMode || "pve"),
   };
 }
