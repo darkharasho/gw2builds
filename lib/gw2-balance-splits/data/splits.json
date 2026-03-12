@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-03-12T07:36:53.344Z",
+  "updatedAt": "2026-03-12T08:00:00.917Z",
   "skills": {
     "985": {
       "name": "Drop Stim Brew",
@@ -486,6 +486,20 @@
               "type": "Range",
               "text": "Range",
               "value": 900
+            }
+          ]
+        }
+      }
+    },
+    "5515": {
+      "name": "Frozen Ground",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 25
             }
           ]
         }
@@ -1363,6 +1377,20 @@
         }
       }
     },
+    "5554": {
+      "name": "Mist Form",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 60
+            }
+          ]
+        }
+      }
+    },
     "5555": {
       "name": "Magnetic Wave",
       "modes": {
@@ -2056,6 +2084,20 @@
               "text": "Combo Finisher",
               "finisher_type": "Blast",
               "percent": 100
+            }
+          ]
+        }
+      }
+    },
+    "5648": {
+      "name": "Air Bubble",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 25
             }
           ]
         }
@@ -4333,6 +4375,20 @@
         }
       }
     },
+    "5965": {
+      "name": "Fumigate",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 16
+            }
+          ]
+        }
+      }
+    },
     "5967": {
       "name": "Toss Elixir B",
       "modes": {
@@ -4385,6 +4441,20 @@
               "type": "Unblockable",
               "text": "Unblockable",
               "value": true
+            }
+          ]
+        }
+      }
+    },
+    "5968": {
+      "name": "Elixir R",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 35
             }
           ]
         }
@@ -7231,6 +7301,20 @@
         }
       }
     },
+    "9163": {
+      "name": "Signet of Mercy",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 90
+            }
+          ]
+        }
+      }
+    },
     "9168": {
       "name": "Sword of Justice",
       "modes": {
@@ -8263,6 +8347,20 @@
         }
       }
     },
+    "10213": {
+      "name": "Mantra of Recovery",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 15
+            }
+          ]
+        }
+      }
+    },
     "10216": {
       "name": "Phantasmal Warlock",
       "modes": {
@@ -8774,6 +8872,20 @@
         }
       }
     },
+    "10237": {
+      "name": "Mantra of Concentration",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 25
+            }
+          ]
+        }
+      }
+    },
     "10238": {
       "name": "Power Break",
       "modes": {
@@ -8823,6 +8935,34 @@
               "status": "Breaks stun",
               "duration": 0,
               "apply_count": 1
+            }
+          ]
+        }
+      }
+    },
+    "10244": {
+      "name": "Illusion of Life",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 90
+            }
+          ]
+        }
+      }
+    },
+    "10245": {
+      "name": "Mass Invisibility",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 60
             }
           ]
         }
@@ -9794,6 +9934,20 @@
               "text": "Combo Finisher",
               "finisher_type": "Blast",
               "percent": 100
+            }
+          ]
+        }
+      }
+    },
+    "10543": {
+      "name": "Summon Flesh Wurm",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 32
             }
           ]
         }
@@ -12238,6 +12392,20 @@
         }
       }
     },
+    "12478": {
+      "name": "Stalker's Strike",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 15
+            }
+          ]
+        }
+      }
+    },
     "12480": {
       "name": "Splitblade",
       "modes": {
@@ -13052,6 +13220,20 @@
         }
       }
     },
+    "12522": {
+      "name": "Counterattack",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 25
+            }
+          ]
+        }
+      }
+    },
     "12523": {
       "name": "Counterattack Kick",
       "modes": {
@@ -13199,6 +13381,20 @@
         }
       }
     },
+    "12542": {
+      "name": "Signet of the Hunt",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 30
+            }
+          ]
+        }
+      }
+    },
     "12550": {
       "name": "Quickening Zephyr",
       "modes": {
@@ -13224,6 +13420,34 @@
               "status": "Breakstun",
               "duration": 0,
               "apply_count": 1
+            }
+          ]
+        }
+      }
+    },
+    "12569": {
+      "name": "Spirit of Nature",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 120
+            }
+          ]
+        }
+      }
+    },
+    "12580": {
+      "name": "Entangle",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 48
             }
           ]
         }
@@ -13988,6 +14212,20 @@
         }
       }
     },
+    "12681": {
+      "name": "Stalk",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 35
+            }
+          ]
+        }
+      }
+    },
     "12698": {
       "name": "Lightning Breath",
       "modes": {
@@ -14501,6 +14739,20 @@
               "type": "Range",
               "text": "Range",
               "value": 300
+            }
+          ]
+        }
+      }
+    },
+    "13002": {
+      "name": "Shadowstep",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 60
             }
           ]
         }
@@ -15071,6 +15323,20 @@
               "type": "Range",
               "text": "Range",
               "value": 900
+            }
+          ]
+        }
+      }
+    },
+    "13024": {
+      "name": "Choking Gas",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Number",
+              "text": "Initiative Cost",
+              "value": 6
             }
           ]
         }
@@ -15880,6 +16146,20 @@
               "type": "Range",
               "text": "Range",
               "value": 900
+            }
+          ]
+        }
+      }
+    },
+    "13113": {
+      "name": "Black Powder",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Number",
+              "text": "Initiative Cost",
+              "value": 7
             }
           ]
         }
@@ -18213,6 +18493,20 @@
         }
       }
     },
+    "14406": {
+      "name": "Berserker Stance",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 40
+            }
+          ]
+        }
+      }
+    },
     "14407": {
       "name": "Banner of Discipline",
       "modes": {
@@ -18372,6 +18666,20 @@
               "type": "Range",
               "text": "Range",
               "value": 600
+            }
+          ]
+        }
+      }
+    },
+    "14412": {
+      "name": "Balanced Stance",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 40
             }
           ]
         }
@@ -20078,6 +20386,20 @@
         }
       }
     },
+    "14573": {
+      "name": "Banner of Tactics (underwater)",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 45
+            }
+          ]
+        }
+      }
+    },
     "15717": {
       "name": "Impale (elementalist skill)",
       "modes": {
@@ -20464,6 +20786,20 @@
               "type": "Range",
               "text": "Range",
               "value": 1200
+            }
+          ]
+        }
+      }
+    },
+    "20451": {
+      "name": "Elixir X (underwater)",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 75
             }
           ]
         }
@@ -21334,6 +21670,20 @@
         }
       }
     },
+    "27080": {
+      "name": "Gaze of Darkness",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 25
+            }
+          ]
+        }
+      }
+    },
     "27107": {
       "name": "Impossible Odds",
       "modes": {
@@ -21528,6 +21878,20 @@
               "status": "Effect",
               "duration": 0,
               "apply_count": 1
+            }
+          ]
+        }
+      }
+    },
+    "27322": {
+      "name": "Pain Absorption",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 5
             }
           ]
         }
@@ -23233,6 +23597,20 @@
         }
       }
     },
+    "29371": {
+      "name": "Facet of Nature",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Number",
+              "text": "Upkeep Cost",
+              "value": -2
+            }
+          ]
+        }
+      }
+    },
     "29373": {
       "name": "Healing Orb",
       "modes": {
@@ -24503,6 +24881,20 @@
         }
       }
     },
+    "29665": {
+      "name": "Bypass Coating",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 35
+            }
+          ]
+        }
+      }
+    },
     "29666": {
       "name": "\"Nothing Can Save You!\"",
       "modes": {
@@ -24808,6 +25200,20 @@
               "type": "Range",
               "text": "Range",
               "value": 360
+            }
+          ]
+        }
+      }
+    },
+    "29739": {
+      "name": "Purge Gyro",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 30
             }
           ]
         }
@@ -26129,6 +26535,20 @@
         }
       }
     },
+    "30027": {
+      "name": "Defense Field",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 35
+            }
+          ]
+        }
+      }
+    },
     "30039": {
       "name": "Shield of Courage",
       "modes": {
@@ -26812,6 +27232,20 @@
               "type": "Range",
               "text": "Range",
               "value": 1500
+            }
+          ]
+        }
+      }
+    },
+    "30238": {
+      "name": "Glyph of the Tides",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 20
             }
           ]
         }
@@ -30758,6 +31192,20 @@
         }
       }
     },
+    "31677": {
+      "name": "Glyph of the Stars",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 75
+            }
+          ]
+        }
+      }
+    },
     "31679": {
       "name": "Spike Shoot",
       "modes": {
@@ -31301,6 +31749,20 @@
               "type": "Range",
               "text": "Range",
               "value": 1200
+            }
+          ]
+        }
+      }
+    },
+    "32588": {
+      "name": "Rite of the Great Dwarf (trait skill)",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 60
             }
           ]
         }
@@ -34039,6 +34501,20 @@
         }
       }
     },
+    "41372": {
+      "name": "Mercy",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 30
+            }
+          ]
+        }
+      }
+    },
     "41406": {
       "name": "Maul (soulbeast porcine)",
       "modes": {
@@ -34328,6 +34804,20 @@
               "type": "Range",
               "text": "Range",
               "value": 600
+            }
+          ]
+        }
+      }
+    },
+    "41714": {
+      "name": "Mantra of Solace",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 30
             }
           ]
         }
@@ -42001,6 +42491,20 @@
         }
       }
     },
+    "49045": {
+      "name": "Cleansing Field",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 20
+            }
+          ]
+        }
+      }
+    },
     "49063": {
       "name": "Detonate Plasma",
       "modes": {
@@ -45963,6 +46467,20 @@
         }
       }
     },
+    "62648": {
+      "name": "Crashing Courage",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 40
+            }
+          ]
+        }
+      }
+    },
     "62650": {
       "name": "Advancing Strike",
       "modes": {
@@ -47128,6 +47646,25 @@
         }
       }
     },
+    "62702": {
+      "name": "Battle Dance",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 3
+            },
+            {
+              "type": "Number",
+              "text": "Energy Cost",
+              "value": 20
+            }
+          ]
+        }
+      }
+    },
     "62705": {
       "name": "Call of the Alliance",
       "modes": {
@@ -47353,6 +47890,20 @@
         }
       }
     },
+    "62729": {
+      "name": "Alliance Tactics",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 10
+            }
+          ]
+        }
+      }
+    },
     "62732": {
       "name": "Artillery Slash",
       "modes": {
@@ -47420,6 +47971,20 @@
               "type": "Range",
               "text": "Range",
               "value": 900
+            }
+          ]
+        }
+      }
+    },
+    "62738": {
+      "name": "Drop Urn of Saint Viktor",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 10
             }
           ]
         }
@@ -47688,6 +48253,20 @@
               "type": "Range",
               "text": "Range",
               "value": 600
+            }
+          ]
+        }
+      }
+    },
+    "62796": {
+      "name": "Awakening",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Number",
+              "text": "Energy Cost",
+              "value": 30
             }
           ]
         }
@@ -48879,6 +49458,20 @@
         }
       }
     },
+    "62901": {
+      "name": "Tactical Reload",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 40
+            }
+          ]
+        }
+      }
+    },
     "62910": {
       "name": "Molten End",
       "modes": {
@@ -49003,6 +49596,20 @@
               "type": "Range",
               "text": "Range",
               "value": 900
+            }
+          ]
+        }
+      }
+    },
+    "62921": {
+      "name": "Imperial Guard",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 20
             }
           ]
         }
@@ -50468,6 +51075,20 @@
               "type": "ComboField",
               "text": "Combo Field",
               "field_type": "Poison"
+            }
+          ]
+        }
+      }
+    },
+    "63111": {
+      "name": "Shift Signet",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 40
             }
           ]
         }
@@ -54222,6 +54843,20 @@
               "status": "Number of hits",
               "duration": 5,
               "apply_count": 1
+            }
+          ]
+        }
+      }
+    },
+    "68280": {
+      "name": "Defense Field (underwater)",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 35
             }
           ]
         }
@@ -58715,6 +59350,20 @@
         }
       }
     },
+    "71987": {
+      "name": "Symbol of Ignition",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 15
+            }
+          ]
+        }
+      }
+    },
     "71993": {
       "name": "Molten Meteor",
       "modes": {
@@ -60967,6 +61616,20 @@
               "type": "Range",
               "text": "Range",
               "value": 1200
+            }
+          ]
+        }
+      }
+    },
+    "72938": {
+      "name": "Abyssal Blitz",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 15
             }
           ]
         }
@@ -65584,6 +66247,20 @@
         }
       }
     },
+    "76619": {
+      "name": "Whirlwind",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 25
+            }
+          ]
+        }
+      }
+    },
     "76633": {
       "name": "Forged Surfer Dash",
       "modes": {
@@ -67449,6 +68126,20 @@
         }
       }
     },
+    "76841": {
+      "name": "Elemental Procession",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 75
+            }
+          ]
+        }
+      }
+    },
     "76846": {
       "name": "Shrike (trait skill)",
       "modes": {
@@ -67587,6 +68278,20 @@
               "type": "Range",
               "text": "Range",
               "value": 900
+            }
+          ]
+        }
+      }
+    },
+    "76879": {
+      "name": "Emergency Jade Shield",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 25
             }
           ]
         }
@@ -68771,6 +69476,20 @@
         }
       }
     },
+    "77022": {
+      "name": "Weapon of Remedy",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 25
+            }
+          ]
+        }
+      }
+    },
     "77038": {
       "name": "Hare's Agility",
       "modes": {
@@ -69128,6 +69847,20 @@
               "type": "Range",
               "text": "Range",
               "value": 600
+            }
+          ]
+        }
+      }
+    },
+    "77073": {
+      "name": "Enter Radiant Forge",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 15
             }
           ]
         }
@@ -70637,6 +71370,20 @@
         }
       }
     },
+    "77300": {
+      "name": "Valorous Stance",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 40
+            }
+          ]
+        }
+      }
+    },
     "77319": {
       "name": "Bluster",
       "modes": {
@@ -70735,6 +71482,20 @@
               "status": "Effect",
               "duration": 0,
               "apply_count": 1
+            }
+          ]
+        }
+      }
+    },
+    "77321": {
+      "name": "Stalwart Stance",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 30
             }
           ]
         }
@@ -71929,6 +72690,20 @@
               "type": "Range",
               "text": "Range",
               "value": 170
+            }
+          ]
+        }
+      }
+    },
+    "79323": {
+      "name": "Rejuvenate",
+      "modes": {
+        "wvw": {
+          "facts": [
+            {
+              "type": "Recharge",
+              "text": "Recharge",
+              "value": 20
             }
           ]
         }

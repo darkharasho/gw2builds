@@ -1,4 +1,4 @@
-const { parseWikitextFacts, mapWikiFactToApiFact, validateSplitEntry } = require("../../lib/gw2-balance-splits/scripts/seed");
+const { parseWikitextFacts, mapWikiFactToApiFact, parseInfoboxParams, validateSplitEntry } = require("../../lib/gw2-balance-splits/scripts/seed");
 
 describe("seed.js parsing functions", () => {
   describe("mapWikiFactToApiFact", () => {
@@ -94,6 +94,42 @@ describe("seed.js parsing functions", () => {
     test("returns empty for no skill facts", () => {
       const facts = parseWikitextFacts("just some regular wikitext");
       expect(facts).toEqual([]);
+    });
+  });
+
+  describe("parseInfoboxParams", () => {
+    test("extracts recharge wvw param", () => {
+      const wikitext = "| recharge = 10\n| recharge wvw = 25\n| id = 5648";
+      const facts = parseInfoboxParams(wikitext);
+      expect(facts).toEqual([{ type: "Recharge", text: "Recharge", value: 25 }]);
+    });
+
+    test("extracts energy wvw param", () => {
+      const wikitext = "| energy = 20\n| energy wvw = 30";
+      const facts = parseInfoboxParams(wikitext);
+      expect(facts).toEqual([{ type: "Number", text: "Energy Cost", value: 30 }]);
+    });
+
+    test("extracts initiative wvw param", () => {
+      const wikitext = "| initiative = 5\n| initiative wvw = 7";
+      const facts = parseInfoboxParams(wikitext);
+      expect(facts).toEqual([{ type: "Number", text: "Initiative Cost", value: 7 }]);
+    });
+
+    test("extracts upkeep wvw param", () => {
+      const wikitext = "| upkeep = -1\n| upkeep wvw = -2";
+      const facts = parseInfoboxParams(wikitext);
+      expect(facts).toEqual([{ type: "Number", text: "Upkeep Cost", value: -2 }]);
+    });
+
+    test("returns empty for no wvw params", () => {
+      const wikitext = "| recharge = 10\n| id = 1234";
+      expect(parseInfoboxParams(wikitext)).toEqual([]);
+    });
+
+    test("ignores non-numeric values", () => {
+      const wikitext = "| recharge wvw = varies";
+      expect(parseInfoboxParams(wikitext)).toEqual([]);
     });
   });
 
