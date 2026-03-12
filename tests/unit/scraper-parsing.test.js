@@ -1,11 +1,10 @@
-const { mapWikitextToFacts, validateSplitEntry } = require("../../lib/gw2-balance-splits/scripts/seed");
+const { parseWikitextFacts, mapWikiFactToApiFact, validateSplitEntry } = require("../../lib/gw2-balance-splits/scripts/seed");
 
 describe("seed.js parsing functions", () => {
-  describe("mapWikitextToFacts", () => {
+  describe("mapWikiFactToApiFact", () => {
     test("extracts damage coefficient", () => {
-      const facts = mapWikitextToFacts({ damage: "0.8" }, []);
-      expect(facts).toHaveLength(1);
-      expect(facts[0]).toEqual({
+      const fact = mapWikiFactToApiFact("damage", [], { coefficient: "0.8" }, true, false);
+      expect(fact).toEqual({
         type: "Damage",
         text: "Damage",
         dmg_multiplier: 0.8,
@@ -14,38 +13,86 @@ describe("seed.js parsing functions", () => {
     });
 
     test("extracts damage with hit count", () => {
-      const facts = mapWikitextToFacts({ damage: "0.5", "hit count": "3" }, []);
-      expect(facts[0].hit_count).toBe(3);
+      const fact = mapWikiFactToApiFact("damage", [], { coefficient: "0.5", "hit count": "3" }, true, false);
+      expect(fact.hit_count).toBe(3);
+      expect(fact.dmg_multiplier).toBe(0.5);
     });
 
     test("extracts duration", () => {
-      const facts = mapWikitextToFacts({ duration: "10" }, []);
+      const fact = mapWikiFactToApiFact("duration", ["duration", "10"], {}, true, false);
+      expect(fact).toEqual({ type: "Duration", text: "Duration", duration: 10 });
+    });
+
+    test("extracts recharge", () => {
+      const fact = mapWikiFactToApiFact("recharge", ["recharge", "25"], {}, true, false);
+      expect(fact).toEqual({ type: "Recharge", text: "Recharge", value: 25 });
+    });
+
+    test("extracts healing with base value", () => {
+      const fact = mapWikiFactToApiFact("healing", ["healing", "300"], {}, true, false);
+      expect(fact).toEqual({ type: "AttributeAdjust", text: "Healing", value: 300 });
+    });
+
+    test("extracts targets", () => {
+      const fact = mapWikiFactToApiFact("targets", ["targets", "5"], {}, true, false);
+      expect(fact).toEqual({ type: "Number", text: "Number of Targets", value: 5 });
+    });
+
+    test("extracts buff/condition with duration and stacks", () => {
+      const fact = mapWikiFactToApiFact("bleeding", ["bleeding", "3"], { stacks: "2" }, true, false);
+      expect(fact).toEqual({
+        type: "Buff",
+        text: "Bleeding",
+        status: "Bleeding",
+        duration: 3,
+        apply_count: 2,
+      });
+    });
+
+    test("unknown type defaults to Buff with apply_count 1", () => {
+      const fact = mapWikiFactToApiFact("unknown", ["unknown"], {}, true, false);
+      expect(fact).toEqual({
+        type: "Buff",
+        text: "Unknown",
+        status: "Unknown",
+        duration: 0,
+        apply_count: 1,
+      });
+    });
+  });
+
+  describe("parseWikitextFacts", () => {
+    test("extracts WvW-specific skill facts from wikitext", () => {
+      const wikitext = `{{skill fact|damage|coefficient=1.35|game mode=wvw}}`;
+      const facts = parseWikitextFacts(wikitext);
       expect(facts).toHaveLength(1);
-      expect(facts[0]).toEqual({ type: "Duration", text: "Duration", duration: 10 });
+      expect(facts[0].type).toBe("Damage");
+      expect(facts[0].dmg_multiplier).toBe(1.35);
     });
 
-    test("extracts recharge/cooldown", () => {
-      const facts = mapWikitextToFacts({ recharge: "25" }, []);
-      expect(facts[0]).toEqual({ type: "Recharge", text: "Recharge", value: 25 });
+    test("skips PvE-only facts", () => {
+      const wikitext = `{{skill fact|damage|coefficient=1.81|game mode=pve}}`;
+      const facts = parseWikitextFacts(wikitext);
+      expect(facts).toEqual([]);
     });
 
-    test("extracts healing", () => {
-      const facts = mapWikitextToFacts({ healing: "300" }, []);
-      expect(facts[0]).toEqual({ type: "AttributeAdjust", text: "Healing", value: 300 });
-    });
-
-    test("returns empty array for no WvW params", () => {
-      expect(mapWikitextToFacts({}, [])).toEqual([]);
-    });
-
-    test("extracts damage from split sections", () => {
-      const facts = mapWikitextToFacts({}, ["damage: 0.6"]);
+    test("includes universal facts (no game mode)", () => {
+      const wikitext = `{{skill fact|targets|5}}`;
+      const facts = parseWikitextFacts(wikitext);
       expect(facts).toHaveLength(1);
-      expect(facts[0].dmg_multiplier).toBe(0.6);
+      expect(facts[0].type).toBe("Number");
     });
 
-    test("ignores non-numeric values", () => {
-      const facts = mapWikitextToFacts({ damage: "varies" }, []);
+    test("handles pvp wvw combined mode", () => {
+      const wikitext = `{{skill fact|blindness|3|game mode=pvp wvw}}`;
+      const facts = parseWikitextFacts(wikitext);
+      expect(facts).toHaveLength(1);
+      expect(facts[0].type).toBe("Buff");
+      expect(facts[0].status).toBe("Blindness");
+    });
+
+    test("returns empty for no skill facts", () => {
+      const facts = parseWikitextFacts("just some regular wikitext");
       expect(facts).toEqual([]);
     });
   });
