@@ -1,0 +1,605 @@
+/* GW2Builds — skills styles */
+.editor-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.subpanel {
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  background: rgba(8, 14, 28, 0.72);
+  padding: 10px;
+  min-height: 260px;
+}
+
+.skills-host {
+  margin-top: 10px;
+}
+
+#skillSearch {
+  margin-top: 10px;
+}
+
+.panel--skillbar {
+  padding: 8px 12px;
+}
+
+.skills-bar__weapon-col {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.skills-bar__weapon-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.weapon-swap-btn {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(190, 155, 50, 0.55);
+  background: radial-gradient(circle at 42% 36%, rgba(50, 42, 14, 0.92) 0%, rgba(14, 11, 4, 0.96) 70%);
+  color: rgba(200, 165, 60, 0.55);
+  cursor: pointer;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+}
+
+.weapon-swap-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.weapon-swap-btn:not(:disabled) {
+  border-color: rgba(210, 175, 70, 0.85);
+  color: rgba(220, 185, 75, 0.95);
+  box-shadow: 0 0 6px rgba(180, 140, 40, 0.35), inset 0 1px 0 rgba(255, 220, 100, 0.12);
+}
+
+.weapon-swap-btn:not(:disabled):hover {
+  border-color: rgba(255, 215, 100, 1);
+  color: #ffe06a;
+  box-shadow: 0 0 12px rgba(210, 170, 50, 0.6), inset 0 1px 0 rgba(255, 230, 120, 0.2);
+}
+
+.weapon-swap-btn--active {
+  border-color: rgba(100, 200, 255, 0.85) !important;
+  color: rgba(120, 210, 255, 0.95) !important;
+  box-shadow: 0 0 8px rgba(80, 180, 240, 0.45), inset 0 1px 0 rgba(150, 220, 255, 0.15) !important;
+}
+
+.weapon-swap-btn svg {
+  width: 16px;
+  height: 13px;
+}
+
+.profession-mechanics-bar {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding-left: 40px; /* align over weapon icons, past swap button (34px + 6px gap) */
+}
+
+/* Revenant: push first elite F slot (F2+) to align above slot 3, past the legend F1 stack */
+.profession-mechanics-bar .legend-stack + * {
+  margin-left: 94px;
+}
+
+
+.skill-icon--profession {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(210, 180, 80, 0.5);
+  border-radius: 4px;
+  background: rgba(2, 8, 16, 0.7);
+  padding: 0;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  overflow: visible;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.skill-icon--profession img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.skill-icon--profession:hover {
+  border-color: rgba(255, 220, 100, 0.85);
+  box-shadow: 0 0 8px rgba(255, 200, 50, 0.4);
+}
+
+.skill-icon--profession-active {
+  border-color: rgba(255, 210, 60, 0.9);
+  box-shadow: 0 0 8px rgba(255, 190, 30, 0.5);
+}
+
+.skill-icon--profession-empty {
+  opacity: 0.25;
+  border-style: dashed;
+  cursor: default;
+  pointer-events: none;
+}
+
+.skill-icon--profession-nokit {
+  cursor: default;
+}
+.skill-icon--profession-nokit:hover {
+  border-color: rgba(210, 180, 80, 0.5);
+  box-shadow: none;
+}
+
+/* Ranger fake pet command buttons (Attack My Target / Return to Me) */
+.skill-icon--fake-command {
+  cursor: default;
+}
+.skill-icon--fake-command:hover {
+  border-color: rgba(210, 180, 80, 0.5);
+  box-shadow: none;
+}
+.skill-icon--fake-command svg {
+  width: 26px;
+  height: 26px;
+}
+.skill-icon--fake-attack {
+  background: rgba(20, 70, 15, 0.85);
+  border-color: rgba(100, 180, 80, 0.5);
+}
+.skill-icon--fake-return {
+  background: rgba(80, 65, 10, 0.85);
+  border-color: rgba(200, 175, 50, 0.5);
+}
+
+.skill-icon--profession-flabel {
+  position: absolute;
+  bottom: -1px;
+  left: -1px;
+  background: rgba(0, 0, 0, 0.72);
+  color: rgba(220, 200, 120, 0.9);
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 1px 3px 2px;
+  border-radius: 0 2px 0 2px;
+  pointer-events: none;
+  letter-spacing: 0.02em;
+  z-index: 1;
+}
+
+.kit-toggle-indicator {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  background: rgba(0, 0, 0, 0.72);
+  color: rgba(220, 200, 120, 0.9);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 2px 4px 3px;
+  border-radius: 2px 0 2px 0;
+  pointer-events: all;
+  cursor: pointer;
+  user-select: none;
+  z-index: 1;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.kit-toggle-indicator:hover {
+  background: rgba(255, 200, 50, 0.85);
+  color: #000;
+}
+.kit-toggle-indicator--active {
+  background: rgba(210, 180, 80, 0.5);
+  color: #fff;
+}
+.kit-toggle-indicator--active:hover {
+  background: rgba(255, 80, 60, 0.8);
+  color: #fff;
+}
+
+
+.legend-stack {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  align-items: center;
+}
+
+.legend-slot-btn {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border: 2px solid rgba(160, 120, 60, 0.6);
+  border-radius: 3px;
+  background: rgba(4, 12, 22, 0.85);
+  padding: 0;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  overflow: visible;
+  color: rgba(200, 180, 120, 0.75);
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+  flex-shrink: 0;
+}
+
+.legend-slot-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 2px;
+}
+
+.legend-slot-btn:hover {
+  border-color: rgba(220, 180, 80, 0.9);
+  box-shadow: 0 0 10px rgba(200, 160, 40, 0.5);
+}
+
+.legend-slot-btn--active {
+  border-color: rgba(220, 190, 60, 0.95) !important;
+  box-shadow: 0 0 12px rgba(200, 170, 30, 0.6) !important;
+}
+
+/* F1/F2 label on legend slot button */
+.legend-slot-btn__label {
+  position: absolute;
+  bottom: -1px;
+  left: -1px;
+  background: rgba(0, 0, 0, 0.75);
+  color: rgba(220, 200, 120, 0.9);
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 1px 3px 2px;
+  border-radius: 0 2px 0 2px;
+  pointer-events: none;
+  letter-spacing: 0.02em;
+}
+
+/* Ranger: spacer inside mechBar that pushes pet selector to the right */
+.pet-panel-spacer {
+  flex: 1;
+}
+
+.pet-slot-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.pet-slot-btn {
+  width: 52px;
+  height: 52px;
+  border: 2px solid rgba(80, 140, 60, 0.6);
+  border-radius: 3px;
+  background: rgba(4, 12, 22, 0.85);
+  padding: 0;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: rgba(140, 200, 110, 0.75);
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+  flex-shrink: 0;
+}
+
+.pet-slot-btn--filled {
+  width: 60px;
+  height: 60px;
+  border-color: transparent;
+  background: transparent;
+}
+
+.pet-slot-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: scale(1.4);
+  transform-origin: 50% 30%;
+}
+
+.pet-slot-btn:hover {
+  border-color: rgba(120, 200, 80, 0.9);
+  box-shadow: 0 0 10px rgba(100, 180, 60, 0.5);
+}
+
+.pet-slot-btn__label {
+  font-size: 10px;
+  color: rgba(160, 210, 130, 0.75);
+  text-align: center;
+  max-width: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.pet-swap-btn {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(80, 140, 60, 0.55);
+  background: radial-gradient(circle at 42% 36%, rgba(14, 30, 10, 0.92) 0%, rgba(4, 12, 4, 0.96) 70%);
+  color: rgba(80, 140, 60, 0.55);
+  cursor: pointer;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+}
+
+.pet-swap-btn:hover {
+  border-color: rgba(120, 200, 80, 0.9);
+  color: rgba(140, 210, 90, 0.95);
+  box-shadow: 0 0 10px rgba(100, 180, 60, 0.5);
+}
+
+.pet-swap-btn--active {
+  border-color: rgba(100, 200, 255, 0.85) !important;
+  color: rgba(120, 210, 255, 0.95) !important;
+  box-shadow: 0 0 8px rgba(80, 180, 240, 0.45) !important;
+}
+
+.pet-swap-btn svg {
+  width: 13px;
+  height: 10px;
+}
+
+.skills-bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 12px;
+}
+
+.skill-group {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+
+.skills-bar__orb-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.health-orb {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 70%, rgba(160, 20, 20, 0.95) 0%, rgba(100, 8, 8, 0.9) 55%, rgba(40, 4, 4, 0.85) 100%);
+  border: 2px solid rgba(200, 60, 60, 0.6);
+  box-shadow: 0 0 12px rgba(200, 30, 30, 0.5), inset 0 0 16px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.health-orb__fill {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 30%, rgba(255, 100, 100, 0.15) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.health-orb__text {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+}
+
+.health-orb__hp {
+  font-family: var(--font-display, 'Cinzel', serif);
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 6px rgba(255, 120, 120, 0.8);
+  letter-spacing: 0.5px;
+}
+
+.health-orb__label {
+  font-size: 9px;
+  font-weight: 600;
+  color: rgba(255, 180, 180, 0.8);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.skill-slot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.skill-icon--weapon {
+  cursor: default;
+}
+
+.skill-icon-large.skill-icon--weapon {
+  border-color: rgba(210, 180, 80, 0.5);
+}
+
+.skill-icon--weapon.skill-icon--empty {
+  opacity: 0.3;
+  background: rgba(2, 8, 16, 0.5);
+  border-style: dashed;
+}
+
+.skill-icon-large {
+  position: relative;
+  overflow: visible;
+  width: 72px;
+  height: 72px;
+  border: 1px solid rgba(210, 180, 80, 0.5);
+  border-radius: 4px;
+  background: rgba(2, 8, 16, 0.7);
+  cursor: pointer;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.skill-slot:hover .skill-icon-large,
+.skill-icon-large:hover {
+  border-color: rgba(255, 220, 100, 0.85);
+  box-shadow: 0 0 8px rgba(255, 200, 50, 0.4);
+}
+
+.skill-icon-large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+@keyframes skillFlipSwap {
+  0% {
+    transform: perspective(280px) rotateX(-86deg) scale(0.92);
+    filter: brightness(1.35);
+  }
+  100% {
+    transform: perspective(280px) rotateX(0deg) scale(1);
+    filter: brightness(1);
+  }
+}
+
+.skill-icon-large.skill-icon--flip-anim,
+.skill-icon--profession.skill-icon--flip-anim,
+.legend-slot-btn.skill-icon--flip-anim {
+  animation: skillFlipSwap 560ms cubic-bezier(0.33, 1, 0.68, 1);
+  transform-origin: center center;
+  backface-visibility: hidden;
+}
+
+.skill-icon-large__keylabel {
+  position: absolute;
+  bottom: -1px;
+  left: -1px;
+  background: rgba(0, 0, 0, 0.72);
+  color: rgba(220, 200, 120, 0.9);
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 1px 3px 2px;
+  border-radius: 0 2px 0 2px;
+  pointer-events: none;
+  letter-spacing: 0.02em;
+  z-index: 1;
+}
+
+.skill-slot-label {
+  font-size: 10px;
+  color: var(--text-dim, #7a9abf);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.skill-slot--locked .skill-icon-large {
+  border-color: rgba(210, 165, 50, 0.5);
+}
+
+.skill-select-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 72px;
+  height: 72px;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.skill-select-overlay .cselect {
+  width: 100%;
+  height: 100%;
+}
+
+.skill-select-overlay .cselect__trigger {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  opacity: 0;
+  border: none;
+  background: transparent;
+  padding: 0;
+  pointer-events: none;
+  cursor: pointer;
+}
+
+.skill-select-overlay .cselect__menu {
+  min-width: 220px;
+  pointer-events: auto;
+}
+
+.skill-select-overlay.cselect-host {
+  pointer-events: none;
+}
+
+.skill-icon-btn {
+  border: 1px solid rgba(159, 183, 221, 0.56);
+  border-radius: 8px;
+  background: rgba(8, 12, 19, 0.74);
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background-color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
+}
+
+.skill-icon-btn:hover {
+  border-color: #93bbe9;
+  background: rgba(11, 17, 27, 0.82);
+  box-shadow: 0 4px 12px rgba(5, 11, 20, 0.54);
+  transform: translateY(-1px);
+}
+
+.skill-icon-btn img {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+}
+
+.skill-card select:hover {
+  border-color: #4870b1;
+}
+
+.skill-card select option:disabled {
+  color: #8095bc;
+}

@@ -1,0 +1,536 @@
+/* GW2Builds — equipment styles */
+/* Equipment Panel */
+.equip-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr 340px;
+  gap: 0;
+  align-items: stretch;
+}
+
+.equip-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 16px 0 0;
+}
+
+.equip-col--art {
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-left: 1px solid rgba(80, 132, 163, 0.2);
+  border-right: 1px solid rgba(80, 132, 163, 0.2);
+}
+
+.equip-col--art::before,
+.equip-col--art::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.equip-col--art::before {
+  left: 0;
+  background: linear-gradient(to right, rgb(11, 18, 34), transparent);
+}
+
+.equip-col--art::after {
+  right: 0;
+  background: linear-gradient(to left, rgb(11, 18, 34), transparent);
+}
+
+.equip-concept-art {
+  width: 60%;
+  height: auto;
+  max-height: 70%;
+  object-fit: contain;
+  display: block;
+  opacity: 0.85;
+}
+
+.equip-col--right {
+  border-left: none;
+  padding-left: 16px;
+}
+
+.equip-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.equip-section__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: "Cinzel", serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--accent-1);
+  text-transform: uppercase;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(80, 132, 163, 0.3);
+  margin-bottom: 2px;
+}
+
+.equip-fill-btn {
+  font-family: inherit;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(80, 132, 163, 0.5);
+  background: rgba(80, 132, 163, 0.1);
+  color: var(--accent-2);
+  cursor: pointer;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.equip-fill-btn:hover {
+  background: rgba(80, 132, 163, 0.2);
+  border-color: var(--accent-2);
+}
+
+.equip-set-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 4px;
+}
+
+.equip-trinket-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 4px;
+}
+
+.equip-trinket-grid--4 {
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+.equip-slot--compact {
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 4px 5px;
+  text-align: center;
+  gap: 4px;
+}
+
+.equip-slot--compact .equip-slot__icon {
+  width: 32px;
+  height: 32px;
+}
+
+.equip-slot--compact .equip-slot__info {
+  align-items: center;
+  gap: 0;
+}
+
+.equip-slot--compact .equip-slot__label {
+  font-size: 9px;
+}
+
+.equip-slot--compact .equip-slot__combo-name {
+  font-size: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.equip-slot--compact .equip-slot__combo-stats {
+  display: none;
+}
+
+.equip-slot--compact .equip-slot__value--empty {
+  font-size: 10px;
+}
+
+.equip-slot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(80, 132, 163, 0.2);
+  background: rgba(6, 11, 21, 0.5);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+
+.equip-slot:hover {
+  border-color: rgba(103, 226, 255, 0.5);
+  background: rgba(103, 226, 255, 0.04);
+  box-shadow: 0 0 8px rgba(103, 226, 255, 0.12), inset 0 0 8px rgba(103, 226, 255, 0.04);
+}
+
+.equip-slot:hover .equip-slot__icon {
+  border-color: rgba(103, 226, 255, 0.55);
+}
+
+.equip-slot:hover .equip-slot__icon img {
+  filter: drop-shadow(0 0 5px rgba(103, 226, 255, 0.75));
+  opacity: 0.35;
+}
+
+.equip-slot:hover .equip-slot__icon--filled img {
+  filter: drop-shadow(0 0 6px rgba(103, 226, 255, 0.8)) brightness(1.1);
+  opacity: 1;
+}
+
+.equip-slot:focus-visible {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 1px;
+}
+
+.equip-slot__icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(80, 132, 163, 0.3);
+  overflow: hidden;
+  display: flex;
+  transition: border-color 0.15s;
+  align-items: center;
+  justify-content: center;
+}
+
+.equip-slot__icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.2;
+  filter: grayscale(0.6);
+  transition: opacity 0.18s, filter 0.18s;
+}
+
+/* Legendary armor icons are full-art squares */
+.equip-slot__icon--filled:not(.equip-slot__icon--weapon) img {
+  object-fit: cover;
+}
+
+.equip-slot__icon--filled {
+  border-color: rgba(80, 132, 163, 0.6);
+}
+
+.equip-slot__icon--filled img {
+  opacity: 1;
+  filter: none;
+}
+
+.equip-slot__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.equip-slot__label {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.equip-slot__value {
+  font-size: 12px;
+  color: var(--text);
+}
+
+.equip-slot__value--empty {
+  color: rgba(120, 150, 180, 0.45);
+  font-style: italic;
+}
+
+.equip-slot__combo-name {
+  display: block;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.equip-slot__combo-stats {
+  display: block;
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 1px;
+}
+
+/* Weapon slot */
+.equip-slot--weapon {
+  cursor: default;
+  gap: 0;
+  padding: 0;
+}
+
+.equip-slot--weapon:hover {
+  border-color: rgba(103, 226, 255, 0.5);
+  background: rgba(103, 226, 255, 0.04);
+  box-shadow: 0 0 8px rgba(103, 226, 255, 0.12), inset 0 0 8px rgba(103, 226, 255, 0.04);
+}
+
+.equip-slot--disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.equip-weapon-type-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background: none;
+  border: none;
+  border-right: 1px solid rgba(80, 132, 163, 0.15);
+  cursor: pointer;
+  flex: 0 0 auto;
+  min-width: 130px;
+  border-radius: 6px 0 0 6px;
+  transition: background 0.15s;
+}
+
+.equip-weapon-type-btn:hover {
+  background: rgba(103, 226, 255, 0.07);
+}
+
+.equip-weapon-type-btn:hover .equip-slot__icon {
+  border-color: rgba(103, 226, 255, 0.55);
+}
+
+.equip-weapon-type-btn:hover .equip-slot__icon img {
+  filter: drop-shadow(0 0 5px rgba(103, 226, 255, 0.75));
+  opacity: 0.35;
+}
+
+.equip-weapon-type-btn:hover .equip-slot__icon--filled img {
+  filter: drop-shadow(0 0 6px rgba(103, 226, 255, 0.8)) brightness(1.1);
+  opacity: 1;
+}
+
+.equip-weapon-name {
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.equip-weapon-name--empty {
+  color: rgba(120, 150, 180, 0.45);
+  font-style: italic;
+}
+
+.equip-stat-pick-btn {
+  flex: 1;
+  padding: 4px 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 0 6px 6px 0;
+  transition: background 0.12s;
+}
+
+.equip-stat-pick-btn:hover {
+  background: rgba(103, 226, 255, 0.07);
+  color: rgba(200, 240, 255, 0.95);
+}
+
+.equip-stat-pick-btn--empty {
+  font-size: 12px;
+  color: rgba(120, 150, 180, 0.45);
+  font-style: italic;
+}
+
+/* Slot picker popup */
+.slot-picker {
+  position: fixed;
+  z-index: 300;
+  background: rgba(8, 15, 30, 0.98);
+  border: 1px solid #2f4368;
+  border-radius: 10px;
+  box-shadow: 0 10px 28px rgba(3, 9, 19, 0.7);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.slot-picker__search {
+  padding: 8px 10px;
+  background: rgba(6, 11, 21, 0.8);
+  border: none;
+  border-bottom: 1px solid rgba(47, 67, 104, 0.8);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  outline: none;
+}
+
+.slot-picker__search:focus {
+  border-bottom-color: var(--accent-2);
+}
+
+.slot-picker__list {
+  overflow-y: auto;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.slot-picker__option {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.slot-picker__icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.slot-picker__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.slot-picker__option:hover {
+  background: rgba(80, 132, 163, 0.12);
+  border-color: rgba(80, 132, 163, 0.4);
+}
+
+.slot-picker__option--selected {
+  background: rgba(80, 132, 163, 0.18);
+  border-color: var(--accent-2);
+}
+
+.slot-picker__name {
+  font-size: 12px;
+}
+
+.slot-picker__stats {
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 1px;
+}
+
+/* Pet picker — bigger entries with zoomed icons */
+.slot-picker--pet .slot-picker__icon {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  transform: scale(1.4);
+  overflow: hidden;
+}
+
+.slot-picker--pet .slot-picker__option {
+  padding: 6px 10px;
+  gap: 12px;
+}
+
+.slot-picker--pet .slot-picker__name {
+  font-size: 14px;
+}
+
+/* Attributes stats panel */
+.equip-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.equip-stat-row {
+  display: flex;
+  gap: 8px;
+}
+
+.equip-stat-cell {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.equip-stat-cell--derived {
+  background: rgba(80, 132, 163, 0.08);
+}
+
+.equip-stat-label {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.equip-stat-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.equip-stat-value--derived {
+  color: var(--accent-2);
+}
+
+/* Text inputs in equipment panel */
+.equip-text-label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.equip-text-label input {
+  background: rgba(6, 11, 21, 0.8);
+  border: 1px solid rgba(44, 61, 94, 0.8);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 5px 8px;
+  font: inherit;
+  font-size: 12px;
+  outline: none;
+}
+
+.equip-text-label input:focus {
+  border-color: var(--accent-2);
+}
+
+.equip-notes {
+  width: 100%;
+  background: rgba(6, 11, 21, 0.8);
+  border: 1px solid rgba(44, 61, 94, 0.8);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 12px;
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.equip-notes:focus {
+  border-color: var(--accent-2);
+}

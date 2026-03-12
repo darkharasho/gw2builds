@@ -1,0 +1,66 @@
+/* GW2Builds — button styles */
+/* Workspace menu */
+.titlebar__workspace-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-dim, #7a9abf);
+  cursor: pointer;
+  padding: 0 10px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s;
+}
+
+.titlebar__workspace-btn:hover,
+.titlebar__workspace-btn--active {
+  color: var(--accent, #99e6ff);
+}
+
+.titlebar__user {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.workspace-menu {
+  position: fixed;
+  top: 40px;
+  right: 8px;
+  z-index: 200;
+  background: linear-gradient(180deg, rgba(16, 25, 48, 0.99), rgba(11, 18, 34, 0.99));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px;
+  width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.workspace-menu__user {
+  font-size: 12px;
+  color: var(--text-dim, #7a9abf);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 4px;
+}
+
+.workspace-menu .btn {
+  width: 100%;
+  text-align: left;
+}
+
+.btn-danger {
+  color: #f87171;
+  background: rgba(200, 30, 30, 0.1);
+  border-color: rgba(200, 60, 60, 0.3);
+}
+
+.btn-danger:hover {
+  background: rgba(200, 30, 30, 0.2);
+  border-color: rgba(220, 80, 80, 0.5);
+}

@@ -1,0 +1,74 @@
+/* GW2Builds — base styles */
+:root {
+  color-scheme: dark;
+  --bg: #04070f;
+  --bg-2: #070d1b;
+  --panel: #101930;
+  --panel-2: #0c1325;
+  --line: #223458;
+  --line-soft: #1a2a49;
+  --text: #e8f0ff;
+  --muted: #a6bbde;
+  --accent: #4fd897;
+  --accent-2: #48a8ff;
+  --danger: #c5485f;
+  --radius: 14px;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(80, 132, 163, 0.4) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(80, 132, 163, 0.4);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 180, 220, 0.6);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: "Exo 2", system-ui, sans-serif;
+  background:
+    radial-gradient(1300px 550px at -5% -10%, rgba(79, 216, 151, 0.2), transparent 55%),
+    radial-gradient(1000px 550px at 110% 0%, rgba(72, 168, 255, 0.2), transparent 55%),
+    var(--bg);
+  color: var(--text);
+}
+
+a {
+  color: #9ac9ff;
+}
+
+.app-drag {
+  -webkit-app-region: drag;
+}
+
+.no-drag,
+.no-drag * {
+  -webkit-app-region: no-drag;
+}
+
+.hidden {
+  display: none !important;
+}

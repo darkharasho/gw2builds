@@ -1,0 +1,69 @@
+/* GW2Builds — forms styles */
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.subtab {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.panel {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, rgba(16, 25, 48, 0.95), rgba(11, 18, 34, 0.95));
+  padding: 12px;
+}
+
+.panel h1,
+.panel h2 {
+  margin: 0;
+  font-family: "Cinzel", serif;
+  letter-spacing: 0.03em;
+}
+
+.panel h1 {
+  font-size: 1.05rem;
+}
+
+.panel h2 {
+  font-size: 0.97rem;
+}
+
+.panel p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.panel input,
+.panel select,
+.panel textarea {
+  width: 100%;
+  border: 1px solid #2a3c66;
+  border-radius: 10px;
+  background: #091124;
+  color: var(--text);
+  padding: 9px 10px;
+  font: inherit;
+}
+
+.panel textarea {
+  resize: vertical;
+}
+
+.panel input:focus,
+.panel select:focus,
+.panel textarea:focus {
+  outline: none;
+  border-color: var(--accent-2);
+  box-shadow: 0 0 0 2px rgba(72, 168, 255, 0.26);
+}
+
+.cselect-host {
+  width: 100%;
+}

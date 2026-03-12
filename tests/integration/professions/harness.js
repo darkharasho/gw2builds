@@ -12,6 +12,7 @@
  */
 
 const { createGw2MockFetch } = require("../../helpers/mockFetch");
+const { buildMechanicSlotsForRender, getSkillOptionsByType, getEquippedWeaponSkills } = require("../../../src/renderer/modules/skills");
 
 function normalizeCatalog(raw) {
   return {
@@ -32,11 +33,10 @@ function slotSig(slot) {
 }
 
 function setupHarness(defaultProfession = "") {
-  const ctx = { gw2Data: null, testOnly: null };
+  const ctx = { gw2Data: null };
 
   beforeAll(() => {
     ctx.gw2Data = require("../../../src/main/gw2Data");
-    ctx.testOnly = require("../../../src/renderer/renderer").__testOnly;
   });
 
   beforeEach(() => { global.fetch = createGw2MockFetch(); });
@@ -52,7 +52,7 @@ function setupHarness(defaultProfession = "") {
   }
 
   function skillOptions(catalog, specId) {
-    return ctx.testOnly.getSkillOptionsByType(catalog, makeSpecSelections(specId));
+    return getSkillOptionsByType(catalog, makeSpecSelections(specId));
   }
 
   function buildEditor(catalog, specId, opts = {}) {
@@ -60,7 +60,7 @@ function setupHarness(defaultProfession = "") {
     if (opts.majorChoices && specSelections.length > 0) {
       specSelections[specSelections.length - 1].majorChoices = opts.majorChoices;
     }
-    const options = ctx.testOnly.getSkillOptionsByType(catalog, specSelections);
+    const options = getSkillOptionsByType(catalog, specSelections);
     const utilities = [0, 1, 2].map((i) => Number(options.utility?.[i]?.id || 0));
     const weaponKey = Object.keys(catalog.professionWeapons || {})[0] || "";
 
@@ -96,8 +96,8 @@ function setupHarness(defaultProfession = "") {
 
   function resolveMechSlots(catalog, specId, opts = {}) {
     const editor = buildEditor(catalog, specId, opts);
-    const options = ctx.testOnly.getSkillOptionsByType(catalog, editor.specializations);
-    const result = ctx.testOnly.buildMechanicSlotsForRender({
+    const options = getSkillOptionsByType(catalog, editor.specializations);
+    const result = buildMechanicSlotsForRender({
       catalog,
       options,
       editor,
@@ -112,7 +112,7 @@ function setupHarness(defaultProfession = "") {
   }
 
   function resolveWeaponSlots(catalog, mainhand, offhand, att1, att2, isWeaver = false) {
-    return ctx.testOnly.getEquippedWeaponSkills(
+    return getEquippedWeaponSkills(
       catalog,
       { mainhand: mainhand || "", offhand: offhand || "" },
       att1 || "",

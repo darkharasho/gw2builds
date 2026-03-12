@@ -1,0 +1,215 @@
+/* GW2Builds — cards styles */
+.auth-row {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.pill {
+  border: 1px solid #335287;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  color: #d2e2ff;
+}
+
+.btn {
+  border: 1px solid #365589;
+  border-radius: 9px;
+  padding: 7px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #e8f0ff;
+  background: #182746;
+}
+
+.btn:hover {
+  background: #20345d;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  border-color: #3f87d8;
+  background: linear-gradient(180deg, #3f87d8, #286cb8);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(180deg, #56a0f4, #2f77c7);
+}
+
+.btn-danger {
+  border-color: #924258;
+  background: #6b2237;
+}
+
+.btn-danger:hover {
+  background: #7a2941;
+}
+
+.mt-8 {
+  margin-top: 8px;
+}
+
+.onboarding {
+  margin-top: 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.status-card {
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  background: rgba(9, 16, 32, 0.76);
+  padding: 10px;
+}
+
+.status-card h3 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.status-card p {
+  margin: 5px 0 0;
+  font-size: 0.78rem;
+}
+
+.status-card--done {
+  border-color: rgba(79, 216, 151, 0.48);
+  background: rgba(79, 216, 151, 0.12);
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.section-head p {
+  margin: 0;
+  font-size: 0.76rem;
+}
+
+.build-list {
+  margin-top: 10px;
+  display: grid;
+  gap: 8px;
+  max-height: 42vh;
+  overflow: auto;
+}
+
+.build-card {
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  padding: 8px;
+  background: rgba(8, 15, 29, 0.9);
+}
+
+.build-card h3 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.build-card p {
+  margin: 4px 0 0;
+  font-size: 0.75rem;
+}
+
+.build-card--active {
+  border-color: #4ea8ff;
+  box-shadow: 0 0 0 1px rgba(78, 168, 255, 0.4) inset;
+}
+
+.build-card__actions {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.empty-line {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.panel--toolbar {
+  display: grid;
+  gap: 10px;
+}
+
+.toolbar-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 10px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.dirty-badge {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(230, 180, 74, 0.58);
+  border-radius: 999px;
+  padding: 4px 9px;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #ffe3a2;
+  background: rgba(95, 65, 8, 0.5);
+}
+
+.publish-status {
+  margin: 0;
+  font-size: 0.76rem;
+  color: #c3d5f8;
+}
+
+.build-summary {
+  border: 1px solid #2a3f69;
+  border-radius: 10px;
+  background: rgba(7, 12, 22, 0.82);
+  padding: 8px 10px;
+  display: grid;
+  gap: 6px;
+}
+
+.build-summary__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 0.78rem;
+}
+
+.build-summary__label {
+  color: #9eb8e5;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.7rem;
+}
+
+.build-summary__value {
+  color: #e5efff;
+}

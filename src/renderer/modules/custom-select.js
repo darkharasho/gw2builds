@@ -1,0 +1,185 @@
+import { state } from "./state.js";
+
+// Module-level injection: set by renderer.js entry point after all modules are loaded.
+// Avoids circular dep between custom-select → render-pages → custom-select.
+let _bindHoverPreview = null;
+let _onError = (err) => console.error("[GW2Builds cselect]", err);
+
+export function initCustomSelect({ bindHoverPreview, onError } = {}) {
+  if (bindHoverPreview) _bindHoverPreview = bindHoverPreview;
+  if (onError) _onError = onError;
+}
+
+export function renderCustomSelect(host, config = {}) {
+  if (!host) return;
+  const options = Array.isArray(config.options) ? config.options : [];
+  const currentValue = String(config.value ?? "");
+  const selectedOption =
+    options.find((option) => String(option.value) === currentValue) ||
+    options.find((option) => !option.disabled) ||
+    options[0] ||
+    null;
+
+  host.innerHTML = "";
+  host.classList.add("cselect-host");
+
+  const root = document.createElement("div");
+  root.className = `cselect ${String(config.className || "").trim()}`.trim();
+
+  const trigger = document.createElement("button");
+  trigger.type = "button";
+  trigger.className = "cselect__trigger";
+  trigger.disabled = Boolean(config.disabled) || !options.length;
+  trigger.append(makeCustomSelectValueNode(selectedOption, config.placeholder || "Select"));
+
+  const chevron = document.createElement("span");
+  chevron.className = "cselect__chevron";
+  chevron.textContent = "▾";
+  trigger.append(chevron);
+
+  const menu = document.createElement("div");
+  menu.className = "cselect__menu";
+  const list = document.createElement("div");
+  list.className = "cselect__list";
+
+  if (!options.length) {
+    const empty = document.createElement("p");
+    empty.className = "cselect__empty";
+    empty.textContent = "No options";
+    list.append(empty);
+  } else {
+    for (const option of options) {
+      const button = document.createElement("button");
+      button.type = "button";
+      const isSelected = String(option.value) === String(selectedOption?.value ?? "");
+      button.className = `cselect__option ${isSelected ? "cselect__option--selected" : ""}`;
+      button.disabled = Boolean(option.disabled);
+      button.append(makeCustomSelectValueNode(option, config.placeholder || "Select"));
+
+      if (option.kind && option.entity && _bindHoverPreview) {
+        _bindHoverPreview(button, option.kind, () => option.entity);
+      }
+
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (button.disabled) return;
+        closeCustomSelect();
+        if (typeof config.onChange === "function") {
+          Promise.resolve(config.onChange(option.value, option)).catch((err) => _onError(err));
+        }
+      });
+      list.append(button);
+    }
+  }
+
+  menu.append(list);
+  root.append(trigger, menu);
+  host.append(root);
+
+  trigger.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    toggleCustomSelect(root);
+  });
+}
+
+export function makeCustomSelectValueNode(option, placeholder) {
+  const value = document.createElement("span");
+  value.className = "cselect__value";
+  value.append(makeCustomSelectIconNode(option));
+
+  const text = document.createElement("span");
+  text.className = "cselect__text";
+  const label = document.createElement("span");
+  label.className = "cselect__label";
+  label.textContent = String(option?.label || placeholder || "Select");
+  text.append(label);
+  if (option?.meta) {
+    const meta = document.createElement("span");
+    meta.className = "cselect__meta";
+    meta.textContent = String(option.meta);
+    text.append(meta);
+  }
+  value.append(text);
+  return value;
+}
+
+export function makeCustomSelectIconNode(option) {
+  if (option?.icon) {
+    const img = document.createElement("img");
+    img.className = "cselect__icon";
+    img.src = String(option.icon);
+    img.alt = `${String(option.label || "Option")} icon`;
+    return img;
+  }
+  const fallback = document.createElement("span");
+  fallback.className = "cselect__icon cselect__icon--fallback";
+  const source = String(option?.iconText || option?.label || option?.meta || "?").trim();
+  fallback.textContent = source ? source.slice(0, 1).toUpperCase() : "?";
+  return fallback;
+}
+
+export function getSelectAnchorRect(root) {
+  // For spec overlays, always anchor to the visible emblem button
+  const card = root.closest(".spec-card");
+  if (card) {
+    const emblem = card.querySelector(".spec-emblem");
+    if (emblem) return emblem.getBoundingClientRect();
+  }
+  const trigger = root.querySelector(".cselect__trigger");
+  return trigger?.getBoundingClientRect() ?? null;
+}
+
+export function toggleCustomSelect(root) {
+  if (!root) return;
+  const currentlyOpen = state.openCustomSelect;
+  if (currentlyOpen && currentlyOpen !== root) {
+    currentlyOpen.classList.remove("cselect--open");
+    resetCustomSelectMenuPosition(currentlyOpen.querySelector(".cselect__menu"));
+  }
+  const shouldOpen = !root.classList.contains("cselect--open");
+  if (shouldOpen) {
+    const menu = root.querySelector(".cselect__menu");
+    const rect = getSelectAnchorRect(root);
+    if (rect && menu) {
+      const menuEstHeight = 300;
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      const dropUp = spaceBelow < menuEstHeight + 8 && spaceAbove > spaceBelow;
+      menu.style.position = "fixed";
+      menu.style.left = `${Math.min(rect.left, window.innerWidth - 200)}px`;
+      menu.style.right = "auto";
+      if (dropUp) {
+        menu.style.top = "auto";
+        menu.style.bottom = `${window.innerHeight - rect.top + 6}px`;
+      } else {
+        menu.style.top = `${rect.bottom + 6}px`;
+        menu.style.bottom = "auto";
+      }
+    }
+  } else {
+    resetCustomSelectMenuPosition(root.querySelector(".cselect__menu"));
+  }
+  root.classList.toggle("cselect--open", shouldOpen);
+  state.openCustomSelect = shouldOpen ? root : null;
+}
+
+export function resetCustomSelectMenuPosition(menu) {
+  if (!menu) return;
+  menu.style.position = "";
+  menu.style.top = "";
+  menu.style.bottom = "";
+  menu.style.left = "";
+  menu.style.right = "";
+}
+
+export function closeCustomSelect() {
+  const open = state.openCustomSelect;
+  if (!open) return;
+  if (open.isConnected) {
+    open.classList.remove("cselect--open");
+    resetCustomSelectMenuPosition(open.querySelector(".cselect__menu"));
+  }
+  state.openCustomSelect = null;
+}

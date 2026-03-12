@@ -14,13 +14,26 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "testMatch": ["**/tests/**/*.test.js"],
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
+    "transform": {
+      "^.+/src/renderer/.+\\.js$": ["babel-jest", {}]
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/"
+    ],
     "collectCoverageFrom": [
       "src/main/**/*.js",
-      "!src/main/index.js"
+      "!src/main/index.js",
+      "src/renderer/modules/**/*.js"
     ],
     "coverageDirectory": "coverage",
-    "coverageReporters": ["text", "lcov", "html"],
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html"
+    ],
     "testTimeout": 15000,
     "clearMocks": true
   },
@@ -30,6 +43,9 @@
     "electron": "^37.2.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.29.0",
+    "@babel/preset-env": "^7.29.0",
+    "babel-jest": "^30.3.0",
     "concurrently": "^9.2.1",
     "electronmon": "^2.0.3",
     "jest": "^30.3.0",

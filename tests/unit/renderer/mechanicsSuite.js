@@ -1,6 +1,7 @@
 "use strict";
 
 const { createGw2MockFetch } = require("../../helpers/mockFetch");
+const { buildMechanicSlotsForRender, getSkillOptionsByType } = require("../../../src/renderer/modules/skills");
 
 function normalizeCatalog(raw) {
   return {
@@ -20,11 +21,11 @@ function slotSignature(slot) {
   return "empty";
 }
 
-function buildEditor(caseData, catalog, testOnly) {
+function buildEditor(caseData, catalog) {
   const specSelections = caseData.specId
     ? [{ specializationId: Number(caseData.specId), majorChoices: caseData.majorChoices || { 1: 0, 2: 0, 3: 0 } }]
     : [];
-  const options = testOnly.getSkillOptionsByType(catalog, specSelections);
+  const options = getSkillOptionsByType(catalog, specSelections);
   const utilities = [0, 1, 2].map((index) => Number(options.utility?.[index]?.id || 0));
   const weaponKey = Object.keys(catalog.professionWeapons || {})[0] || "";
 
@@ -61,12 +62,10 @@ function buildEditor(caseData, catalog, testOnly) {
 function setupMechanicsHarness(defaultProfession = "") {
   const context = {
     gw2Data: null,
-    testOnly: null,
   };
 
   beforeAll(() => {
     context.gw2Data = require("../../../src/main/gw2Data");
-    context.testOnly = require("../../../src/renderer/renderer").__testOnly;
   });
 
   beforeEach(() => {
@@ -81,10 +80,10 @@ function setupMechanicsHarness(defaultProfession = "") {
     const caseData = { profession: defaultProfession, ...(entry || {}) };
     const rawCatalog = await context.gw2Data.getProfessionCatalog(caseData.profession);
     const catalog = normalizeCatalog(rawCatalog);
-    const editor = buildEditor(caseData, catalog, context.testOnly);
-    const options = context.testOnly.getSkillOptionsByType(catalog, editor.specializations);
+    const editor = buildEditor(caseData, catalog);
+    const options = getSkillOptionsByType(catalog, editor.specializations);
 
-    const result = context.testOnly.buildMechanicSlotsForRender({
+    const result = buildMechanicSlotsForRender({
       catalog,
       options: { ...options },
       editor,

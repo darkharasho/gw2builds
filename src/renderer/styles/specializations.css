@@ -1,0 +1,323 @@
+/* GW2Builds — specializations styles */
+.specs-with-detail {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.specs-panel {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.detail-panel {
+  flex: 0 0 340px;
+  width: 340px;
+}
+
+.specializations-host {
+  margin-top: 10px;
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+}
+
+.spec-card {
+  --spec-scale: 1.1;
+  position: relative;
+  padding: 0;
+  background: transparent;
+  min-height: 0;
+  width: min(1060px, 100%);
+  max-width: 100%;
+  min-width: 0;
+  margin-inline: auto;
+}
+
+.spec-select-overlay {
+  position: absolute;
+  top: calc(10px * var(--spec-scale));
+  left: calc(18px * var(--spec-scale));
+  width: calc(96px * var(--spec-scale));
+  height: calc(96px * var(--spec-scale));
+  overflow: visible;
+  pointer-events: none;
+  /* z-index keeps the overlay above panel children so :hover on the emblem works via
+     pointer-events pass-through. The dropdown menu itself uses position:fixed so it
+     escapes this stacking context and is unaffected by this z-index. */
+  z-index: 5;
+}
+
+.spec-select-overlay .cselect {
+  width: 100%;
+  height: 100%;
+}
+
+.spec-select-overlay .cselect__trigger {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  opacity: 0;
+  border: none;
+  background: transparent;
+  padding: 0;
+  pointer-events: none;
+  cursor: pointer;
+}
+
+.spec-select-overlay .cselect__menu {
+  min-width: calc(180px * var(--spec-scale));
+  pointer-events: auto;
+}
+
+.spec-select-overlay.cselect-host {
+  pointer-events: none;
+}
+
+
+.spec-card__panel {
+  position: relative;
+  border: 1px solid rgba(80, 132, 163, 0.48);
+  border-radius: 4px;
+  padding: calc(8px * var(--spec-scale)) calc(12px * var(--spec-scale)) calc(10px * var(--spec-scale));
+  background-color: #070f1d;
+  background-position: center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  min-height: calc(148px * var(--spec-scale));
+  overflow: hidden;
+}
+
+.spec-card__panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.08));
+  pointer-events: none;
+}
+
+.spec-card__panel--elite {
+  border-color: rgba(210, 165, 50, 0.7);
+  box-shadow: 0 0 20px rgba(190, 145, 30, 0.2) inset;
+}
+
+.spec-emblem--elite {
+  filter: drop-shadow(0 0 5px rgba(220, 175, 60, 0.9)) drop-shadow(0 0 14px rgba(200, 150, 40, 0.5));
+}
+
+.spec-emblem--elite:hover {
+  filter: drop-shadow(0 0 7px rgba(240, 200, 80, 1)) drop-shadow(0 0 20px rgba(210, 165, 50, 0.7));
+}
+
+.spec-card__panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+
+.spec-card__body {
+  position: relative;
+  margin-top: 0;
+  display: grid;
+  grid-template-columns:
+    calc(94px * var(--spec-scale))
+    calc(52px * var(--spec-scale)) calc(60px * var(--spec-scale))
+    calc(52px * var(--spec-scale)) calc(60px * var(--spec-scale))
+    calc(52px * var(--spec-scale)) calc(60px * var(--spec-scale));
+  column-gap: calc(12px * var(--spec-scale));
+  row-gap: 0;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(104px * var(--spec-scale));
+  max-width: 100%;
+  overflow: visible;
+  padding: calc(2px * var(--spec-scale)) calc(6px * var(--spec-scale)) calc(4px * var(--spec-scale));
+}
+
+.spec-connector {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes connectorFlow {
+  to { stroke-dashoffset: -32; }
+}
+
+.spec-connector .connector-flow {
+  animation: connectorFlow 2.4s linear infinite;
+}
+
+.spec-connector .connector-flow2 {
+  animation: connectorFlow 2.4s linear infinite;
+  animation-delay: -1.2s;
+}
+
+.spec-emblem {
+  width: calc(96px * var(--spec-scale));
+  height: calc(96px * var(--spec-scale));
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+  clip-path: none;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  margin: 0;
+  line-height: 0;
+  cursor: pointer;
+  box-shadow: none;
+  outline: none;
+  filter: drop-shadow(0 0 5px rgba(100, 220, 255, 0.85)) drop-shadow(0 0 14px rgba(80, 200, 255, 0.45));
+  transition: filter 0.16s ease;
+}
+
+.spec-emblem:hover:not(.spec-emblem--elite) {
+  box-shadow: none;
+  filter: drop-shadow(0 0 7px rgba(160, 240, 255, 1)) drop-shadow(0 0 20px rgba(100, 220, 255, 0.7));
+}
+
+.spec-emblem img {
+  width: calc(86px * var(--spec-scale));
+  height: calc(86px * var(--spec-scale));
+  display: block;
+  object-fit: contain;
+  border-radius: 0;
+  border: 0;
+}
+
+.trait-column {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  display: grid;
+  gap: calc(4px * var(--spec-scale));
+}
+
+.trait-column--major {
+  width: auto;
+  justify-self: center;
+}
+
+.trait-minor-anchor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  width: auto;
+}
+
+.trait-minor-anchor .trait-btn img {
+  width: calc(40px * var(--spec-scale));
+  height: calc(40px * var(--spec-scale));
+}
+
+.trait-btn {
+  border: none;
+  border-radius: 2px;
+  background: transparent;
+  height: calc(46px * var(--spec-scale));
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.16s ease, filter 0.16s ease;
+}
+
+.trait-btn:hover {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+.trait-btn:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.trait-btn:disabled:hover {
+  transform: none;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.trait-btn img {
+  width: calc(30px * var(--spec-scale));
+  height: calc(30px * var(--spec-scale));
+  border-radius: 2px;
+}
+
+.trait-column--major .trait-btn {
+  background: transparent;
+  border-color: transparent;
+  opacity: 1;
+}
+
+.trait-column--major .trait-btn:hover {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  opacity: 1;
+}
+
+.trait-btn--active {
+  border-color: transparent;
+  background: transparent;
+  opacity: 1;
+  box-shadow: none;
+}
+
+.trait-btn--active img {
+  filter: drop-shadow(0 0 5px rgba(103, 226, 255, 0.9)) drop-shadow(0 0 2px rgba(200, 248, 255, 0.7));
+}
+
+.trait-btn--active:hover {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.trait-btn--always {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.trait-btn--always:hover {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+.trait-minor-anchor .trait-btn--always {
+  height: calc(50px * var(--spec-scale));
+  width: calc(40px * var(--spec-scale));
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+}
+
+.trait-column--major .trait-btn {
+  height: calc(50px * var(--spec-scale));
+}
+
+.trait-column--major .trait-btn img {
+  width: calc(32px * var(--spec-scale));
+  height: calc(32px * var(--spec-scale));
+}
+
+.trait-minor-anchor .trait-btn--always img {
+  width: calc(26px * var(--spec-scale));
+  height: calc(26px * var(--spec-scale));
+  border-radius: 0;
+  clip-path: polygon(25% 5%, 75% 5%, 96% 50%, 75% 95%, 25% 95%, 4% 50%);
+  box-shadow:
+    0 0 0 1px rgba(153, 230, 255, 0.48),
+    0 0 9px rgba(107, 224, 255, 0.24);
+}

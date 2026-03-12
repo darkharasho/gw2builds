@@ -10,13 +10,8 @@
  *   3. Duplicate facts with same text but different values (e.g. Stack Threshold 10 / 8)
  */
 
-let resolveEntityFacts;
-
-beforeAll(() => {
-  // resolveEntityFacts reads state.editor.specializations — stub it via the module's state.
-  const renderer = require("../../../src/renderer/renderer");
-  resolveEntityFacts = renderer.__testOnly.resolveEntityFacts;
-});
+const { resolveEntityFacts } = require("../../../src/renderer/modules/detail-panel");
+const { state } = require("../../../src/renderer/modules/state");
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -150,8 +145,6 @@ describe("resolveEntityFacts — AttributeConversion deduplication", () => {
 
 describe("resolveEntityFacts — traited_facts overrides", () => {
   test("replaces base fact when required trait is active", () => {
-    const renderer = require("../../../src/renderer/renderer");
-    const state = renderer.__testOnly._state;
     state.editor = {
       specializations: [{ specializationId: 51, majorChoices: { 1: 1855, 2: 0, 3: 0 } }],
     };
@@ -167,8 +160,7 @@ describe("resolveEntityFacts — traited_facts overrides", () => {
 
   test("cleans up state after trait test", () => {
     // Reset state so other tests are not affected
-    const renderer = require("../../../src/renderer/renderer");
-    renderer.__testOnly._state.editor = { specializations: [] };
+    state.editor = { specializations: [] };
   });
 
   test("does not replace when required trait is not active", () => {
