@@ -4,6 +4,8 @@
 
 import { state, createEmptyEditor } from "./modules/state.js";
 import { delay } from "./modules/utils.js";
+
+let _lastGameMode = "pve";
 import { initCustomSelect, closeCustomSelect } from "./modules/custom-select.js";
 import {
   initDetailPanel, bindHoverPreview, hideHoverPreview,
@@ -151,6 +153,8 @@ async function init() {
   wireWindowControls();
   wireEvents();
 
+  _lastGameMode = (await window.desktopApi.getSetting("lastGameMode")) || "pve";
+
   const [builds, professions] = await Promise.all([
     window.desktopApi.listBuilds(),
     window.desktopApi.listProfessions(),
@@ -162,7 +166,7 @@ async function init() {
   if (state.builds.length) {
     await loadBuildIntoEditor(state.builds[0], { captureBaseline: true });
   } else if (state.professions.length) {
-    state.editor = createEmptyEditor(state.professions[0].id);
+    state.editor = createEmptyEditor(state.professions[0].id, _lastGameMode);
     await setProfession(state.professions[0].id, { preserveSelections: false });
     captureEditorBaseline();
   }
@@ -181,7 +185,7 @@ async function reloadBuilds() {
 async function startNewBuild() {
   if (!confirmDiscardDirty("Start a new build")) return;
   const profession = state.editor.profession || state.professions[0]?.id || "";
-  state.editor = createEmptyEditor(profession);
+  state.editor = createEmptyEditor(profession, _lastGameMode);
   if (profession) {
     await setProfession(profession, { preserveSelections: false });
   }
@@ -252,7 +256,7 @@ async function setProfession(professionId, options = {}) {
   const selected = String(professionId || "");
   if (!selected) return;
 
-  const catalog = await getCatalog(selected);
+  const catalog = await getCatalog(selected, state.editor.gameMode || "pve");
   state.activeCatalog = catalog;
   state.editor.profession = selected;
 
@@ -265,9 +269,10 @@ async function setProfession(professionId, options = {}) {
   renderEditor();
 }
 
-async function getCatalog(professionId) {
-  if (state.catalogCache.has(professionId)) return state.catalogCache.get(professionId);
-  const raw = await window.desktopApi.getProfessionCatalog(professionId);
+async function getCatalog(professionId, gameMode = "pve") {
+  const cacheKey = `${professionId}_${gameMode}`;
+  if (state.catalogCache.has(cacheKey)) return state.catalogCache.get(cacheKey);
+  const raw = await window.desktopApi.getProfessionCatalog(professionId, gameMode);
   const catalog = {
     ...raw,
     specializationById: new Map((raw.specializations || []).map((entry) => [Number(entry.id), entry])),
@@ -277,7 +282,7 @@ async function getCatalog(professionId) {
     legendById: new Map((raw.legends || []).map((entry) => [String(entry.id), entry])),
     petById: new Map((raw.pets || []).map((entry) => [Number(entry.id), entry])),
   };
-  state.catalogCache.set(professionId, catalog);
+  state.catalogCache.set(cacheKey, catalog);
 
   // Pre-load all spec background images so they're cached before the user switches specs
   for (const spec of catalog.specializations || []) {
