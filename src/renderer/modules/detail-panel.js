@@ -385,7 +385,8 @@ function formatBuffConditionText(fact) {
   const count = Number(fact.apply_count) || 0;
   const stackPart = count > 1 ? ` ×${count}` : "";
   const duration = fact.duration != null ? ` (${fact.duration}s)` : "";
-  return `${name}${stackPart}${duration}`;
+  const desc = fact.description ? `: ${fact.description}` : "";
+  return `${name}${stackPart}${duration}${desc}`;
 }
 
 export function formatFactHtml(fact, dmgStats = null) {
