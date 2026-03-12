@@ -385,8 +385,13 @@ function formatBuffConditionText(fact) {
   const count = Number(fact.apply_count) || 0;
   const stackPart = count > 1 ? ` ×${count}` : "";
   const duration = fact.duration != null ? ` (${fact.duration}s)` : "";
-  const desc = fact.description ? `: ${fact.description}` : "";
-  return `${name}${stackPart}${duration}${desc}`;
+  // Show description if available, or text if it differs from status (wiki effect facts)
+  const extra = fact.description
+    ? `: ${fact.description}`
+    : (fact.text && fact.status && fact.text !== fact.status && fact.text !== "Apply Buff/Condition")
+      ? `: ${fact.text}`
+      : "";
+  return `${name}${stackPart}${duration}${extra}`;
 }
 
 export function formatFactHtml(fact, dmgStats = null) {
