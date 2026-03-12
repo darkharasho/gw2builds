@@ -55,7 +55,7 @@ async function getProfessionList(lang = "en") {
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-async function getProfessionCatalog(professionId, lang = "en") {
+async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve") {
   if (!professionId) {
     throw new Error("Missing profession id.");
   }
@@ -620,6 +620,7 @@ async function getProfessionCatalog(professionId, lang = "en") {
     })),
     legends,
     pets,
+    gameMode: gameMode || "pve",
     updatedAt: new Date().toISOString(),
   };
 }

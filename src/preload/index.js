@@ -24,8 +24,10 @@ contextBridge.exposeInMainWorld("desktopApi", {
   deleteBuild: (id) => ipcRenderer.invoke("builds:delete", id),
   publishSite: () => ipcRenderer.invoke("builds:publish-site"),
   listProfessions: () => ipcRenderer.invoke("gw2:list-professions"),
-  getProfessionCatalog: (professionId) =>
-    ipcRenderer.invoke("gw2:get-profession-catalog", professionId),
+  getProfessionCatalog: (professionId, gameMode) =>
+    ipcRenderer.invoke("gw2:get-profession-catalog", professionId, gameMode),
   getWikiSummary: (title) => ipcRenderer.invoke("wiki:get-summary", title),
   showError: (title, body) => ipcRenderer.invoke("dialog:error", title, body),
+  getSetting: (key) => ipcRenderer.invoke("settings:get", key),
+  setSetting: (key, value) => ipcRenderer.invoke("settings:set", key, value),
 });

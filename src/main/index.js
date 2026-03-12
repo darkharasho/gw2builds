@@ -249,10 +249,12 @@ app.whenReady().then(async () => {
   });
 
   ipcMain.handle("gw2:list-professions", async () => getProfessionList("en"));
-  ipcMain.handle("gw2:get-profession-catalog", async (_e, professionId) =>
-    getProfessionCatalog(professionId, "en")
+  ipcMain.handle("gw2:get-profession-catalog", async (_e, professionId, gameMode) =>
+    getProfessionCatalog(professionId, "en", gameMode)
   );
   ipcMain.handle("wiki:get-summary", async (_e, title) => getWikiSummary(title));
+  ipcMain.handle("settings:get", async (_e, key) => store.getSetting(key));
+  ipcMain.handle("settings:set", async (_e, key, value) => store.setSetting(key, value));
 
   ipcMain.handle("onboarding:status", async () => getOnboardingStatus());
   ipcMain.handle("onboarding:list-targets", async () => {
