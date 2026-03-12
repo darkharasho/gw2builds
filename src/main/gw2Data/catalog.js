@@ -34,6 +34,22 @@ const {
   LEGEND_FLIP_OVERRIDES,
 } = require("./overrides");
 
+const { getSkillSplit, getTraitSplit } = require("../../../lib/gw2-balance-splits");
+
+/**
+ * Apply WvW balance split override to a mapped skill or trait object (mutates in place).
+ * Called from mapSkill(), traits.map(), and weaponSkills mapping.
+ */
+function applyBalanceSplit(mapped, entityType, gameMode) {
+  if (gameMode === "pve") return;
+  const splitFn = entityType === "trait" ? getTraitSplit : getSkillSplit;
+  const split = splitFn(mapped.id, gameMode);
+  if (split?.facts) {
+    mapped.facts = split.facts;
+    mapped.hasSplit = true;
+  }
+}
+
 async function getProfessionList(lang = "en") {
   // Profession IDs are static (unchanged since 2015); hardcode to avoid an extra round-trip
   // and to avoid the /v2/professions bare endpoint which has inconsistent API support.
@@ -388,7 +404,7 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
     // dual_attunement is the Elementalist/Weaver dual attack secondary attunement field.
     // (dual_wield is a Thief-specific field for offhand weapon requirement — unrelated)
     const dualWield = skill.dual_attunement === "None" ? "" : (skill.dual_attunement || "");
-    return {
+    const mapped = {
       id: skill.id,
       name: skill.name || "",
       icon: skill.icon || "",
@@ -415,6 +431,8 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
       // not appear as permanent F-slot selections.
       inProfessionEndpoint: profSkillRefs.has(skill.id),
     };
+    applyBalanceSplit(mapped, "skill", gameMode);
+    return mapped;
   }
 
   let legendSkillsRaw = [];
@@ -564,32 +582,36 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
       minorTraits: Array.isArray(spec.minor_traits) ? spec.minor_traits : [],
       majorTraits: Array.isArray(spec.major_traits) ? spec.major_traits : [],
     })),
-    traits: traits.map((trait) => ({
-      id: trait.id,
-      name: trait.name || "",
-      // Use the render CDN icon directly — wiki FilePath lookups by trait name are unreliable
-      // because multiple traits across different professions can share the same name (e.g.
-      // "Deadly Aim", "No Quarter"), causing the wrong profession's icon to be served.
-      icon: trait.icon || "",
-      iconFallback: "",
-      description: trait.description || "",
-      tier: Number(trait.tier) || 0,
-      order: Number(trait.order) || 0,
-      slot: trait.slot || "",
-      specialization: Number(trait.specialization) || 0,
-      facts: Array.isArray(trait.facts) ? trait.facts.filter((f) => !f.requires_trait) : [],
-      traitedFacts: Array.isArray(trait.traited_facts) ? trait.traited_facts : [],
-      traitSkillIds: Array.isArray(trait.skills)
-        ? trait.skills.map((s) => Number(s?.id)).filter(Boolean)
-        : [],
-      traitSkillIcons: Array.isArray(trait.skills)
-        ? Object.fromEntries(
-            trait.skills
-              .filter((s) => s?.id && s?.icon)
-              .map((s) => [Number(s.id), String(s.icon)])
-          )
-        : {},
-    })),
+    traits: traits.map((trait) => {
+      const mapped = {
+        id: trait.id,
+        name: trait.name || "",
+        // Use the render CDN icon directly — wiki FilePath lookups by trait name are unreliable
+        // because multiple traits across different professions can share the same name (e.g.
+        // "Deadly Aim", "No Quarter"), causing the wrong profession's icon to be served.
+        icon: trait.icon || "",
+        iconFallback: "",
+        description: trait.description || "",
+        tier: Number(trait.tier) || 0,
+        order: Number(trait.order) || 0,
+        slot: trait.slot || "",
+        specialization: Number(trait.specialization) || 0,
+        facts: Array.isArray(trait.facts) ? trait.facts.filter((f) => !f.requires_trait) : [],
+        traitedFacts: Array.isArray(trait.traited_facts) ? trait.traited_facts : [],
+        traitSkillIds: Array.isArray(trait.skills)
+          ? trait.skills.map((s) => Number(s?.id)).filter(Boolean)
+          : [],
+        traitSkillIcons: Array.isArray(trait.skills)
+          ? Object.fromEntries(
+              trait.skills
+                .filter((s) => s?.id && s?.icon)
+                .map((s) => [Number(s.id), String(s.icon)])
+            )
+          : {},
+      };
+      applyBalanceSplit(mapped, "trait", gameMode);
+      return mapped;
+    }),
     skills: skills.map(mapSkill),
     professionWeapons: Object.fromEntries(
       Object.entries(profession.weapons || {}).map(([apiKey, wData]) => [
@@ -606,18 +628,22 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
         },
       ])
     ),
-    weaponSkills: weaponSkillsRaw.map((skill) => ({
-      id: skill.id,
-      name: skill.name || "",
-      icon: skill.icon || "",
-      description: skill.description || "",
-      slot: skill.slot || "",
-      attunement: skill.attunement === "None" ? "" : (skill.attunement || ""),
-      dualWield: skill.dual_attunement === "None" ? "" : (skill.dual_attunement || ""),
-      weaponType: skill.weapon_type === "None" ? "" : (skill.weapon_type || ""),
-      facts: Array.isArray(skill.facts) ? skill.facts : [],
-      flipSkill: Number(skill.flip_skill) || 0,
-    })),
+    weaponSkills: weaponSkillsRaw.map((skill) => {
+      const mapped = {
+        id: skill.id,
+        name: skill.name || "",
+        icon: skill.icon || "",
+        description: skill.description || "",
+        slot: skill.slot || "",
+        attunement: skill.attunement === "None" ? "" : (skill.attunement || ""),
+        dualWield: skill.dual_attunement === "None" ? "" : (skill.dual_attunement || ""),
+        weaponType: skill.weapon_type === "None" ? "" : (skill.weapon_type || ""),
+        facts: Array.isArray(skill.facts) ? skill.facts : [],
+        flipSkill: Number(skill.flip_skill) || 0,
+      };
+      applyBalanceSplit(mapped, "skill", gameMode);
+      return mapped;
+    }),
     legends,
     pets,
     gameMode: gameMode || "pve",
@@ -628,4 +654,5 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
 module.exports = {
   getProfessionList,
   getProfessionCatalog,
+  applyBalanceSplit,
 };
