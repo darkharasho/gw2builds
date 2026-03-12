@@ -32,6 +32,36 @@ export function initSkillsCallbacks({ renderEditor, markEditorChanged, enforceEd
   _openSlotPicker = openSlotPicker;
 }
 
+// Tracks which utility slot (0–2) is currently being dragged; -1 means none.
+let _dragUtilIdx = -1;
+
+// Shared swap animation: briefly offset the two newly-rendered icons to the
+// OLD positions of their counterparts, then spring them to their natural resting place.
+function _animateUtilitySwap(swapRects) {
+  if (!swapRects) return;
+  const newSlots = _el.skillsHost?.querySelectorAll('.skill-group--utilities .skill-slot');
+  const newFromBtn = newSlots?.[swapRects.fromIdx + 1]?.querySelector('.skill-icon-large');
+  const newToBtn   = newSlots?.[swapRects.toIdx   + 1]?.querySelector('.skill-icon-large');
+  if (!newFromBtn || !newToBtn) return;
+  const dx1 = swapRects.toRect.left   - swapRects.fromRect.left;
+  const dy1 = swapRects.toRect.top    - swapRects.fromRect.top;
+  const dx2 = swapRects.fromRect.left - swapRects.toRect.left;
+  const dy2 = swapRects.fromRect.top  - swapRects.toRect.top;
+  newFromBtn.style.transition = 'none';
+  newFromBtn.style.transform  = `translate(${dx1}px,${dy1}px)`;
+  newToBtn.style.transition   = 'none';
+  newToBtn.style.transform    = `translate(${dx2}px,${dy2}px)`;
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const spring = 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)';
+    newFromBtn.style.transition = spring;
+    newFromBtn.style.transform  = '';
+    newToBtn.style.transition   = spring;
+    newToBtn.style.transform    = '';
+    newFromBtn.addEventListener('transitionend', () => { newFromBtn.style.transition = ''; }, { once: true });
+    newToBtn.addEventListener('transitionend',   () => { newToBtn.style.transition   = ''; }, { once: true });
+  }));
+}
+
 // Matches GW2 API profession mechanic slot names ("Profession_1" … "Profession_5").
 const PROFESSION_SLOT_RE = /^Profession_\d/;
 
@@ -701,6 +731,68 @@ export function makeSkillSlot(slot, catalog, options, utilitySelection, markSkil
     iconBtn.append(toggleBadge);
   }
 
+  // Drag-to-swap: only the three utility slots (index 0–2) are draggable.
+  if (slot.index !== undefined) {
+    iconBtn.draggable = true;
+    slotEl.dataset.utilIdx = String(slot.index);
+
+    iconBtn.addEventListener("dragstart", (e) => {
+      _dragUtilIdx = slot.index;
+      e.dataTransfer.effectAllowed = "move";
+      // Delay the visual dimming so the browser captures the full icon as drag ghost first.
+      requestAnimationFrame(() => slotEl.classList.add("skill-slot--dragging"));
+    });
+
+    iconBtn.addEventListener("dragend", () => {
+      _dragUtilIdx = -1;
+      slotEl.classList.remove("skill-slot--dragging");
+      // Clean up any lingering drop-over highlights in case dragleave didn't fire.
+      _el.skillsHost?.querySelectorAll(".skill-slot--drag-over").forEach((el) => {
+        el.classList.remove("skill-slot--drag-over");
+      });
+    });
+
+    slotEl.addEventListener("dragover", (e) => {
+      if (_dragUtilIdx === -1 || _dragUtilIdx === slot.index) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      slotEl.classList.add("skill-slot--drag-over");
+    });
+
+    slotEl.addEventListener("dragleave", (e) => {
+      if (!slotEl.contains(e.relatedTarget)) {
+        slotEl.classList.remove("skill-slot--drag-over");
+      }
+    });
+
+    slotEl.addEventListener("drop", (e) => {
+      e.preventDefault();
+      slotEl.classList.remove("skill-slot--drag-over");
+      const fromIdx = _dragUtilIdx;
+      const toIdx   = slot.index;
+      _dragUtilIdx  = -1;
+      if (fromIdx === -1 || fromIdx === toIdx) return;
+
+      // Capture icon rects BEFORE re-render for the swap animation.
+      const utilSlots = _el.skillsHost?.querySelectorAll('.skill-group--utilities .skill-slot');
+      const fromBtn   = utilSlots?.[fromIdx + 1]?.querySelector('.skill-icon-large');
+      const toBtn     = utilSlots?.[toIdx   + 1]?.querySelector('.skill-icon-large');
+      const swapRects = (fromBtn && toBtn) ? {
+        fromIdx, toIdx,
+        fromRect: fromBtn.getBoundingClientRect(),
+        toRect:   toBtn.getBoundingClientRect(),
+      } : null;
+
+      const ids = state.editor.skills.utilityIds;
+      [ids[fromIdx], ids[toIdx]] = [ids[toIdx], ids[fromIdx]];
+      _enforceEditorConsistency();
+      state.editor.activeKit = 0;
+      _markEditorChanged({ updateBuildList: true });
+      renderSkills();
+      _animateUtilitySwap(swapRects);
+    });
+  }
+
   const selectHost = document.createElement("div");
   renderCustomSelect(selectHost, {
     value: String(selectedId || ""),
@@ -744,36 +836,7 @@ export function makeSkillSlot(slot, catalog, options, utilitySelection, markSkil
 
       // FLIP animation: after re-render, briefly offset the new icons to their OLD positions
       // then transition them to their natural (0,0) resting place with a springy easing.
-      if (swapRects) {
-        const newSlots = _el.skillsHost?.querySelectorAll('.skill-group--utilities .skill-slot');
-        const newFromBtn = newSlots?.[swapRects.fromIdx + 1]?.querySelector('.skill-icon-large');
-        const newToBtn = newSlots?.[swapRects.toIdx + 1]?.querySelector('.skill-icon-large');
-        if (newFromBtn && newToBtn) {
-          const dx1 = swapRects.toRect.left - swapRects.fromRect.left;
-          const dy1 = swapRects.toRect.top  - swapRects.fromRect.top;
-          const dx2 = swapRects.fromRect.left - swapRects.toRect.left;
-          const dy2 = swapRects.fromRect.top  - swapRects.toRect.top;
-          newFromBtn.style.transition = 'none';
-          newFromBtn.style.transform = `translate(${dx1}px,${dy1}px)`;
-          newToBtn.style.transition = 'none';
-          newToBtn.style.transform = `translate(${dx2}px,${dy2}px)`;
-          // Double rAF: first frame applies the offset, second starts the spring transition.
-          requestAnimationFrame(() => requestAnimationFrame(() => {
-            const spring = 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)';
-            newFromBtn.style.transition = spring;
-            newFromBtn.style.transform = '';
-            newToBtn.style.transition = spring;
-            newToBtn.style.transform = '';
-            // Clean up inline styles once settled.
-            newFromBtn.addEventListener('transitionend', () => {
-              newFromBtn.style.transition = '';
-            }, { once: true });
-            newToBtn.addEventListener('transitionend', () => {
-              newToBtn.style.transition = '';
-            }, { once: true });
-          }));
-        }
-      }
+      _animateUtilitySwap(swapRects);
 
       const nextSkill = options[resolveSkillSlotType(slot)]?.find((skill) => Number(skill.id) === nextId) || null;
       if (nextSkill) selectDetail("skill", nextSkill);

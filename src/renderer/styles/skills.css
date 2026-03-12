@@ -531,6 +531,23 @@
   border-color: rgba(210, 165, 50, 0.5);
 }
 
+/* Drag-to-swap: utility skill slots */
+[data-util-idx] .skill-icon-large {
+  cursor: grab;
+}
+
+.skill-slot--dragging .skill-icon-large {
+  opacity: 0.5;
+  cursor: grabbing;
+  border-color: rgba(74, 143, 214, 0.7);
+  box-shadow: 0 0 0 2px rgba(74, 143, 214, 0.3);
+}
+
+.skill-slot--drag-over .skill-icon-large {
+  border-color: rgba(74, 143, 214, 0.9);
+  box-shadow: 0 0 0 2px rgba(74, 143, 214, 0.5), 0 0 14px rgba(74, 143, 214, 0.35);
+}
+
 .skill-select-overlay {
   position: absolute;
   top: 0;
