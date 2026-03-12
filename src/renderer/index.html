@@ -39,7 +39,7 @@
 
     <section id="setupGate" class="setup-gate hidden"></section>
 
-    <div class="app-layout app-layout--subnav">
+    <div class="app-layout">
       <nav class="leftnav">
         <button class="leftnav__item leftnav__item--active" data-page="editor" type="button">
           <span class="leftnav__icon">&#9998;</span>
@@ -55,13 +55,16 @@
         </button>
       </nav>
 
-      <!-- Secondary nav (slides in for Build Editor) -->
-      <nav id="subnav" class="subnav subnav--visible">
-        <button class="subnav__item subnav__item--active" data-subtab="build" type="button"><span class="subnav__icon">&#9876;</span> Build</button>
-        <button class="subnav__item" data-subtab="equipment" type="button"><span class="subnav__icon">&#9775;</span> Equipment</button>
-      </nav>
-
       <div class="page-content">
+        <!-- Secondary nav (horizontal bar for Build Editor) -->
+        <nav id="subnav" class="subnav subnav--visible">
+          <button class="subnav__item subnav__item--active" data-subtab="build" type="button"><span class="subnav__icon">&#9876;</span> Build</button>
+          <button class="subnav__item" data-subtab="equipment" type="button"><span class="subnav__icon">&#9775;</span> Equipment</button>
+          <div class="game-mode-toggle">
+            <button class="game-mode-toggle__btn game-mode-toggle__btn--active" data-mode="pve" type="button">PvE</button>
+            <button class="game-mode-toggle__btn" data-mode="wvw" type="button">WvW</button>
+          </div>
+        </nav>
 
         <!-- Build Editor page -->
         <div id="page-editor" class="page">

@@ -456,7 +456,6 @@ function wireEvents() {
       // Show/hide subnav for editor page
       const showSubnav = page === "editor";
       el.subnav.classList.toggle("subnav--visible", showSubnav);
-      el.appLayout.classList.toggle("app-layout--subnav", showSubnav);
     });
   });
 
