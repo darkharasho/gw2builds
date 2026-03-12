@@ -526,6 +526,7 @@ export function buildMechanicSlotsForRender({
 
     const isWarrior = (catalog?.profession?.id || editor.profession || "") === "Warrior";
     const isBerserker = isWarrior && eliteSpecId === 18;
+    const isSpellbreaker = isWarrior && eliteSpecId === 61;
     // Berserk (F2 toggle for Berserker): resolve the Berserk skill from the Profession_2 slot.
     const berserkSkillId = isBerserker ? (bySlot.get("Profession_2")?.[0]?.id || 0) : 0;
     const berserkActive = berserkSkillId > 0 && activeKit === berserkSkillId;
@@ -578,6 +579,12 @@ export function buildMechanicSlotsForRender({
       // weapon-specific; show nothing rather than an arbitrary burst for an empty hand).
       if (isWarrior && slotKey === "Profession_1" && candidates.every((s) => s.weaponType) && !activeMainhand) {
         return { skill: null, sourceId: 0, isStatic: true, isSelectable: false };
+      }
+      // Spellbreaker: F2 is Full Counter (44165). The Profession_2 slot also contains 6 "Disrupting
+      // Counter" outcome skills (transient replacements after a successful interrupt) — pin to 44165.
+      if (isSpellbreaker && slotKey === "Profession_2") {
+        const fullCounter = candidates.find((s) => s.id === 44165) || skill;
+        return { skill: fullCounter, sourceId: fullCounter?.id || 0, isStatic: true, isSelectable: false };
       }
       // Berserker: F2 "Berserk" is toggleable — clicking it switches F1 between core and primal burst.
       if (isBerserker && slotKey === "Profession_2") {

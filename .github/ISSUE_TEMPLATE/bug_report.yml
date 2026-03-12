@@ -1,0 +1,101 @@
+name: Bug Report
+description: Report a bug or unexpected behavior in GW2Builds
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for helping test GW2Builds! Please fill out as much as you can.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the bug.
+      placeholder: e.g. "Clicking the weapon swap button crashes the app"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: How do we make it happen?
+      placeholder: |
+        1. Select profession...
+        2. Equip...
+        3. Click...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: false
+
+  - type: dropdown
+    id: profession
+    attributes:
+      label: Profession / Elite Spec
+      description: Which profession were you using? (if applicable)
+      options:
+        - N/A
+        - Guardian
+        - Dragonhunter
+        - Firebrand
+        - Willbender
+        - Luminary
+        - Warrior
+        - Berserker
+        - Spellbreaker
+        - Bladesworn
+        - Engineer
+        - Scrapper
+        - Holosmith
+        - Mechanist
+        - Ranger
+        - Druid
+        - Soulbeast
+        - Untamed
+        - Thief
+        - Daredevil
+        - Deadeye
+        - Specter
+        - Antiquary
+        - Elementalist
+        - Tempest
+        - Weaver
+        - Catalyst
+        - Mesmer
+        - Chronomancer
+        - Mirage
+        - Virtuoso
+        - Necromancer
+        - Reaper
+        - Scourge
+        - Harbinger
+        - Revenant
+        - Herald
+        - Renegade
+        - Vindicator
+        - Conduit
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Screenshots or recording
+      description: Drag and drop images or a screen recording here if it helps.
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      description: Found in the title bar or About screen.
+      placeholder: e.g. 0.1.0
+    validations:
+      required: false
