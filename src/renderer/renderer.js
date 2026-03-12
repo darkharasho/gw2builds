@@ -173,6 +173,7 @@ async function init() {
 
   await refreshWindowControls();
   render();
+  syncGameModeToggleUI(state.editor.gameMode || "pve");
 }
 
 // ── Build operations ─────────────────────────────────────────────────────────
@@ -192,6 +193,7 @@ async function startNewBuild() {
   state.detail = null;
   captureEditorBaseline();
   render();
+  syncGameModeToggleUI(state.editor.gameMode || "pve");
   setPublishStatus("Started a new local build draft.");
 }
 
@@ -204,6 +206,7 @@ async function saveCurrentBuild() {
     if (savedBuild) await loadBuildIntoEditor(savedBuild, { captureBaseline: true });
     else captureEditorBaseline();
     render();
+    syncGameModeToggleUI(state.editor.gameMode || "pve");
     setPublishStatus("Build saved locally.");
   } catch (err) {
     showError(err);
@@ -244,6 +247,7 @@ async function importBuildJsonFromClipboard() {
     state.editorDirty = true;
     renderEditorMeta();
     render();
+    syncGameModeToggleUI(state.editor.gameMode || "pve");
     setPublishStatus("Imported build JSON from clipboard. Save to keep it locally.");
   } catch (err) {
     showError(err);
@@ -292,6 +296,12 @@ async function getCatalog(professionId, gameMode = "pve") {
   }
 
   return catalog;
+}
+
+function syncGameModeToggleUI(mode) {
+  document.querySelectorAll(".game-mode-toggle__btn").forEach((btn) => {
+    btn.classList.toggle("game-mode-toggle__btn--active", btn.dataset.mode === mode);
+  });
 }
 
 // ── Auth / onboarding helpers ────────────────────────────────────────────────
@@ -388,6 +398,7 @@ function wireEvents() {
       await refreshOnboardingStatus();
       setPublishStatus(`Publish triggered. Pages URL: ${state.onboarding?.pagesUrl || "pending"}`);
       render();
+      syncGameModeToggleUI(state.editor.gameMode || "pve");
     } catch (err) {
       showError(err);
     }
@@ -469,6 +480,29 @@ function wireEvents() {
       document.querySelectorAll(".subtab").forEach((t) => t.classList.add("hidden"));
       const target = document.querySelector(`#subtab-${tab}`);
       if (target) target.classList.remove("hidden");
+    });
+  });
+
+  // Game mode toggle
+  document.querySelectorAll(".game-mode-toggle__btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const mode = btn.dataset.mode;
+      if (!mode || mode === state.editor.gameMode) return;
+
+      state.editor.gameMode = mode;
+      _lastGameMode = mode;
+      window.desktopApi.setSetting("lastGameMode", mode);
+
+      // Re-fetch catalog for the new mode (cache key includes mode)
+      if (state.editor.profession) {
+        const catalog = await getCatalog(state.editor.profession, mode);
+        state.activeCatalog = catalog;
+        enforceEditorConsistency();
+      }
+
+      markEditorChanged();
+      syncGameModeToggleUI(mode);
+      renderEditor();
     });
   });
 }
