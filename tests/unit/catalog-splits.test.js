@@ -24,6 +24,13 @@ jest.mock("../../lib/gw2-balance-splits", () => ({
     };
     return splits[String(id)] || null;
   },
+  getSkillPveFacts: (id) => {
+    const data = {
+      "1234": { facts: [{ type: "AttributeAdjust", text: "Healing", value: 100, target: "Healing", hit_count: 1, coefficient: 0.75 }] },
+    };
+    return data[String(id)] || null;
+  },
+  getTraitPveFacts: () => null,
 }));
 
 // Mock fetch module (required by catalog.js at import time)
@@ -79,10 +86,15 @@ describe("Catalog balance splits integration", () => {
   });
 
   describe("trait splits", () => {
-    test("overrides facts for WvW trait with split", () => {
+    test("merges facts for WvW trait with split — preserves unmatched base facts, appends new split facts", () => {
       const mapped = { id: 5678, facts: [{ type: "Number", value: 10 }] };
       applyBalanceSplit(mapped, "trait", "wvw");
-      expect(mapped.facts[0].type).toBe("Buff");
+      // Base Number fact has no matching type in the split, so it is preserved unchanged
+      expect(mapped.facts[0].type).toBe("Number");
+      expect(mapped.facts[0].value).toBe(10);
+      // The unmatched split Buff fact is appended and marked
+      expect(mapped.facts[1].type).toBe("Buff");
+      expect(mapped.facts[1]._splitFact).toBe(true);
       expect(mapped.hasSplit).toBe(true);
     });
 

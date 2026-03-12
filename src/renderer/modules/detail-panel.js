@@ -409,7 +409,8 @@ export function formatFactHtml(fact, dmgStats = null) {
     const targetLabel = rawTarget.replace(/([A-Z])/g, " $1").trim();
     const label = (fact.text && fact.text !== "AttributeAdjust") ? fact.text : (targetLabel || "Attribute");
     const val = fact.value ?? "";
-    const text = val === "" ? label : `${label}: ${val > 0 ? "+" : ""}${val}`;
+    let text = val === "" ? label : `${label}: ${val > 0 ? "+" : ""}${val}`;
+    if (fact.coefficient != null) text += ` (×${fact.coefficient})`;
     const iconUrl = fact.icon || "";
     return iconUrl ? `<img class="fact-status-icon" src="${escapeHtml(iconUrl)}" alt="" aria-hidden="true">${escapeHtml(text)}` : escapeHtml(text);
   }

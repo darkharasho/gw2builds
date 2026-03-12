@@ -34,20 +34,213 @@ const {
   LEGEND_FLIP_OVERRIDES,
 } = require("./overrides");
 
-const { getSkillSplit, getTraitSplit } = require("../../../lib/gw2-balance-splits");
+const { getSkillSplit, getTraitSplit, getSkillPveFacts, getTraitPveFacts } = require("../../../lib/gw2-balance-splits");
 
 /**
  * Apply WvW balance split override to a mapped skill or trait object (mutates in place).
  * Called from mapSkill(), traits.map(), and weaponSkills mapping.
+ *
+ * Merges split facts into the base facts rather than replacing them, so that facts
+ * not covered by the split (e.g. Recharge) are still shown. Split facts are matched
+ * to base facts in two passes:
+ *   1. Exact text + type match (e.g. "Conditions Removed" → "Conditions Removed")
+ *   2. Type-group positional match (e.g. 1st AttributeAdjust split → 1st AttributeAdjust base)
+ *      using type+target as the grouping key for finer granularity.
+ * The base fact's text label is always preserved; only value fields are taken from the split.
+ * A fact is marked _splitFact:true only when its value actually changed.
+ */
+// ── Balance split helpers ─────────────────────────────────────────────────────
+
+// The GW2 API uses type "Distance" for radius/range facts, but the wiki scraper
+// produces type "Radius". Normalize both to the same token for group matching.
+function _splitNormalizeType(type) {
+  return (type === "Distance" ? "Radius" : type) || "";
+}
+
+// Grouping key: normalizedType + target (for AttributeAdjust) or + status (for Buff).
+// Distance/Radius facts share a group; AttributeAdjust[Healing] and [Power] are distinct.
+function _splitGroupKey(f) {
+  return `${_splitNormalizeType(f.type)}:${f.target || f.status || ""}`;
+}
+
+const _SPLIT_VALUE_KEYS = ["value", "distance", "duration", "apply_count", "dmg_multiplier", "hit_count", "percent", "coefficient"];
+
+// hit_count is metadata — skip it when the base didn't carry it (avoids false positives
+// from the wiki scraper always emitting hit_count:1). For all other keys (including
+// coefficient) flag as changed whenever the split adds or changes the value.
+function _splitValueChanged(before, after) {
+  return _SPLIT_VALUE_KEYS.some((k) => {
+    if (after[k] === undefined) return false;
+    if (k === "hit_count" && before[k] === undefined) return false;
+    return before[k] !== after[k];
+  });
+}
+
+/**
+ * Build bidirectional index: baseToSplit[bi] = si and splitToBase[si] = bi.
+ *
+ * Two-pass matching:
+ *   Pass 1 — exact text + normalized-type match (e.g. "Conditions Removed" → same)
+ *   Pass 2 — type-group positional match (e.g. 1st AttributeAdjust:Healing split →
+ *             1st AttributeAdjust:Healing base), enabling generic wiki labels like
+ *             "Healing" to resolve to labelled base facts like "First Heal".
+ */
+function _buildSplitMatchTables(baseFacts, splitFacts) {
+  const baseToSplit = new Map();
+  const splitToBase = new Map();
+
+  // Pass 1: text + normalized-type
+  for (let si = 0; si < splitFacts.length; si++) {
+    const sf = splitFacts[si];
+    const sfText = (sf.text || "").toLowerCase().trim();
+    if (!sfText) continue;
+    for (let bi = 0; bi < baseFacts.length; bi++) {
+      if (baseToSplit.has(bi)) continue;
+      const bf = baseFacts[bi];
+      if (
+        _splitNormalizeType(bf.type) === _splitNormalizeType(sf.type) &&
+        (bf.text || "").toLowerCase().trim() === sfText
+      ) {
+        baseToSplit.set(bi, si);
+        splitToBase.set(si, bi);
+        break;
+      }
+    }
+  }
+
+  // Pass 2: type-group positional for remaining unmatched facts
+  const unmatchedByGroup = {};
+  for (let si = 0; si < splitFacts.length; si++) {
+    if (splitToBase.has(si)) continue;
+    const key = _splitGroupKey(splitFacts[si]);
+    (unmatchedByGroup[key] = unmatchedByGroup[key] || []).push(si);
+  }
+  const groupCounters = {};
+  for (let bi = 0; bi < baseFacts.length; bi++) {
+    if (baseToSplit.has(bi)) continue;
+    const key = _splitGroupKey(baseFacts[bi]);
+    const pool = unmatchedByGroup[key];
+    if (!pool) continue;
+    const idx = groupCounters[key] || 0;
+    if (idx < pool.length) {
+      baseToSplit.set(bi, pool[idx]);
+      splitToBase.set(pool[idx], bi);
+      groupCounters[key] = idx + 1;
+    }
+  }
+
+  return { baseToSplit, splitToBase };
+}
+
+/** Merge a split fact's values into a base fact (mutates a copy). */
+function _mergeSplitValues(bf, sf) {
+  const merged = { ...bf };
+  for (const k of _SPLIT_VALUE_KEYS) {
+    if (sf[k] !== undefined) merged[k] = sf[k];
+  }
+  // Cross-map Distance↔Radius: the GW2 API stores these in "value" (type Distance)
+  // while the wiki scraper uses "distance" (type Radius). Promote so the renderer
+  // (which reads fact.value first) shows the correct WvW number.
+  if (sf.distance !== undefined && bf.value !== undefined && bf.distance === undefined) {
+    merged.value = sf.distance;
+  }
+  return merged;
+}
+
+/**
+ * Apply WvW balance split override to a mapped skill or trait object (mutates in place).
+ * Called from mapSkill(), traits.map(), and weaponSkills mapping.
+ *
+ * Two modes controlled by split.complete:
+ *
+ *   complete:true  — The split represents the FULL WvW fact set (scraped from wiki
+ *                    {{skill fact}} templates). WvW facts are used as the primary list;
+ *                    base labels are grafted in where possible. Any PvE fact absent from
+ *                    the WvW split is DROPPED (e.g. Aegis removed in WvW).
+ *
+ *   complete:false — The split only lists CHANGED facts (e.g. a Recharge override from
+ *   (or undefined)   an infobox param). PvE facts not in the split are kept unchanged.
  */
 function applyBalanceSplit(mapped, entityType, gameMode) {
   if (gameMode === "pve") return;
   const splitFn = entityType === "trait" ? getTraitSplit : getSkillSplit;
   const split = splitFn(mapped.id, gameMode);
-  if (split?.facts) {
-    mapped.facts = split.facts.map((f) => ({ ...f, _splitFact: true }));
-    mapped.hasSplit = true;
+  if (!split?.facts) return;
+
+  mapped.hasSplit = true;
+  const baseFacts = Array.isArray(mapped.facts) ? mapped.facts : [];
+  const splitFacts = split.facts;
+
+  if (baseFacts.length === 0) {
+    mapped.facts = splitFacts.map((f) => ({ ...f, _splitFact: true }));
+    return;
   }
+
+  const { baseToSplit, splitToBase } = _buildSplitMatchTables(baseFacts, splitFacts);
+
+  if (split.complete) {
+    // ── Complete mode ─────────────────────────────────────────────────────────
+    // Iterate over the WvW split facts (authoritative). Enrich each with its
+    // matching PvE base label. PvE facts with no WvW counterpart are dropped.
+    mapped.facts = splitFacts.map((sf, si) => {
+      const bi = splitToBase.get(si);
+      if (bi === undefined) return sf; // WvW-only fact (no PvE counterpart)
+      const merged = _mergeSplitValues(baseFacts[bi], sf);
+      if (_splitValueChanged(baseFacts[bi], merged)) merged._splitFact = true;
+      return merged;
+    });
+  } else {
+    // ── Partial mode ──────────────────────────────────────────────────────────
+    // Iterate over the PvE base facts. Apply split overrides where matched.
+    // Unmatched base facts pass through unchanged. Unmatched split facts appended.
+    const result = baseFacts.map((bf, bi) => {
+      const si = baseToSplit.get(bi);
+      if (si === undefined) return bf;
+      const merged = _mergeSplitValues(bf, splitFacts[si]);
+      if (_splitValueChanged(bf, merged)) merged._splitFact = true;
+      return merged;
+    });
+    for (let si = 0; si < splitFacts.length; si++) {
+      if (!splitToBase.has(si)) result.push({ ...splitFacts[si], _splitFact: true });
+    }
+    mapped.facts = result;
+  }
+}
+
+/**
+ * Apply PvE fact enrichments (healing coefficients) to a mapped skill/trait object.
+ * The GW2 API does not expose healing-power coefficients in its facts; we scrape them
+ * from the wiki and store them in modes.pve. This function merges just the coefficient
+ * field into matching base facts so PvE tooltips can display e.g. "+2344 (×0.75)".
+ * Does NOT mark facts as _splitFact — these are PvE values, not WvW overrides.
+ */
+function applyPveFacts(mapped, entityType) {
+  const pveFn = entityType === "trait" ? getTraitPveFacts : getSkillPveFacts;
+  const pve = pveFn(mapped.id);
+  if (!pve?.facts?.length) return;
+
+  const baseFacts = Array.isArray(mapped.facts) ? mapped.facts : [];
+  if (baseFacts.length === 0) return;
+
+  // Match PvE facts to base facts by type+target positional group, then copy coefficient.
+  const groupKey = (f) => `${f.type || ""}:${f.target || f.status || ""}`;
+  const byGroup = {};
+  for (const pf of pve.facts) {
+    const key = groupKey(pf);
+    (byGroup[key] = byGroup[key] || []).push(pf);
+  }
+  const counters = {};
+
+  mapped.facts = baseFacts.map((bf) => {
+    const key = groupKey(bf);
+    const pool = byGroup[key];
+    if (!pool) return bf;
+    const idx = counters[key] || 0;
+    if (idx >= pool.length) return bf;
+    counters[key] = idx + 1;
+    const pf = pool[idx];
+    return pf.coefficient != null ? { ...bf, coefficient: pf.coefficient } : bf;
+  });
 }
 
 async function getProfessionList(lang = "en") {
@@ -432,6 +625,7 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
       inProfessionEndpoint: profSkillRefs.has(skill.id),
     };
     applyBalanceSplit(mapped, "skill", gameMode);
+    if (gameMode === "pve") applyPveFacts(mapped, "skill");
     return mapped;
   }
 
@@ -610,6 +804,7 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
           : {},
       };
       applyBalanceSplit(mapped, "trait", gameMode);
+      if (gameMode === "pve") applyPveFacts(mapped, "trait");
       return mapped;
     }),
     skills: skills.map(mapSkill),
@@ -642,6 +837,7 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
         flipSkill: Number(skill.flip_skill) || 0,
       };
       applyBalanceSplit(mapped, "skill", gameMode);
+      if (gameMode === "pve") applyPveFacts(mapped, "skill");
       return mapped;
     }),
     legends,
