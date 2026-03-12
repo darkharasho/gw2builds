@@ -45,7 +45,7 @@ function applyBalanceSplit(mapped, entityType, gameMode) {
   const splitFn = entityType === "trait" ? getTraitSplit : getSkillSplit;
   const split = splitFn(mapped.id, gameMode);
   if (split?.facts) {
-    mapped.facts = split.facts;
+    mapped.facts = split.facts.map((f) => ({ ...f, _splitFact: true }));
     mapped.hasSplit = true;
   }
 }

@@ -36,8 +36,8 @@ export function renderDetailPanel() {
   const factsHtml = facts.length
     ? facts
         .map((fact) => {
-          const cls = fact.type === "NoData" ? ' class="fact-item--section"' : '';
-          return `<li${cls}>${formatFactHtml(fact, detailDmgStats)}</li>`;
+          const cls = fact.type === "NoData" ? "fact-item--section" : fact._splitFact ? "fact-item--split" : "";
+          return `<li${cls ? ` class="${cls}"` : ""}>${formatFactHtml(fact, detailDmgStats)}</li>`;
         })
         .join("")
     : "<li>No fact entries.</li>";
@@ -197,8 +197,8 @@ export function buildSkillCard(skill, kind, isChained = false, dmgStats = null) 
     .map((fact) => {
       const html = formatFactHtml(fact, dmgStats);
       if (!html) return null;
-      const cls = fact.type === "NoData" ? ' class="fact-item--section"' : '';
-      return `<li${cls}>${html}</li>`;
+      const cls = fact.type === "NoData" ? "fact-item--section" : fact._splitFact ? "fact-item--split" : "";
+      return `<li${cls ? ` class="${cls}"` : ""}>${html}</li>`;
     })
     .filter(Boolean);
   const meta = getHoverMetaLine(kind, skill);

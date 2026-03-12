@@ -242,6 +242,10 @@
   border-top: 1px solid rgba(74, 113, 170, 0.25);
 }
 
+.fact-item--split {
+  color: #e8b84a;
+}
+
 .hover-preview__chain-divider {
   text-align: center;
   color: #5a7ab5;
