@@ -61,7 +61,7 @@ export function renderDetailPanel() {
             : `<div class="detail-card__icon-placeholder"></div>`}
           <div>
             <h3>${escapeHtml(detail.title)}</h3>
-            <p>${escapeHtml(detail.kindLabel)}</p>
+            <p>${escapeHtml(detail.kindLabel)}${detail.hasSplit ? ' <span class="split-badge">WvW split</span>' : ''}</p>
           </div>
         </header>
         <section>
@@ -208,7 +208,7 @@ export function buildSkillCard(skill, kind, isChained = false, dmgStats = null) 
       ${icon ? `<img class="hover-preview__icon" src="${escapeHtml(icon)}" alt="${escapeHtml(skill.name || "Icon")}" onerror="this.onerror=null;this.src='${escapeHtml(String(skill.iconFallback || icon))}'" />` : "<div></div>"}
       <div>
         <h4 class="hover-preview__title">${escapeHtml(skill.name || "Unknown")}</h4>
-        <p class="hover-preview__meta">${escapeHtml(meta)}</p>
+        <p class="hover-preview__meta">${escapeHtml(meta)}${skill.hasSplit ? ' <span class="split-badge">WvW split</span>' : ''}</p>
       </div>
     </div>
     ${description ? `<p class="hover-preview__desc">${escapeHtml(description)}</p>` : (!factsItems.length ? `<p class="hover-preview__desc">No description available.</p>` : "")}
@@ -325,6 +325,7 @@ export async function selectDetail(kind, entity) {
     description: entity.description || "",
     facts: resolveEntityFacts(entity),
     wiki: { loading: true, summary: "", url: "" },
+    hasSplit: Boolean(entity.hasSplit),
   };
   state.detail = detail;
   renderDetailPanel();

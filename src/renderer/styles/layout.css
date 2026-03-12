@@ -244,3 +244,18 @@
 .game-mode-toggle__btn--active:hover {
   background: var(--accent, #c5a855);
 }
+
+/* WvW balance split badge */
+.split-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: #3a5a3a;
+  color: #8fc98f;
+  margin-left: 6px;
+  vertical-align: middle;
+}
