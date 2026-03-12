@@ -1,4 +1,4 @@
-const { parseWikitextFacts, mapWikiFactToApiFact, parseInfoboxParams, validateSplitEntry } = require("../../lib/gw2-balance-splits/scripts/seed");
+const { parseSplitGrouping, parseWikitextFacts, mapWikiFactToApiFact, parseInfoboxParams, validateSplitEntry } = require("../../lib/gw2-balance-splits/scripts/seed");
 
 describe("seed.js parsing functions", () => {
   describe("mapWikiFactToApiFact", () => {
@@ -97,6 +97,48 @@ describe("seed.js parsing functions", () => {
     });
   });
 
+  describe("parseSplitGrouping", () => {
+    test("pve, wvw pvp → wvw split, grouped with pvp", () => {
+      expect(parseSplitGrouping("pve, wvw pvp")).toEqual({ wvwHasSplit: true, wvwGroupedWithPvp: true });
+    });
+
+    test("pve, pvp wvw → wvw split, grouped with pvp", () => {
+      expect(parseSplitGrouping("pve, pvp wvw")).toEqual({ wvwHasSplit: true, wvwGroupedWithPvp: true });
+    });
+
+    test("pve wvw, pvp → no wvw split (wvw shares pve values)", () => {
+      expect(parseSplitGrouping("pve wvw, pvp")).toEqual({ wvwHasSplit: false, wvwGroupedWithPvp: false });
+    });
+
+    test("pve, wvw, pvp → wvw has own group, not grouped with pvp", () => {
+      expect(parseSplitGrouping("pve, wvw, pvp")).toEqual({ wvwHasSplit: true, wvwGroupedWithPvp: false });
+    });
+
+    test("pve, wvw → wvw split, not grouped with pvp", () => {
+      expect(parseSplitGrouping("pve, wvw")).toEqual({ wvwHasSplit: true, wvwGroupedWithPvp: false });
+    });
+
+    test("no wvw at all → no split", () => {
+      expect(parseSplitGrouping("pve, pvp")).toEqual({ wvwHasSplit: false, wvwGroupedWithPvp: false });
+    });
+  });
+
+  describe("parseWikitextFacts with wvwGroupedWithPvp", () => {
+    test("treats pvp-only facts as wvw when grouped", () => {
+      const wikitext = `{{skill fact|Endurance gained|8|game mode = pve}}{{skill fact|Endurance gained|5|game mode = pvp}}`;
+      const facts = parseWikitextFacts(wikitext, true);
+      expect(facts).toHaveLength(1);
+      expect(facts[0]._wvwSpecific).toBe(true);
+      expect(facts[0].type).toBe("Buff");
+    });
+
+    test("skips pvp-only facts when NOT grouped", () => {
+      const wikitext = `{{skill fact|Endurance gained|8|game mode = pve}}{{skill fact|Endurance gained|5|game mode = pvp}}`;
+      const facts = parseWikitextFacts(wikitext, false);
+      expect(facts).toEqual([]);
+    });
+  });
+
   describe("parseInfoboxParams", () => {
     test("extracts recharge wvw param", () => {
       const wikitext = "| recharge = 10\n| recharge wvw = 25\n| id = 5648";
@@ -130,6 +172,17 @@ describe("seed.js parsing functions", () => {
     test("ignores non-numeric values", () => {
       const wikitext = "| recharge wvw = varies";
       expect(parseInfoboxParams(wikitext)).toEqual([]);
+    });
+
+    test("reads pvp params when wvwGroupedWithPvp is true", () => {
+      const wikitext = "| recharge = 20\n| recharge pvp = 35";
+      const facts = parseInfoboxParams(wikitext, true);
+      expect(facts).toEqual([{ type: "Recharge", text: "Recharge", value: 35 }]);
+    });
+
+    test("ignores pvp params when wvwGroupedWithPvp is false", () => {
+      const wikitext = "| recharge = 20\n| recharge pvp = 35";
+      expect(parseInfoboxParams(wikitext, false)).toEqual([]);
     });
   });
 
