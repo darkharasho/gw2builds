@@ -18,7 +18,10 @@
       "**/tests/**/*.test.js"
     ],
     "transform": {
-      "^.+/src/renderer/.+\\.js$": ["babel-jest", {}]
+      "^.+/src/renderer/.+\\.js$": [
+        "babel-jest",
+        {}
+      ]
     },
     "transformIgnorePatterns": [
       "/node_modules/"
@@ -46,6 +49,7 @@
     "@babel/core": "^7.29.0",
     "@babel/preset-env": "^7.29.0",
     "babel-jest": "^30.3.0",
+    "cheerio": "^1.2.0",
     "concurrently": "^9.2.1",
     "electronmon": "^2.0.3",
     "jest": "^30.3.0",
