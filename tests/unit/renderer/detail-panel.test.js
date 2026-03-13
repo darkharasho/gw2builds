@@ -45,3 +45,36 @@ describe("initDetailPanel — openWikiModal callback injection", () => {
     expect(() => handler({ target: { closest: () => btn } })).not.toThrow();
   });
 });
+
+describe("initDetailPanel — openDetailModal expand button", () => {
+  function makeExpandBtn() {
+    return { addEventListener: jest.fn(), disabled: true };
+  }
+
+  test("adds click listener to expandBtn when provided", () => {
+    const expandBtn = makeExpandBtn();
+    detailPanel.initDetailPanel(
+      { detailHost: null, hoverPreview: null, expandBtn },
+      {}
+    );
+    expect(expandBtn.addEventListener).toHaveBeenCalledWith("click", expect.any(Function));
+  });
+
+  test("calls openDetailModal when expand button is clicked", () => {
+    const openDetailModal = jest.fn();
+    const expandBtn = makeExpandBtn();
+    detailPanel.initDetailPanel(
+      { detailHost: null, hoverPreview: null, expandBtn },
+      { openDetailModal }
+    );
+    const [, handler] = expandBtn.addEventListener.mock.calls.at(-1);
+    handler();
+    expect(openDetailModal).toHaveBeenCalled();
+  });
+
+  test("does not throw when expandBtn is null", () => {
+    expect(() =>
+      detailPanel.initDetailPanel({ detailHost: null, hoverPreview: null, expandBtn: null }, {})
+    ).not.toThrow();
+  });
+});

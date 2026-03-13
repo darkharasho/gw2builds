@@ -5,8 +5,9 @@ import { computeEquipmentStats } from "./stats.js";
 
 // DOM refs injected by the entry point via initDetailPanel() to keep this module
 // importable in Node.js test environments (no document.querySelector at module scope).
-let _el = { detailHost: null, hoverPreview: null };
+let _el = { detailHost: null, hoverPreview: null, expandBtn: null };
 let _openWikiModal = null;
+let _openDetailModal = null;
 
 export function triggerDetailPanelAnimation() {
   if (!_el.detailHost) return;
@@ -35,10 +36,16 @@ export function triggerDetailPanelAnimation() {
 export function initDetailPanel(domRefs, callbacks = {}) {
   _el = { ..._el, ...domRefs };
   _openWikiModal = callbacks.openWikiModal || null;
+  _openDetailModal = callbacks.openDetailModal || null;
   if (_el.detailHost) {
     _el.detailHost.addEventListener("click", (e) => {
       const btn = e.target.closest("[data-url]");
       if (btn && _openWikiModal) _openWikiModal(btn.dataset.url);
+    });
+  }
+  if (_el.expandBtn) {
+    _el.expandBtn.addEventListener("click", () => {
+      if (_openDetailModal) _openDetailModal();
     });
   }
 }
@@ -46,6 +53,7 @@ export function initDetailPanel(domRefs, callbacks = {}) {
 export function renderDetailPanel() {
   const detail = state.detail;
   if (!detail) {
+    if (_el.expandBtn) _el.expandBtn.disabled = true;
     if (_el.detailHost) _el.detailHost.innerHTML = `<p class="empty-line">Select a trait or skill to inspect wiki and API details.</p>`;
     return;
   }
@@ -111,6 +119,7 @@ export function renderDetailPanel() {
         </section>
       </article>
     `;
+    if (_el.expandBtn) _el.expandBtn.disabled = false;
   }
 }
 
