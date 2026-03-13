@@ -5,7 +5,7 @@ const {
   TARGET_REPO,
   getViewer,
   listTargets,
-  ensureGw2BuildsRepo,
+  ensureAxiForgeRepo,
   ensurePages,
   getPagesBuildStatus,
   ensurePagesWorkflow,
@@ -20,7 +20,7 @@ const { createGithubMockFetch } = require("../helpers/mockFetch");
 
 const FAKE_TOKEN = "ghs_faketoken123";
 const FAKE_OWNER = "octocat";
-const FAKE_REPO = TARGET_REPO; // "gw2builds"
+const FAKE_REPO = TARGET_REPO; // "axiforge"
 
 function makeHeaders(overrides = {}) {
   return {
@@ -64,8 +64,8 @@ function computeGitBlobSha(content) {
 // ---------------------------------------------------------------------------
 
 describe("TARGET_REPO", () => {
-  test("is 'gw2builds'", () => {
-    expect(TARGET_REPO).toBe("gw2builds");
+  test("is 'axiforge'", () => {
+    expect(TARGET_REPO).toBe("axiforge");
   });
 });
 
@@ -181,10 +181,10 @@ describe("listTargets", () => {
 });
 
 // ---------------------------------------------------------------------------
-// ensureGw2BuildsRepo
+// ensureAxiForgeRepo
 // ---------------------------------------------------------------------------
 
-describe("ensureGw2BuildsRepo", () => {
+describe("ensureAxiForgeRepo", () => {
   afterEach(() => { delete global.fetch; });
 
   test("returns TARGET_REPO when repo already exists", async () => {
@@ -195,7 +195,7 @@ describe("ensureGw2BuildsRepo", () => {
       // Subsequent calls: waitForRepo polling — also returns repo
       return okRes({ name: FAKE_REPO, full_name: `${FAKE_OWNER}/${FAKE_REPO}` });
     });
-    const result = await ensureGw2BuildsRepo(FAKE_TOKEN, FAKE_OWNER);
+    const result = await ensureAxiForgeRepo(FAKE_TOKEN, FAKE_OWNER);
     expect(result).toBe(TARGET_REPO);
   });
 
@@ -217,7 +217,7 @@ describe("ensureGw2BuildsRepo", () => {
 
     // waitForRepo has 1500ms delay — mock setTimeout to skip delays
     jest.useFakeTimers();
-    const promise = ensureGw2BuildsRepo(FAKE_TOKEN, FAKE_OWNER, "user");
+    const promise = ensureAxiForgeRepo(FAKE_TOKEN, FAKE_OWNER, "user");
     // Advance through all potential waitForRepo delays
     for (let i = 0; i < 30; i++) {
       await Promise.resolve();
@@ -232,7 +232,7 @@ describe("ensureGw2BuildsRepo", () => {
 
   test("throws if non-404 error when checking repo existence", async () => {
     global.fetch = jest.fn(() => failRes(500, "Internal Server Error"));
-    await expect(ensureGw2BuildsRepo(FAKE_TOKEN, FAKE_OWNER)).rejects.toThrow();
+    await expect(ensureAxiForgeRepo(FAKE_TOKEN, FAKE_OWNER)).rejects.toThrow();
   });
 });
 
@@ -245,11 +245,11 @@ describe("ensurePages", () => {
 
   test("returns htmlUrl and branch when Pages already configured as workflow", async () => {
     global.fetch = jest.fn(() => okRes({
-      html_url: "https://octocat.github.io/gw2builds/",
+      html_url: "https://octocat.github.io/axiforge/",
       build_type: "workflow",
     }));
     const result = await ensurePages(FAKE_TOKEN, FAKE_OWNER);
-    expect(result.htmlUrl).toBe("https://octocat.github.io/gw2builds/");
+    expect(result.htmlUrl).toBe("https://octocat.github.io/axiforge/");
     expect(result.branch).toBe("main");
   });
 
@@ -261,14 +261,14 @@ describe("ensurePages", () => {
       const method = (options?.method || "GET").toUpperCase();
 
       if (method === "GET" && callIndex === 1) {
-        return okRes({ html_url: "https://octocat.github.io/gw2builds/", build_type: "legacy" });
+        return okRes({ html_url: "https://octocat.github.io/axiforge/", build_type: "legacy" });
       }
       if (method === "PUT") {
         putCalled = true;
         return okRes({});
       }
       // Second GET after PUT
-      return okRes({ html_url: "https://octocat.github.io/gw2builds/", build_type: "workflow" });
+      return okRes({ html_url: "https://octocat.github.io/axiforge/", build_type: "workflow" });
     });
 
     jest.useFakeTimers();
@@ -280,7 +280,7 @@ describe("ensurePages", () => {
 
     const result = await promise;
     expect(putCalled).toBe(true);
-    expect(result.htmlUrl).toBe("https://octocat.github.io/gw2builds/");
+    expect(result.htmlUrl).toBe("https://octocat.github.io/axiforge/");
   });
 
   test("creates Pages when not found (404)", async () => {
@@ -295,7 +295,7 @@ describe("ensurePages", () => {
         postCalled = true;
         return okRes({});
       }
-      return okRes({ html_url: "https://octocat.github.io/gw2builds/" });
+      return okRes({ html_url: "https://octocat.github.io/axiforge/" });
     });
 
     jest.useFakeTimers();
@@ -326,7 +326,7 @@ describe("getPagesBuildStatus", () => {
         return okRes({ status: "built", updated_at: "2024-06-01T12:00:00Z", error: null });
       }
       if (url.includes("/pages")) {
-        return okRes({ html_url: "https://octocat.github.io/gw2builds/" });
+        return okRes({ html_url: "https://octocat.github.io/axiforge/" });
       }
       // isUrlReachable check — return 200
       return okRes({}, {});
@@ -342,7 +342,7 @@ describe("getPagesBuildStatus", () => {
         return okRes({ status: "built", updated_at: "2024-06-01T12:00:00Z", error: null });
       }
       if (url.includes("/pages")) {
-        return okRes({ html_url: "https://octocat.github.io/gw2builds/" });
+        return okRes({ html_url: "https://octocat.github.io/axiforge/" });
       }
       // isUrlReachable — simulate network error / unreachable
       return Promise.reject(new Error("ECONNREFUSED"));
@@ -358,7 +358,7 @@ describe("getPagesBuildStatus", () => {
         return okRes({ status: "errored", updated_at: null, error: { message: "Build failed" } });
       }
       if (url.includes("/pages")) {
-        return okRes({ html_url: "https://octocat.github.io/gw2builds/" });
+        return okRes({ html_url: "https://octocat.github.io/axiforge/" });
       }
       return okRes({});
     });
@@ -369,7 +369,7 @@ describe("getPagesBuildStatus", () => {
   test("falls back to workflow runs when latest build returns 404", async () => {
     global.fetch = jest.fn((url) => {
       if (url.includes("pages/builds/latest")) return failRes(404);
-      if (url.includes("/pages")) return okRes({ html_url: "https://octocat.github.io/gw2builds/" });
+      if (url.includes("/pages")) return okRes({ html_url: "https://octocat.github.io/axiforge/" });
       if (url.includes("/workflows/")) {
         return okRes({ workflow_runs: [{ status: "completed", conclusion: "success", updated_at: "2024-06-01" }] });
       }
@@ -384,7 +384,7 @@ describe("getPagesBuildStatus", () => {
   test("returns queued when workflow run is not completed", async () => {
     global.fetch = jest.fn((url) => {
       if (url.includes("pages/builds/latest")) return failRes(404);
-      if (url.includes("/pages")) return okRes({ html_url: "https://octocat.github.io/gw2builds/" });
+      if (url.includes("/pages")) return okRes({ html_url: "https://octocat.github.io/axiforge/" });
       if (url.includes("/workflows/")) {
         return okRes({ workflow_runs: [{ status: "queued", conclusion: null, updated_at: "2024-06-01" }] });
       }
@@ -398,7 +398,7 @@ describe("getPagesBuildStatus", () => {
   test("returns building status for in_progress workflow run", async () => {
     global.fetch = jest.fn((url) => {
       if (url.includes("pages/builds/latest")) return failRes(404);
-      if (url.includes("/pages")) return okRes({ html_url: "https://octocat.github.io/gw2builds/" });
+      if (url.includes("/pages")) return okRes({ html_url: "https://octocat.github.io/axiforge/" });
       if (url.includes("/workflows/")) {
         return okRes({ workflow_runs: [{ status: "in_progress", conclusion: null, updated_at: "2024-06-01" }] });
       }
@@ -411,7 +411,7 @@ describe("getPagesBuildStatus", () => {
   test("returns error status when workflow run conclusion is failure", async () => {
     global.fetch = jest.fn((url) => {
       if (url.includes("pages/builds/latest")) return failRes(404);
-      if (url.includes("/pages")) return okRes({ html_url: "https://octocat.github.io/gw2builds/" });
+      if (url.includes("/pages")) return okRes({ html_url: "https://octocat.github.io/axiforge/" });
       if (url.includes("/workflows/")) {
         return okRes({ workflow_runs: [{ status: "completed", conclusion: "failure", updated_at: "2024-06-01" }] });
       }

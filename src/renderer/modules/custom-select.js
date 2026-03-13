@@ -3,7 +3,7 @@ import { state } from "./state.js";
 // Module-level injection: set by renderer.js entry point after all modules are loaded.
 // Avoids circular dep between custom-select → render-pages → custom-select.
 let _bindHoverPreview = null;
-let _onError = (err) => console.error("[GW2Builds cselect]", err);
+let _onError = (err) => console.error("[AxiForge cselect]", err);
 
 export function initCustomSelect({ bindHoverPreview, onError } = {}) {
   if (bindHoverPreview) _bindHoverPreview = bindHoverPreview;

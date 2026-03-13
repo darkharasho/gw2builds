@@ -95,7 +95,7 @@ const SITE_INDEX_HTML = `<!doctype html>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>GW2 Builds</title>
+    <title>AxiForge</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -103,7 +103,7 @@ const SITE_INDEX_HTML = `<!doctype html>
       <header class="site-header">
         <p class="eyebrow">Guild Wars 2</p>
         <h1>Build Library</h1>
-        <p class="subtitle">Published from GW2Builds desktop.</p>
+        <p class="subtitle">Published from AxiForge desktop.</p>
       </header>
       <section class="controls">
         <label class="search-wrap">

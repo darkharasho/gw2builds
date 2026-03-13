@@ -67,7 +67,7 @@ describe("BuildStore — settings", () => {
   });
 
   test("init creates settings.json if missing", async () => {
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "gw2builds-settings-test-"));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "axiforge-settings-test-"));
     dir = tmpDir;
     const store = new BuildStore(tmpDir);
     await store.init();

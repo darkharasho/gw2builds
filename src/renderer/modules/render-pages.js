@@ -120,7 +120,7 @@ export function renderOnboarding() {
       },
     },
     {
-      title: "Create gw2builds + enable Pages",
+      title: "Create axiforge + enable Pages",
       done: status.repoReady && status.pagesReady,
       actionLabel: status.repoReady && status.pagesReady ? "Re-run setup" : "Setup",
       canRun: status.isAuthenticated && Boolean(target),
@@ -140,7 +140,7 @@ export function renderOnboarding() {
     title.textContent = step.title;
     const body = document.createElement("p");
     body.textContent =
-      step.title.includes("gw2builds") && !step.done ? targetHint : step.done ? "Completed" : "Required";
+      step.title.includes("axiforge") && !step.done ? targetHint : step.done ? "Completed" : "Required";
     card.append(title, body);
 
     if (step.canRun) {
@@ -200,7 +200,7 @@ export function renderSetupGate() {
     <div class="gate-shell">
       <div>
         <h1>Complete First-Time Setup</h1>
-        <p>GW2Builds stays locked until authentication and repository setup are complete.</p>
+        <p>AxiForge stays locked until authentication and repository setup are complete.</p>
       </div>
       ${codeBlock}
       ${pollBlock}
@@ -232,7 +232,7 @@ export function renderSetupGate() {
       },
     },
     {
-      title: "2. Create gw2builds and enable Pages",
+      title: "2. Create axiforge and enable Pages",
       done: status.repoReady && status.pagesReady,
       actionLabel: status.repoReady && status.pagesReady ? "Re-run setup" : "Setup repo + Pages",
       canRun: status.isAuthenticated && Boolean(target),
@@ -532,5 +532,5 @@ export function getSelectedTarget() {
 export async function showError(err) {
   const message = err instanceof Error ? err.message : String(err);
   setPublishStatus(`Error: ${message}`);
-  await window.desktopApi.showError("GW2Builds Error", message);
+  await window.desktopApi.showError("AxiForge Error", message);
 }

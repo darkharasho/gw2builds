@@ -19,7 +19,7 @@ const { buildSiteBundle } = require("../../src/main/siteBundle");
 // ---------------------------------------------------------------------------
 
 async function makeTempStore() {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "gw2builds-integration-"));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "axiforge-integration-"));
   const store = new BuildStore(dir);
   await store.init();
   return { store, dir };

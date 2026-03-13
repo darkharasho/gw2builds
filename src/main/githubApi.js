@@ -1,6 +1,6 @@
 const GH_REST = "https://api.github.com";
-const TARGET_REPO = "gw2builds";
-const USER_AGENT = "gw2builds-desktop";
+const TARGET_REPO = "axiforge";
+const USER_AGENT = "axiforge-desktop";
 const crypto = require("node:crypto");
 
 async function apiFetch(path, token, init = {}) {
@@ -52,7 +52,7 @@ async function listTargets(token, viewerLogin) {
   return targets;
 }
 
-async function ensureGw2BuildsRepo(token, owner, ownerType = "user") {
+async function ensureAxiForgeRepo(token, owner, ownerType = "user") {
   try {
     await apiFetch(`/repos/${owner}/${TARGET_REPO}`, token);
     await waitForRepo(token, owner, TARGET_REPO);
@@ -68,7 +68,7 @@ async function ensureGw2BuildsRepo(token, owner, ownerType = "user") {
       name: TARGET_REPO,
       private: false,
       auto_init: true,
-      description: "GW2 Builds static site",
+      description: "AxiForge static site",
     }),
   }).catch(async (err) => {
     if (err.status === 422) {
@@ -166,7 +166,7 @@ jobs:
         run: |
           mkdir -p site data
           if [ ! -f site/index.html ]; then
-            printf '<!doctype html><html><body><h1>GW2 Builds</h1><p>Publish from desktop to update this site.</p></body></html>' > site/index.html
+            printf '<!doctype html><html><body><h1>AxiForge</h1><p>Publish from desktop to update this site.</p></body></html>' > site/index.html
           fi
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -300,7 +300,7 @@ async function getRepo(token, owner, repo = TARGET_REPO) {
 }
 
 async function publishSiteBundle(token, owner, bundle, branch = "main", repo = TARGET_REPO) {
-  await ensureGw2BuildsRepo(token, owner);
+  await ensureAxiForgeRepo(token, owner);
   const entries = Object.entries(bundle || {}).filter(
     ([filePath, content]) => filePath && typeof content === "string"
   );
@@ -383,7 +383,7 @@ async function publishSiteBundle(token, owner, bundle, branch = "main", repo = T
   const commit = await apiFetch(`/repos/${owner}/${repo}/git/commits`, token, {
     method: "POST",
     body: JSON.stringify({
-      message: "Publish GW2Builds static site",
+      message: "Publish AxiForge static site",
       tree: newTree.sha,
       parents: [headSha],
     }),
@@ -470,7 +470,7 @@ module.exports = {
   TARGET_REPO,
   getViewer,
   listTargets,
-  ensureGw2BuildsRepo,
+  ensureAxiForgeRepo,
   ensurePages,
   getPagesBuildStatus,
   getRepo,

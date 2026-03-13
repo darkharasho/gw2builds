@@ -1,7 +1,7 @@
 const { shell } = require("electron");
 
 const GITHUB_API = "https://github.com";
-const UA = "gw2builds-desktop";
+const UA = "axiforge-desktop";
 
 async function requestDeviceCode(clientId) {
   const body = new URLSearchParams({

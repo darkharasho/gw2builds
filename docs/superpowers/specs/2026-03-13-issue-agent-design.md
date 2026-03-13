@@ -14,7 +14,7 @@ A Claude Code slash command that takes a GitHub issue number, triages it, attemp
 /fix-issue <issue-number>
 ```
 
-**Repo:** `darkharasho/gw2builds`
+**Repo:** `darkharasho/axiforge`
 
 ---
 
@@ -84,7 +84,7 @@ These are hardcoded in the command file to avoid dynamic lookup overhead:
 ```
 /fix-issue <N>
     │
-    ├─ 1. Fetch issue via `gh api repos/darkharasho/gw2builds/issues/<N>`
+    ├─ 1. Fetch issue via `gh api repos/darkharasho/axiforge/issues/<N>`
     │      Bail early if not found or if gh CLI is not authenticated.
     │      Compute slug from issue title (first 4–5 words, lowercase, hyphenated).
     │      Slug is reused in steps 4 and 6.
@@ -96,7 +96,7 @@ These are hardcoded in the command file to avoid dynamic lookup overhead:
     │
     ├─ 3. Add issue to Project board (idempotent) + move to "In progress"
     │      a. `gh project item-add 1 --owner darkharasho \`
-    │            `--url https://github.com/darkharasho/gw2builds/issues/<N>`
+    │            `--url https://github.com/darkharasho/axiforge/issues/<N>`
     │         → captures item `id` from returned JSON
     │      b. `gh project item-edit --project-id PVT_kwHOCJlSRs4BRf9t \`
     │            `--id <item-id> --field-id PVTSSF_lAHOCJlSRs4BRf9tzg_T1Jg \`

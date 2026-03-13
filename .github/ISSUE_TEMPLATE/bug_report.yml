@@ -1,10 +1,10 @@
 name: Bug Report
-description: Report a bug or unexpected behavior in GW2Builds
+description: Report a bug or unexpected behavior in AxiForge
 labels: ["bug"]
 body:
   - type: markdown
     attributes:
-      value: Thanks for helping test GW2Builds! Please fill out as much as you can.
+      value: Thanks for helping test AxiForge! Please fill out as much as you can.
 
   - type: textarea
     id: description

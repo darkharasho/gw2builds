@@ -1,5 +1,5 @@
 {
-  "name": "gw2builds-desktop",
+  "name": "axiforge-desktop",
   "version": "0.1.0",
   "description": "GW2 build editor desktop app with GitHub Pages publishing",
   "main": "src/main/index.js",

@@ -1,4 +1,4 @@
-# GW2Builds Renderer Refactor Plan
+# AxiForge Renderer Refactor Plan
 
 ## Problem
 

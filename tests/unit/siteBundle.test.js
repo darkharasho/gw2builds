@@ -126,8 +126,8 @@ describe("buildSiteBundle — site/index.html", () => {
     expect(html).toContain('id="generatedAt"');
   });
 
-  test("has GW2 Builds title", () => {
-    expect(html).toContain("GW2 Builds");
+  test("has AxiForge title", () => {
+    expect(html).toContain("AxiForge");
   });
 
   test("has lang=en on html element", () => {

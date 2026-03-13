@@ -10,7 +10,7 @@ const { BuildStore } = require("../../src/main/buildStore");
 // ---------------------------------------------------------------------------
 
 async function makeTempStore() {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "gw2builds-test-"));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "axiforge-test-"));
   const store = new BuildStore(dir);
   await store.init();
   return { store, dir };
@@ -43,7 +43,7 @@ describe("BuildStore — init", () => {
   afterEach(async () => { if (dir) await cleanupDir(dir); });
 
   test("creates base directory and files on init", async () => {
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "gw2builds-init-test-"));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "axiforge-init-test-"));
     dir = tmpDir;
     const nestedDir = path.join(tmpDir, "data", "nested");
     const store = new BuildStore(nestedDir);
@@ -660,7 +660,7 @@ describe("BuildStore — settings", () => {
   });
 
   test("init creates settings.json if missing", async () => {
-    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "gw2builds-settings-test-"));
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "axiforge-settings-test-"));
     dir = tmpDir;
     const store = new BuildStore(tmpDir);
     await store.init();

@@ -1,4 +1,4 @@
-You are a bug-fixing agent for the gw2builds GW2 build editor Electron desktop app (repo: `darkharasho/gw2builds`).
+You are a bug-fixing agent for the axiforge GW2 build editor Electron desktop app (repo: `darkharasho/axiforge`).
 
 Your task: fix GitHub issue **#$ARGUMENTS**.
 
@@ -26,7 +26,7 @@ Follow these steps in order. Do not skip steps.
 ### Step 1 — Fetch issue + compute slug
 
 ```bash
-gh api repos/darkharasho/gw2builds/issues/$ARGUMENTS
+gh api repos/darkharasho/axiforge/issues/$ARGUMENTS
 ```
 
 - If the issue is not found: stop and report the error.
@@ -40,7 +40,7 @@ gh api repos/darkharasho/gw2builds/issues/$ARGUMENTS
 Analyze the issue title and body. Choose exactly one label: `bug`, `enhancement`, or `question`.
 
 ```bash
-gh issue edit $ARGUMENTS --repo darkharasho/gw2builds --add-label <label>
+gh issue edit $ARGUMENTS --repo darkharasho/axiforge --add-label <label>
 ```
 
 If the label is **not** `bug`: stop with "Issue is not a bug — aborting fix agent."
@@ -53,7 +53,7 @@ If the label is **not** `bug`: stop with "Issue is not a bug — aborting fix ag
 
 ```bash
 gh project item-add 1 --owner darkharasho \
-  --url https://github.com/darkharasho/gw2builds/issues/$ARGUMENTS \
+  --url https://github.com/darkharasho/axiforge/issues/$ARGUMENTS \
   --format json
 ```
 
@@ -74,7 +74,7 @@ gh project item-edit \
 ### Step 4 — Post opening comment
 
 ```bash
-gh issue comment $ARGUMENTS --repo darkharasho/gw2builds --body "🤖 **Issue agent investigating.**
+gh issue comment $ARGUMENTS --repo darkharasho/axiforge --body "🤖 **Issue agent investigating.**
 Hypothesis: <one-line root cause guess>.
 Branch: \`fix/issue-$ARGUMENTS-<slug>\`. Will post results when complete."
 ```
@@ -127,7 +127,7 @@ git push -u origin fix/issue-$ARGUMENTS-<slug>
 Check for an existing PR on this branch:
 
 ```bash
-gh pr list --repo darkharasho/gw2builds \
+gh pr list --repo darkharasho/axiforge \
   --head fix/issue-$ARGUMENTS-<slug> \
   --state open \
   --json url
@@ -138,7 +138,7 @@ gh pr list --repo darkharasho/gw2builds \
 
 ```bash
 gh pr create \
-  --repo darkharasho/gw2builds \
+  --repo darkharasho/axiforge \
   --title "fix: <issue title> (closes #$ARGUMENTS)" \
   --body "## Summary
 <one paragraph describing root cause and fix>
@@ -167,7 +167,7 @@ gh project item-edit \
 **Post closing comment:**
 
 ```bash
-gh issue comment $ARGUMENTS --repo darkharasho/gw2builds \
+gh issue comment $ARGUMENTS --repo darkharasho/axiforge \
   --body "✅ **Fix complete.** PR: <pr-url>"
 ```
 
@@ -189,7 +189,7 @@ git push -u origin fix/issue-$ARGUMENTS-<slug> 2>/dev/null || true
 3. Post a comment:
 
 ```bash
-gh issue comment $ARGUMENTS --repo darkharasho/gw2builds \
+gh issue comment $ARGUMENTS --repo darkharasho/axiforge \
   --body "🤖 **Could not fix automatically.**
 What I tried: <summary of approaches>
 Why it failed: <specific reason>"

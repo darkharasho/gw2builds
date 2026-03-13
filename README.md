@@ -1,11 +1,11 @@
-# GW2Builds Desktop
+# AxiForge Desktop
 
 Electron app for creating Guild Wars 2 builds, publishing a static build site, and syncing it to GitHub Pages.
 
 ## What It Does
 
 - GitHub device-flow auth
-- First-time setup for a dedicated `gw2builds` repository
+- First-time setup for a dedicated `axiforge` repository
 - Automatic Pages workflow setup + status polling
 - Native build editor for:
   - profession
@@ -14,7 +14,7 @@ Electron app for creating Guild Wars 2 builds, publishing a static build site, a
   - optional equipment notes + tags
 - Data-driven editor catalog from Guild Wars 2 API
 - Wiki summary panel for selected traits/skills
-- Static site publish to `site/*` in your `gw2builds` repo
+- Static site publish to `site/*` in your `axiforge` repo
 
 ## Setup
 

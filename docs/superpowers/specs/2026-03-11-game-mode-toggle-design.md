@@ -2,7 +2,7 @@
 
 ## Overview
 
-Add a per-build PvE/WvW game mode toggle to GW2Builds. The toggle controls which balance context applies to skills, traits, and stats. This is Phase 1 of a 3-phase feature; it establishes the UI, state management, persistence, and data-layer plumbing that subsequent phases build on.
+Add a per-build PvE/WvW game mode toggle to AxiForge. The toggle controls which balance context applies to skills, traits, and stats. This is Phase 1 of a 3-phase feature; it establishes the UI, state management, persistence, and data-layer plumbing that subsequent phases build on.
 
 ## Phasing
 
@@ -20,7 +20,7 @@ Add a per-build PvE/WvW game mode toggle to GW2Builds. The toggle controls which
 - Wiki scraper scripts to seed the registry from the GW2 wiki
 - Cross-reference logic: given a skill ID and game mode, resolve which API facts apply
 - Published as an npm package and/or a public JSON file that tools can fetch
-- GW2Builds consumes this as a dependency to display mode-appropriate facts in the detail panel
+- AxiForge consumes this as a dependency to display mode-appropriate facts in the detail panel
 
 ### Phase 3: Patch Note Crawler (part of the same package)
 - Runnable scripts within the `gw2-balance-splits` package

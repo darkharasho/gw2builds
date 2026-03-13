@@ -156,7 +156,7 @@ const path = require("path");
 const fs   = require("fs/promises");
 
 const WIKI_API   = "https://wiki.guildwars2.com/api.php";
-const USER_AGENT = "GW2Builds-PatchCrawler/1.0 (https://github.com/gw2builds)";
+const USER_AGENT = "AxiForge-PatchCrawler/1.0 (https://github.com/darkharasho/axiforge)";
 
 const {
   rateLimitedFetch, extractFromWikitext,

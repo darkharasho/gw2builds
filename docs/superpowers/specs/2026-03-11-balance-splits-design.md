@@ -118,7 +118,7 @@ A Node.js script that builds `splits.json` by discovering all skills/traits with
 - `cheerio` for HTML fallback parsing
 - No other heavy dependencies
 
-## Integration with GW2Builds
+## Integration with AxiForge
 
 ### Catalog layer (`src/main/gw2Data/catalog.js`)
 
@@ -207,5 +207,5 @@ When extracting to a standalone package:
 1. Move `lib/gw2-balance-splits/` to its own repo
 2. Add `package.json` with name `gw2-balance-splits`
 3. Publish to npm
-4. In GW2Builds: `npm install gw2-balance-splits`, change `require` path
+4. In AxiForge: `npm install gw2-balance-splits`, change `require` path
 5. Public API is identical — no consumer code changes

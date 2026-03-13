@@ -23,7 +23,7 @@ jobs:
         run: |
           mkdir -p site data
           if [ ! -f site/index.html ]; then
-            printf '<!doctype html><html><body><h1>GW2 Builds</h1><p>Publish from desktop to update this site.</p></body></html>' > site/index.html
+            printf '<!doctype html><html><body><h1>AxiForge</h1><p>Publish from desktop to update this site.</p></body></html>' > site/index.html
           fi
       - uses: actions/upload-pages-artifact@v3
         with:

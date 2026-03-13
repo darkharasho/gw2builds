@@ -1,4 +1,4 @@
-// GW2Builds Renderer — Entry Point
+// AxiForge Renderer — Entry Point
 // Imports all feature modules and wires them together via init callbacks.
 // Application-level orchestration (init, wireEvents, setProfession, etc.) lives here.
 

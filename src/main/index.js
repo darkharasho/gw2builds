@@ -7,7 +7,7 @@ const {
   TARGET_REPO,
   getViewer,
   listTargets,
-  ensureGw2BuildsRepo,
+  ensureAxiForgeRepo,
   ensurePages,
   getPagesBuildStatus,
   getRepo,
@@ -252,7 +252,7 @@ app.whenReady().then(async () => {
     const branch = auth?.onboarding?.branch || "main";
     const owner = auth?.onboarding?.targetOwner || session.viewer.login;
 
-    await ensureGw2BuildsRepo(session.token, owner, "user");
+    await ensureAxiForgeRepo(session.token, owner, "user");
     await ensurePagesWorkflow(session.token, owner, branch, TARGET_REPO);
     await ensurePages(session.token, owner, branch, TARGET_REPO);
 
@@ -306,7 +306,7 @@ app.whenReady().then(async () => {
 
     const owner = targetOwner || session.viewer.login;
     try {
-      await ensureGw2BuildsRepo(session.token, owner, ownerType);
+      await ensureAxiForgeRepo(session.token, owner, ownerType);
       const repo = await getRepo(session.token, owner, TARGET_REPO);
       const defaultBranch = repo.default_branch || "main";
       await ensurePagesWorkflow(session.token, owner, defaultBranch, TARGET_REPO);
