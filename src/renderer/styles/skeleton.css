@@ -1,0 +1,221 @@
+/* AxiForge — skeleton loading placeholders */
+
+@keyframes skel-pulse {
+  0%   { opacity: 0; }
+  50%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.skel {
+  background: #1a2744;
+  border-radius: 4px;
+  animation: skel-pulse 1.8s ease-in-out infinite;
+  animation-delay: 150ms;
+  opacity: 0;
+  animation-fill-mode: both;
+}
+
+/* Hexagonal shape — matches specializations.css minor trait clip-path */
+.skel-hex {
+  clip-path: polygon(25% 5%, 75% 5%, 96% 50%, 75% 95%, 25% 95%, 4% 50%);
+  border-radius: 0;
+}
+
+/* Staggered delays (50ms increments, added to base 150ms) */
+.skel-d1 { animation-delay: 200ms; }
+.skel-d2 { animation-delay: 250ms; }
+.skel-d3 { animation-delay: 300ms; }
+.skel-d4 { animation-delay: 350ms; }
+.skel-d5 { animation-delay: 400ms; }
+
+/* ── Skill bar skeleton ──────────────────────────────────────────────────── */
+.skel-skills {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 8px;
+}
+
+.skel-skills__group {
+  display: flex;
+  gap: 6px;
+}
+
+.skel-skills__slot {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+}
+
+.skel-skills__sep {
+  width: 1px;
+  height: 44px;
+  background: #1a2744;
+  flex-shrink: 0;
+}
+
+/* ── Specialization skeleton ─────────────────────────────────────────────── */
+.skel-specs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skel-spec-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border: 1px solid #1a2744;
+  border-radius: 8px;
+}
+
+.skel-spec-card__emblem {
+  width: calc(40px * var(--spec-scale, 1.1));
+  height: calc(40px * var(--spec-scale, 1.1));
+  flex-shrink: 0;
+}
+
+.skel-spec-card__traits {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  align-items: center;
+}
+
+.skel-spec-card__major {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.skel-spec-card__major-trait {
+  width: calc(32px * var(--spec-scale, 1.1));
+  height: calc(32px * var(--spec-scale, 1.1));
+  border-radius: 4px;
+}
+
+.skel-spec-card__minor {
+  width: calc(26px * var(--spec-scale, 1.1));
+  height: calc(26px * var(--spec-scale, 1.1));
+}
+
+.skel-spec-card__line {
+  width: 16px;
+  height: 1px;
+  background: #1a2744;
+  flex-shrink: 0;
+}
+
+/* ── Equipment skeleton ──────────────────────────────────────────────────── */
+.skel-equip {
+  display: flex;
+  gap: 16px;
+}
+
+.skel-equip__col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skel-equip__col--art {
+  flex: 0.8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.skel-equip__slot {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.skel-equip__slot-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.skel-equip__slot-lines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.skel-equip__art {
+  width: 100%;
+  height: 180px;
+  border-radius: 8px;
+}
+
+.skel-equip__stat-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.skel-equip__trinket-grid {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.skel-equip__trinket {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+}
+
+/* ── Detail panel skeleton ───────────────────────────────────────────────── */
+.skel-detail__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.skel-detail__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.skel-detail__text-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.skel-detail__section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.skel-detail__fact-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.skel-detail__fact-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Toolbar profession dropdown skeleton ────────────────────────────────── */
+.skel-dropdown {
+  height: 32px;
+  border-radius: 6px;
+  width: 100%;
+}
