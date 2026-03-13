@@ -70,8 +70,13 @@ function createWindow() {
       if (!wasFocused) win.setFocusable(true);
     });
   } else {
-    win.loadFile(path.join(__dirname, "../renderer/index.html"));
+    const rendererPath = app.isPackaged
+      ? path.join(__dirname, "../../dist/renderer/index.html")
+      : path.join(__dirname, "../renderer/index.html");
+    win.loadFile(rendererPath);
   }
+
+  return win;
 }
 
 async function getSession() {
@@ -137,7 +142,7 @@ async function getOnboardingStatus() {
 
 app.whenReady().then(async () => {
   await store.init();
-  createWindow();
+  const win = createWindow();
 
   // Pre-warm all profession catalogs in the background so class switching is instant.
   // Runs sequentially with a short delay between each to avoid hammering the GW2 API.
