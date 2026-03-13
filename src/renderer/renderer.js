@@ -4,6 +4,7 @@
 
 import { state, createEmptyEditor } from "./modules/state.js";
 import { delay } from "./modules/utils.js";
+import { injectSkeleton } from "./modules/skeleton.js";
 
 let _lastGameMode = "pve";
 import { initCustomSelect, closeCustomSelect } from "./modules/custom-select.js";
@@ -348,6 +349,12 @@ async function setProfession(professionId, options = {}) {
   const selected = String(professionId || "");
   if (!selected) return;
 
+  // Show skeleton placeholders while catalog loads
+  injectSkeleton(el.skillsHost, "skills");
+  injectSkeleton(el.specializationsHost, "specs");
+  injectSkeleton(el.equipmentPanel, "equipment");
+  injectSkeleton(el.detailHost, "detail");
+
   const catalog = await getCatalog(selected, state.editor.gameMode || "pve");
   state.activeCatalog = catalog;
   state.editor.profession = selected;
@@ -584,6 +591,12 @@ function wireEvents() {
 
         // Re-fetch catalog for the new mode (cache key includes mode)
         if (state.editor.profession) {
+          // Show skeleton placeholders while catalog loads
+          injectSkeleton(el.skillsHost, "skills");
+          injectSkeleton(el.specializationsHost, "specs");
+          injectSkeleton(el.equipmentPanel, "equipment");
+          injectSkeleton(el.detailHost, "detail");
+
           const catalog = await getCatalog(state.editor.profession, mode);
           state.activeCatalog = catalog;
           enforceEditorConsistency();
