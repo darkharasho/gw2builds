@@ -332,7 +332,7 @@
               "value": 3
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 9
             },
@@ -794,7 +794,7 @@
               "value": 3
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 3
             },
@@ -957,7 +957,7 @@
               "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 10
             },
@@ -1255,7 +1255,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -1902,7 +1902,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 15
             },
@@ -2050,7 +2050,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 6
             },
@@ -2109,7 +2109,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Fire Wall Duration",
               "duration": 4
             },
@@ -2173,7 +2173,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Delay",
               "duration": 1
             },
@@ -2287,7 +2287,7 @@
               "value": 10
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -2464,7 +2464,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -2649,7 +2649,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Ring of Fire Duration",
               "duration": 5
             },
@@ -2804,7 +2804,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 30
             }
@@ -3205,7 +3205,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Fuse Time",
               "duration": 3
             },
@@ -3302,7 +3302,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Fuse Time",
               "duration": 1
             },
@@ -3499,7 +3499,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Glue Puddle Duration",
               "duration": 5
             },
@@ -3627,7 +3627,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Fuse Time",
               "duration": 1
             },
@@ -3752,7 +3752,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 60
             },
@@ -3940,12 +3940,12 @@
               "value": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Rate of Fire",
               "duration": 4
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -4114,7 +4114,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -4188,7 +4188,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 10
             },
@@ -4533,7 +4533,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 60
             }
@@ -4700,7 +4700,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 10
             },
@@ -4828,7 +4828,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Timer",
               "duration": 3
             },
@@ -5791,7 +5791,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Symbol Duration",
               "duration": 4
             },
@@ -5875,7 +5875,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Symbol Duration",
               "duration": 4
             },
@@ -6105,7 +6105,7 @@
               "hit_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Block Duration",
               "duration": 3
             },
@@ -6262,7 +6262,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Symbol Duration",
               "duration": 4
             },
@@ -6336,7 +6336,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 3.5
             },
@@ -6660,7 +6660,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Symbol Duration",
               "duration": 4
             },
@@ -6715,7 +6715,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Symbol Duration",
               "duration": 4
             },
@@ -6768,7 +6768,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Maximum Blade Duration",
               "duration": 10
             },
@@ -7002,7 +7002,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Symbol Duration",
               "duration": 2
             },
@@ -7137,7 +7137,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4.5
             },
@@ -7221,7 +7221,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Symbol Duration",
               "duration": 4
             },
@@ -8112,7 +8112,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 30
             }
@@ -8198,7 +8198,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 2
             },
@@ -9061,7 +9061,7 @@
               "apply_count": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Evade",
               "duration": 0.5
             },
@@ -9074,7 +9074,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Block Duration",
               "duration": 2
             },
@@ -9108,7 +9108,7 @@
               "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Block Duration",
               "duration": 2.5
             },
@@ -9368,7 +9368,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -9678,7 +9678,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -9979,7 +9979,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -10047,7 +10047,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 6
             },
@@ -10278,7 +10278,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -10408,7 +10408,7 @@
               "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 6
             },
@@ -10461,7 +10461,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 3
             },
@@ -10660,7 +10660,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -10718,7 +10718,7 @@
               "value": 10
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -10796,7 +10796,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -10973,7 +10973,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Minion Lifetime",
               "duration": 6
             },
@@ -12184,7 +12184,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -12307,7 +12307,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -12588,7 +12588,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 10
             },
@@ -12857,7 +12857,7 @@
               "value": 3
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Evasion Duration While Swinging",
               "duration": 0.5
             },
@@ -13012,7 +13012,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 2
             },
@@ -13483,7 +13483,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -14160,7 +14160,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -14205,7 +14205,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Venom Duration",
               "duration": 20
             }
@@ -14234,7 +14234,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Venom Duration",
               "duration": 20
             }
@@ -15054,7 +15054,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Venom Duration",
               "duration": 24
             },
@@ -15265,7 +15265,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 24
             },
@@ -15347,7 +15347,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Smoke Screen Duration",
               "duration": 7
             },
@@ -15491,7 +15491,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Dagger Storm Duration",
               "duration": 2.75
             },
@@ -15878,7 +15878,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -16062,7 +16062,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Symbol Duration",
               "duration": 4
             },
@@ -16311,7 +16311,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -16359,7 +16359,7 @@
               "value": 3
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Caltrops Duration",
               "duration": 3
             },
@@ -17478,7 +17478,7 @@
               "icon": "https://render.guildwars2.com/file/B0CD8077991E4FB1622D2930337ED7F9B54211D5/156665.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Vengance Duration",
               "duration": 15
             }
@@ -17872,7 +17872,7 @@
               "apply_count": 10
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 6
             }
@@ -17949,7 +17949,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 15
             },
@@ -18023,12 +18023,12 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Combo Field Duration",
               "duration": 3
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 15
             },
@@ -18319,7 +18319,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 15
             },
@@ -18695,7 +18695,7 @@
               "icon": "https://render.guildwars2.com/file/7B2193ACCF77E56C13E608191B082D68AA0FAA71/156659.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 10
             },
@@ -19514,7 +19514,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 15
             },
@@ -19600,7 +19600,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 15
             },
@@ -19803,7 +19803,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 8
             },
@@ -20099,7 +20099,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 8
             },
@@ -20316,7 +20316,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Venom Duration",
               "duration": 24
             },
@@ -20779,7 +20779,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 15
             },
@@ -20827,7 +20827,7 @@
               "coefficient": 1.75
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Delay Time",
               "duration": 1
             },
@@ -20974,7 +20974,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Strike Delay",
               "duration": 0.25
             },
@@ -21077,7 +21077,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -21263,7 +21263,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 3
             },
@@ -21756,7 +21756,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 3
             },
@@ -21890,7 +21890,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 3
             },
@@ -22010,7 +22010,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 0.75
             },
@@ -22130,7 +22130,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -22225,7 +22225,7 @@
               "value": 3
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 1
             },
@@ -22691,7 +22691,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 2
             },
@@ -22777,7 +22777,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 3
             },
@@ -23232,7 +23232,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 2
             },
@@ -23302,7 +23302,7 @@
               "icon": "https://render.guildwars2.com/file/7B2193ACCF77E56C13E608191B082D68AA0FAA71/156659.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 2
             },
@@ -23386,7 +23386,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 3
             },
@@ -23435,7 +23435,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 8
             },
@@ -24252,7 +24252,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -24329,7 +24329,7 @@
               "value": 3
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Field Duration",
               "duration": 4
             },
@@ -24531,7 +24531,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 6
             },
@@ -24653,7 +24653,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Block Duration",
               "duration": 2
             },
@@ -24885,7 +24885,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 3
             },
@@ -25136,7 +25136,7 @@
               "value": 3
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -25197,7 +25197,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -25339,7 +25339,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 3
             },
@@ -25383,7 +25383,7 @@
               "apply_count": 3
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 6
             },
@@ -25464,7 +25464,7 @@
               "apply_count": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 6
             }
@@ -25654,7 +25654,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 2
             },
@@ -25882,7 +25882,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 3
             },
@@ -26100,12 +26100,12 @@
               "icon": "https://render.guildwars2.com/file/E1E7C4D3A6E62F3D5C9F627CE8175BFB0C614CBE/156652.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Berserk Duration Increase",
               "duration": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -26298,7 +26298,7 @@
               "icon": "https://render.guildwars2.com/file/7B2193ACCF77E56C13E608191B082D68AA0FAA71/156659.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Extended Duration Increase",
               "duration": 2
             },
@@ -26343,7 +26343,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Maw Barrier Duration",
               "duration": 4
             },
@@ -26455,7 +26455,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 3
             },
@@ -26546,7 +26546,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -26732,7 +26732,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 2
             },
@@ -27042,7 +27042,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 15
             }
@@ -27482,7 +27482,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 3
             },
@@ -27687,7 +27687,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 3
             },
@@ -27753,7 +27753,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 10
             },
@@ -27810,7 +27810,12 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
+              "text": "Stun",
+              "duration": 2.5
+            },
+            {
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -27826,32 +27831,9 @@
               "field_type": "Ice"
             },
             {
-              "type": "Buff",
-              "text": "Defiance break",
-              "status": "Defiance break",
-              "duration": 250,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Reaper's Frost",
-              "status": "Reaper's Frost",
-              "duration": 2.5,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Health threshold",
-              "status": "Health threshold",
-              "duration": 50,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
-              "text": "Health threshold",
-              "status": "Health threshold",
-              "duration": 25,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Defiance Break",
+              "value": 250
             }
           ],
           "complete": true
@@ -28078,7 +28060,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Ring Duration",
               "duration": 3
             },
@@ -28666,7 +28648,7 @@
               "value": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 25
             },
@@ -28732,7 +28714,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 1
             },
@@ -28909,7 +28891,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 3
             },
@@ -28956,7 +28938,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 2
             },
@@ -29347,7 +29329,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Blast Delay",
               "duration": 3
             },
@@ -30846,7 +30828,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 60
             }
@@ -31420,7 +31402,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -32003,7 +31985,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Mirage Duration",
               "duration": 3
             },
@@ -32135,7 +32117,7 @@
               "value": 10
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 6
             },
@@ -32586,7 +32568,7 @@
               "value": 3
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Symbol Duration",
               "duration": 4
             },
@@ -33059,7 +33041,7 @@
               "value": 3
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 3
             },
@@ -34096,7 +34078,7 @@
               "icon": "https://wiki.guildwars2.com/images/b/ba/Page_cost.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -34456,7 +34438,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Field Duration",
               "duration": 10
             },
@@ -34649,7 +34631,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 2
             },
@@ -35675,7 +35657,7 @@
               "value": 3
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 3
             },
@@ -35893,7 +35875,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 2.5
             },
@@ -36298,7 +36280,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 8
             },
@@ -36594,7 +36576,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -37360,7 +37342,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Strike Heal Cooldown",
               "duration": 1
             },
@@ -37763,7 +37745,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -38025,7 +38007,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -38343,7 +38325,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 6
             },
@@ -38417,7 +38399,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 6
             },
@@ -38723,7 +38705,7 @@
               "value": 2
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 15
             },
@@ -39561,7 +39543,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 2
             },
@@ -39640,7 +39622,7 @@
               "icon": "https://render.guildwars2.com/file/7B2193ACCF77E56C13E608191B082D68AA0FAA71/156659.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -39913,7 +39895,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -40135,7 +40117,7 @@
               "icon": "https://wiki.guildwars2.com/images/3/3b/One_Wolf_Pack.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Strike Delay",
               "duration": 0.25
             },
@@ -40786,7 +40768,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 2
             },
@@ -40834,7 +40816,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Mud Duration",
               "duration": 3
             },
@@ -41113,7 +41095,7 @@
               "value": 3
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Cyclone Lifetime",
               "duration": 1.5
             },
@@ -41901,7 +41883,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Fuse Time",
               "duration": 1
             },
@@ -41995,7 +41977,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Torment Duration per Malice",
               "duration": 2
             },
@@ -42648,7 +42630,7 @@
               "icon": "https://render.guildwars2.com/file/BBE8191A494B0352259C10EADFDACCE177E6DA5B/1770208.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 3.5
             },
@@ -42942,7 +42924,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 3
             },
@@ -43782,7 +43764,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Flurry Count Tracking Duration",
               "duration": 5
             },
@@ -44886,7 +44868,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -45291,7 +45273,7 @@
         "wvw": {
           "facts": [
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Gain All Boons for Base Duration",
               "duration": 5
             },
@@ -46225,12 +46207,12 @@
               "value": 3
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration Increase",
               "duration": 3
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -46405,7 +46387,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -46831,7 +46813,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Missile Block Duration",
               "duration": 1.5
             },
@@ -47068,7 +47050,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -47116,7 +47098,7 @@
               "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 3
             },
@@ -47354,7 +47336,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -48382,7 +48364,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -48834,7 +48816,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Boon Increase per Target Struck",
               "duration": 1
             },
@@ -49532,7 +49514,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -49807,7 +49789,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -51159,7 +51141,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration Increase per Target",
               "duration": 1
             },
@@ -51604,7 +51586,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 2.25
             },
@@ -53016,7 +52998,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -54651,7 +54633,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Portal Duration",
               "duration": 5
             },
@@ -54945,7 +54927,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Fuse Time",
               "duration": 4
             },
@@ -55367,7 +55349,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 10
             },
@@ -55411,7 +55393,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 10
             },
@@ -55675,7 +55657,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Chain Reaction Availability Window",
               "duration": 4
             },
@@ -55936,12 +55918,12 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Chain Reaction Availability Window",
               "duration": 4
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -56114,7 +56096,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Chain Reaction Availability Window",
               "duration": 4
             },
@@ -56877,7 +56859,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -57074,7 +57056,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 7
             },
@@ -57108,7 +57090,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 7
             },
@@ -57793,7 +57775,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 2
             },
@@ -57890,7 +57872,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Singularity Duration",
               "duration": 3
             },
@@ -58258,7 +58240,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 10
             },
@@ -58470,7 +58452,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Chain Reaction Availability Window",
               "duration": 4
             },
@@ -58619,7 +58601,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Detonation Window",
               "duration": 2
             },
@@ -58993,7 +58975,7 @@
               "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 3
             },
@@ -59258,7 +59240,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 7
             },
@@ -60559,7 +60541,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Fuse Time",
               "duration": 1
             },
@@ -60625,7 +60607,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Web Duration",
               "duration": 4
             },
@@ -60816,7 +60798,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -62360,7 +62342,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -62751,7 +62733,7 @@
               "value": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Pursuit Duration",
               "duration": 3
             },
@@ -62986,7 +62968,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Symbol Duration",
               "duration": 4
             },
@@ -63193,12 +63175,12 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Arming Time",
               "duration": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 10
             },
@@ -63688,7 +63670,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Fuse Time",
               "duration": 2
             },
@@ -63800,7 +63782,7 @@
               "icon": "https://render.guildwars2.com/file/BBE8191A494B0352259C10EADFDACCE177E6DA5B/1770208.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Additional Time per Note",
               "duration": 5
             },
@@ -64088,7 +64070,7 @@
               "hit_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 4
             },
@@ -64576,7 +64558,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 5
             },
@@ -64834,7 +64816,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Symbol Duration",
               "duration": 4
             },
@@ -65057,7 +65039,7 @@
               "apply_count": 3
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Fuse Time",
               "duration": 2
             },
@@ -65312,7 +65294,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration Increase per Note",
               "duration": 5
             },
@@ -65935,7 +65917,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Shield Duration",
               "duration": 4
             },
@@ -66725,7 +66707,7 @@
         "wvw": {
           "facts": [
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 1.5
             },
@@ -66785,7 +66767,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration Increase per Note",
               "duration": 5
             },
@@ -67059,7 +67041,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 6
             },
@@ -67760,7 +67742,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration Increase per Note",
               "duration": 5
             },
@@ -68475,7 +68457,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 2
             }
@@ -68778,7 +68760,7 @@
         "wvw": {
           "facts": [
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 15
             },
@@ -68876,12 +68858,12 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 6
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Ally Duration",
               "duration": 3
             },
@@ -69129,7 +69111,7 @@
               "apply_count": 2
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 0.5
             },
@@ -70333,7 +70315,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Symbol Duration",
               "duration": 4
             },
@@ -71934,7 +71916,7 @@
               "icon": "https://wiki.guildwars2.com/images/b/bf/Illusionary_Membrane.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Maximum Effect Duration",
               "duration": 15
             }
@@ -72607,7 +72589,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Jagged Horror Lifetime Duration",
               "duration": 30
             }
@@ -72745,7 +72727,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 10
             }
@@ -75040,12 +75022,12 @@
         "wvw": {
           "facts": [
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration on Entering",
               "duration": 4
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration on Exiting",
               "duration": 1
             }
@@ -75102,7 +75084,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Reflective Shield Duration",
               "duration": 4
             },
@@ -76272,7 +76254,7 @@
         "wvw": {
           "facts": [
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Duration",
               "duration": 6
             }
@@ -77558,7 +77540,7 @@
               "value": 5
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Maximum Boon Duration",
               "duration": 10
             },
@@ -80075,7 +80057,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Maximum Duration",
               "duration": 20
             },
@@ -81087,7 +81069,7 @@
               "apply_count": 1
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Resolve Duration Increase",
               "duration": 2
             }
@@ -81136,12 +81118,12 @@
               "icon": "https://render.guildwars2.com/file/61AA4919C4A7990903241B680A69530121E994C7/156657.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Justice Duration Increase",
               "duration": 2
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Lethal Tempo Duration Reduction",
               "duration": 2
             }
@@ -82762,7 +82744,7 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Base Lingering Duration",
               "duration": 3
             },
@@ -82905,7 +82887,7 @@
               "icon": "https://wiki.guildwars2.com/images/c/cf/Exhilarating_Ephemera_%28effect%29.png"
             },
             {
-              "type": "Duration",
+              "type": "Time",
               "text": "Maximum Duration",
               "duration": 20
             }

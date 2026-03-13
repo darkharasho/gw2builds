@@ -20,7 +20,7 @@ describe("seed.js parsing functions", () => {
 
     test("extracts duration", () => {
       const fact = mapWikiFactToApiFact("duration", ["duration", "10"], {}, true, false);
-      expect(fact).toEqual({ type: "Duration", text: "Duration", duration: 10 });
+      expect(fact).toEqual({ type: "Time", text: "Duration", duration: 10 });
     });
 
     test("extracts recharge", () => {
