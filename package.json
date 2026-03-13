@@ -9,6 +9,7 @@
     "dev:clean": "node scripts/dev-clean.mjs",
     "build:renderer": "vite build",
     "seed": "node lib/gw2-balance-splits/scripts/seed.js",
+    "crawl": "node lib/gw2-balance-splits/scripts/crawl-patches.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
