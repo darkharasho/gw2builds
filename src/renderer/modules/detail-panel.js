@@ -6,6 +6,7 @@ import { computeEquipmentStats } from "./stats.js";
 // DOM refs injected by the entry point via initDetailPanel() to keep this module
 // importable in Node.js test environments (no document.querySelector at module scope).
 let _el = { detailHost: null, hoverPreview: null };
+let _openWikiModal = null;
 
 export function triggerDetailPanelAnimation() {
   if (!_el.detailHost) return;
@@ -31,8 +32,15 @@ export function triggerDetailPanelAnimation() {
   });
 }
 
-export function initDetailPanel(domRefs) {
+export function initDetailPanel(domRefs, callbacks = {}) {
   _el = { ..._el, ...domRefs };
+  _openWikiModal = callbacks.openWikiModal || null;
+  if (_el.detailHost) {
+    _el.detailHost.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-url]");
+      if (btn && _openWikiModal) _openWikiModal(btn.dataset.url);
+    });
+  }
 }
 
 export function renderDetailPanel() {
