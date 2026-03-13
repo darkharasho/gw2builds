@@ -89,16 +89,21 @@
                   <input id="tagsInput" type="text" placeholder="wvw, roaming, sustain" />
                 </label>
               </div>
-              <div class="toolbar-actions">
-                <span id="editorDirtyBadge" class="dirty-badge hidden">Unsaved changes</span>
-                <button id="saveBuildBtn" class="btn btn-primary" type="button">Save Build</button>
-                <button id="duplicateBuildBtn" class="btn btn-secondary" type="button">Duplicate</button>
-                <button id="copyBuildBtn" class="btn btn-secondary" type="button">Copy JSON</button>
-                <button id="pasteBuildBtn" class="btn btn-secondary" type="button">Paste JSON</button>
-                <button id="publishSiteBtn" class="btn btn-primary" type="button">Publish Static Site</button>
-                <p id="publishStatus" class="publish-status"></p>
-              </div>
-              <div id="buildSummary" class="build-summary"></div>
+              <details id="buildSummaryDetails" class="build-summary-details">
+                <summary class="build-summary-toggle">Build Summary</summary>
+                <div class="build-summary-content">
+                  <div class="build-summary-actions">
+                    <span id="editorDirtyBadge" class="dirty-badge hidden">Unsaved changes</span>
+                    <button id="saveBuildBtn" class="btn btn-primary" type="button">Save Build</button>
+                    <button id="duplicateBuildBtn" class="btn btn-secondary" type="button">Duplicate</button>
+                    <button id="copyBuildBtn" class="btn btn-secondary" type="button">Copy JSON</button>
+                    <button id="pasteBuildBtn" class="btn btn-secondary" type="button">Paste JSON</button>
+                    <button id="publishSiteBtn" class="btn btn-primary" type="button">Publish Static Site</button>
+                    <p id="publishStatus" class="publish-status"></p>
+                  </div>
+                  <div id="buildSummary" class="build-summary"></div>
+                </div>
+              </details>
             </section>
 
             <!-- Build subtab -->
