@@ -77520,12 +77520,16 @@
         "wvw": {
           "facts": [
             {
-              "type": "Buff",
+              "type": "Percent",
               "text": "Percent",
-              "status": "Percent",
-              "duration": 50,
-              "apply_count": 1,
+              "percent": 50,
               "icon": "https://render.guildwars2.com/file/B0CD8077991E4FB1622D2930337ED7F9B54211D5/156665.png"
+            },
+            {
+              "type": "Time",
+              "text": "Daze",
+              "duration": 1.5,
+              "icon": "https://render.guildwars2.com/file/9AE125E930C92FEA0DD99E7EBAEDE4CF5EC556B6/433474.png"
             }
           ],
           "complete": true
