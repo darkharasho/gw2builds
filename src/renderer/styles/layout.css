@@ -22,15 +22,30 @@
   letter-spacing: 0.06em;
 }
 
-/* ── Update status (titlebar) ─────────────────────────────────────────────── */
-.titlebar__update-status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: auto;
-  margin-right: 8px;
+.titlebar__alpha-badge {
+  font-family: system-ui, sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--accent, #c8a96e) 75%, transparent);
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  padding: 1px 4px;
+  line-height: 1.4;
+  align-self: center;
 }
 
+.titlebar__version-badge {
+  font-family: system-ui, sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: color-mix(in srgb, var(--text-dim, #7a9abf) 60%, transparent);
+  align-self: center;
+}
+
+/* ── Update status (titlebar) ─────────────────────────────────────────────── */
 .titlebar__version {
   font-family: system-ui, sans-serif;
   font-size: 0.6rem;
