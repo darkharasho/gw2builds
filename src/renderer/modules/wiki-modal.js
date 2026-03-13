@@ -7,6 +7,7 @@ let _escHandler = null;
 
 export function initWikiModal() {
   if (typeof document === "undefined") return;
+  if (_overlay) return; // already initialized
   _overlay = document.createElement("div");
   _overlay.className = "wiki-modal-overlay wiki-modal-overlay--hidden";
   _overlay.innerHTML = `
@@ -55,6 +56,7 @@ export function initWikiModal() {
 }
 
 export function openWikiModal(url) {
+  if (!_overlay) return; // not yet initialized
   _currentUrl = url;
   _urlDisplay.textContent = url;
   if (_webview.src !== url) _webview.src = url; // skip reload if same URL already loaded
