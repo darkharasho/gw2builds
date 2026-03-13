@@ -77906,11 +77906,9 @@
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
-              "type": "Buff",
-              "text": "Range threshold",
-              "status": "Range threshold",
-              "duration": 450,
-              "apply_count": 1,
+              "type": "Number",
+              "text": "Range Threshold",
+              "value": 450,
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
@@ -77927,9 +77925,9 @@
               "icon": "https://render.guildwars2.com/file/BBE8191A494B0352259C10EADFDACCE177E6DA5B/1770208.png"
             },
             {
-              "type": "Number",
+              "type": "Radius",
               "text": "Boon Radius",
-              "value": 360,
+              "distance": 360,
               "icon": "https://render.guildwars2.com/file/B0CD8077991E4FB1622D2930337ED7F9B54211D5/156665.png"
             }
           ],
