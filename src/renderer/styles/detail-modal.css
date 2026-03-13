@@ -161,7 +161,7 @@
   display: block;
 }
 
-.dm-section--loading .dm-related-list--hidden {
+.dm-section--loading .dm-related-grid--hidden {
   display: none;
 }
 
@@ -259,6 +259,32 @@
   font-weight: 700;
   color: var(--text);
   font-size: 1rem;
+}
+
+/* ── Nav buttons (back / forward) ────────────────────────────────────────── */
+
+.dm-nav-btn {
+  padding: 5px 9px;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.dm-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Clickable related items ─────────────────────────────────────────────── */
+
+.dm-related-item[data-nav-name] {
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.1s;
+}
+
+.dm-related-item[data-nav-name]:hover {
+  background: var(--panel);
 }
 
 /* ── Expand button ───────────────────────────────────────────────────────── */

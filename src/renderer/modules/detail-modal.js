@@ -1,4 +1,4 @@
-import { formatFactHtml } from "./detail-panel.js";
+import { formatFactHtml, resolveEntityFacts } from "./detail-panel.js";
 import { getProfessionSvg } from "./profession-icons.js";
 import { escapeHtml } from "./utils.js";
 
@@ -6,6 +6,12 @@ import { escapeHtml } from "./utils.js";
 let _overlay = null;
 let _el = {};
 let _escHandler = null;
+
+// Navigation history: array of {detail, catalog, professionName}
+let _history = [];
+let _historyIndex = -1;
+// Incremented each time content loads; guards stale async callbacks
+let _renderId = 0;
 
 export function initDetailModal() {
   if (typeof document === "undefined") return;
@@ -16,6 +22,8 @@ export function initDetailModal() {
   _overlay.innerHTML = `
     <div class="detail-modal">
       <div class="detail-modal-toolbar">
+        <button class="wiki-modal-btn dm-nav-btn" id="dm-back" title="Back" disabled>&#8592;</button>
+        <button class="wiki-modal-btn dm-nav-btn" id="dm-fwd" title="Forward" disabled>&#8594;</button>
         <span class="detail-modal-title" id="dm-title"></span>
         <button class="wiki-modal-btn" id="dm-wiki-btn">Open Wiki Page</button>
         <button class="wiki-modal-btn wiki-modal-btn--close" id="dm-close">&#x2715;</button>
@@ -53,6 +61,8 @@ export function initDetailModal() {
     title:          document.getElementById("dm-title"),
     wikiBtn:        document.getElementById("dm-wiki-btn"),
     close:          document.getElementById("dm-close"),
+    backBtn:        document.getElementById("dm-back"),
+    fwdBtn:         document.getElementById("dm-fwd"),
     body:           document.getElementById("dm-body"),
     icon:           document.getElementById("dm-icon"),
     profIcon:       document.getElementById("dm-prof-icon"),
@@ -74,18 +84,143 @@ export function initDetailModal() {
     const url = _el.wikiBtn.dataset.url;
     if (url) window.open(url, "_blank");
   });
+
+  _el.backBtn.addEventListener("click", () => {
+    if (_historyIndex > 0) {
+      _historyIndex--;
+      const { detail, catalog, professionName } = _history[_historyIndex];
+      _el.body.scrollTop = 0;
+      _loadModalContent(detail, catalog, professionName);
+      _updateNavButtons();
+    }
+  });
+
+  _el.fwdBtn.addEventListener("click", () => {
+    if (_historyIndex < _history.length - 1) {
+      _historyIndex++;
+      const { detail, catalog, professionName } = _history[_historyIndex];
+      _el.body.scrollTop = 0;
+      _loadModalContent(detail, catalog, professionName);
+      _updateNavButtons();
+    }
+  });
+
+  // Click delegate for related item navigation
+  _el.body.addEventListener("click", (e) => {
+    const li = e.target.closest("[data-nav-name]");
+    if (!li) return;
+    const name = li.dataset.navName;
+    const iconUrl = li.dataset.navIcon || "";
+    const { catalog, professionName } = _history[_historyIndex] || {};
+    if (!catalog || !name) return;
+    _navigateToName(name, iconUrl, catalog, professionName);
+  });
 }
 
 export function openDetailModal(detail, catalog, professionName) {
   if (!_overlay || !detail) return;
+
+  // Reset history for a fresh open from the reference panel
+  _history = [{ detail, catalog, professionName }];
+  _historyIndex = 0;
+
+  // Show modal
+  _overlay.classList.remove("detail-modal-overlay--hidden");
+  _el.body.scrollTop = 0;
+  _escHandler = (e) => { if (e.key === "Escape") closeDetailModal(); };
+  document.addEventListener("keydown", _escHandler);
+
+  _loadModalContent(detail, catalog, professionName);
+  _updateNavButtons();
+}
+
+export function closeDetailModal() {
+  if (!_overlay) return;
+  _renderId++; // cancel in-flight async callbacks
+  _history = [];
+  _historyIndex = -1;
+  _overlay.classList.add("detail-modal-overlay--hidden");
+  if (_escHandler) {
+    document.removeEventListener("keydown", _escHandler);
+    _escHandler = null;
+  }
+}
+
+// ── Private helpers ──────────────────────────────────────────────────────────
+
+function _navigateToName(name, iconUrl, catalog, professionName) {
+  const found = _findEntityByName(name, catalog);
+  let detail;
+  if (found) {
+    detail = _buildModalDetail(found.kind, found.entity);
+  } else {
+    // Minimal placeholder for items not in the current catalog
+    detail = {
+      kind: "skill",
+      entityId: null,
+      kindLabel: "Skill",
+      title: name,
+      icon: iconUrl || "",
+      iconFallback: "",
+      description: "",
+      facts: [],
+      wiki: { loading: false, summary: "", url: "" },
+      hasSplit: false,
+    };
+  }
+  // Truncate forward history, push new entry
+  _history = _history.slice(0, _historyIndex + 1);
+  _history.push({ detail, catalog, professionName });
+  _historyIndex++;
+  _el.body.scrollTop = 0;
+  _loadModalContent(detail, catalog, professionName);
+  _updateNavButtons();
+}
+
+function _findEntityByName(name, catalog) {
+  if (!name || !catalog) return null;
+  // Non-weapon skills
+  if (Array.isArray(catalog.skills)) {
+    const s = catalog.skills.find((e) => e.name === name);
+    if (s) return { entity: s, kind: "skill" };
+  }
+  // Weapon skills (not included in catalog.skills array)
+  if (catalog.weaponSkillById instanceof Map) {
+    for (const s of catalog.weaponSkillById.values()) {
+      if (s.name === name) return { entity: s, kind: "skill" };
+    }
+  }
+  // Traits
+  if (Array.isArray(catalog.traits)) {
+    const t = catalog.traits.find((e) => e.name === name);
+    if (t) return { entity: t, kind: "trait" };
+  }
+  return null;
+}
+
+function _buildModalDetail(kind, entity) {
+  return {
+    kind,
+    entityId: Number(entity.id) || null,
+    kindLabel: kind === "trait" ? "Trait" : "Skill",
+    title: entity.name || "Unknown",
+    icon: entity.icon || "",
+    iconFallback: entity.iconFallback || "",
+    description: entity.description || "",
+    facts: resolveEntityFacts(entity),
+    wiki: { loading: false, summary: "", url: "" },
+    hasSplit: Boolean(entity.hasSplit),
+  };
+}
+
+function _loadModalContent(detail, catalog, professionName) {
+  const myId = ++_renderId;
 
   // ── Hero ──────────────────────────────────────────────────────────────────
   _el.title.textContent = detail.title;
   _el.name.textContent = detail.title;
   _el.desc.textContent = detail.description || "";
 
-  // Spec name: find matching specialization by entity ID (works for traits;
-  // skills fall back to professionName)
   const specializations = catalog?.specializations || [];
   const spec = specializations.find((s) => s.id === detail.entityId);
   const specName = spec?.name || professionName || "";
@@ -94,7 +229,7 @@ export function openDetailModal(detail, catalog, professionName) {
 
   // Icon
   if (detail.icon) {
-    _el.icon.style.visibility = "";   // reset in case previous item had no icon
+    _el.icon.style.visibility = "";
     _el.icon.src = detail.icon;
     _el.icon.alt = detail.title;
     _el.icon.onerror = () => {
@@ -106,14 +241,15 @@ export function openDetailModal(detail, catalog, professionName) {
     _el.icon.style.visibility = "hidden";
   }
 
-  // Profession SVG — try spec name first, then profession name
+  // Profession SVG
   const svg = getProfessionSvg(specName) ?? getProfessionSvg(professionName) ?? "";
   _el.profIcon.innerHTML = svg;
 
-  // Wiki button
-  const wikiUrl = detail.wiki?.url || "";
+  // Wiki button — always show; fallback URL until a real URL is known
+  const wikiUrl = detail.wiki?.url
+    || `https://wiki.guildwars2.com/wiki/${encodeURIComponent((detail.title || "").replaceAll(" ", "_"))}`;
   _el.wikiBtn.dataset.url = wikiUrl;
-  _el.wikiBtn.style.display = wikiUrl ? "" : "none";
+  _el.wikiBtn.style.display = "";
 
   // ── Facts ─────────────────────────────────────────────────────────────────
   const facts = Array.isArray(detail.facts) ? detail.facts : [];
@@ -121,7 +257,7 @@ export function openDetailModal(detail, catalog, professionName) {
     .map((fact) => `<li>${formatFactHtml(fact, null)}</li>`)
     .join("") || "<li>No facts.</li>";
 
-  // ── Related sections — show with spinners, hide lists ────────────────────
+  // ── Related sections — show spinners, hide lists ───────────────────────────
   _el.skillsSection.className = "dm-section dm-section--loading";
   _el.traitsSection.className = "dm-section dm-section--loading";
   _el.skillsList.className = "dm-related-grid dm-related-grid--hidden";
@@ -129,32 +265,22 @@ export function openDetailModal(detail, catalog, professionName) {
   _el.traitsList.className = "dm-related-grid--hidden";
   _el.traitsList.innerHTML = "";
 
-  // ── Show modal ────────────────────────────────────────────────────────────
-  _overlay.classList.remove("detail-modal-overlay--hidden");
-  _el.body.scrollTop = 0;
-  _escHandler = (e) => { if (e.key === "Escape") closeDetailModal(); };
-  document.addEventListener("keydown", _escHandler);
-
   // ── Async: fetch related data ─────────────────────────────────────────────
   window.desktopApi?.getWikiRelatedData(detail.title).then((related) => {
+    if (_renderId !== myId) return;
     _renderRelatedSkills(related.relatedSkills, catalog);
     _renderRelatedTraits(related.relatedTraits, catalog);
   }).catch(() => {
+    if (_renderId !== myId) return;
     _showRelatedError(_el.skillsSection, _el.skillsSpinner, _el.skillsList);
     _showRelatedError(_el.traitsSection, _el.traitsSpinner, _el.traitsList);
   });
 }
 
-export function closeDetailModal() {
-  if (!_overlay) return;
-  _overlay.classList.add("detail-modal-overlay--hidden");
-  if (_escHandler) {
-    document.removeEventListener("keydown", _escHandler);
-    _escHandler = null;
-  }
+function _updateNavButtons() {
+  _el.backBtn.disabled = _historyIndex <= 0;
+  _el.fwdBtn.disabled = _historyIndex >= _history.length - 1;
 }
-
-// ── Private rendering helpers ─────────────────────────────────────────────
 
 function _showRelatedError(section, spinner, list) {
   section.className = "dm-section";
@@ -168,7 +294,6 @@ function _renderRelatedSkills(items, catalog) {
     _el.skillsSection.className = "dm-section dm-section--hidden";
     return;
   }
-  // Prefer icon from wiki HTML (item.icon); fall back to catalog lookup for non-weapon skills
   const skillMap = _buildNameMap(catalog?.skills);
   _el.skillsList.innerHTML = items.map((item) => {
     const icon = item.icon || skillMap.get(item.name)?.icon || "";
@@ -184,7 +309,6 @@ function _renderRelatedTraits(groups, catalog) {
     _el.traitsSection.className = "dm-section dm-section--hidden";
     return;
   }
-  // Prefer icon from wiki HTML (item.icon); fall back to catalog lookup
   const traitMap = _buildNameMap(catalog?.traits);
   const specMap = new Map((catalog?.specializations || []).map((s) => [s.name, s]));
 
@@ -226,7 +350,7 @@ function _relatedItemHtml(name, context, iconUrl) {
     ? `<img class="dm-related-item__icon" src="${escapeHtml(iconUrl)}" alt="${escapeHtml(name)}" onerror="this.style.visibility='hidden'" />`
     : `<div class="dm-related-item__icon dm-related-item__icon--missing"></div>`;
   return `
-    <li class="dm-related-item">
+    <li class="dm-related-item" data-nav-name="${escapeHtml(name)}" data-nav-icon="${escapeHtml(iconUrl)}">
       ${iconEl}
       <span class="dm-related-item__name">${escapeHtml(name)}</span>
       ${context ? `<span class="dm-related-item__context">${escapeHtml(context)}</span>` : ""}
