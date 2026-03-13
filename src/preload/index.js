@@ -31,4 +31,27 @@ contextBridge.exposeInMainWorld("desktopApi", {
   showError: (title, body) => ipcRenderer.invoke("dialog:error", title, body),
   getSetting: (key) => ipcRenderer.invoke("settings:get", key),
   setSetting: (key, value) => ipcRenderer.invoke("settings:set", key, value),
+  getAppVersion: () => ipcRenderer.invoke("updater:get-version"),
+  checkForUpdates: () => ipcRenderer.send("updater:check"),
+  restartApp: () => ipcRenderer.send("updater:restart"),
+  onUpdateAvailable: (cb) => {
+    ipcRenderer.removeAllListeners("update-available");
+    ipcRenderer.on("update-available", (_e, info) => cb(info));
+  },
+  onUpdateNotAvailable: (cb) => {
+    ipcRenderer.removeAllListeners("update-not-available");
+    ipcRenderer.on("update-not-available", (_e, info) => cb(info));
+  },
+  onUpdateDownloaded: (cb) => {
+    ipcRenderer.removeAllListeners("update-downloaded");
+    ipcRenderer.on("update-downloaded", (_e, info) => cb(info));
+  },
+  onUpdateError: (cb) => {
+    ipcRenderer.removeAllListeners("update-error");
+    ipcRenderer.on("update-error", (_e, info) => cb(info));
+  },
+  onDownloadProgress: (cb) => {
+    ipcRenderer.removeAllListeners("download-progress");
+    ipcRenderer.on("download-progress", (_e, info) => cb(info));
+  },
 });
