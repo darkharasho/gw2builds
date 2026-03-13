@@ -177,6 +177,7 @@
 }
 
 .dm-related-grid--indented {
+  grid-template-columns: 1fr;
   padding-left: 8px;
 }
 
