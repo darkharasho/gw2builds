@@ -46,6 +46,11 @@ function createWindow() {
 
   if (DEV_SERVER_URL) {
     win.loadURL(DEV_SERVER_URL);
+    // Vite HMR reloads cause Electron to steal focus. Track whether the window was
+    // focused before each reload; if not, blur it immediately after the load finishes.
+    let wasFocused = false;
+    win.webContents.on("did-start-loading", () => { wasFocused = win.isFocused(); });
+    win.webContents.on("did-finish-load", () => { if (!wasFocused) win.blur(); });
   } else {
     win.loadFile(path.join(__dirname, "../renderer/index.html"));
   }
