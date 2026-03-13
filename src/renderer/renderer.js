@@ -75,6 +75,9 @@ const el = {
   winMax:            q("#winMax"),
   winClose:          q("#winClose"),
   titlebar:          q("#titlebar"),
+  updateVersionLabel: q("#updateVersionLabel"),
+  updateProgressLabel: q("#updateProgressLabel"),
+  updateRestartBtn:    q("#updateRestartBtn"),
 };
 
 // ── Module initialization ────────────────────────────────────────────────────
@@ -155,6 +158,78 @@ initRenderPagesCallbacks({
   showError,
   setPublishStatus,
 });
+
+// ── Auto-update titlebar UI ──────────────────────────────────────────────────
+
+(async function initUpdateUI() {
+  if (typeof window === "undefined" || !window.desktopApi?.getAppVersion) return;
+
+  try {
+    const version = await window.desktopApi.getAppVersion();
+    if (el.updateVersionLabel) el.updateVersionLabel.textContent = `v${version}`;
+  } catch { /* not available in web builds */ }
+
+  let errorTimeout = null;
+
+  window.desktopApi.onUpdateAvailable?.((info) => {
+    if (el.updateVersionLabel) el.updateVersionLabel.textContent = `v${info.version} available`;
+  });
+
+  window.desktopApi.onUpdateNotAvailable?.((info) => {
+    if (el.updateVersionLabel) el.updateVersionLabel.textContent = `v${info.version}`;
+  });
+
+  window.desktopApi.onDownloadProgress?.((info) => {
+    if (el.updateProgressLabel) {
+      el.updateProgressLabel.textContent = `Updating... ${Math.round(info.percent)}%`;
+      el.updateProgressLabel.classList.add("visible");
+    }
+    if (el.updateVersionLabel) el.updateVersionLabel.style.opacity = "0";
+  });
+
+  window.desktopApi.onUpdateDownloaded?.(() => {
+    if (el.updateProgressLabel) {
+      el.updateProgressLabel.textContent = "";
+      el.updateProgressLabel.classList.remove("visible");
+    }
+    if (el.updateVersionLabel) el.updateVersionLabel.style.opacity = "";
+    if (el.updateRestartBtn) {
+      el.updateRestartBtn.classList.remove("hidden");
+      // Trigger reflow before adding visible class for transition
+      void el.updateRestartBtn.offsetWidth;
+      el.updateRestartBtn.classList.add("visible");
+    }
+  });
+
+  window.desktopApi.onUpdateError?.((info) => {
+    if (errorTimeout) clearTimeout(errorTimeout);
+    if (el.updateVersionLabel) {
+      el.updateVersionLabel.classList.add("titlebar__version--error");
+      el.updateVersionLabel.textContent = "Update failed";
+    }
+    if (el.updateProgressLabel) {
+      el.updateProgressLabel.textContent = "";
+      el.updateProgressLabel.classList.remove("visible");
+    }
+    errorTimeout = setTimeout(async () => {
+      if (el.updateVersionLabel) {
+        el.updateVersionLabel.classList.remove("titlebar__version--error");
+        try {
+          const version = await window.desktopApi.getAppVersion();
+          el.updateVersionLabel.textContent = `v${version}`;
+        } catch {
+          el.updateVersionLabel.textContent = "";
+        }
+      }
+    }, 5000);
+  });
+
+  if (el.updateRestartBtn) {
+    el.updateRestartBtn.addEventListener("click", () => {
+      window.desktopApi.restartApp?.();
+    });
+  }
+})();
 
 // ── Entry point ──────────────────────────────────────────────────────────────
 
