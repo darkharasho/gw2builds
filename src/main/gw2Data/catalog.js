@@ -33,6 +33,7 @@ const {
   ELIXIR_TOOLBELT_OVERRIDES,
   LEGEND_FLIP_OVERRIDES,
   KNOWN_SKILL_ATTUNEMENT_OVERRIDES,
+  EVOKER_F5_EXTRA_VARIANTS,
 } = require("./overrides");
 
 const { getSkillSplit, getTraitSplit, getSkillPveFacts, getTraitPveFacts } = require("../../../lib/gw2-balance-splits");
@@ -306,6 +307,18 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
       }])
   );
 
+  // Evoker F5 Water/Air/Earth familiar passives are not in the Elementalist profession endpoint.
+  // Inject them into profSkillRefs so they get inProfessionEndpoint=true and pass the
+  // profMechanics filter in the renderer (skills that have no professions[] from the API would
+  // otherwise be silently excluded).
+  if (professionId === "Elementalist") {
+    for (const id of EVOKER_F5_EXTRA_VARIANTS) {
+      if (!profSkillRefs.has(id)) {
+        profSkillRefs.set(id, { slot: "Profession_5", specialization: 80, type: "Profession" });
+      }
+    }
+  }
+
   const specializationIds = dedupeNumbers(profession.specializations || []);
   const professionSkillIds = dedupeNumbers((profession.skills || []).map((entry) => entry?.id));
 
@@ -383,6 +396,10 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
     // Alliance Tactics (Vindicator F3, 62729) — ensure it's fetched (not in profession endpoint).
     // Conduit Release Potential variants (F2, one per legend) + Cosmic Wisdom (F3) — ensure all are fetched.
     ...(professionId === "Revenant" ? [62729, 78845, 78501, 78615, 78661, 78895, 77371] : []),
+    // Evoker (Elementalist spec 80) F5 Water/Air/Earth familiar passives — not in the
+    // Elementalist profession endpoint; must be fetched explicitly so they appear in the
+    // F5 slot when the matching attunement is active.
+    ...(professionId === "Elementalist" ? EVOKER_F5_EXTRA_VARIANTS : []),
     // Thief extras:
     // - Specter Siphon (63067, spec=71) — not in Thief profession endpoint
     // - Shadow Shroud Enter/Exit (63155/63251) + weapon skills (for bundle display)

@@ -45,8 +45,8 @@ const KNOWN_SKILL_SPEC_OVERRIDES = new Map([
   [76580, 56], [76988, 56], [76703, 56], [77082, 56],
   // Weaver Weapon_3 dual-attunement combo skills (Aqua Surge, Earthen Vortex, Plasma Burst, Seismic Impact)
   [76585, 56], [76811, 56], [77089, 56], [76707, 56],
-  // Evoker (spec 80) F5 familiar passives — API returns no specialization for Splash/Zap/Calcify.
-  [77225, 80], [77370, 80], [77226, 80],
+  // Evoker (spec 80) F5 familiar passives — API returns no specialization for all four variants.
+  [76643, 80], [77225, 80], [77370, 80], [77226, 80],
   // Evoker F5 familiar chain skills — API returns no specialization.
   [77074, 80], [77357, 80], [76618, 80], [76681, 80],
   // Scrapper Function Gyro variants — profession endpoint incorrectly tags these as Holosmith (57)
@@ -96,8 +96,8 @@ const KNOWN_SKILL_SLOT_OVERRIDES = new Map([
   [78661, "Profession_2"], [78895, "Profession_2"],
   // Conduit Cosmic Wisdom — Profession_3 slot.
   [77371, "Profession_3"],
-  // Evoker (spec 80) F5 familiar passives — API returns no slot for Splash/Zap/Calcify.
-  [77225, "Profession_5"], [77370, "Profession_5"], [77226, "Profession_5"],
+  // Evoker (spec 80) F5 familiar passives — API returns no slot for all four variants.
+  [76643, "Profession_5"], [77225, "Profession_5"], [77370, "Profession_5"], [77226, "Profession_5"],
 ]);
 
 // Photon Forge (skill 42938) has no bundle_skills in the GW2 API, but in-game it grants
@@ -371,6 +371,12 @@ const KNOWN_SKILL_ATTUNEMENT_OVERRIDES = new Map([
   [77226, "Earth"], // Calcify
 ]);
 
+// Evoker (spec 80) F5 familiar passives that are NOT listed in the Elementalist
+// profession endpoint. Only Ignite (76643/Fire) appears in the profession endpoint;
+// the Water/Air/Earth variants must be explicitly fetched and registered as profession
+// mechanics so the F5 slot switches correctly when attunement changes.
+const EVOKER_F5_EXTRA_VARIANTS = [77225, 77370, 77226]; // Splash (Water), Zap (Air), Calcify (Earth)
+
 module.exports = {
   KNOWN_SKILL_DESCRIPTION_OVERRIDES,
   _IC,
@@ -402,4 +408,5 @@ module.exports = {
   ELIXIR_TOOLBELT_OVERRIDES,
   LEGEND_FLIP_OVERRIDES,
   KNOWN_SKILL_ATTUNEMENT_OVERRIDES,
+  EVOKER_F5_EXTRA_VARIANTS,
 };
