@@ -22,19 +22,77 @@
   letter-spacing: 0.06em;
 }
 
-.titlebar__alpha-badge {
+/* ── Update status (titlebar) ─────────────────────────────────────────────── */
+.titlebar__update-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  margin-right: 8px;
+}
+
+.titlebar__version {
+  font-family: system-ui, sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: color-mix(in srgb, var(--text-dim, #7a9abf) 60%, transparent);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.titlebar__progress {
+  font-family: system-ui, sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--accent, #c8a96e);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.titlebar__progress.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.titlebar__restart-btn {
   font-family: system-ui, sans-serif;
   font-size: 0.6rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--accent, #c8a96e) 75%, transparent);
-  border: 1px solid currentColor;
+  color: var(--accent, #c8a96e);
+  border: 1px solid color-mix(in srgb, var(--accent, #c8a96e) 60%, transparent);
   border-radius: 3px;
-  padding: 1px 4px;
+  padding: 2px 8px;
   line-height: 1.4;
-  align-self: center;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateX(8px);
+  transition: opacity 0.4s ease, transform 0.4s ease, background 0.15s ease, border-color 0.15s ease;
   -webkit-font-smoothing: antialiased;
+}
+
+.titlebar__restart-btn.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.titlebar__restart-btn:hover {
+  background: color-mix(in srgb, var(--accent, #c8a96e) 15%, transparent);
+  border-color: var(--accent, #c8a96e);
+}
+
+.titlebar__update-status .hidden {
+  display: none;
+}
+
+.titlebar__version--error {
+  color: #e06060;
+  transition: opacity 0.3s ease;
 }
 
 .titlebar__logo {
