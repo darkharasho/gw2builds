@@ -27597,11 +27597,9 @@
               "coefficient": 0.0125
             },
             {
-              "type": "Buff",
-              "text": "Maximum count",
-              "status": "Maximum count",
-              "duration": 4,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Maximum Boon Scaling",
+              "value": 4
             },
             {
               "type": "Number",
@@ -27609,11 +27607,9 @@
               "value": 5
             },
             {
-              "type": "Buff",
+              "type": "Number",
               "text": "Pulses",
-              "status": "Pulses",
-              "duration": 3,
-              "apply_count": 1,
+              "value": 3,
               "icon": "https://render.guildwars2.com/file/9352ED3244417304995F26CB01AE76BB7E547052/156661.png"
             },
             {
