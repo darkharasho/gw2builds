@@ -49,6 +49,8 @@ function createWindow() {
     // Strip any preload the renderer tries to attach — prevents privilege escalation
     delete webPreferences.preload;
     delete webPreferences.preloadURL;
+    // Enforce sandbox isolation on the webview process
+    webPreferences.sandbox = true;
     // Block any webview whose initial src is not the GW2 wiki
     if (!params.src.startsWith("https://wiki.guildwars2.com/")) {
       event.preventDefault();
