@@ -1,0 +1,47 @@
+<h2>Which panels get skeleton loading?</h2>
+<p class="subtitle">Select all the areas that should show shimmer placeholders while loading. The app has these main visual areas:</p>
+
+<div class="options" data-multiselect>
+  <div class="option" data-choice="skillbar" onclick="toggleSelect(this)">
+    <div class="letter">1</div>
+    <div class="content">
+      <h3>Skill Bar</h3>
+      <p>The row of heal / utility / elite skill slots at the top of the Build tab. Could show ~5 circular or rounded-square placeholders.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="specs" onclick="toggleSelect(this)">
+    <div class="letter">2</div>
+    <div class="content">
+      <h3>Specializations Panel</h3>
+      <p>The 3 spec lines with trait trees. Could show 3 rows of rectangular placeholders mimicking the spec selector + trait grid structure.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="equipment" onclick="toggleSelect(this)">
+    <div class="letter">3</div>
+    <div class="content">
+      <h3>Equipment Panel</h3>
+      <p>Armor, weapons, trinkets, food slots in the Equipment tab. Could show a grid of square slot placeholders.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="detail" onclick="toggleSelect(this)">
+    <div class="letter">4</div>
+    <div class="content">
+      <h3>Detail / Reference Panel</h3>
+      <p>The right-side panel that shows skill/trait details. Usually empty until you click something — skeleton here might be misleading.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="buildlist" onclick="toggleSelect(this)">
+    <div class="letter">5</div>
+    <div class="content">
+      <h3>Build Library List</h3>
+      <p>The list of saved build cards on the Library page. Could show 3-4 card-shaped placeholders.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="toolbar" onclick="toggleSelect(this)">
+    <div class="letter">6</div>
+    <div class="content">
+      <h3>Toolbar (Profession Dropdown)</h3>
+      <p>The profession selector dropdown in the toolbar. Could show a placeholder select box while professions load.</p>
+    </div>
+  </div>
+</div>

@@ -82,7 +82,7 @@
                 </label>
                 <label>
                   Profession
-                  <div id="professionSelect"><div class="skel skel-dropdown"></div></div>
+                  <div id="professionSelect"></div>
                 </label>
                 <label>
                   Tags
@@ -111,16 +111,20 @@
               <section class="panel panel--skillbar">
                 <div id="skillsHost" class="skills-host">
 <div class="skel-skills">
+  <div class="skel-skills__weapon-col">
+    <div class="skel-skills__mechbar">
+      <div class="skel skel-skills__mechslot"></div><div class="skel skel-skills__mechslot skel-d1"></div><div class="skel skel-skills__mechslot skel-d2"></div><div class="skel skel-skills__mechslot skel-d3"></div><div class="skel skel-skills__mechslot skel-d4"></div>
+    </div>
+    <div class="skel-skills__weapon-row">
+      <div class="skel skel-skills__swap"></div>
+      <div class="skel-skills__group">
+        <div class="skel skel-skills__slot"></div><div class="skel skel-skills__slot skel-d1"></div><div class="skel skel-skills__slot skel-d2"></div><div class="skel skel-skills__slot skel-d3"></div><div class="skel skel-skills__slot skel-d4"></div>
+      </div>
+    </div>
+  </div>
+  <div class="skel skel-skills__orb skel-d2"></div>
   <div class="skel-skills__group">
     <div class="skel skel-skills__slot"></div><div class="skel skel-skills__slot skel-d1"></div><div class="skel skel-skills__slot skel-d2"></div><div class="skel skel-skills__slot skel-d3"></div><div class="skel skel-skills__slot skel-d4"></div>
-  </div>
-  <div class="skel-skills__sep"></div>
-  <div class="skel-skills__group">
-    <div class="skel skel-skills__slot"></div><div class="skel skel-skills__slot skel-d1"></div><div class="skel skel-skills__slot skel-d2"></div><div class="skel skel-skills__slot skel-d3"></div><div class="skel skel-skills__slot skel-d4"></div>
-  </div>
-  <div class="skel-skills__sep"></div>
-  <div class="skel-skills__group">
-    <div class="skel skel-skills__slot"></div><div class="skel skel-skills__slot skel-d1"></div><div class="skel skel-skills__slot skel-d2"></div><div class="skel skel-skills__slot skel-d3"></div>
   </div>
 </div>
                 </div>
@@ -135,83 +139,77 @@
                   <div id="specializationsHost" class="specializations-host">
 <div class="skel-specs">
   <div class="skel-spec-card">
-    <div class="skel skel-hex skel-spec-card__emblem"></div>
-    <div class="skel-spec-card__traits">
-      <div class="skel-spec-card__line"></div>
-      <div class="skel-spec-card__major">
-        <div class="skel skel-spec-card__major-trait skel-d1"></div>
-        <div class="skel skel-spec-card__major-trait skel-d2"></div>
-        <div class="skel skel-spec-card__major-trait skel-d3"></div>
-      </div>
-      <div class="skel-spec-card__line"></div>
-      <div class="skel skel-hex skel-spec-card__minor skel-d2"></div>
-      <div class="skel-spec-card__line"></div>
-      <div class="skel-spec-card__major">
-        <div class="skel skel-spec-card__major-trait skel-d3"></div>
-        <div class="skel skel-spec-card__major-trait skel-d4"></div>
-        <div class="skel skel-spec-card__major-trait skel-d5"></div>
-      </div>
-      <div class="skel-spec-card__line"></div>
-      <div class="skel skel-hex skel-spec-card__minor skel-d4"></div>
-      <div class="skel-spec-card__line"></div>
-      <div class="skel-spec-card__major">
-        <div class="skel skel-spec-card__major-trait skel-d5"></div>
-        <div class="skel skel-spec-card__major-trait"></div>
-        <div class="skel skel-spec-card__major-trait skel-d1"></div>
+    <div class="skel-spec-card__panel">
+      <div class="skel-spec-card__body">
+        <div class="skel skel-hex skel-spec-card__emblem"></div>
+        <div class="skel skel-hex skel-spec-card__minor skel-d1"></div>
+        <div class="skel-spec-card__major">
+          <div class="skel skel-spec-card__major-trait skel-d2"></div>
+          <div class="skel skel-spec-card__major-trait skel-d3"></div>
+          <div class="skel skel-spec-card__major-trait skel-d4"></div>
+        </div>
+        <div class="skel skel-hex skel-spec-card__minor skel-d3"></div>
+        <div class="skel-spec-card__major">
+          <div class="skel skel-spec-card__major-trait skel-d4"></div>
+          <div class="skel skel-spec-card__major-trait skel-d5"></div>
+          <div class="skel skel-spec-card__major-trait"></div>
+        </div>
+        <div class="skel skel-hex skel-spec-card__minor skel-d5"></div>
+        <div class="skel-spec-card__major">
+          <div class="skel skel-spec-card__major-trait"></div>
+          <div class="skel skel-spec-card__major-trait skel-d1"></div>
+          <div class="skel skel-spec-card__major-trait skel-d2"></div>
+        </div>
       </div>
     </div>
   </div>
   <div class="skel-spec-card">
-    <div class="skel skel-hex skel-spec-card__emblem skel-d1"></div>
-    <div class="skel-spec-card__traits">
-      <div class="skel-spec-card__line"></div>
-      <div class="skel-spec-card__major">
-        <div class="skel skel-spec-card__major-trait skel-d2"></div>
-        <div class="skel skel-spec-card__major-trait skel-d3"></div>
-        <div class="skel skel-spec-card__major-trait skel-d4"></div>
-      </div>
-      <div class="skel-spec-card__line"></div>
-      <div class="skel skel-hex skel-spec-card__minor skel-d3"></div>
-      <div class="skel-spec-card__line"></div>
-      <div class="skel-spec-card__major">
-        <div class="skel skel-spec-card__major-trait skel-d4"></div>
-        <div class="skel skel-spec-card__major-trait skel-d5"></div>
-        <div class="skel skel-spec-card__major-trait"></div>
-      </div>
-      <div class="skel-spec-card__line"></div>
-      <div class="skel skel-hex skel-spec-card__minor skel-d5"></div>
-      <div class="skel-spec-card__line"></div>
-      <div class="skel-spec-card__major">
-        <div class="skel skel-spec-card__major-trait"></div>
-        <div class="skel skel-spec-card__major-trait skel-d1"></div>
-        <div class="skel skel-spec-card__major-trait skel-d2"></div>
+    <div class="skel-spec-card__panel">
+      <div class="skel-spec-card__body">
+        <div class="skel skel-hex skel-spec-card__emblem skel-d1"></div>
+        <div class="skel skel-hex skel-spec-card__minor skel-d2"></div>
+        <div class="skel-spec-card__major">
+          <div class="skel skel-spec-card__major-trait skel-d3"></div>
+          <div class="skel skel-spec-card__major-trait skel-d4"></div>
+          <div class="skel skel-spec-card__major-trait skel-d5"></div>
+        </div>
+        <div class="skel skel-hex skel-spec-card__minor skel-d4"></div>
+        <div class="skel-spec-card__major">
+          <div class="skel skel-spec-card__major-trait skel-d5"></div>
+          <div class="skel skel-spec-card__major-trait"></div>
+          <div class="skel skel-spec-card__major-trait skel-d1"></div>
+        </div>
+        <div class="skel skel-hex skel-spec-card__minor"></div>
+        <div class="skel-spec-card__major">
+          <div class="skel skel-spec-card__major-trait skel-d1"></div>
+          <div class="skel skel-spec-card__major-trait skel-d2"></div>
+          <div class="skel skel-spec-card__major-trait skel-d3"></div>
+        </div>
       </div>
     </div>
   </div>
   <div class="skel-spec-card">
-    <div class="skel skel-hex skel-spec-card__emblem skel-d2"></div>
-    <div class="skel-spec-card__traits">
-      <div class="skel-spec-card__line"></div>
-      <div class="skel-spec-card__major">
-        <div class="skel skel-spec-card__major-trait skel-d3"></div>
-        <div class="skel skel-spec-card__major-trait skel-d4"></div>
-        <div class="skel skel-spec-card__major-trait skel-d5"></div>
-      </div>
-      <div class="skel-spec-card__line"></div>
-      <div class="skel skel-hex skel-spec-card__minor skel-d4"></div>
-      <div class="skel-spec-card__line"></div>
-      <div class="skel-spec-card__major">
-        <div class="skel skel-spec-card__major-trait skel-d5"></div>
-        <div class="skel skel-spec-card__major-trait"></div>
-        <div class="skel skel-spec-card__major-trait skel-d1"></div>
-      </div>
-      <div class="skel-spec-card__line"></div>
-      <div class="skel skel-hex skel-spec-card__minor"></div>
-      <div class="skel-spec-card__line"></div>
-      <div class="skel-spec-card__major">
-        <div class="skel skel-spec-card__major-trait skel-d1"></div>
-        <div class="skel skel-spec-card__major-trait skel-d2"></div>
-        <div class="skel skel-spec-card__major-trait skel-d3"></div>
+    <div class="skel-spec-card__panel">
+      <div class="skel-spec-card__body">
+        <div class="skel skel-hex skel-spec-card__emblem skel-d2"></div>
+        <div class="skel skel-hex skel-spec-card__minor skel-d3"></div>
+        <div class="skel-spec-card__major">
+          <div class="skel skel-spec-card__major-trait skel-d4"></div>
+          <div class="skel skel-spec-card__major-trait skel-d5"></div>
+          <div class="skel skel-spec-card__major-trait"></div>
+        </div>
+        <div class="skel skel-hex skel-spec-card__minor skel-d5"></div>
+        <div class="skel-spec-card__major">
+          <div class="skel skel-spec-card__major-trait"></div>
+          <div class="skel skel-spec-card__major-trait skel-d1"></div>
+          <div class="skel skel-spec-card__major-trait skel-d2"></div>
+        </div>
+        <div class="skel skel-hex skel-spec-card__minor skel-d1"></div>
+        <div class="skel-spec-card__major">
+          <div class="skel skel-spec-card__major-trait skel-d2"></div>
+          <div class="skel skel-spec-card__major-trait skel-d3"></div>
+          <div class="skel skel-spec-card__major-trait skel-d4"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -225,7 +223,7 @@
                     <button id="detail-expand-btn" class="detail-expand-btn" title="Expand details" disabled>⛶</button>
                   </div>
                   <div id="detailHost" class="detail-host">
-<div>
+<div class="skel-detail">
   <div class="skel-detail__header">
     <div class="skel skel-detail__icon"></div>
     <div class="skel-detail__text-group">
@@ -303,23 +301,39 @@
   <div class="skel-equip__col--art">
     <div class="skel skel-equip__art skel-d2"></div>
   </div>
-  <div class="skel-equip__col">
+  <div class="skel-equip__col skel-equip__col--right">
     <div class="skel skel-d2" style="height:8px;width:60px"></div>
-    <div class="skel-equip__stat-row"><div class="skel skel-d2" style="height:8px;width:45%"></div><div class="skel skel-d3" style="height:8px;width:25%"></div></div>
-    <div class="skel-equip__stat-row"><div class="skel skel-d3" style="height:8px;width:50%"></div><div class="skel skel-d4" style="height:8px;width:20%"></div></div>
-    <div class="skel-equip__stat-row"><div class="skel skel-d4" style="height:8px;width:40%"></div><div class="skel skel-d5" style="height:8px;width:22%"></div></div>
-    <div class="skel-equip__stat-row"><div class="skel" style="height:8px;width:48%"></div><div class="skel skel-d1" style="height:8px;width:18%"></div></div>
-    <div class="skel-equip__stat-row"><div class="skel skel-d1" style="height:8px;width:42%"></div><div class="skel skel-d2" style="height:8px;width:24%"></div></div>
+    <div class="skel-equip__stats">
+      <div class="skel-equip__stat-row">
+        <div class="skel-equip__stat-cell"><div class="skel skel-d2" style="height:8px;width:55%"></div><div class="skel skel-d3" style="height:8px;width:25%"></div></div>
+        <div class="skel-equip__stat-cell"><div class="skel skel-d3" style="height:8px;width:50%"></div><div class="skel skel-d2" style="height:8px;width:20%"></div></div>
+      </div>
+      <div class="skel-equip__stat-row">
+        <div class="skel-equip__stat-cell"><div class="skel skel-d3" style="height:8px;width:55%"></div><div class="skel skel-d4" style="height:8px;width:25%"></div></div>
+        <div class="skel-equip__stat-cell"><div class="skel skel-d4" style="height:8px;width:50%"></div><div class="skel skel-d3" style="height:8px;width:20%"></div></div>
+      </div>
+      <div class="skel-equip__stat-row">
+        <div class="skel-equip__stat-cell"><div class="skel skel-d4" style="height:8px;width:55%"></div><div class="skel skel-d5" style="height:8px;width:25%"></div></div>
+        <div class="skel-equip__stat-cell"><div class="skel skel-d5" style="height:8px;width:50%"></div><div class="skel skel-d4" style="height:8px;width:20%"></div></div>
+      </div>
+      <div class="skel-equip__stat-row">
+        <div class="skel-equip__stat-cell"><div class="skel skel-d5" style="height:8px;width:55%"></div><div class="skel skel-d1" style="height:8px;width:25%"></div></div>
+        <div class="skel-equip__stat-cell"><div class="skel skel-d1" style="height:8px;width:50%"></div><div class="skel skel-d5" style="height:8px;width:20%"></div></div>
+      </div>
+      <div class="skel-equip__stat-row">
+        <div class="skel-equip__stat-cell"><div class="skel skel-d1" style="height:8px;width:55%"></div><div class="skel skel-d2" style="height:8px;width:25%"></div></div>
+        <div class="skel-equip__stat-cell"><div class="skel skel-d2" style="height:8px;width:50%"></div><div class="skel skel-d1" style="height:8px;width:20%"></div></div>
+      </div>
+    </div>
     <div class="skel-equip__trinket-grid">
       <div class="skel skel-equip__trinket skel-d3"></div>
       <div class="skel skel-equip__trinket skel-d4"></div>
       <div class="skel skel-equip__trinket skel-d5"></div>
-      <div class="skel skel-equip__trinket skel-d1"></div>
     </div>
     <div class="skel-equip__trinket-grid">
+      <div class="skel skel-equip__trinket skel-d1"></div>
       <div class="skel skel-equip__trinket skel-d2"></div>
       <div class="skel skel-equip__trinket skel-d3"></div>
-      <div class="skel skel-equip__trinket skel-d4"></div>
     </div>
   </div>
 </div>

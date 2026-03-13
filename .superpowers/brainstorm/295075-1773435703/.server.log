@@ -1,0 +1,6 @@
+{"type":"server-started","port":51875,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:51875","screen_dir":"/var/home/mstephens/Documents/GitHub/axiforge/.superpowers/brainstorm/295075-1773435703"}
+{"type":"screen-added","file":"/var/home/mstephens/Documents/GitHub/axiforge/.superpowers/brainstorm/295075-1773435703/skeleton-mockups.html"}
+{"type":"screen-added","file":"/var/home/mstephens/Documents/GitHub/axiforge/.superpowers/brainstorm/295075-1773435703/skeleton-mockups-v2.html"}
+{"type":"screen-added","file":"/var/home/mstephens/Documents/GitHub/axiforge/.superpowers/brainstorm/295075-1773435703/skeleton-mockups-v3.html"}
+{"type":"screen-added","file":"/var/home/mstephens/Documents/GitHub/axiforge/.superpowers/brainstorm/295075-1773435703/waiting.html"}
+{"type":"server-stopped","reason":"idle timeout"}

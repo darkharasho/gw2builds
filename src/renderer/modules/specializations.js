@@ -139,18 +139,6 @@ export function renderSpecializations() {
   const lastSlotSpec = catalog.specializationById.get(
     Number(state.editor.specializations[2]?.specializationId) || 0
   );
-  const selectedEliteCount = (state.editor.specializations || []).reduce((count, entry) => {
-    const spec = catalog.specializationById.get(Number(entry?.specializationId) || 0);
-    return spec?.elite ? count + 1 : count;
-  }, 0);
-  const ruleHint = document.createElement("p");
-  ruleHint.className = "empty-line";
-  ruleHint.textContent =
-    selectedEliteCount > 0
-      ? "One elite specialization is active. Picking another elite line will swap the previous elite line to a core line."
-      : "You can use up to one elite specialization.";
-  _el.specializationsHost.append(ruleHint);
-
   for (let slotIndex = 0; slotIndex < 3; slotIndex += 1) {
     const selection = state.editor.specializations[slotIndex];
     const currentId = Number(selection?.specializationId) || 0;

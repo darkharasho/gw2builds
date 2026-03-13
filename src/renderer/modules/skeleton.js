@@ -7,6 +7,11 @@ function slot(extraClass = "", delay = "") {
   return `<div class="skel skel-skills__slot${extraClass}${d}"></div>`;
 }
 
+function mechSlot(delay = "") {
+  const d = delay ? ` skel-d${delay}` : "";
+  return `<div class="skel skel-skills__mechslot${d}"></div>`;
+}
+
 function specCard(delayOffset) {
   const d = (n) => { const v = (delayOffset + n) % 6; return v === 0 ? "" : ` skel-d${v}`; };
   const majorCol = (base) => `
@@ -19,18 +24,16 @@ function specCard(delayOffset) {
     <div class="skel skel-hex skel-spec-card__minor${d(n)}"></div>`;
   return `
   <div class="skel-spec-card">
-    <div class="skel skel-hex skel-spec-card__emblem${d(0)}"></div>
-    <div class="skel-spec-card__traits">
-      <div class="skel-spec-card__line"></div>
-      ${majorCol(1)}
-      <div class="skel-spec-card__line"></div>
-      ${minor(2)}
-      <div class="skel-spec-card__line"></div>
-      ${majorCol(3)}
-      <div class="skel-spec-card__line"></div>
-      ${minor(4)}
-      <div class="skel-spec-card__line"></div>
-      ${majorCol(5)}
+    <div class="skel-spec-card__panel">
+      <div class="skel-spec-card__body">
+        <div class="skel skel-hex skel-spec-card__emblem${d(0)}"></div>
+        ${minor(1)}
+        ${majorCol(2)}
+        ${minor(3)}
+        ${majorCol(4)}
+        ${minor(5)}
+        ${majorCol(0)}
+      </div>
     </div>
   </div>`;
 }
@@ -48,19 +51,31 @@ function equipSlot(delay) {
   </div>`;
 }
 
+function statRow(d1, d2) {
+  return `
+  <div class="skel-equip__stat-row">
+    <div class="skel-equip__stat-cell"><div class="skel skel-d${d1}" style="height:8px;width:55%"></div><div class="skel skel-d${d2}" style="height:8px;width:25%"></div></div>
+    <div class="skel-equip__stat-cell"><div class="skel skel-d${d2}" style="height:8px;width:50%"></div><div class="skel skel-d${d1}" style="height:8px;width:20%"></div></div>
+  </div>`;
+}
+
 const skeletonTemplates = {
   skills: `
 <div class="skel-skills">
+  <div class="skel-skills__weapon-col">
+    <div class="skel-skills__mechbar">
+      ${mechSlot("")}${mechSlot("1")}${mechSlot("2")}${mechSlot("3")}${mechSlot("4")}
+    </div>
+    <div class="skel-skills__weapon-row">
+      <div class="skel skel-skills__swap"></div>
+      <div class="skel-skills__group">
+        ${slot("", "")}${slot("", "1")}${slot("", "2")}${slot("", "3")}${slot("", "4")}
+      </div>
+    </div>
+  </div>
+  <div class="skel skel-skills__orb skel-d2"></div>
   <div class="skel-skills__group">
     ${slot("", "")}${slot("", "1")}${slot("", "2")}${slot("", "3")}${slot("", "4")}
-  </div>
-  <div class="skel-skills__sep"></div>
-  <div class="skel-skills__group">
-    ${slot("", "")}${slot("", "1")}${slot("", "2")}${slot("", "3")}${slot("", "4")}
-  </div>
-  <div class="skel-skills__sep"></div>
-  <div class="skel-skills__group">
-    ${slot("", "")}${slot("", "1")}${slot("", "2")}${slot("", "3")}
   </div>
 </div>`,
 
@@ -80,29 +95,30 @@ const skeletonTemplates = {
   <div class="skel-equip__col--art">
     <div class="skel skel-equip__art skel-d2"></div>
   </div>
-  <div class="skel-equip__col">
+  <div class="skel-equip__col skel-equip__col--right">
     <div class="skel skel-d2" style="height:8px;width:60px"></div>
-    <div class="skel-equip__stat-row"><div class="skel skel-d2" style="height:8px;width:45%"></div><div class="skel skel-d3" style="height:8px;width:25%"></div></div>
-    <div class="skel-equip__stat-row"><div class="skel skel-d3" style="height:8px;width:50%"></div><div class="skel skel-d4" style="height:8px;width:20%"></div></div>
-    <div class="skel-equip__stat-row"><div class="skel skel-d4" style="height:8px;width:40%"></div><div class="skel skel-d5" style="height:8px;width:22%"></div></div>
-    <div class="skel-equip__stat-row"><div class="skel" style="height:8px;width:48%"></div><div class="skel skel-d1" style="height:8px;width:18%"></div></div>
-    <div class="skel-equip__stat-row"><div class="skel skel-d1" style="height:8px;width:42%"></div><div class="skel skel-d2" style="height:8px;width:24%"></div></div>
+    <div class="skel-equip__stats">
+      ${statRow(2, 3)}
+      ${statRow(3, 4)}
+      ${statRow(4, 5)}
+      ${statRow(5, 1)}
+      ${statRow(1, 2)}
+    </div>
     <div class="skel-equip__trinket-grid">
       <div class="skel skel-equip__trinket skel-d3"></div>
       <div class="skel skel-equip__trinket skel-d4"></div>
       <div class="skel skel-equip__trinket skel-d5"></div>
-      <div class="skel skel-equip__trinket skel-d1"></div>
     </div>
     <div class="skel-equip__trinket-grid">
+      <div class="skel skel-equip__trinket skel-d1"></div>
       <div class="skel skel-equip__trinket skel-d2"></div>
       <div class="skel skel-equip__trinket skel-d3"></div>
-      <div class="skel skel-equip__trinket skel-d4"></div>
     </div>
   </div>
 </div>`,
 
   detail: `
-<div>
+<div class="skel-detail">
   <div class="skel-detail__header">
     <div class="skel skel-detail__icon"></div>
     <div class="skel-detail__text-group">

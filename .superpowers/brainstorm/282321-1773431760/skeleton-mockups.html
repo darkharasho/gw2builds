@@ -1,0 +1,194 @@
+<style>
+  .app-mock { background: #0a1020; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  .app-mock h4 { color: #9eb8e5; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 10px 0; }
+  .skel { background: #1a2744; border-radius: 4px; animation: skel-pulse 1.8s ease-in-out infinite; }
+  .skel-circle { border-radius: 50%; }
+  .skel-delay-1 { animation-delay: 0.15s; }
+  .skel-delay-2 { animation-delay: 0.3s; }
+  .skel-delay-3 { animation-delay: 0.45s; }
+  .skel-delay-4 { animation-delay: 0.6s; }
+  @keyframes skel-pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+  .panel-label { color: #c8a96e; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; font-weight: 700; }
+</style>
+
+<h2>Skeleton Mockups</h2>
+<p class="subtitle">Here's what each panel looks like while loading. All use the pulse glow animation.</p>
+
+<!-- TOOLBAR -->
+<div class="panel-label">Toolbar — Profession Dropdown</div>
+<div class="app-mock">
+  <div style="display:flex;gap:12px;align-items:center;">
+    <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+      <div class="skel" style="height:10px;width:60px;"></div>
+      <div class="skel" style="height:32px;width:100%;border-radius:6px;"></div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+      <div class="skel" style="height:10px;width:60px;"></div>
+      <div class="skel skel-delay-1" style="height:32px;width:100%;border-radius:6px;"></div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+      <div class="skel" style="height:10px;width:30px;"></div>
+      <div class="skel skel-delay-2" style="height:32px;width:100%;border-radius:6px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SKILL BAR -->
+<div class="panel-label">Skill Bar</div>
+<div class="app-mock">
+  <div style="display:flex;gap:16px;align-items:flex-start;">
+    <!-- Weapon skills -->
+    <div style="display:flex;gap:6px;">
+      <div class="skel" style="width:44px;height:44px;border-radius:6px;"></div>
+      <div class="skel skel-delay-1" style="width:44px;height:44px;border-radius:6px;"></div>
+      <div class="skel skel-delay-2" style="width:44px;height:44px;border-radius:6px;"></div>
+      <div class="skel skel-delay-3" style="width:44px;height:44px;border-radius:6px;"></div>
+      <div class="skel skel-delay-4" style="width:44px;height:44px;border-radius:6px;"></div>
+    </div>
+    <div style="width:1px;height:44px;background:#1a2744;"></div>
+    <!-- Heal + Utility + Elite -->
+    <div style="display:flex;gap:6px;">
+      <div class="skel" style="width:44px;height:44px;border-radius:6px;"></div>
+      <div class="skel skel-delay-1" style="width:44px;height:44px;border-radius:6px;"></div>
+      <div class="skel skel-delay-2" style="width:44px;height:44px;border-radius:6px;"></div>
+      <div class="skel skel-delay-3" style="width:44px;height:44px;border-radius:6px;"></div>
+      <div class="skel skel-delay-4" style="width:44px;height:44px;border-radius:6px;"></div>
+    </div>
+    <div style="width:1px;height:44px;background:#1a2744;"></div>
+    <!-- Profession mechanics -->
+    <div style="display:flex;gap:6px;">
+      <div class="skel" style="width:44px;height:44px;border-radius:6px;"></div>
+      <div class="skel skel-delay-1" style="width:44px;height:44px;border-radius:6px;"></div>
+      <div class="skel skel-delay-2" style="width:44px;height:44px;border-radius:6px;"></div>
+      <div class="skel skel-delay-3" style="width:44px;height:44px;border-radius:6px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SPECIALIZATIONS -->
+<div class="panel-label">Specializations (3 rows)</div>
+<div class="app-mock">
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <!-- Spec card 1 -->
+    <div style="display:flex;align-items:center;gap:12px;padding:10px;border:1px solid #1a2744;border-radius:8px;">
+      <div class="skel skel-circle" style="width:48px;height:48px;flex-shrink:0;"></div>
+      <div style="display:flex;gap:8px;flex:1;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <div class="skel skel-circle skel-delay-1" style="width:28px;height:28px;"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <div class="skel skel-circle skel-delay-1" style="width:28px;height:28px;"></div>
+          <div class="skel skel-circle skel-delay-2" style="width:28px;height:28px;"></div>
+          <div class="skel skel-circle skel-delay-3" style="width:28px;height:28px;"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <div class="skel skel-circle skel-delay-2" style="width:28px;height:28px;"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <div class="skel skel-circle skel-delay-2" style="width:28px;height:28px;"></div>
+          <div class="skel skel-circle skel-delay-3" style="width:28px;height:28px;"></div>
+          <div class="skel skel-circle skel-delay-4" style="width:28px;height:28px;"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <div class="skel skel-circle skel-delay-3" style="width:28px;height:28px;"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <div class="skel skel-circle skel-delay-3" style="width:28px;height:28px;"></div>
+          <div class="skel skel-circle skel-delay-4" style="width:28px;height:28px;"></div>
+          <div class="skel skel-circle" style="width:28px;height:28px;"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Spec card 2 -->
+    <div style="display:flex;align-items:center;gap:12px;padding:10px;border:1px solid #1a2744;border-radius:8px;">
+      <div class="skel skel-circle skel-delay-1" style="width:48px;height:48px;flex-shrink:0;"></div>
+      <div style="display:flex;gap:8px;flex:1;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div class="skel skel-circle skel-delay-2" style="width:28px;height:28px;"></div></div>
+        <div style="display:flex;flex-direction:column;gap:4px;"><div class="skel skel-circle skel-delay-2" style="width:28px;height:28px;"></div><div class="skel skel-circle skel-delay-3" style="width:28px;height:28px;"></div><div class="skel skel-circle skel-delay-4" style="width:28px;height:28px;"></div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div class="skel skel-circle skel-delay-3" style="width:28px;height:28px;"></div></div>
+        <div style="display:flex;flex-direction:column;gap:4px;"><div class="skel skel-circle skel-delay-3" style="width:28px;height:28px;"></div><div class="skel skel-circle skel-delay-4" style="width:28px;height:28px;"></div><div class="skel skel-circle" style="width:28px;height:28px;"></div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div class="skel skel-circle skel-delay-4" style="width:28px;height:28px;"></div></div>
+        <div style="display:flex;flex-direction:column;gap:4px;"><div class="skel skel-circle skel-delay-4" style="width:28px;height:28px;"></div><div class="skel skel-circle" style="width:28px;height:28px;"></div><div class="skel skel-circle skel-delay-1" style="width:28px;height:28px;"></div></div>
+      </div>
+    </div>
+    <!-- Spec card 3 -->
+    <div style="display:flex;align-items:center;gap:12px;padding:10px;border:1px solid #1a2744;border-radius:8px;">
+      <div class="skel skel-circle skel-delay-2" style="width:48px;height:48px;flex-shrink:0;"></div>
+      <div style="display:flex;gap:8px;flex:1;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div class="skel skel-circle skel-delay-3" style="width:28px;height:28px;"></div></div>
+        <div style="display:flex;flex-direction:column;gap:4px;"><div class="skel skel-circle skel-delay-3" style="width:28px;height:28px;"></div><div class="skel skel-circle skel-delay-4" style="width:28px;height:28px;"></div><div class="skel skel-circle" style="width:28px;height:28px;"></div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div class="skel skel-circle skel-delay-4" style="width:28px;height:28px;"></div></div>
+        <div style="display:flex;flex-direction:column;gap:4px;"><div class="skel skel-circle skel-delay-4" style="width:28px;height:28px;"></div><div class="skel skel-circle" style="width:28px;height:28px;"></div><div class="skel skel-circle skel-delay-1" style="width:28px;height:28px;"></div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;"><div class="skel skel-circle" style="width:28px;height:28px;"></div></div>
+        <div style="display:flex;flex-direction:column;gap:4px;"><div class="skel skel-circle" style="width:28px;height:28px;"></div><div class="skel skel-circle skel-delay-1" style="width:28px;height:28px;"></div><div class="skel skel-circle skel-delay-2" style="width:28px;height:28px;"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL PANEL -->
+<div class="panel-label">Detail / Reference Panel</div>
+<div class="app-mock" style="max-width:320px;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+    <div class="skel skel-circle" style="width:40px;height:40px;flex-shrink:0;"></div>
+    <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+      <div class="skel skel-delay-1" style="height:12px;width:70%;"></div>
+      <div class="skel skel-delay-2" style="height:10px;width:40%;"></div>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+    <div class="skel skel-delay-1" style="height:8px;width:50%;"></div>
+    <div class="skel skel-delay-2" style="height:8px;width:90%;"></div>
+    <div class="skel skel-delay-3" style="height:8px;width:75%;"></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:6px;">
+    <div class="skel skel-delay-2" style="height:8px;width:35%;"></div>
+    <div class="skel skel-delay-3" style="height:8px;width:85%;"></div>
+    <div class="skel skel-delay-4" style="height:8px;width:60%;"></div>
+    <div class="skel" style="height:8px;width:70%;"></div>
+  </div>
+</div>
+
+<!-- EQUIPMENT (simplified) -->
+<div class="panel-label">Equipment Panel (3-column layout)</div>
+<div class="app-mock">
+  <div style="display:flex;gap:16px;">
+    <!-- Left: armor + weapons -->
+    <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
+      <div class="skel skel-delay-1" style="height:8px;width:50px;"></div>
+      <div style="display:flex;gap:8px;align-items:center;"><div class="skel" style="width:32px;height:32px;border-radius:6px;flex-shrink:0;"></div><div style="flex:1;display:flex;flex-direction:column;gap:3px;"><div class="skel skel-delay-1" style="height:8px;width:60%;"></div><div class="skel skel-delay-2" style="height:7px;width:40%;"></div></div></div>
+      <div style="display:flex;gap:8px;align-items:center;"><div class="skel skel-delay-1" style="width:32px;height:32px;border-radius:6px;flex-shrink:0;"></div><div style="flex:1;display:flex;flex-direction:column;gap:3px;"><div class="skel skel-delay-2" style="height:8px;width:55%;"></div><div class="skel skel-delay-3" style="height:7px;width:35%;"></div></div></div>
+      <div style="display:flex;gap:8px;align-items:center;"><div class="skel skel-delay-2" style="width:32px;height:32px;border-radius:6px;flex-shrink:0;"></div><div style="flex:1;display:flex;flex-direction:column;gap:3px;"><div class="skel skel-delay-3" style="height:8px;width:65%;"></div><div class="skel skel-delay-4" style="height:7px;width:45%;"></div></div></div>
+      <div style="display:flex;gap:8px;align-items:center;"><div class="skel skel-delay-3" style="width:32px;height:32px;border-radius:6px;flex-shrink:0;"></div><div style="flex:1;display:flex;flex-direction:column;gap:3px;"><div class="skel skel-delay-4" style="height:8px;width:50%;"></div><div class="skel" style="height:7px;width:30%;"></div></div></div>
+      <div style="display:flex;gap:8px;align-items:center;"><div class="skel skel-delay-4" style="width:32px;height:32px;border-radius:6px;flex-shrink:0;"></div><div style="flex:1;display:flex;flex-direction:column;gap:3px;"><div class="skel" style="height:8px;width:60%;"></div><div class="skel skel-delay-1" style="height:7px;width:40%;"></div></div></div>
+      <div style="display:flex;gap:8px;align-items:center;"><div class="skel" style="width:32px;height:32px;border-radius:6px;flex-shrink:0;"></div><div style="flex:1;display:flex;flex-direction:column;gap:3px;"><div class="skel skel-delay-1" style="height:8px;width:55%;"></div><div class="skel skel-delay-2" style="height:7px;width:35%;"></div></div></div>
+    </div>
+    <!-- Center: art placeholder -->
+    <div style="flex:0.8;display:flex;align-items:center;justify-content:center;">
+      <div class="skel skel-delay-2" style="width:100%;height:180px;border-radius:8px;"></div>
+    </div>
+    <!-- Right: stats + trinkets -->
+    <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
+      <div class="skel skel-delay-2" style="height:8px;width:60px;"></div>
+      <div style="display:flex;justify-content:space-between;"><div class="skel skel-delay-2" style="height:8px;width:45%;"></div><div class="skel skel-delay-3" style="height:8px;width:25%;"></div></div>
+      <div style="display:flex;justify-content:space-between;"><div class="skel skel-delay-3" style="height:8px;width:50%;"></div><div class="skel skel-delay-4" style="height:8px;width:20%;"></div></div>
+      <div style="display:flex;justify-content:space-between;"><div class="skel skel-delay-4" style="height:8px;width:40%;"></div><div class="skel" style="height:8px;width:22%;"></div></div>
+      <div style="display:flex;justify-content:space-between;"><div class="skel" style="height:8px;width:48%;"></div><div class="skel skel-delay-1" style="height:8px;width:18%;"></div></div>
+      <div style="display:flex;justify-content:space-between;"><div class="skel skel-delay-1" style="height:8px;width:42%;"></div><div class="skel skel-delay-2" style="height:8px;width:24%;"></div></div>
+      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+        <div class="skel skel-delay-3" style="width:32px;height:32px;border-radius:6px;"></div>
+        <div class="skel skel-delay-4" style="width:32px;height:32px;border-radius:6px;"></div>
+        <div class="skel" style="width:32px;height:32px;border-radius:6px;"></div>
+        <div class="skel skel-delay-1" style="width:32px;height:32px;border-radius:6px;"></div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <div class="skel skel-delay-2" style="width:32px;height:32px;border-radius:6px;"></div>
+        <div class="skel skel-delay-3" style="width:32px;height:32px;border-radius:6px;"></div>
+        <div class="skel skel-delay-4" style="width:32px;height:32px;border-radius:6px;"></div>
+      </div>
+    </div>
+  </div>
+</div>

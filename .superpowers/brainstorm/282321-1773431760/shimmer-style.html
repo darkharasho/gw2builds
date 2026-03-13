@@ -1,0 +1,76 @@
+<h2>Shimmer animation style</h2>
+<p class="subtitle">Which loading animation feels right for the dark UI theme?</p>
+
+<div class="cards">
+  <div class="card" data-choice="sweep" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:24px;background:#0a1020;">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="height:14px;width:70%;border-radius:4px;background:linear-gradient(90deg,#1a2744 25%,#243456 50%,#1a2744 75%);background-size:200% 100%;animation:sweep 1.5s ease-in-out infinite;"></div>
+        <div style="height:14px;width:50%;border-radius:4px;background:linear-gradient(90deg,#1a2744 25%,#243456 50%,#1a2744 75%);background-size:200% 100%;animation:sweep 1.5s ease-in-out infinite;animation-delay:0.1s;"></div>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <div style="height:36px;width:36px;border-radius:6px;background:linear-gradient(90deg,#1a2744 25%,#243456 50%,#1a2744 75%);background-size:200% 100%;animation:sweep 1.5s ease-in-out infinite;animation-delay:0.2s;"></div>
+          <div style="height:36px;width:36px;border-radius:6px;background:linear-gradient(90deg,#1a2744 25%,#243456 50%,#1a2744 75%);background-size:200% 100%;animation:sweep 1.5s ease-in-out infinite;animation-delay:0.3s;"></div>
+          <div style="height:36px;width:36px;border-radius:6px;background:linear-gradient(90deg,#1a2744 25%,#243456 50%,#1a2744 75%);background-size:200% 100%;animation:sweep 1.5s ease-in-out infinite;animation-delay:0.4s;"></div>
+        </div>
+      </div>
+      <style>
+        @keyframes sweep {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+      </style>
+    </div>
+    <div class="card-body">
+      <h3>A. Sweep Shimmer</h3>
+      <p>Classic Facebook-style left-to-right light sweep across dark placeholder bars. Smooth, familiar.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="pulse" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:24px;background:#0a1020;">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="height:14px;width:70%;border-radius:4px;background:#1a2744;animation:pulse 1.8s ease-in-out infinite;"></div>
+        <div style="height:14px;width:50%;border-radius:4px;background:#1a2744;animation:pulse 1.8s ease-in-out infinite;animation-delay:0.15s;"></div>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <div style="height:36px;width:36px;border-radius:6px;background:#1a2744;animation:pulse 1.8s ease-in-out infinite;animation-delay:0.3s;"></div>
+          <div style="height:36px;width:36px;border-radius:6px;background:#1a2744;animation:pulse 1.8s ease-in-out infinite;animation-delay:0.45s;"></div>
+          <div style="height:36px;width:36px;border-radius:6px;background:#1a2744;animation:pulse 1.8s ease-in-out infinite;animation-delay:0.6s;"></div>
+        </div>
+      </div>
+      <style>
+        @keyframes pulse {
+          0%, 100% { opacity: 0.4; }
+          50% { opacity: 1; }
+        }
+      </style>
+    </div>
+    <div class="card-body">
+      <h3>B. Pulse Glow</h3>
+      <p>Subtle opacity pulsing. Less motion, more ambient. Feels calmer on dark backgrounds.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="sweep-accent" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:24px;background:#0a1020;">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="height:14px;width:70%;border-radius:4px;background:linear-gradient(90deg,#1a2744 25%,#2a3a5e 40%,#3a4a6e 50%,#2a3a5e 60%,#1a2744 75%);background-size:200% 100%;animation:sweepAccent 2s ease-in-out infinite;"></div>
+        <div style="height:14px;width:50%;border-radius:4px;background:linear-gradient(90deg,#1a2744 25%,#2a3a5e 40%,#3a4a6e 50%,#2a3a5e 60%,#1a2744 75%);background-size:200% 100%;animation:sweepAccent 2s ease-in-out infinite;animation-delay:0.1s;"></div>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <div style="height:36px;width:36px;border-radius:6px;background:linear-gradient(90deg,#1a2744 25%,#2a3a5e 40%,#3a4a6e 50%,#2a3a5e 60%,#1a2744 75%);background-size:200% 100%;animation:sweepAccent 2s ease-in-out infinite;animation-delay:0.2s;"></div>
+          <div style="height:36px;width:36px;border-radius:6px;background:linear-gradient(90deg,#1a2744 25%,#2a3a5e 40%,#3a4a6e 50%,#2a3a5e 60%,#1a2744 75%);background-size:200% 100%;animation:sweepAccent 2s ease-in-out infinite;animation-delay:0.3s;"></div>
+          <div style="height:36px;width:36px;border-radius:6px;background:linear-gradient(90deg,#1a2744 25%,#2a3a5e 40%,#3a4a6e 50%,#2a3a5e 60%,#1a2744 75%);background-size:200% 100%;animation:sweepAccent 2s ease-in-out infinite;animation-delay:0.4s;"></div>
+        </div>
+      </div>
+      <style>
+        @keyframes sweepAccent {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+      </style>
+    </div>
+    <div class="card-body">
+      <h3>C. Slow Sweep (Wider Highlight)</h3>
+      <p>Same sweep pattern but slower, with a wider/softer highlight band. More polished feel.</p>
+    </div>
+  </div>
+</div>

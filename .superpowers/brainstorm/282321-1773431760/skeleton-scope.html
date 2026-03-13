@@ -1,0 +1,26 @@
+<h2>When should skeleton loading appear?</h2>
+<p class="subtitle">The app has a ~1-3 second blank window while GW2 API data loads. When should we show shimmer placeholders?</p>
+
+<div class="options">
+  <div class="option" data-choice="first-only" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>First Launch Only</h3>
+      <p>Show skeletons only on initial app load. When switching professions mid-session, the old content stays visible until the new data arrives (feels snappier since there's already content on screen).</p>
+    </div>
+  </div>
+  <div class="option" data-choice="all-loads" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Every Data Load</h3>
+      <p>Show skeletons any time panels are waiting for data — initial launch, profession switches, game mode toggles. Consistent loading experience but means brief skeleton flashes even on warm cache (~50ms).</p>
+    </div>
+  </div>
+  <div class="option" data-choice="smart" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Smart — Only When Empty</h3>
+      <p>Show skeletons only when a panel has no content yet. If switching professions, keep the old content visible until new data replaces it. Skeletons only appear for truly blank panels (first load, or after creating a new build with no profession).</p>
+    </div>
+  </div>
+</div>

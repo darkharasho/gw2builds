@@ -19,9 +19,12 @@ describe("skeletonTemplates", () => {
     }
   });
 
-  test("skills template contains weapon and mechanic groups", () => {
+  test("skills template contains weapon-col, mechbar, swap, orb, and utility group", () => {
+    expect(skeletonTemplates.skills).toContain("skel-skills__weapon-col");
+    expect(skeletonTemplates.skills).toContain("skel-skills__mechbar");
+    expect(skeletonTemplates.skills).toContain("skel-skills__swap");
+    expect(skeletonTemplates.skills).toContain("skel-skills__orb");
     expect(skeletonTemplates.skills).toContain("skel-skills__group");
-    expect(skeletonTemplates.skills).toContain("skel-skills__sep");
   });
 
   test("specs template contains 3 spec cards with hex emblems", () => {
@@ -30,18 +33,24 @@ describe("skeletonTemplates", () => {
     expect(skeletonTemplates.specs).toContain("skel-hex");
   });
 
-  test("specs template has major (square) and minor (hex) traits", () => {
+  test("specs template has panel, body, major and minor traits", () => {
+    expect(skeletonTemplates.specs).toContain("skel-spec-card__panel");
+    expect(skeletonTemplates.specs).toContain("skel-spec-card__body");
     expect(skeletonTemplates.specs).toContain("skel-spec-card__major-trait");
     expect(skeletonTemplates.specs).toContain("skel-spec-card__minor");
   });
 
-  test("equipment template contains 3-column layout", () => {
+  test("equipment template contains grid layout with stat cells and trinkets", () => {
     expect(skeletonTemplates.equipment).toContain("skel-equip__col--art");
+    expect(skeletonTemplates.equipment).toContain("skel-equip__col--right");
     expect(skeletonTemplates.equipment).toContain("skel-equip__slot-icon");
+    expect(skeletonTemplates.equipment).toContain("skel-equip__stat-cell");
     expect(skeletonTemplates.equipment).toContain("skel-equip__trinket");
   });
 
-  test("detail template has icon+text fact rows", () => {
+  test("detail template has card wrapper, icon, and fact rows", () => {
+    expect(skeletonTemplates.detail).toContain("skel-detail\"");
+    expect(skeletonTemplates.detail).toContain("skel-detail__icon");
     expect(skeletonTemplates.detail).toContain("skel-detail__fact-row");
     expect(skeletonTemplates.detail).toContain("skel-detail__fact-icon");
   });

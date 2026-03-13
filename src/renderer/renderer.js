@@ -250,6 +250,7 @@ async function init() {
   ]);
   state.builds = Array.isArray(builds) ? builds : [];
   state.professions = Array.isArray(professions) ? professions : [];
+  renderEditorForm();
   await refreshOnboardingStatus();
 
   if (state.builds.length) {
