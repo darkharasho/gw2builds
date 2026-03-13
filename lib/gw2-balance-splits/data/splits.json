@@ -8538,11 +8538,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 25,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "25%"
             },
             {
               "type": "Range",
@@ -16372,11 +16370,9 @@
               "value": 3
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 20,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "20%"
             },
             {
               "type": "Buff",
@@ -19854,11 +19850,9 @@
               "coefficient": 0.06
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 50,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "50%"
             }
           ],
           "complete": true
@@ -24512,11 +24506,9 @@
               "value": 3
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 100,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "100%"
             },
             {
               "type": "Range",
@@ -25591,11 +25583,9 @@
               "value": 5
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 100,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "100%"
             },
             {
               "type": "ComboFinisher",
@@ -28514,11 +28504,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 100,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "100%"
             },
             {
               "type": "Range",
@@ -37519,11 +37507,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 100,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "100%"
             },
             {
               "type": "Buff",
@@ -46242,11 +46228,9 @@
               "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 33,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "33%"
             },
             {
               "type": "Duration",
@@ -46291,11 +46275,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 20,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "20%"
             },
             {
               "type": "Buff",
@@ -55418,11 +55400,9 @@
               "distance": 180
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 33,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "33%"
             },
             {
               "type": "Number",
@@ -56302,11 +56282,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 33,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "33%"
             },
             {
               "type": "Buff",
@@ -57921,11 +57899,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 100,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "100%"
             },
             {
               "type": "Duration",
@@ -58118,11 +58094,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 100,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "100%"
             },
             {
               "type": "Damage",
@@ -58236,11 +58210,9 @@
               "icon": "https://wiki.guildwars2.com/images/c/ce/Fire_Aura.png"
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 100,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "100%"
             },
             {
               "type": "Damage",
@@ -59049,11 +59021,9 @@
               "value": 3
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 33,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "33%"
             },
             {
               "type": "Buff",
@@ -60544,11 +60514,9 @@
               "value": 1
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 100,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "100%"
             },
             {
               "type": "Damage",
@@ -60812,11 +60780,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 100,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "100%"
             },
             {
               "type": "Damage",
@@ -61550,11 +61516,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 100,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "100%"
             },
             {
               "type": "Damage",
@@ -63280,11 +63244,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 33,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "33%"
             },
             {
               "type": "Buff",
@@ -70227,11 +70189,9 @@
         "wvw": {
           "facts": [
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 20,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "20%"
             },
             {
               "type": "Buff",
@@ -70384,11 +70344,9 @@
               "percent": 13
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 15,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "15%"
             }
           ],
           "complete": true
@@ -70502,11 +70460,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 20,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "20%"
             }
           ],
           "complete": true
@@ -70714,11 +70670,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 25,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "25%"
             },
             {
               "type": "Buff",
@@ -71596,11 +71550,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 20,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "20%"
             }
           ],
           "complete": true
@@ -73014,11 +72966,9 @@
               "apply_count": 2
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 15,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "15%"
             }
           ],
           "complete": true
@@ -73908,11 +73858,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 50,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "50%"
             }
           ],
           "complete": true
@@ -74046,11 +73994,9 @@
               "value": 5
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 20,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "20%"
             }
           ],
           "complete": true
@@ -75425,11 +75371,9 @@
               "icon": "https://wiki.guildwars2.com/images/a/ac/Transcendent_Tempest_%28effect%29.png"
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 33,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "33%"
             }
           ],
           "complete": true
@@ -76130,11 +76074,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 20,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "20%"
             },
             {
               "type": "Buff",
@@ -76154,11 +76096,9 @@
         "wvw": {
           "facts": [
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 20,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "20%"
             }
           ],
           "complete": true
@@ -77184,11 +77124,9 @@
         "wvw": {
           "facts": [
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 15,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "15%"
             }
           ],
           "complete": true
@@ -80364,11 +80302,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 20,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "20%"
             }
           ],
           "complete": true
@@ -81820,11 +81756,9 @@
         "wvw": {
           "facts": [
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 30,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "30%"
             },
             {
               "type": "Buff",
@@ -82229,11 +82163,9 @@
               "apply_count": 1
             },
             {
-              "type": "Buff",
-              "text": "Recharge reduced",
-              "status": "Recharge reduced",
-              "duration": 100,
-              "apply_count": 1
+              "type": "Number",
+              "text": "Recharge Reduced",
+              "value": "100%"
             }
           ],
           "complete": true

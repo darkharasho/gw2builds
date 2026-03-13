@@ -381,7 +381,7 @@ export async function selectDetail(kind, entity) {
 // ── Fact formatting helpers ──────────────────────────────────────────────────
 
 function formatBuffConditionText(fact) {
-  const name = String(fact.status || fact.text || "Unknown");
+  const name = String(fact.status || fact.text || "Unknown").replace(/\s*\(effect\)\s*$/i, "");
   const count = Number(fact.apply_count) || 0;
   const stackPart = count > 1 ? ` ×${count}` : "";
   const duration = fact.duration != null ? ` (${fact.duration}s)` : "";
