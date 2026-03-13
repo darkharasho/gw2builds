@@ -101,52 +101,88 @@ export function renderOnboarding() {
   const status = state.onboarding;
   _el.onboarding.innerHTML = "";
   if (!status) return;
-  // Onboarding steps are surfaced via the workspace dropdown actions, not as cards here
-  if (status.isAuthenticated) return;
 
   const target = getSelectedTarget();
-  const targetHint = target ? `Target: ${target.login}` : "Target: not selected";
-  const steps = [
-    {
-      title: "Authenticate with GitHub",
-      done: status.isAuthenticated,
-      actionLabel: status.isAuthenticated ? "Re-authenticate" : "Authenticate",
-      canRun: !state.loginFlow.pending,
-      action: async () => {
-        await startLoginFlow();
-        await _callbacks.refreshOnboardingStatus();
-        render();
-      },
-    },
-    {
-      title: "Create axiforge + enable Pages",
-      done: status.repoReady && status.pagesReady,
-      actionLabel: status.repoReady && status.pagesReady ? "Re-run setup" : "Setup",
-      canRun: status.isAuthenticated && Boolean(target),
-      action: async () => {
-        await window.desktopApi.setupRepoPages(target.login, target.type);
-        await runPagesBuildPoll();
-        await _callbacks.refreshOnboardingStatus();
-        render();
-      },
-    },
-  ];
 
-  for (const step of steps) {
+  // Device code display — shown during active login flow regardless of auth state
+  if (state.loginFlow.beginData) {
     const card = document.createElement("article");
-    card.className = `status-card ${step.done ? "status-card--done" : ""}`;
+    card.className = "status-card";
+    const heading = document.createElement("h3");
+    heading.textContent = "GitHub Device Code";
+    const instruction = document.createElement("p");
+    instruction.textContent = "Approve login at GitHub using this code.";
+
+    const codeDisplay = document.createElement("div");
+    codeDisplay.style.cssText = "text-align:center;font-size:1.5rem;font-family:monospace;padding:0.75rem;background:#060d1d;border-radius:6px;margin:8px 0;letter-spacing:0.15em;";
+    codeDisplay.textContent = state.loginFlow.beginData.userCode || "";
+
+    const copyBtn = makeButton("Copy code", "secondary", async () => {
+      await window.desktopApi.writeClipboardText(state.loginFlow.beginData.userCode);
+      copyBtn.textContent = "Copied";
+      setTimeout(() => { copyBtn.textContent = "Copy code"; }, 1000);
+    });
+
+    const link = document.createElement("p");
+    link.style.fontSize = "0.85rem";
+    const a = document.createElement("a");
+    a.href = state.loginFlow.beginData.verificationUri || "";
+    a.target = "_blank";
+    a.rel = "noreferrer";
+    a.textContent = state.loginFlow.beginData.verificationUri || "";
+    link.append("Open ", a);
+
+    card.append(heading, instruction, codeDisplay, copyBtn, link);
+    _el.onboarding.append(card);
+  }
+
+  // Pages poll status — shown during active Pages build poll
+  if (state.pagesPoll.active) {
+    const card = document.createElement("article");
+    card.className = "status-card";
+    const heading = document.createElement("h3");
+    heading.textContent = "Waiting For GitHub Pages";
+    const statusLine = document.createElement("p");
+    statusLine.innerHTML = `Current status: <strong>${escapeHtml(formatPagesStatus(state.pagesPoll.status))}</strong>`;
+    card.append(heading, statusLine);
+    if (state.pagesPoll.error) {
+      const errLine = document.createElement("p");
+      errLine.className = "error-line";
+      errLine.textContent = state.pagesPoll.error;
+      card.append(errLine);
+    }
+    _el.onboarding.append(card);
+  }
+
+  // Onboarding steps — only show setup step when authenticated but not fully set up
+  if (!status.isAuthenticated) return;
+
+  const repoReady = status.repoReady;
+  const pagesReady = status.pagesReady;
+
+  if (!repoReady || !pagesReady) {
+    // Target picker
+    const pickerContainer = document.createElement("div");
+    _el.onboarding.append(pickerContainer);
+    renderTargetPicker(pickerContainer);
+
+    // Setup Publishing step card
+    const card = document.createElement("article");
+    card.className = "status-card";
     const title = document.createElement("h3");
-    title.textContent = step.title;
+    title.textContent = "Setup Publishing";
     const body = document.createElement("p");
-    body.textContent =
-      step.title.includes("axiforge") && !step.done ? targetHint : step.done ? "Completed" : "Required";
+    body.textContent = target ? `Target: ${target.login}` : "Pick a target first.";
     card.append(title, body);
 
-    if (step.canRun) {
-      const btn = makeButton(step.actionLabel, "primary", async () => {
+    if (target) {
+      const btn = makeButton("Setup Publishing", "primary", async () => {
         try {
           btn.disabled = true;
-          await step.action();
+          await window.desktopApi.setupRepoPages(target.login, target.type);
+          await runPagesBuildPoll();
+          await _callbacks.refreshOnboardingStatus();
+          render();
         } catch (err) {
           showError(err);
         } finally {
