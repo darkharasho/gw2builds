@@ -4,4 +4,4 @@
 - [x] Redo first time setup to be optional, dont require setting up the github pages
 - [x] rename the github page repo to AxiForge instead of gw2builds
 - [x] have the buildSummary collapsed by default and expandable
-- [ ] loading states on first load
+- [x] loading states on first load

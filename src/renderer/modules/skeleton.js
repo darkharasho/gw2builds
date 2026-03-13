@@ -38,25 +38,68 @@ function specCard(delayOffset) {
   </div>`;
 }
 
+function sectionHead(delay, hasFill = false) {
+  const d = delay ? ` skel-d${delay}` : "";
+  const fill = hasFill ? `<div class="skel skel-equip__fill-btn${d}"></div>` : "";
+  return `
+    <div class="skel-equip__section-head"><div class="skel${d}" style="height:13px;width:50px"></div>${fill}</div>`;
+}
+
 function equipSlot(delay) {
   const d = delay ? ` skel-d${delay}` : "";
   const d2 = delay ? ` skel-d${Math.min(delay + 1, 5)}` : " skel-d1";
   return `
-  <div class="skel-equip__slot">
-    <div class="skel skel-equip__slot-icon${d}"></div>
-    <div class="skel-equip__slot-lines">
-      <div class="skel${d}" style="height:8px;width:60%"></div>
-      <div class="skel${d2}" style="height:7px;width:40%"></div>
-    </div>
-  </div>`;
+    <div class="skel-equip__slot">
+      <div class="skel skel-equip__slot-icon${d}"></div>
+      <div class="skel-equip__slot-lines">
+        <div class="skel${d}" style="height:8px;width:60%"></div>
+        <div class="skel${d2}" style="height:7px;width:40%"></div>
+      </div>
+    </div>`;
+}
+
+function weaponSlot(delay) {
+  const d = delay ? ` skel-d${delay}` : "";
+  const d2 = delay ? ` skel-d${Math.min(delay + 1, 5)}` : " skel-d1";
+  return `
+    <div class="skel-equip__slot skel-equip__slot--weapon">
+      <div class="skel-equip__weapon-type">
+        <div class="skel skel-equip__slot-icon${d}"></div>
+        <div class="skel${d}" style="height:8px;width:60px"></div>
+      </div>
+      <div class="skel-equip__weapon-stat">
+        <div class="skel${d}" style="height:8px;width:55%"></div>
+        <div class="skel${d2}" style="height:7px;width:35%"></div>
+      </div>
+    </div>`;
+}
+
+function compactSlot(delay) {
+  const d = delay ? ` skel-d${delay}` : "";
+  const d2 = delay ? ` skel-d${Math.min(delay + 1, 5)}` : " skel-d1";
+  return `
+    <div class="skel-equip__slot skel-equip__slot--compact">
+      <div class="skel skel-equip__slot-icon${d}"></div>
+      <div class="skel-equip__slot-lines">
+        <div class="skel${d}" style="height:11px;width:70%"></div>
+        <div class="skel${d2}" style="height:12px;width:50%"></div>
+      </div>
+    </div>`;
 }
 
 function statRow(d1, d2) {
   return `
-  <div class="skel-equip__stat-row">
-    <div class="skel-equip__stat-cell"><div class="skel skel-d${d1}" style="height:8px;width:55%"></div><div class="skel skel-d${d2}" style="height:8px;width:25%"></div></div>
-    <div class="skel-equip__stat-cell"><div class="skel skel-d${d2}" style="height:8px;width:50%"></div><div class="skel skel-d${d1}" style="height:8px;width:20%"></div></div>
-  </div>`;
+    <div class="skel-equip__stat-row">
+      <div class="skel-equip__stat-cell"><div class="skel skel-d${d1}" style="height:14px;width:55%"></div><div class="skel skel-d${d2}" style="height:14px;width:25%"></div></div>
+      <div class="skel-equip__stat-cell"><div class="skel skel-d${d2}" style="height:14px;width:50%"></div><div class="skel skel-d${d1}" style="height:14px;width:20%"></div></div>
+    </div>`;
+}
+
+function statRowSingle(d1) {
+  return `
+    <div class="skel-equip__stat-row">
+      <div class="skel-equip__stat-cell"><div class="skel skel-d${d1}" style="height:14px;width:55%"></div><div class="skel skel-d${d1}" style="height:14px;width:25%"></div></div>
+    </div>`;
 }
 
 const skeletonTemplates = {
@@ -89,30 +132,71 @@ const skeletonTemplates = {
   equipment: `
 <div class="skel-equip">
   <div class="skel-equip__col">
-    <div class="skel skel-d1" style="height:8px;width:50px"></div>
-    ${equipSlot(1)}${equipSlot(2)}${equipSlot(3)}${equipSlot(4)}${equipSlot(5)}${equipSlot(1)}
+    <!-- Armor -->
+    <div class="skel-equip__section">
+      ${sectionHead(1, true)}
+      ${equipSlot(1)}${equipSlot(2)}${equipSlot(3)}${equipSlot(4)}${equipSlot(5)}${equipSlot(1)}
+    </div>
+    <!-- Weapons -->
+    <div class="skel-equip__section">
+      ${sectionHead(2)}
+      <div class="skel-equip__set-label"><div class="skel skel-d1" style="height:12px;width:30px"></div></div>
+      ${weaponSlot(1)}${weaponSlot(2)}
+      <div class="skel-equip__set-label"><div class="skel skel-d2" style="height:12px;width:30px"></div></div>
+      ${weaponSlot(3)}${weaponSlot(4)}
+    </div>
+    <!-- Consumables -->
+    <div class="skel-equip__section">
+      ${sectionHead(3)}
+      ${compactSlot(1)}${compactSlot(2)}
+    </div>
+    <!-- Notes -->
+    <div class="skel-equip__section">
+      ${sectionHead(4)}
+      <div class="skel skel-equip__notes"></div>
+    </div>
   </div>
   <div class="skel-equip__col--art">
     <div class="skel skel-equip__art skel-d2"></div>
   </div>
   <div class="skel-equip__col skel-equip__col--right">
-    <div class="skel skel-d2" style="height:8px;width:60px"></div>
-    <div class="skel-equip__stats">
-      ${statRow(2, 3)}
-      ${statRow(3, 4)}
-      ${statRow(4, 5)}
-      ${statRow(5, 1)}
-      ${statRow(1, 2)}
+    <!-- Attributes -->
+    <div class="skel-equip__section">
+      ${sectionHead(1)}
+      <div class="skel-equip__stats">
+        ${statRowSingle(1)}
+        ${statRow(1, 2)}
+        ${statRowSingle(2)}
+        ${statRow(2, 3)}
+        ${statRow(3, 4)}
+        ${statRowSingle(4)}
+        ${statRow(4, 5)}
+        ${statRow(5, 1)}
+        ${statRowSingle(1)}
+      </div>
     </div>
-    <div class="skel-equip__trinket-grid">
-      <div class="skel skel-equip__trinket skel-d3"></div>
-      <div class="skel skel-equip__trinket skel-d4"></div>
-      <div class="skel skel-equip__trinket skel-d5"></div>
+    <!-- Upgrades -->
+    <div class="skel-equip__section">
+      ${sectionHead(2)}
+      <div class="skel-equip__text-label">
+        <div class="skel skel-d2" style="height:7px;width:30px"></div>
+        <div class="skel skel-equip__text-input skel-d3"></div>
+      </div>
     </div>
-    <div class="skel-equip__trinket-grid">
-      <div class="skel skel-equip__trinket skel-d1"></div>
-      <div class="skel skel-equip__trinket skel-d2"></div>
-      <div class="skel skel-equip__trinket skel-d3"></div>
+    <!-- Trinkets -->
+    <div class="skel-equip__section">
+      ${sectionHead(3, true)}
+      <div class="skel-equip__trinket-grid skel-equip__trinket-grid--4">
+        ${compactSlot(1)}${compactSlot(2)}${compactSlot(3)}${compactSlot(4)}
+      </div>
+      <div class="skel-equip__trinket-grid">
+        ${compactSlot(2)}${compactSlot(3)}${compactSlot(4)}
+      </div>
+    </div>
+    <!-- Underwater -->
+    <div class="skel-equip__section">
+      ${sectionHead(4)}
+      ${equipSlot(1)}${weaponSlot(2)}${weaponSlot(3)}
     </div>
   </div>
 </div>`,
