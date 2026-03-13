@@ -35,6 +35,7 @@ import {
 } from "./modules/render-pages.js";
 import { resolveEntityFacts } from "./modules/detail-panel.js";
 import { initWikiModal, openWikiModal } from "./modules/wiki-modal.js";
+import { initDetailModal, openDetailModal } from "./modules/detail-modal.js";
 
 // ── DOM element cache ────────────────────────────────────────────────────────
 
@@ -67,6 +68,7 @@ const el = {
   specializationsHost: q("#specializationsHost"),
   skillsHost:        q("#skillsHost"),
   detailHost:        q("#detailHost"),
+  detailExpandBtn:   q("#detail-expand-btn"),
   publishStatus:     q("#publishStatus"),
   hoverPreview:      q("#hoverPreview"),
   winMin:            q("#winMin"),
@@ -81,7 +83,16 @@ const el = {
 initCustomSelect({ bindHoverPreview, onError: showError });
 
 initWikiModal();
-initDetailPanel({ detailHost: el.detailHost, hoverPreview: el.hoverPreview }, { openWikiModal });
+initDetailModal();
+initDetailPanel(
+  { detailHost: el.detailHost, hoverPreview: el.hoverPreview, expandBtn: el.detailExpandBtn },
+  {
+    openWikiModal,
+    // Capture state.detail and state.activeCatalog at click time (not at init time)
+    // so the modal always reflects the current profession catalog.
+    openDetailModal: () => openDetailModal(state.detail, state.activeCatalog, state.editor?.profession),
+  }
+);
 
 initSpecializations({ specializationsHost: el.specializationsHost });
 initSpecializationsCallbacks({
