@@ -124,7 +124,9 @@ export function openDetailModal(detail, catalog, professionName) {
   // ── Related sections — show with spinners, hide lists ────────────────────
   _el.skillsSection.className = "dm-section dm-section--loading";
   _el.traitsSection.className = "dm-section dm-section--loading";
+  _el.skillsList.className = "dm-related-list dm-related-list--hidden";
   _el.skillsList.innerHTML = "";
+  _el.traitsList.className = "dm-related-list--hidden";
   _el.traitsList.innerHTML = "";
 
   // ── Show modal ────────────────────────────────────────────────────────────
