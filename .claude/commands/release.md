@@ -42,17 +42,23 @@ Follow these steps in order. Do not skip steps.
 
 ```
 
-### Step 4 — Build
+### Step 4 — Clean dist directories
 
 ```bash
-npm run build:renderer && electron-builder --linux --win --publish never
+rm -rf dist/ dist_out/
+```
+
+### Step 5 — Build
+
+```bash
+npm run build:renderer && npx electron-builder --linux --win --publish never
 ```
 
 If the build fails, abort: "Build failed — see output above."
 
 Note: Building Windows from Linux requires Wine. If `--win` fails due to Wine, retry with `--linux` only and warn the user.
 
-### Step 5 — Commit, tag, and push
+### Step 6 — Commit, tag, and push
 
 ```bash
 git add package.json package-lock.json RELEASE_NOTES.md
@@ -61,7 +67,7 @@ git tag v{version}
 git push origin main --follow-tags
 ```
 
-### Step 6 — Create GitHub release
+### Step 7 — Create GitHub release
 
 1. Create the release with artifacts:
 
@@ -80,6 +86,6 @@ gh release create v{version} \
 gh release edit v{version} --repo darkharasho/axiforge --draft=false
 ```
 
-### Step 7 — Report
+### Step 8 — Report
 
 End your response with: `Release published: <release-url>`

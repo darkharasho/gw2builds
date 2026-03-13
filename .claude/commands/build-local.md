@@ -32,15 +32,21 @@ console.log('Version stamped: ' + pkg.version);
 
 This produces a version like `0.1.0-beta.20260313T1530`. Do NOT commit this change — it is a local-only build stamp.
 
-### Step 3 — Build
+### Step 3 — Clean dist directories
 
 ```bash
-npm run build:renderer && electron-builder --linux --win --publish never
+rm -rf dist/ dist_out/
+```
+
+### Step 4 — Build
+
+```bash
+npm run build:renderer && npx electron-builder --linux --win --publish never
 ```
 
 Note: Building Windows from Linux requires Wine. If `--win` fails due to Wine, retry with `--linux` only and note this in the output.
 
-### Step 4 — Restore version
+### Step 5 — Restore version
 
 Reset `package.json` so the stamped version doesn't linger in the working tree:
 
@@ -48,7 +54,7 @@ Reset `package.json` so the stamped version doesn't linger in the working tree:
 git checkout package.json
 ```
 
-### Step 5 — Report artifacts
+### Step 6 — Report artifacts
 
 List the built artifacts:
 

@@ -1,5 +1,5 @@
 const path = require("node:path");
-require("dotenv").config({ path: path.resolve(process.cwd(), ".env") });
+require("dotenv").config({ path: path.resolve(__dirname, "../../.env") });
 const { app, BrowserWindow, ipcMain, dialog, clipboard } = require("electron");
 const { BuildStore } = require("./buildStore");
 const { beginGitHubDeviceAuth, completeGitHubDeviceAuth } = require("./githubAuth");
@@ -214,12 +214,12 @@ app.whenReady().then(async () => {
   ipcMain.handle("auth:get-session", async () => getSession());
 
   ipcMain.handle("auth:begin-login", async () => {
-    const clientId = process.env.GITHUB_OAUTH_CLIENT_ID || "";
+    const clientId = process.env.GITHUB_OAUTH_CLIENT_ID || "Ov23li30QPR3mAwgSUvv";
     return beginGitHubDeviceAuth(clientId);
   });
 
   ipcMain.handle("auth:complete-login", async (_e, beginData) => {
-    const clientId = process.env.GITHUB_OAUTH_CLIENT_ID || "";
+    const clientId = process.env.GITHUB_OAUTH_CLIENT_ID || "Ov23li30QPR3mAwgSUvv";
     const token = await completeGitHubDeviceAuth(
       clientId,
       beginData?.deviceCode,
