@@ -61,7 +61,8 @@
 
 .detail-card ul {
   margin: 0;
-  padding-left: 18px;
+  padding-left: 0;
+  list-style: none;
 }
 
 .detail-card li,
@@ -242,7 +243,7 @@
   border-top: 1px solid rgba(74, 113, 170, 0.25);
 }
 
-.fact-item--split {
+li.fact-item--split {
   color: #e8b84a;
 }
 

@@ -54,7 +54,12 @@ const { getSkillSplit, getTraitSplit, getSkillPveFacts, getTraitPveFacts } = req
 // The GW2 API uses type "Distance" for radius/range facts, but the wiki scraper
 // produces type "Radius". Normalize both to the same token for group matching.
 function _splitNormalizeType(type) {
-  return (type === "Distance" ? "Radius" : type) || "";
+  if (type === "Distance") return "Radius";
+  // The wiki scraper always emits "Buff" for {{skill fact|effect|...}}, but the GW2 API
+  // may use "PrefixedBuff" or "ApplyBuffCondition" for the same fact. Normalize all three
+  // to "Buff" so Pass 2 group-key matching can pair them by status name.
+  if (type === "PrefixedBuff" || type === "ApplyBuffCondition") return "Buff";
+  return type || "";
 }
 
 // Grouping key: normalizedType + target (for AttributeAdjust) or + status (for Buff).

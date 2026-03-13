@@ -4,7 +4,9 @@
       "Bash(*)",
       "Read(*)",
       "Edit(*)",
-      "Write(*)"
+      "Write(*)",
+      "Read(//home/mstephens/.claude/**)",
+      "Read(//var/home/mstephens/.claude/**)"
     ]
   },
   "defaultMode": "bypassPermissions"

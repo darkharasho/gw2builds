@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-03-12T20:55:55.952Z",
+  "updatedAt": "2026-03-13T01:10:23.679Z",
   "skills": {
     "985": {
       "name": "Drop Stim Brew",
@@ -629,7 +629,8 @@
               "text": "-10% Incoming Damage",
               "status": "Frost Aura (effect)",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/87/Frost_Aura_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -805,7 +806,8 @@
               "text": "Shocking Aura (effect)",
               "status": "Shocking Aura (effect)",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/5/5d/Shocking_Aura_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -936,7 +938,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Duration",
@@ -948,7 +951,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -1238,7 +1242,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -1572,7 +1577,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "ComboFinisher",
@@ -1853,7 +1859,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Number",
@@ -1870,7 +1877,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -1979,7 +1987,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 444,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -2076,7 +2085,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "ComboField",
@@ -2419,7 +2429,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -2724,7 +2735,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1753,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -3763,7 +3775,8 @@
               "text": "Number of targets",
               "status": "Number of targets",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/5/53/Number_of_targets.png"
             },
             {
               "type": "Range",
@@ -4244,7 +4257,8 @@
               "text": "Stealth",
               "status": "Stealth",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/1/19/Stealth.png"
             },
             {
               "type": "Number",
@@ -4276,7 +4290,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "StunBreak",
@@ -4547,7 +4562,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "ComboFinisher",
@@ -6210,7 +6226,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 0.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Range",
@@ -6749,7 +6766,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -7077,7 +7095,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -7377,14 +7396,16 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1513,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
               "text": "Barrier",
               "status": "Barrier",
               "duration": 625,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -8917,7 +8938,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Duration",
@@ -9162,7 +9184,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 1.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Buff",
@@ -9186,7 +9209,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -9595,7 +9619,8 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Buff",
@@ -10188,7 +10213,8 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 8,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Duration",
@@ -10485,7 +10511,8 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Number",
@@ -10502,7 +10529,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "ComboField",
@@ -10749,7 +10777,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -10833,14 +10862,16 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Buff",
               "text": "Interval",
               "status": "Interval",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "StunBreak",
@@ -11176,14 +11207,16 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 8,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Buff",
               "text": "Life force",
               "status": "Life force",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Buff",
@@ -11791,7 +11824,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "ComboFinisher",
@@ -11935,7 +11969,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -12141,7 +12176,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "StunBreak",
@@ -12328,7 +12364,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -12606,7 +12643,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             }
           ],
           "complete": true
@@ -12649,7 +12687,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Buff",
@@ -12796,7 +12835,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "StunBreak",
@@ -13103,7 +13143,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 3973,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -13881,7 +13922,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "ComboField",
@@ -14110,7 +14152,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "ComboFinisher",
@@ -14266,7 +14309,8 @@
               "text": "Initiative",
               "status": "Initiative",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/ea/Initiative.png"
             },
             {
               "type": "Buff",
@@ -14393,7 +14437,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Range",
@@ -14531,7 +14576,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             }
           ],
           "complete": true
@@ -14682,7 +14728,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 1.25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             }
           ],
           "complete": true
@@ -14699,14 +14746,16 @@
               "text": "Initiative",
               "status": "Initiative",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/ea/Initiative.png"
             },
             {
               "type": "Buff",
               "text": "Evade",
               "status": "Evade",
               "duration": 0.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "StunBreak",
@@ -15192,7 +15241,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Range",
@@ -15546,7 +15596,8 @@
               "text": "Stealth",
               "status": "Stealth",
               "duration": 2.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/1/19/Stealth.png"
             },
             {
               "type": "Number",
@@ -15995,7 +16046,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -16041,7 +16093,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -16182,7 +16235,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -17180,7 +17234,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 2580,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -17508,7 +17563,8 @@
               "text": "Unblockable (effect)",
               "status": "Unblockable (effect)",
               "duration": 6,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/f/f0/Unblockable_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -17579,7 +17635,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Number",
@@ -17655,7 +17712,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Buff",
@@ -17941,7 +17999,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Number",
@@ -18147,7 +18206,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "ComboFinisher",
@@ -18310,7 +18370,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Buff",
@@ -18847,7 +18908,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 1.25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "ComboFinisher",
@@ -19110,7 +19172,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Number",
@@ -19192,7 +19255,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Number",
@@ -19355,7 +19419,8 @@
               "text": "Stealth",
               "status": "Stealth",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/1/19/Stealth.png"
             },
             {
               "type": "Buff",
@@ -19384,7 +19449,8 @@
               "text": "Stealth",
               "status": "Stealth",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/1/19/Stealth.png"
             },
             {
               "type": "Buff",
@@ -20098,7 +20164,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -20238,7 +20305,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 1.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Buff",
@@ -20373,7 +20441,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Range",
@@ -20565,7 +20634,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 0.25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -20621,7 +20691,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -20665,7 +20736,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -20890,7 +20962,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -21055,7 +21128,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 1.25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Number",
@@ -21114,7 +21188,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Number",
@@ -21238,7 +21313,8 @@
               "text": "Unblockable (effect)",
               "status": "Unblockable (effect)",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/f/f0/Unblockable_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -21382,7 +21458,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -21484,7 +21561,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -21809,7 +21887,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Number",
@@ -22025,7 +22104,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -22111,7 +22191,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "StunBreak",
@@ -22536,7 +22617,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -22668,7 +22750,8 @@
               "text": "Magnetic Aura (effect)",
               "status": "Magnetic Aura (effect)",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/0/0b/Magnetic_Aura_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -22793,7 +22876,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Buff",
@@ -22846,7 +22930,8 @@
               "text": "Morphed (Polymorph Moa)",
               "status": "Morphed (Polymorph Moa)",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/5/55/Morphed_%28Polymorph_Moa%29.png"
             },
             {
               "type": "Buff",
@@ -22963,7 +23048,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -23273,7 +23359,8 @@
               "text": "Revealed",
               "status": "Revealed",
               "duration": 6,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/d/db/Revealed.png"
             },
             {
               "type": "Range",
@@ -23579,14 +23666,16 @@
               "text": "Unblockable (effect)",
               "status": "Unblockable (effect)",
               "duration": 6,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/f/f0/Unblockable_%28effect%29.png"
             },
             {
               "type": "Buff",
               "text": "Unblockable (effect)",
               "status": "Unblockable (effect)",
               "duration": 6,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/f/f0/Unblockable_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -23699,7 +23788,8 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Number",
@@ -23751,7 +23841,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "StunBreak",
@@ -23826,14 +23917,16 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Buff",
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -23905,7 +23998,8 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Number",
@@ -24115,7 +24209,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 213,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -24298,7 +24393,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -24407,7 +24503,8 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Number",
@@ -24489,7 +24586,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Unblockable",
@@ -24770,7 +24868,8 @@
               "text": "-10% Incoming Damage",
               "status": "Frost Aura (effect)",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/87/Frost_Aura_%28effect%29.png"
             },
             {
               "type": "Number",
@@ -24875,7 +24974,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 3.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Buff",
@@ -24904,7 +25004,8 @@
               "text": "Unblockable (effect)",
               "status": "Unblockable (effect)",
               "duration": 6,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/f/f0/Unblockable_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -24946,7 +25047,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 2.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Buff",
@@ -25134,7 +25236,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Buff",
@@ -25301,14 +25404,16 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 740,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
               "text": "Barrier",
               "status": "Barrier",
               "duration": 410,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Number",
@@ -25325,7 +25430,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -25973,7 +26079,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -26075,7 +26182,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -26330,7 +26438,8 @@
               "text": "Magnetic Aura (effect)",
               "status": "Magnetic Aura (effect)",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/0/0b/Magnetic_Aura_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -26477,7 +26586,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -26604,7 +26714,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -26724,21 +26835,24 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Buff",
               "text": "Life force",
               "status": "Life force",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Buff",
               "text": "Life force",
               "status": "Life force",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Number",
@@ -26952,7 +27066,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             }
           ],
           "complete": true
@@ -27262,7 +27377,8 @@
               "text": "Initiative",
               "status": "Initiative",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/ea/Initiative.png"
             },
             {
               "type": "Buff",
@@ -27328,7 +27444,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "ComboFinisher",
@@ -27600,7 +27717,8 @@
               "text": "Fire Aura",
               "status": "Fire Aura",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/ce/Fire_Aura.png"
             },
             {
               "type": "Buff",
@@ -27670,7 +27788,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Range",
@@ -27884,7 +28003,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -28148,7 +28268,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 0.25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -28181,7 +28302,8 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Number",
@@ -28221,7 +28343,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Buff",
@@ -28284,7 +28407,8 @@
               "text": "Stealth",
               "status": "Stealth",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/1/19/Stealth.png"
             },
             {
               "type": "Buff",
@@ -28303,7 +28427,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -28638,7 +28763,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "ComboFinisher",
@@ -28775,7 +28901,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "ComboFinisher",
@@ -29642,7 +29769,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 1.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Buff",
@@ -30184,7 +30312,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Buff",
@@ -30693,7 +30822,8 @@
               "text": "Page cost",
               "status": "Page cost",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/b/ba/Page_cost.png"
             },
             {
               "type": "Number",
@@ -30717,7 +30847,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -30769,7 +30900,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Range",
@@ -30867,7 +30999,8 @@
               "text": "Stealth",
               "status": "Stealth",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/1/19/Stealth.png"
             },
             {
               "type": "Buff",
@@ -31146,7 +31279,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -31282,7 +31416,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -31324,7 +31459,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 1.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Buff",
@@ -31672,7 +31808,8 @@
               "text": "-10% Incoming Damage",
               "status": "Frost Aura (effect)",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/87/Frost_Aura_%28effect%29.png"
             },
             {
               "type": "Number",
@@ -31894,7 +32031,8 @@
               "text": "Page cost",
               "status": "Page cost",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/b/ba/Page_cost.png"
             },
             {
               "type": "Number",
@@ -31940,7 +32078,8 @@
               "text": "Page cost",
               "status": "Page cost",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/b/ba/Page_cost.png"
             },
             {
               "type": "Buff",
@@ -32001,7 +32140,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Number",
@@ -32198,7 +32338,8 @@
               "text": "Stealth",
               "status": "Stealth",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/1/19/Stealth.png"
             },
             {
               "type": "Buff",
@@ -32310,7 +32451,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -32339,7 +32481,8 @@
               "text": "Page cost",
               "status": "Page cost",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/b/ba/Page_cost.png"
             },
             {
               "type": "Buff",
@@ -32353,7 +32496,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -32783,7 +32927,8 @@
               "text": "Page cost",
               "status": "Page cost",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/b/ba/Page_cost.png"
             },
             {
               "type": "Number",
@@ -32915,14 +33060,16 @@
               "text": "Initiative",
               "status": "Initiative",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/ea/Initiative.png"
             },
             {
               "type": "Buff",
               "text": "Initiative",
               "status": "Initiative",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/ea/Initiative.png"
             },
             {
               "type": "StunBreak",
@@ -33080,7 +33227,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1295,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -33313,7 +33461,8 @@
               "text": "Page cost",
               "status": "Page cost",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/b/ba/Page_cost.png"
             },
             {
               "type": "Duration",
@@ -33497,7 +33646,8 @@
               "text": "Page cost",
               "status": "Page cost",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/b/ba/Page_cost.png"
             },
             {
               "type": "Radius",
@@ -33587,7 +33737,8 @@
               "text": "Page cost",
               "status": "Page cost",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/b/ba/Page_cost.png"
             },
             {
               "type": "Buff",
@@ -33869,7 +34020,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -33881,7 +34033,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "ComboField",
@@ -33968,7 +34121,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -34060,7 +34214,8 @@
               "text": "Page cost",
               "status": "Page cost",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/b/ba/Page_cost.png"
             },
             {
               "type": "Number",
@@ -34191,7 +34346,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Buff",
@@ -34311,7 +34467,8 @@
               "text": "Stealth",
               "status": "Stealth",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/1/19/Stealth.png"
             },
             {
               "type": "Buff",
@@ -34464,7 +34621,8 @@
               "text": "Page cost",
               "status": "Page cost",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/b/ba/Page_cost.png"
             },
             {
               "type": "Buff",
@@ -34478,7 +34636,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -34559,7 +34718,8 @@
               "text": "Page cost",
               "status": "Page cost",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/b/ba/Page_cost.png"
             },
             {
               "type": "Buff",
@@ -34622,14 +34782,16 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Buff",
               "text": "Life force",
               "status": "Life force",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Number",
@@ -34945,7 +35107,8 @@
               "text": "Page cost",
               "status": "Page cost",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/b/ba/Page_cost.png"
             },
             {
               "type": "Buff",
@@ -35175,14 +35338,16 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 2420,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1220,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "AttributeAdjust",
@@ -35366,7 +35531,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1188,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -35763,7 +35929,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -35874,7 +36041,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "ComboFinisher",
@@ -36228,7 +36396,8 @@
               "text": "+2%",
               "status": "Kalla's Fervor",
               "duration": 8,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/9/9e/Kalla%27s_Fervor.png"
             },
             {
               "type": "Buff",
@@ -36298,7 +36467,8 @@
               "text": "Revealed",
               "status": "Revealed",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/d/db/Revealed.png"
             },
             {
               "type": "Number",
@@ -36442,7 +36612,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Number",
@@ -36577,7 +36748,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             }
           ],
           "complete": true
@@ -36905,7 +37077,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 1.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "ComboField",
@@ -37040,7 +37213,8 @@
               "text": "Page cost",
               "status": "Page cost",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/b/ba/Page_cost.png"
             },
             {
               "type": "Buff",
@@ -37160,7 +37334,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Range",
@@ -37417,7 +37592,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 2900,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -37445,7 +37621,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Buff",
@@ -37509,7 +37686,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 2188,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -37540,7 +37718,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -37728,7 +37907,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1069,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -37770,7 +37950,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -37951,7 +38132,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Buff",
@@ -38001,7 +38183,8 @@
               "text": "Page cost",
               "status": "Page cost",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/b/ba/Page_cost.png"
             },
             {
               "type": "Buff",
@@ -38191,7 +38374,8 @@
               "text": "Page cost",
               "status": "Page cost",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/b/ba/Page_cost.png"
             },
             {
               "type": "Buff",
@@ -38251,7 +38435,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Buff",
@@ -38265,14 +38450,16 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Buff",
               "text": "Evade",
               "status": "Evade",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             }
           ],
           "complete": true
@@ -38295,7 +38482,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 445,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -38594,7 +38782,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -38655,7 +38844,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -38730,7 +38920,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -38762,7 +38953,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Buff",
@@ -38944,7 +39136,8 @@
               "text": "Stealth",
               "status": "Stealth",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/1/19/Stealth.png"
             },
             {
               "type": "Buff",
@@ -38994,7 +39187,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -39094,7 +39288,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 2440,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -39170,7 +39365,8 @@
               "text": "Revealed",
               "status": "Revealed",
               "duration": 6,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/d/db/Revealed.png"
             },
             {
               "type": "Range",
@@ -39210,7 +39406,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -39327,14 +39524,16 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Buff",
               "text": "Evade",
               "status": "Evade",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Buff",
@@ -39438,7 +39637,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -39848,7 +40048,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 0.25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -39903,7 +40104,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Buff",
@@ -40048,7 +40250,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1418,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -40079,7 +40282,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 2123,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             }
           ],
           "complete": true
@@ -40165,7 +40369,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -40205,7 +40410,8 @@
               "text": "Stealth",
               "status": "Stealth",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/1/19/Stealth.png"
             },
             {
               "type": "Number",
@@ -40284,14 +40490,16 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1018,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
               "text": "Barrier",
               "status": "Barrier",
               "duration": 227,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -40331,7 +40539,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -40399,14 +40608,16 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1012,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
               "text": "Barrier",
               "status": "Barrier",
               "duration": 879,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -40446,14 +40657,16 @@
               "text": "+2%",
               "status": "Kalla's Fervor",
               "duration": 8,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/9/9e/Kalla%27s_Fervor.png"
             },
             {
               "type": "Buff",
               "text": "+2%",
               "status": "Kalla's Fervor",
               "duration": 8,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/9/9e/Kalla%27s_Fervor.png"
             },
             {
               "type": "Buff",
@@ -41227,21 +41440,24 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 8,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Buff",
               "text": "Life force",
               "status": "Life force",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Buff",
               "text": "Life force",
               "status": "Life force",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Number",
@@ -41606,14 +41822,16 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 543,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1079,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -41936,7 +42154,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -41976,7 +42195,8 @@
               "text": "Fire Aura",
               "status": "Fire Aura",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/ce/Fire_Aura.png"
             },
             {
               "type": "Number",
@@ -42026,7 +42246,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -42803,7 +43024,8 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Radius",
@@ -42857,7 +43079,8 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 1.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "ComboFinisher",
@@ -42897,7 +43120,8 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Damage",
@@ -42910,7 +43134,8 @@
               "text": "3,250 Heal, -15% Health",
               "status": "Blight",
               "duration": 25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/a/ac/Blight.png"
             },
             {
               "type": "Buff",
@@ -43041,7 +43266,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "StunBreak",
@@ -43229,7 +43455,8 @@
               "text": "3,250 Heal, -15% Health",
               "status": "Blight",
               "duration": 25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/a/ac/Blight.png"
             },
             {
               "type": "Number",
@@ -43312,7 +43539,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Buff",
@@ -43394,7 +43622,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -43551,7 +43780,8 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Number",
@@ -43605,7 +43835,8 @@
               "text": "Number of targets",
               "status": "Number of targets",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/5/53/Number_of_targets.png"
             },
             {
               "type": "Radius",
@@ -43764,7 +43995,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Buff",
@@ -43836,7 +44068,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -44122,7 +44355,8 @@
               "text": "3,250 Heal, -15% Health",
               "status": "Blight",
               "duration": 25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/a/ac/Blight.png"
             },
             {
               "type": "Number",
@@ -44273,14 +44507,16 @@
               "text": "4,875 Heal, -{{fraction",
               "status": "Blight",
               "duration": 25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/a/ac/Blight.png"
             },
             {
               "type": "Buff",
               "text": "4,875 Heal, -{{fraction",
               "status": "Blight",
               "duration": 25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/a/ac/Blight.png"
             },
             {
               "type": "Number",
@@ -44470,7 +44706,8 @@
               "text": "3,250 Heal, -15% Health",
               "status": "Blight",
               "duration": 25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/a/ac/Blight.png"
             },
             {
               "type": "Number",
@@ -44544,7 +44781,8 @@
               "text": "3,250 Heal, -15% Health",
               "status": "Blight",
               "duration": 25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/a/ac/Blight.png"
             },
             {
               "type": "Number",
@@ -44915,7 +45153,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 300,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "AttributeAdjust",
@@ -45150,7 +45389,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 0.25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -45319,7 +45559,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -45969,7 +46210,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -45996,7 +46238,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1254,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -46059,7 +46302,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Buff",
@@ -46248,7 +46492,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -46293,7 +46538,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -46338,7 +46584,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -46666,7 +46913,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -47257,7 +47505,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -47389,7 +47638,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Number",
@@ -47514,7 +47764,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -47634,7 +47885,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "StunBreak",
@@ -47759,7 +48011,8 @@
               "text": "Flow",
               "status": "Flow",
               "duration": 15,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e6/Flow.png"
             },
             {
               "type": "Buff",
@@ -48123,7 +48376,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 365,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -48176,7 +48430,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1428,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -48293,7 +48548,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 2017,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Number",
@@ -48516,7 +48772,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 645,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -48742,7 +48999,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 365,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -48795,7 +49053,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 260,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -48856,7 +49115,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 365,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -48916,7 +49176,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1428,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -49089,7 +49350,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 6,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Buff",
@@ -49230,7 +49492,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 516,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -49342,7 +49605,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 365,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -49668,14 +49932,16 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1605,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
               "text": "Barrier",
               "status": "Barrier",
               "duration": 6405,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -49911,7 +50177,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Buff",
@@ -50079,7 +50346,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 2576,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "AttributeAdjust",
@@ -50403,7 +50671,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1.25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -50518,7 +50787,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -50669,7 +50939,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Buff",
@@ -50735,7 +51006,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Number",
@@ -51096,7 +51368,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 652,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -51285,14 +51558,16 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1194,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
               "text": "Barrier",
               "status": "Barrier",
               "duration": 198,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -51365,7 +51640,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -52694,7 +52970,8 @@
               "text": "Revealed",
               "status": "Revealed",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/d/db/Revealed.png"
             },
             {
               "type": "ComboFinisher",
@@ -52862,7 +53139,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "ComboFinisher",
@@ -53650,7 +53928,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 504,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -53669,7 +53948,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -53743,7 +54023,8 @@
               "text": "Defiance",
               "status": "Defiance",
               "duration": 200,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/4/40/Defiance.png"
             },
             {
               "type": "Range",
@@ -53841,7 +54122,8 @@
               "text": "Initiative",
               "status": "Initiative",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/ea/Initiative.png"
             },
             {
               "type": "Number",
@@ -53891,14 +54173,16 @@
               "text": "Nature's Strength",
               "status": "Nature's Strength",
               "duration": 25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/84/Nature%27s_Strength.png"
             },
             {
               "type": "Buff",
               "text": "+10% Damage, +25% Healing Increase to Others",
               "status": "Force of Nature",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Force_of_Nature.png"
             },
             {
               "type": "Buff",
@@ -54158,7 +54442,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "ComboFinisher",
@@ -54201,7 +54486,8 @@
               "text": "Unblockable (effect)",
               "status": "Unblockable (effect)",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/f/f0/Unblockable_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -54272,7 +54558,8 @@
               "text": "Fire Aura",
               "status": "Fire Aura",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/ce/Fire_Aura.png"
             },
             {
               "type": "Buff",
@@ -54322,7 +54609,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Range",
@@ -54693,7 +54981,8 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 12,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Number",
@@ -54733,7 +55022,8 @@
               "text": "Nature's Strength",
               "status": "Nature's Strength",
               "duration": 25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/84/Nature%27s_Strength.png"
             },
             {
               "type": "Buff",
@@ -54785,7 +55075,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Buff",
@@ -55170,28 +55461,32 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1610,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1410,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
               "text": "Nature's Strength",
               "status": "Nature's Strength",
               "duration": 25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/84/Nature%27s_Strength.png"
             },
             {
               "type": "Buff",
               "text": "+10% Damage, +25% Healing Increase to Others",
               "status": "Force of Nature",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Force_of_Nature.png"
             },
             {
               "type": "Buff",
@@ -55269,28 +55564,32 @@
               "text": "Fire Aura",
               "status": "Fire Aura",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/ce/Fire_Aura.png"
             },
             {
               "type": "Buff",
               "text": "Frost Aura (effect)",
               "status": "Frost Aura (effect)",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/87/Frost_Aura_%28effect%29.png"
             },
             {
               "type": "Buff",
               "text": "Shocking Aura (effect)",
               "status": "Shocking Aura (effect)",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/5/5d/Shocking_Aura_%28effect%29.png"
             },
             {
               "type": "Buff",
               "text": "Magnetic Aura (effect)",
               "status": "Magnetic Aura (effect)",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/0/0b/Magnetic_Aura_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -55617,7 +55916,8 @@
               "text": "Fire Aura",
               "status": "Fire Aura",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/ce/Fire_Aura.png"
             },
             {
               "type": "Number",
@@ -55666,7 +55966,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 251,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Number",
@@ -55745,7 +56046,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Buff",
@@ -55778,7 +56080,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -55819,21 +56122,24 @@
               "text": "Frost Aura (effect)",
               "status": "Frost Aura (effect)",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/87/Frost_Aura_%28effect%29.png"
             },
             {
               "type": "Buff",
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Buff",
               "text": "Evade",
               "status": "Evade",
               "duration": 0.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             }
           ],
           "complete": true
@@ -55856,14 +56162,16 @@
               "text": "Nature's Strength",
               "status": "Nature's Strength",
               "duration": 25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/84/Nature%27s_Strength.png"
             },
             {
               "type": "Buff",
               "text": "+10% Damage, +25% Healing Increase to Others",
               "status": "Force of Nature",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Force_of_Nature.png"
             },
             {
               "type": "Buff",
@@ -55955,7 +56263,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Range",
@@ -56208,7 +56517,8 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Number",
@@ -56262,14 +56572,16 @@
               "text": "Nature's Strength",
               "status": "Nature's Strength",
               "duration": 25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/84/Nature%27s_Strength.png"
             },
             {
               "type": "Buff",
               "text": "+10% Damage, +25% Healing Increase to Others",
               "status": "Force of Nature",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Force_of_Nature.png"
             },
             {
               "type": "Number",
@@ -56481,13 +56793,6 @@
             },
             {
               "type": "Buff",
-              "text": "Count recharge",
-              "status": "Count recharge",
-              "duration": 20,
-              "apply_count": 1
-            },
-            {
-              "type": "Buff",
               "text": "Defiance break",
               "status": "Defiance break",
               "duration": 150,
@@ -56518,7 +56823,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 2346,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -56890,7 +57196,8 @@
               "text": "Initiative",
               "status": "Initiative",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/ea/Initiative.png"
             },
             {
               "type": "Number",
@@ -57085,7 +57392,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 645,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -57155,14 +57463,16 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 755,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
               "text": "Barrier",
               "status": "Barrier",
               "duration": 755,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Range",
@@ -57309,7 +57619,8 @@
               "text": "Nature's Strength",
               "status": "Nature's Strength",
               "duration": 25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/84/Nature%27s_Strength.png"
             },
             {
               "type": "Buff",
@@ -57518,7 +57829,8 @@
               "text": "Stealth",
               "status": "Stealth",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/1/19/Stealth.png"
             },
             {
               "type": "Buff",
@@ -57544,7 +57856,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Range",
@@ -57649,7 +57962,8 @@
               "text": "Number of targets",
               "status": "Number of targets",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/5/53/Number_of_targets.png"
             },
             {
               "type": "Radius",
@@ -57835,7 +58149,8 @@
               "text": "Number of targets",
               "status": "Number of targets",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/5/53/Number_of_targets.png"
             },
             {
               "type": "Radius",
@@ -57909,14 +58224,16 @@
               "text": "Frost Aura (effect)",
               "status": "Frost Aura (effect)",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/87/Frost_Aura_%28effect%29.png"
             },
             {
               "type": "Buff",
               "text": "Fire Aura",
               "status": "Fire Aura",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/ce/Fire_Aura.png"
             },
             {
               "type": "Buff",
@@ -57941,7 +58258,8 @@
               "text": "Number of targets",
               "status": "Number of targets",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/5/53/Number_of_targets.png"
             },
             {
               "type": "Radius",
@@ -58043,7 +58361,8 @@
               "text": "Initiative",
               "status": "Initiative",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/ea/Initiative.png"
             },
             {
               "type": "Number",
@@ -58342,7 +58661,8 @@
               "text": "Illuminated",
               "status": "Illuminated",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/7/7d/Illuminated.png"
             },
             {
               "type": "Number",
@@ -58536,7 +58856,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 0.25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -58739,7 +59060,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "ComboFinisher",
@@ -58854,7 +59176,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "ComboFinisher",
@@ -58941,7 +59264,8 @@
               "text": "Illuminated",
               "status": "Illuminated",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/7/7d/Illuminated.png"
             },
             {
               "type": "Buff",
@@ -59194,7 +59518,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Number",
@@ -59396,7 +59721,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -59450,7 +59776,8 @@
               "text": "Initiative",
               "status": "Initiative",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/ea/Initiative.png"
             },
             {
               "type": "Number",
@@ -59504,7 +59831,8 @@
               "text": "Soul Shards",
               "status": "Soul Shards",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e3/Soul_Shards.png"
             },
             {
               "type": "Buff",
@@ -59518,14 +59846,16 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 12,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Buff",
               "text": "Life force",
               "status": "Life force",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Number",
@@ -59558,7 +59888,8 @@
               "text": "Stealth",
               "status": "Stealth",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/1/19/Stealth.png"
             },
             {
               "type": "Buff",
@@ -59621,7 +59952,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Buff",
@@ -59739,7 +60071,8 @@
               "text": "Soul Shards",
               "status": "Soul Shards",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e3/Soul_Shards.png"
             },
             {
               "type": "Buff",
@@ -59899,7 +60232,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 2010,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -59960,7 +60294,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "ComboFinisher",
@@ -60000,7 +60335,8 @@
               "text": "Revealed",
               "status": "Revealed",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/d/db/Revealed.png"
             },
             {
               "type": "Buff",
@@ -60040,7 +60376,8 @@
               "text": "Soul Shards",
               "status": "Soul Shards",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e3/Soul_Shards.png"
             },
             {
               "type": "Number",
@@ -60164,7 +60501,8 @@
               "text": "Soul Shards",
               "status": "Soul Shards",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e3/Soul_Shards.png"
             },
             {
               "type": "Buff",
@@ -60237,7 +60575,8 @@
               "text": "Number of targets",
               "status": "Number of targets",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/5/53/Number_of_targets.png"
             },
             {
               "type": "Radius",
@@ -60498,7 +60837,8 @@
               "text": "Number of targets",
               "status": "Number of targets",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/5/53/Number_of_targets.png"
             },
             {
               "type": "Radius",
@@ -61037,7 +61377,8 @@
               "text": "Illuminated",
               "status": "Illuminated",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/7/7d/Illuminated.png"
             },
             {
               "type": "Number",
@@ -61226,7 +61567,8 @@
               "text": "Number of targets",
               "status": "Number of targets",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/5/53/Number_of_targets.png"
             },
             {
               "type": "Radius",
@@ -61511,14 +61853,16 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Buff",
               "text": "Interval",
               "status": "Interval",
               "duration": 6,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -61751,7 +62095,8 @@
               "text": "Revealed",
               "status": "Revealed",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/d/db/Revealed.png"
             },
             {
               "type": "Number",
@@ -61768,7 +62113,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "ComboFinisher",
@@ -62225,7 +62571,8 @@
               "text": "Forged Surfer Dash (effect)",
               "status": "Forged Surfer Dash (effect)",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/3/34/Forged_Surfer_Dash_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -62331,14 +62678,16 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1940,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
               "text": "Barrier",
               "status": "Barrier",
               "duration": 3880,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -62352,7 +62701,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Number",
@@ -62364,7 +62714,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -62413,7 +62764,8 @@
               "text": "Metal Legion Guitar (effect)",
               "status": "Metal Legion Guitar (effect)",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/3/32/Metal_Legion_Guitar_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -62439,7 +62791,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -62520,7 +62873,8 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 7,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Number",
@@ -62600,7 +62954,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Buff",
@@ -62648,14 +63003,16 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 2250,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
               "text": "Magnetic Aura (effect)",
               "status": "Magnetic Aura (effect)",
               "duration": 2.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/0/0b/Magnetic_Aura_%28effect%29.png"
             }
           ],
           "complete": true
@@ -62672,7 +63029,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Buff",
@@ -62686,7 +63044,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Range",
@@ -62719,7 +63078,8 @@
               "text": "Forged Surfer Dash (effect)",
               "status": "Forged Surfer Dash (effect)",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/3/34/Forged_Surfer_Dash_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -62765,7 +63125,8 @@
               "text": "Evolved",
               "status": "Evolved",
               "duration": 6,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/8d/Evolved.png"
             }
           ],
           "complete": true
@@ -62789,7 +63150,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Damage",
@@ -62874,7 +63236,8 @@
               "text": "Holo-Dancer Decoy (effect)",
               "status": "Holo-Dancer Decoy (effect)",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cb/Holo-Dancer_Decoy_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -63205,7 +63568,8 @@
               "text": "Exalted Hammer (effect)",
               "status": "Exalted Hammer (effect)",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/83/Exalted_Hammer_%28effect%29.png"
             },
             {
               "type": "Number",
@@ -63229,7 +63593,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "ComboFinisher",
@@ -63543,7 +63908,8 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 7,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Number",
@@ -63888,7 +64254,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -63915,7 +64282,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1615,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -63986,7 +64354,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -64052,7 +64421,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 805,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -64227,14 +64597,16 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 3973,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
               "text": "-10% Incoming",
               "status": "Light Aura",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/5/5a/Light_Aura.png"
             },
             {
               "type": "Buff",
@@ -64333,14 +64705,16 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 394,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
               "text": "Chak Shield (effect)",
               "status": "Chak Shield (effect)",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/1/13/Chak_Shield_%28effect%29.png"
             },
             {
               "type": "Number",
@@ -64364,7 +64738,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -64578,7 +64953,8 @@
               "text": "Zephyrite Sun Crystal (effect)",
               "status": "Zephyrite Sun Crystal (effect)",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/8d/Zephyrite_Sun_Crystal_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -64619,7 +64995,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 1.25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Range",
@@ -64654,7 +65031,8 @@
               "text": "Summon Kryptis Turret (effect)",
               "status": "Summon Kryptis Turret (effect)",
               "duration": 8,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/85/Summon_Kryptis_Turret_%28effect%29.png"
             },
             {
               "type": "Radius",
@@ -64737,7 +65115,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 1.75,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             }
           ],
           "complete": true
@@ -64767,7 +65146,8 @@
               "text": "+50% Incoming",
               "status": "Unstable Skritt Bomb (effect)",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c9/Unstable_Skritt_Bomb_%28effect%29.png"
             },
             {
               "type": "Number",
@@ -64946,7 +65326,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 2565,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -64980,14 +65361,16 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1305,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
               "text": "Barrier",
               "status": "Barrier",
               "duration": 660,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -65020,7 +65403,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -65123,7 +65507,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 3250,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -65505,7 +65890,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -65554,7 +65940,8 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 7,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             },
             {
               "type": "Number",
@@ -65606,7 +65993,8 @@
               "text": "Evade",
               "status": "Evade",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e2/Evade.png"
             },
             {
               "type": "Range",
@@ -65628,7 +66016,8 @@
               "text": "+66% Movement Speed, +100% Incoming Fumble Unrestricted Percent",
               "status": "Gaseous State (effect)",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/3/32/Gaseous_State_%28effect%29.png"
             },
             {
               "type": "StunBreak",
@@ -65770,7 +66159,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -65985,7 +66375,8 @@
               "text": "Solid State (effect)",
               "status": "Solid State (effect)",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/a/a2/Solid_State_%28effect%29.png"
             },
             {
               "type": "Number",
@@ -66242,7 +66633,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 6,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Buff",
@@ -66304,7 +66696,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -66535,7 +66928,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -66560,7 +66954,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 0.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "StunBreak",
@@ -66641,7 +67036,8 @@
               "text": "Revealed",
               "status": "Revealed",
               "duration": 1.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/d/db/Revealed.png"
             },
             {
               "type": "Number",
@@ -66767,7 +67163,8 @@
               "text": "Summon Kryptis Turret (effect)",
               "status": "Summon Kryptis Turret (effect)",
               "duration": 8,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/85/Summon_Kryptis_Turret_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -66848,7 +67245,8 @@
               "text": "+7% Condition Damage, +7% Damage",
               "status": "Plasmatic State (effect)",
               "duration": 7,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/b/b0/Plasmatic_State_%28effect%29.png"
             },
             {
               "type": "Number",
@@ -67002,7 +67400,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 0.25,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Damage",
@@ -67015,7 +67414,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1359,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Number",
@@ -67118,7 +67518,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Range",
@@ -67317,7 +67718,8 @@
               "text": "Mistburn Mortar (effect)",
               "status": "Mistburn Mortar (effect)",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/f/f0/Mistburn_Mortar_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -67343,7 +67745,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -67581,7 +67984,8 @@
               "text": "-10% Incoming",
               "status": "Light Aura",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/5/5a/Light_Aura.png"
             },
             {
               "type": "Number",
@@ -67701,7 +68105,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -67871,7 +68276,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 15,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Damage",
@@ -67891,7 +68297,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 975,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Number",
@@ -68115,7 +68522,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 2265,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "StunBreak",
@@ -68213,7 +68621,8 @@
               "text": "-10% Incoming Condition Damage",
               "status": "Light Aura",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/5/5a/Light_Aura.png"
             },
             {
               "type": "Number",
@@ -68392,7 +68801,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1292,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             }
           ],
           "complete": true
@@ -68699,7 +69109,8 @@
               "text": "Number of targets",
               "status": "Number of targets",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/5/53/Number_of_targets.png"
             },
             {
               "type": "Radius",
@@ -68983,7 +69394,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -69030,7 +69442,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1302,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -69064,35 +69477,40 @@
               "text": "Frost Aura (effect)",
               "status": "Frost Aura (effect)",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/87/Frost_Aura_%28effect%29.png"
             },
             {
               "type": "Buff",
               "text": "Fire Aura",
               "status": "Fire Aura",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/ce/Fire_Aura.png"
             },
             {
               "type": "Buff",
               "text": "Frost Aura (effect)",
               "status": "Frost Aura (effect)",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/87/Frost_Aura_%28effect%29.png"
             },
             {
               "type": "Buff",
               "text": "Shocking Aura (effect)",
               "status": "Shocking Aura (effect)",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/5/5d/Shocking_Aura_%28effect%29.png"
             },
             {
               "type": "Buff",
               "text": "Magnetic Aura (effect)",
               "status": "Magnetic Aura (effect)",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/0/0b/Magnetic_Aura_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -69254,7 +69672,8 @@
               "text": "800 {{coefficient",
               "status": "Soothing Mist (effect)",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/f/f0/Soothing_Mist_%28effect%29.png"
             },
             {
               "type": "Number",
@@ -69266,7 +69685,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -69278,14 +69698,16 @@
               "text": "1,600 {{coefficient",
               "status": "Soothing Mist (effect)",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/f/f0/Soothing_Mist_%28effect%29.png"
             },
             {
               "type": "Buff",
               "text": "1,600 {{coefficient",
               "status": "Soothing Mist (effect)",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/f/f0/Soothing_Mist_%28effect%29.png"
             },
             {
               "type": "AttributeAdjust",
@@ -70040,7 +70462,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -70151,7 +70574,8 @@
               "text": "Chaos Aura",
               "status": "Chaos Aura",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/ec/Chaos_Aura.png"
             },
             {
               "type": "Buff",
@@ -70235,7 +70659,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -70300,7 +70725,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -70324,7 +70750,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -70658,14 +71085,16 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 100,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
               "text": "Barrier",
               "status": "Barrier",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             }
           ],
           "complete": true
@@ -70904,7 +71333,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -70928,7 +71358,8 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 15,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             }
           ],
           "complete": true
@@ -71570,7 +72001,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -71612,7 +72044,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -71641,7 +72074,8 @@
               "text": "Instant Reflexes (effect)",
               "status": "Instant Reflexes (effect)",
               "duration": 1.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/e4/Instant_Reflexes_%28effect%29.png"
             }
           ],
           "complete": true
@@ -71696,14 +72130,16 @@
               "text": "Initiative",
               "status": "Initiative",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/ea/Initiative.png"
             },
             {
               "type": "Buff",
               "text": "Initiative",
               "status": "Initiative",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/ea/Initiative.png"
             }
           ],
           "complete": true
@@ -72205,7 +72641,8 @@
               "text": "Stealth",
               "status": "Stealth",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/1/19/Stealth.png"
             }
           ],
           "complete": true
@@ -72263,7 +72700,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -72490,7 +72928,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -72927,7 +73366,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -73240,7 +73680,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -73298,7 +73739,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -73421,7 +73863,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -73507,7 +73950,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "AttributeAdjust",
@@ -73908,7 +74352,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -73944,7 +74389,8 @@
               "text": "-20% Incoming Condition Damage",
               "status": "Dark Aura",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/ef/Dark_Aura.png"
             },
             {
               "type": "Unblockable",
@@ -74141,7 +74587,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -74807,7 +75254,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 170,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -74821,7 +75269,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -74954,7 +75403,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -74971,7 +75421,8 @@
               "text": "+7% Damage, +7% Condition Damage",
               "status": "Transcendent Tempest (effect)",
               "duration": 7,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/a/ac/Transcendent_Tempest_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -75019,21 +75470,24 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 500,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1500,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
               "text": "Barrier",
               "status": "Barrier",
               "duration": 500,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -75386,7 +75840,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Buff",
@@ -75424,7 +75879,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -75441,7 +75897,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 15,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             }
           ],
           "complete": true
@@ -75867,7 +76324,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -75889,7 +76347,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 1.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Buff",
@@ -76155,7 +76614,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 340,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "AttributeConversion",
@@ -76251,7 +76711,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -76284,7 +76745,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -76383,14 +76845,16 @@
               "text": "Exhaustion",
               "status": "Exhaustion",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/88/Exhaustion.png"
             },
             {
               "type": "Buff",
               "text": "Exhaustion",
               "status": "Exhaustion",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/88/Exhaustion.png"
             },
             {
               "type": "Buff",
@@ -76462,7 +76926,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Buff",
@@ -76505,7 +76970,8 @@
               "text": "Fire Aura",
               "status": "Fire Aura",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/ce/Fire_Aura.png"
             },
             {
               "type": "Buff",
@@ -76519,7 +76985,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -76551,7 +77018,8 @@
               "text": "-10% Incoming Damage",
               "status": "Frost Aura (effect)",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/87/Frost_Aura_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -76606,7 +77074,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -76637,7 +77106,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             }
           ],
           "complete": true
@@ -76661,7 +77131,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             }
           ],
           "complete": true
@@ -76855,14 +77326,16 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Buff",
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Radius",
@@ -77094,7 +77567,8 @@
               "text": "Fire Aura",
               "status": "Fire Aura",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/ce/Fire_Aura.png"
             },
             {
               "type": "Buff",
@@ -77207,7 +77681,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -77229,14 +77704,16 @@
               "text": "Stealth",
               "status": "Stealth",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/1/19/Stealth.png"
             },
             {
               "type": "Buff",
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             },
             {
               "type": "Buff",
@@ -77389,7 +77866,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1000,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             }
           ],
           "complete": true
@@ -77603,7 +78081,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 261,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             }
           ],
           "complete": true
@@ -77620,7 +78099,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 385,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -77791,21 +78271,24 @@
               "text": "+6{{fraction",
               "status": "Phantom Pain (effect)",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/5/55/Phantom_Pain_%28effect%29.png"
             },
             {
               "type": "Buff",
               "text": "+3% Damage, +3% Condition Damage",
               "status": "Phantom Pain (effect)",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/5/55/Phantom_Pain_%28effect%29.png"
             },
             {
               "type": "Buff",
               "text": "+2{{fraction",
               "status": "Phantom Pain (effect)",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/5/55/Phantom_Pain_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -78111,7 +78594,8 @@
               "text": "Initiative",
               "status": "Initiative",
               "duration": 7,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/ea/Initiative.png"
             }
           ],
           "complete": true
@@ -78196,7 +78680,8 @@
               "text": "Stealth",
               "status": "Stealth",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/1/19/Stealth.png"
             }
           ],
           "complete": true
@@ -78507,7 +78992,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 671,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
@@ -78584,14 +79070,16 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 1804,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
               "text": "Barrier",
               "status": "Barrier",
               "duration": 500,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             }
           ],
           "complete": true
@@ -78647,7 +79135,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 6,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -78681,7 +79170,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 1.5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             }
           ],
           "complete": true
@@ -78733,7 +79223,8 @@
               "text": "Mirage Cloak (effect)",
               "status": "Mirage Cloak (effect)",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/a/a5/Mirage_Cloak_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -78771,7 +79262,8 @@
               "text": "Number of targets",
               "status": "Number of targets",
               "duration": 5,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/5/53/Number_of_targets.png"
             },
             {
               "type": "Radius",
@@ -79151,7 +79643,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Buff",
@@ -79369,28 +79862,32 @@
               "text": "Fire Aura",
               "status": "Fire Aura",
               "duration": 4,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/ce/Fire_Aura.png"
             },
             {
               "type": "Buff",
               "text": "-10% Incoming Damage",
               "status": "Frost Aura (effect)",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/8/87/Frost_Aura_%28effect%29.png"
             },
             {
               "type": "Buff",
               "text": "Shocking Aura (effect)",
               "status": "Shocking Aura (effect)",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/5/5d/Shocking_Aura_%28effect%29.png"
             },
             {
               "type": "Buff",
               "text": "Magnetic Aura (effect)",
               "status": "Magnetic Aura (effect)",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/0/0b/Magnetic_Aura_%28effect%29.png"
             },
             {
               "type": "Buff",
@@ -80078,7 +80575,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -80181,7 +80679,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -80205,7 +80704,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             }
           ],
           "complete": true
@@ -80408,7 +80908,8 @@
               "text": "Interval",
               "status": "Interval",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/2/29/Interval.png"
             },
             {
               "type": "Radius",
@@ -80749,7 +81250,8 @@
               "text": "+10%",
               "status": "Exhilarating Ephemera (effect)",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cf/Exhilarating_Ephemera_%28effect%29.png"
             },
             {
               "type": "Duration",
@@ -80942,7 +81444,8 @@
               "text": "+10%",
               "status": "Willing Host (effect)",
               "duration": 10,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c9/Willing_Host_%28effect%29.png"
             }
           ],
           "complete": true
@@ -80959,7 +81462,8 @@
               "text": "Superspeed",
               "status": "Superspeed",
               "duration": 2,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/c8/Superspeed.png"
             }
           ],
           "complete": true
@@ -81027,14 +81531,16 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 783,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             },
             {
               "type": "Buff",
               "text": "Initiative",
               "status": "Initiative",
               "duration": 1,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/e/ea/Initiative.png"
             }
           ],
           "complete": true
@@ -81188,7 +81694,8 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             }
           ],
           "complete": true
@@ -81514,7 +82021,8 @@
               "text": "Barrier",
               "status": "Barrier",
               "duration": 783,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/c/cc/Barrier.png"
             }
           ],
           "complete": true
@@ -81652,7 +82160,8 @@
               "text": "Life force",
               "status": "Life force",
               "duration": 3,
-              "apply_count": 1
+              "apply_count": 1,
+              "icon": "https://wiki.guildwars2.com/images/6/60/Life_force.png"
             }
           ],
           "complete": true
