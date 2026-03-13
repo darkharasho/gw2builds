@@ -6,6 +6,7 @@ let _currentUrl = "";
 let _escHandler = null;
 
 export function initWikiModal() {
+  if (typeof document === "undefined") return;
   _overlay = document.createElement("div");
   _overlay.className = "wiki-modal-overlay wiki-modal-overlay--hidden";
   _overlay.innerHTML = `

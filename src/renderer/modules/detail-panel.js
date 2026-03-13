@@ -81,7 +81,7 @@ export function renderDetailPanel() {
       ? `<p>${escapeHtml(wiki.summary)}</p>`
       : "<p>No wiki summary available.</p>";
   const wikiLink = wiki.url
-    ? `<a href="${escapeHtml(wiki.url)}" target="_blank" rel="noreferrer">Open Wiki Page</a>`
+    ? `<button class="wiki-open-btn" data-url="${escapeHtml(wiki.url)}">Open Wiki Page</button>`
     : "";
 
   if (_el.detailHost) {

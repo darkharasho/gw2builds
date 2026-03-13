@@ -34,6 +34,7 @@ import {
   setPublishStatus, showError, runPagesBuildPoll, getSelectedTarget,
 } from "./modules/render-pages.js";
 import { resolveEntityFacts } from "./modules/detail-panel.js";
+import { initWikiModal, openWikiModal } from "./modules/wiki-modal.js";
 
 // ── DOM element cache ────────────────────────────────────────────────────────
 
@@ -79,7 +80,8 @@ const el = {
 
 initCustomSelect({ bindHoverPreview, onError: showError });
 
-initDetailPanel({ detailHost: el.detailHost, hoverPreview: el.hoverPreview });
+initWikiModal();
+initDetailPanel({ detailHost: el.detailHost, hoverPreview: el.hoverPreview }, { openWikiModal });
 
 initSpecializations({ specializationsHost: el.specializationsHost });
 initSpecializationsCallbacks({
