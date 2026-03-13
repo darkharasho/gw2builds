@@ -86,9 +86,18 @@ function parseRelatedItems(html) {
     if (links.length === 0) continue;
     const name = decodeEntities(links[links.length - 1]);
     if (!name) continue;
+    // Extract icon from the last <img src="..."> in namePart.
+    // For skill items: profession icon comes first (direct <a><img>), skill icon is last (in <span>).
+    // For trait items: only one icon, the trait icon.
+    let icon = "";
+    const imgRe = /<img\s[^>]*\bsrc="([^"]+)"/gi;
+    let imgMatch;
+    while ((imgMatch = imgRe.exec(namePart)) !== null) icon = imgMatch[1];
+    // Make relative wiki image URLs absolute
+    if (icon.startsWith("/")) icon = `https://wiki.guildwars2.com${icon}`;
     // Context: strip all tags (including inline links like "fire"), decode, trim
     const context = decodeEntities(stripTags(contextPart)).replace(/^[\s—]+/, "").trim();
-    results.push({ name, context });
+    results.push({ name, icon, context });
   }
   return results;
 }

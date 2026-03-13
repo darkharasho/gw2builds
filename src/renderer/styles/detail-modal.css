@@ -167,23 +167,28 @@
 
 /* ── Related items ───────────────────────────────────────────────────────── */
 
-.dm-related-list {
+.dm-related-grid {
   list-style: none;
   padding: 0;
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px 16px;
 }
 
-.dm-related-list--hidden {
+.dm-related-grid--indented {
+  padding-left: 8px;
+}
+
+.dm-related-grid--hidden {
   display: none;
 }
 
 .dm-related-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  min-width: 0;
 }
 
 .dm-related-item__icon {
@@ -206,12 +211,18 @@
 .dm-related-item__name {
   font-weight: 600;
   color: var(--text);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dm-related-item__context {
   color: var(--muted);
-  font-size: 0.85rem;
+  font-size: 0.78rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dm-related-error {
@@ -224,27 +235,29 @@
 /* ── Trait groups ────────────────────────────────────────────────────────── */
 
 .dm-trait-group {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .dm-trait-group__header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
 }
 
 .dm-trait-group__spec-icon {
-  width: 24px;
-  height: 24px;
-  border-radius: 3px;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
   object-fit: contain;
 }
 
 .dm-trait-group__name {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text);
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 /* ── Expand button ───────────────────────────────────────────────────────── */

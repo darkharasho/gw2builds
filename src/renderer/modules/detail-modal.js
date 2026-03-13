@@ -37,12 +37,12 @@ export function initDetailModal() {
         <section class="dm-section dm-section--loading" id="dm-related-skills-section">
           <h3 class="dm-section__heading">Related Skills</h3>
           <div class="dm-spinner" id="dm-skills-spinner"></div>
-          <ul class="dm-related-list dm-related-list--hidden" id="dm-related-skills"></ul>
+          <ul class="dm-related-grid dm-related-grid--hidden" id="dm-related-skills"></ul>
         </section>
         <section class="dm-section dm-section--loading" id="dm-related-traits-section">
           <h3 class="dm-section__heading">Related Traits</h3>
           <div class="dm-spinner" id="dm-traits-spinner"></div>
-          <div class="dm-related-list--hidden" id="dm-related-traits"></div>
+          <div class="dm-related-grid--hidden" id="dm-related-traits"></div>
         </section>
       </div>
     </div>
@@ -124,9 +124,9 @@ export function openDetailModal(detail, catalog, professionName) {
   // ── Related sections — show with spinners, hide lists ────────────────────
   _el.skillsSection.className = "dm-section dm-section--loading";
   _el.traitsSection.className = "dm-section dm-section--loading";
-  _el.skillsList.className = "dm-related-list dm-related-list--hidden";
+  _el.skillsList.className = "dm-related-grid dm-related-grid--hidden";
   _el.skillsList.innerHTML = "";
-  _el.traitsList.className = "dm-related-list--hidden";
+  _el.traitsList.className = "dm-related-grid--hidden";
   _el.traitsList.innerHTML = "";
 
   // ── Show modal ────────────────────────────────────────────────────────────
@@ -160,7 +160,7 @@ function _showRelatedError(section, spinner, list) {
   section.className = "dm-section";
   spinner.style.display = "none";
   list.innerHTML = '<p class="dm-related-error">Could not load related data.</p>';
-  list.className = list.className.replace("dm-related-list--hidden", "dm-related-list");
+  list.className = list.className.replace("dm-related-grid--hidden", "dm-related-grid");
 }
 
 function _renderRelatedSkills(items, catalog) {
@@ -168,14 +168,15 @@ function _renderRelatedSkills(items, catalog) {
     _el.skillsSection.className = "dm-section dm-section--hidden";
     return;
   }
+  // Prefer icon from wiki HTML (item.icon); fall back to catalog lookup for non-weapon skills
   const skillMap = _buildNameMap(catalog?.skills);
   _el.skillsList.innerHTML = items.map((item) => {
-    const icon = skillMap.get(item.name)?.icon || "";
+    const icon = item.icon || skillMap.get(item.name)?.icon || "";
     return _relatedItemHtml(item.name, item.context, icon);
   }).join("");
   _el.skillsSection.className = "dm-section";
   _el.skillsSpinner.style.display = "none";
-  _el.skillsList.className = "dm-related-list";
+  _el.skillsList.className = "dm-related-grid";
 }
 
 function _renderRelatedTraits(groups, catalog) {
@@ -183,6 +184,7 @@ function _renderRelatedTraits(groups, catalog) {
     _el.traitsSection.className = "dm-section dm-section--hidden";
     return;
   }
+  // Prefer icon from wiki HTML (item.icon); fall back to catalog lookup
   const traitMap = _buildNameMap(catalog?.traits);
   const specMap = new Map((catalog?.specializations || []).map((s) => [s.name, s]));
 
@@ -192,7 +194,7 @@ function _renderRelatedTraits(groups, catalog) {
       ? `<img class="dm-trait-group__spec-icon" src="${escapeHtml(spec.icon)}" alt="${escapeHtml(group.groupName)}" />`
       : "";
     const itemsHtml = group.items.map((item) => {
-      const icon = traitMap.get(item.name)?.icon || "";
+      const icon = item.icon || traitMap.get(item.name)?.icon || "";
       return _relatedItemHtml(item.name, item.desc || item.context || "", icon);
     }).join("");
     return `
@@ -201,7 +203,7 @@ function _renderRelatedTraits(groups, catalog) {
           ${specIconHtml}
           <span class="dm-trait-group__name">${escapeHtml(group.groupName)}</span>
         </div>
-        <ul class="dm-related-list">${itemsHtml}</ul>
+        <ul class="dm-related-grid dm-related-grid--indented">${itemsHtml}</ul>
       </div>`;
   }).join("");
 
