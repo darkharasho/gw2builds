@@ -154,6 +154,7 @@
   border-top-color: var(--accent-2, #6ab0f5);
   border-radius: 50%;
   animation: wiki-spin 0.7s linear infinite;
+  display: none;  /* hidden by default; shown only when parent has dm-section--loading */
 }
 
 .dm-section--loading .dm-spinner {

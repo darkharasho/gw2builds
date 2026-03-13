@@ -94,6 +94,7 @@ export function openDetailModal(detail, catalog, professionName) {
 
   // Icon
   if (detail.icon) {
+    _el.icon.style.visibility = "";   // reset in case previous item had no icon
     _el.icon.src = detail.icon;
     _el.icon.alt = detail.title;
     _el.icon.onerror = () => {
