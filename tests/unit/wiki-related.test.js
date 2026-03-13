@@ -120,6 +120,33 @@ describe("getWikiRelatedData", () => {
     expect(result.relatedTraits[1].items[0].name).toBe("Spectacular Sphere");
   });
 
+  test("extracts skill name correctly when context contains inline links", async () => {
+    // Real wiki HTML: context ends with <a title="Fire">fire</a> — must NOT be picked up as the name
+    const htmlWithContextLinks = `
+<div class="mw-parser-output">
+<ul>
+<li class="filter-list f-Elementalist f-Weapon">
+  <a href="/wiki/Elementalist"><img alt="Elementalist icon small.png" /></a>
+  <span><a href="/wiki/Drake%27s_Breath"><img alt="Drake's Breath" /></a></span>
+  &#160;<a href="/wiki/Drake%27s_Breath" title="Drake&#39;s Breath">Drake's Breath</a>&#160;&#8212;&#160;Dagger, when attuned to <a href="/wiki/Fire" title="Fire">fire</a>
+</li>
+</ul>
+</div>`;
+    jest.doMock("../../src/main/gw2Data/fetch", () => ({
+      WIKI_API_ROOT: "https://wiki.guildwars2.com/api.php",
+      cache: { get: () => null, set: jest.fn() },
+      fetchJson: jest.fn()
+        .mockResolvedValueOnce({ parse: { sections: [{ index: "1", line: "Related skills" }] } })
+        .mockResolvedValueOnce({ parse: { text: htmlWithContextLinks } }),
+    }));
+    freshLoad();
+    const result = await wiki.getWikiRelatedData("Burning Precision");
+    expect(result.relatedSkills).toHaveLength(1);
+    expect(result.relatedSkills[0].name).toBe("Drake's Breath");
+    expect(result.relatedSkills[0].context).toContain("Dagger");
+    expect(result.relatedSkills[0].context).toContain("fire");
+  });
+
   test("returns empty arrays when fetchJson throws", async () => {
     jest.doMock("../../src/main/gw2Data/fetch", () => ({
       WIKI_API_ROOT: "https://wiki.guildwars2.com/api.php",

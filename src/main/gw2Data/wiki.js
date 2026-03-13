@@ -68,22 +68,26 @@ function parseRelatedItems(html) {
   let liMatch;
   while ((liMatch = liRe.exec(html)) !== null) {
     const liHtml = liMatch[1];
-    // Find all text-bearing links: <a href="..." title="...">text (not just img)</a>
+    // Split on &#8212; (em dash) — wiki puts " &#8212; context" after the item name link.
+    // Context may contain inline links (e.g. <a title="Fire">fire</a>), so we must NOT
+    // search the full <li> for the last text link — that would pick up context links as the name.
+    const emDashIdx = liHtml.indexOf("&#8212;");
+    const namePart = emDashIdx >= 0 ? liHtml.slice(0, emDashIdx) : liHtml;
+    const contextPart = emDashIdx >= 0 ? liHtml.slice(emDashIdx + 7) : "";
+
+    // Find the skill/trait name: last title-bearing text link in the name part
     const links = [];
     const linkRe = /<a\s[^>]*title="([^"]*)"[^>]*>([^<]+)<\/a>/gi;
     let linkMatch;
-    while ((linkMatch = linkRe.exec(liHtml)) !== null) {
+    while ((linkMatch = linkRe.exec(namePart)) !== null) {
       const text = linkMatch[2].trim();
       if (text) links.push(text);
     }
     if (links.length === 0) continue;
-    // Last text link is the skill/trait name (earlier ones are profession/element labels)
     const name = decodeEntities(links[links.length - 1]);
     if (!name) continue;
-    // Context: everything after the last </a>, strip tags, decode, strip leading " — "
-    const lastClose = liHtml.lastIndexOf("</a>");
-    let context = lastClose >= 0 ? liHtml.slice(lastClose + 4) : "";
-    context = decodeEntities(stripTags(context)).replace(/^[\s—]+/, "").trim();
+    // Context: strip all tags (including inline links like "fire"), decode, trim
+    const context = decodeEntities(stripTags(contextPart)).replace(/^[\s—]+/, "").trim();
     results.push({ name, context });
   }
   return results;
