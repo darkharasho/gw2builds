@@ -43,8 +43,12 @@ const KNOWN_SKILL_SPEC_OVERRIDES = new Map([
   [63067, 71],  // Specter Siphon → Specter (77397 is Antiquary spec=77, unrelated)
   // Weaver attunement button skills — /v2/skills returns spec=80 but Weaver spec is 56
   [76580, 56], [76988, 56], [76703, 56], [77082, 56],
-  // Weaver F5 dual-attunement combo skills (Conflagration, Buoyant Deluge, Lightning Blitz, Seismic Impact)
+  // Weaver Weapon_3 dual-attunement combo skills (Aqua Surge, Earthen Vortex, Plasma Burst, Seismic Impact)
   [76585, 56], [76811, 56], [77089, 56], [76707, 56],
+  // Evoker (spec 80) F5 familiar passives — API returns no specialization for Splash/Zap/Calcify.
+  [77225, 80], [77370, 80], [77226, 80],
+  // Evoker F5 familiar chain skills — API returns no specialization.
+  [77074, 80], [77357, 80], [76618, 80], [76681, 80],
   // Scrapper Function Gyro variants — profession endpoint incorrectly tags these as Holosmith (57)
   // but /v2/skills correctly returns spec=43 (Scrapper). Without override, they could appear at
   // Holosmith's F5 slot instead of Photon Forge (42938).
@@ -92,6 +96,8 @@ const KNOWN_SKILL_SLOT_OVERRIDES = new Map([
   [78661, "Profession_2"], [78895, "Profession_2"],
   // Conduit Cosmic Wisdom — Profession_3 slot.
   [77371, "Profession_3"],
+  // Evoker (spec 80) F5 familiar passives — API returns no slot for Splash/Zap/Calcify.
+  [77225, "Profession_5"], [77370, "Profession_5"], [77226, "Profession_5"],
 ]);
 
 // Photon Forge (skill 42938) has no bundle_skills in the GW2 API, but in-game it grants
@@ -344,11 +350,25 @@ const DRAGON_TRIGGER_BUNDLE_SKILLS = [
   { id: 62926, name: "Flicker Step",              slot: "Weapon_5", icon: `${_WK}/d/de/Flicker_Step.png` },
 ];
 
-// GW2 API omits flip_skill for Facet of Elements (27014); hardcode the missing link.
-// Shadow Shroud Enter (63155) needs a flip to its Exit skill (63251) for the active-icon toggle.
+// GW2 API omits flip_skill for some skills; hardcode missing links.
 const LEGEND_FLIP_OVERRIDES = new Map([
   [27014, 27162], // Facet of Elements → Elemental Blast
   [63155, 63251], // Enter Shadow Shroud → Exit Shadow Shroud
+  // Evoker (spec 80) F5 familiar passive → chain summon (API omits flip_skill entirely).
+  [76643, 77074], // Ignite → Conflagration (Fire)
+  [77225, 77357], // Splash → Buoyant Deluge (Water)
+  [77370, 76618], // Zap → Lightning Blitz (Air)
+  [77226, 76681], // Calcify → Seismic Impact (Earth)
+]);
+
+// GW2 API omits the attunement field for some Elementalist skills.
+// Override so the renderer can match them to the active attunement.
+const KNOWN_SKILL_ATTUNEMENT_OVERRIDES = new Map([
+  // Evoker F5 familiar passives (each corresponds to one element).
+  [76643, "Fire"],  // Ignite
+  [77225, "Water"], // Splash
+  [77370, "Air"],   // Zap
+  [77226, "Earth"], // Calcify
 ]);
 
 module.exports = {
@@ -381,4 +401,5 @@ module.exports = {
   DRAGON_TRIGGER_BUNDLE_SKILLS,
   ELIXIR_TOOLBELT_OVERRIDES,
   LEGEND_FLIP_OVERRIDES,
+  KNOWN_SKILL_ATTUNEMENT_OVERRIDES,
 };

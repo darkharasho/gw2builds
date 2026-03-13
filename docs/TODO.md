@@ -1,0 +1,3 @@
+- Reaper shroud 5 is inaccurate in wvw split from the wiki
+- when clicking on an overload skill it should update the reference panel to that overload skill
+- Ele flip skills are STILL getting picked up in core/cata/evoker. they shouldnt ever have overload skills.

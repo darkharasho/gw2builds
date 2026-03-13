@@ -280,18 +280,31 @@ export function showHoverPreview(kind, entity, x, y) {
 
   // For skills, follow flipSkill chain to show chained/charged skills as subsequent cards.
   // Weapon skills live in weaponSkillById; profession/utility skills in skillById — check both.
-  // Elementalist exception: only Tempest (spec 48) uses a meaningful flip chain (Overload).
-  // Weaver, Catalyst, Evoker, core ele — none of them should show a flip chain.
-  // entity.professions and entity.specialization are unreliable for newer specs (both may be
-  // empty/0 in the API), so check the active build's profession + elite spec instead.
-  const suppressFlipForElem = state.editor?.profession === "Elementalist" && (() => {
-    const specs = state.editor?.specializations || [];
-    const cat = state.activeCatalog;
-    const eliteEntry = specs.find((s) => cat?.specializationById?.get(Number(s?.specializationId))?.elite);
-    return Number(eliteEntry?.specializationId) !== 48; // not Tempest
-  })();
+  // The mechBar candidate pool may include skills from elite specs other than the active one
+  // (e.g. Tempest attunement skills spec=48 appear when Catalyst/Core Ele is active because
+  // Catalyst has no spec=67 attunement candidates so the pool falls back to all candidates).
+  // Those mis-spec'd skills have flip chains (Overloads) that should not be shown. Suppress the
+  // flip chain whenever the hovered entity belongs to an elite spec that isn't currently active.
+  const _flipCat = state.activeCatalog;
+  const _activeEliteSpecId = _flipCat?.specializationById
+    ? ((state.editor?.specializations || [])
+        .map((e) => Number(e?.specializationId) || 0)
+        .find((id) => id > 0 && _flipCat.specializationById.get(id)?.elite) || 0)
+    : 0;
+  const _entitySpecId = Number(entity.specialization) || 0;
+  const suppressMismatchedEliteFlip = _entitySpecId > 0
+    && !!_flipCat?.specializationById?.get(_entitySpecId)?.elite
+    && _entitySpecId !== _activeEliteSpecId;
+  // Elementalist: only Tempest (spec 48) has Overload flips on attunement F1-F4 skills; suppress
+  // for all other builds including Weaver where the entity spec matches the active elite spec.
+  // Restrict to F1-F4 slots so Evoker F5 familiar flip chains (e.g. Ignite → Conflagration) are
+  // not suppressed.
+  const suppressElemNonTempestFlip = _entitySpecId > 0
+    && (state.editor?.profession ?? "") === "Elementalist"
+    && _activeEliteSpecId !== 48
+    && /^Profession_[1-4]$/.test(entity.slot || "");
   const chainCards = [buildSkillCard(entity, kind, false, dmgStats)];
-  if (kind === "skill" && entity.flipSkill && !suppressFlipForElem) {
+  if (kind === "skill" && entity.flipSkill && !suppressMismatchedEliteFlip && !suppressElemNonTempestFlip) {
     const catalog = state.activeCatalog;
     const lookupSkill = (id) => catalog?.skillById?.get(id) || catalog?.weaponSkillById?.get(id);
     const exitPattern = /^(Exit|Leave|Deactivate|Stow)\b/i;

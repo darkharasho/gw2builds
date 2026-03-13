@@ -32,6 +32,7 @@ const {
   DRAGON_TRIGGER_BUNDLE_SKILLS,
   ELIXIR_TOOLBELT_OVERRIDES,
   LEGEND_FLIP_OVERRIDES,
+  KNOWN_SKILL_ATTUNEMENT_OVERRIDES,
 } = require("./overrides");
 
 const { getSkillSplit, getTraitSplit, getSkillPveFacts, getTraitPveFacts } = require("../../../lib/gw2-balance-splits");
@@ -607,7 +608,8 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
           : (transformOpenerSlots.has(skill.slot || "") ? (transformBundleBySpecId.get(specId) || []) : []);
     // GW2 API returns "None" for weapon-agnostic skills; normalize to "" so falsy checks work.
     const weaponType = skill.weapon_type === "None" ? "" : (skill.weapon_type || "");
-    const attunement = skill.attunement === "None" ? "" : (skill.attunement || "");
+    const attunement = KNOWN_SKILL_ATTUNEMENT_OVERRIDES.get(skill.id)
+      || (skill.attunement === "None" ? "" : (skill.attunement || ""));
     // dual_attunement is the Elementalist/Weaver dual attack secondary attunement field.
     // (dual_wield is a Thief-specific field for offhand weapon requirement — unrelated)
     const dualWield = skill.dual_attunement === "None" ? "" : (skill.dual_attunement || "");

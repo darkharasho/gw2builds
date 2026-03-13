@@ -1073,7 +1073,12 @@ export function renderSkills() {
         mechIconSignature = `fake:${fakeCommand}`;
       } else {
         // When a static bundle skill (e.g. Photon Forge) is active, show the flip_skill icon.
-        const flipSkillId = isActive && isStatic && !isDragonTriggerToggle && (skill?.flipSkill ?? 0);
+        // Elementalist attunement skills have flipSkill → Tempest Overloads; only follow that
+        // chain when Tempest (spec 48) is the active elite spec.
+        const isElemNonTempestAttunement = !isKit && isStatic
+          && (catalog?.profession?.id || "") === "Elementalist" && eliteSpecId !== 48;
+        const flipSkillId = isActive && isStatic && !isDragonTriggerToggle
+          && !isElemNonTempestAttunement && (skill?.flipSkill ?? 0);
         const flipSkill = flipSkillId ? catalog.skillById.get(flipSkillId) : null;
         // Elixir toolbelt skills ("Detonate Elixir X") share a generic icon in the API.
         // Fall back to the source elixir's own icon so each slot looks distinct.

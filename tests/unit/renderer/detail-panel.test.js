@@ -1,6 +1,7 @@
 "use strict";
 
 const detailPanel = require("../../../src/renderer/modules/detail-panel");
+const { state } = require("../../../src/renderer/modules/state");
 
 function makeDetachHost() {
   return { addEventListener: jest.fn() };
@@ -76,5 +77,185 @@ describe("initDetailPanel — openDetailModal expand button", () => {
     expect(() =>
       detailPanel.initDetailPanel({ detailHost: null, hoverPreview: null, expandBtn: null }, {})
     ).not.toThrow();
+  });
+});
+
+// ── showHoverPreview — flip-chain suppression for mismatched elite spec ────────
+//
+// Root cause: the mechBar candidate pool falls back to ALL specialization
+// candidates when no skills match the active elite spec.  For Elementalist,
+// this means Tempest attunement skills (specialization: 48) can appear on the
+// bar even when Catalyst or core is active.  Those Tempest skills carry a
+// flipSkill pointer to the corresponding Overload (also spec 48), and because
+// both the entity and the flip target share the same spec the while-loop
+// mismatch guard inside showHoverPreview never fires — the Overload card would
+// be appended.  The fix (suppressMismatchedEliteFlip) checks the entity's own
+// specialization against the currently active elite spec and skips the flip
+// chain entirely when they differ.
+
+describe("showHoverPreview — flip-chain suppression for mismatched elite spec", () => {
+  // Minimal mock specialization catalog (Tempest=48, Weaver=56, Catalyst=67, all elite).
+  const MOCK_CATALOG = {
+    specializationById: new Map([
+      [48, { id: 48, name: "Tempest",  elite: true }],
+      [56, { id: 56, name: "Weaver",   elite: true }],
+      [67, { id: 67, name: "Catalyst", elite: true }],
+    ]),
+    skillById: new Map([
+      [2001, {
+        id: 2001, name: "Overload Fire", specialization: 48, flipSkill: 0,
+        icon: "", iconFallback: "", description: "", facts: [], traitedFacts: [],
+        slot: "Profession_1", type: "Profession", professions: ["Elementalist"],
+        attunement: "", weaponType: "", hasSplit: false,
+      }],
+      [2002, {
+        id: 2002, name: "Overload Fire (Weaver target)", specialization: 0, flipSkill: 0,
+        icon: "", iconFallback: "", description: "", facts: [], traitedFacts: [],
+        slot: "Profession_1", type: "Profession", professions: ["Elementalist"],
+        attunement: "", weaponType: "", hasSplit: false,
+      }],
+      [3002, {
+        id: 3002, name: "Core Flip Target", specialization: 0, flipSkill: 0,
+        icon: "", iconFallback: "", description: "", facts: [], traitedFacts: [],
+        slot: "", type: "Profession", professions: [],
+        attunement: "", weaponType: "", hasSplit: false,
+      }],
+    ]),
+    weaponSkillById: new Map(),
+  };
+
+  // A Tempest-spec attunement skill (spec 48) whose flipSkill points to Overload Fire.
+  const TEMPEST_ATTUNEMENT = {
+    id: 1001, name: "Attune to Fire (Tempest)", specialization: 48, flipSkill: 2001,
+    icon: "", iconFallback: "", description: "", facts: [], traitedFacts: [],
+    slot: "Profession_1", type: "Profession", professions: ["Elementalist"],
+    attunement: "Fire", weaponType: "", hasSplit: false,
+  };
+
+  // A Weaver-spec attunement skill (spec 56) whose flipSkill points to an Overload (spec 0).
+  // Models real Weaver attunements like Fire Attunement (76703) which have flip chains in the live API.
+  const WEAVER_ATTUNEMENT = {
+    id: 4001, name: "Fire Attunement (Weaver)", specialization: 56, flipSkill: 2002,
+    icon: "", iconFallback: "", description: "", facts: [], traitedFacts: [],
+    slot: "Profession_2", type: "Profession", professions: ["Elementalist"],
+    attunement: "Fire", weaponType: "", hasSplit: false,
+  };
+
+  // A core (spec 0) skill whose flipSkill points to another core (spec 0) skill.
+  const CORE_SKILL_WITH_FLIP = {
+    id: 3001, name: "Core Skill", specialization: 0, flipSkill: 3002,
+    icon: "", iconFallback: "", description: "", facts: [], traitedFacts: [],
+    slot: "Profession_1", type: "Profession", professions: [],
+    attunement: "", weaponType: "", hasSplit: false,
+  };
+
+  let savedEditor;
+  let savedCatalog;
+  let savedWindow;
+  let savedDocument;
+  let mockHover;
+
+  beforeEach(() => {
+    savedEditor   = state.editor;
+    savedCatalog  = state.activeCatalog;
+    savedWindow   = global.window;
+    savedDocument = global.document;
+
+    global.window = { innerWidth: 1920, innerHeight: 1080 };
+    // Minimal document mock: decodeHtmlEntities in utils.js creates a textarea to
+    // decode HTML entities — stub it so it returns the raw string (our test data
+    // has no entities that need decoding).
+    global.document = {
+      createElement(tag) {
+        if (tag === "textarea") {
+          const el = { _html: "", value: "" };
+          Object.defineProperty(el, "innerHTML", {
+            set(v) { el._html = v; el.value = v; },
+            get() { return el._html; },
+          });
+          return el;
+        }
+        return {};
+      },
+    };
+
+    mockHover = {
+      innerHTML: "",
+      style: {},
+      classList: {
+        _classes: new Set(),
+        add(c)      { this._classes.add(c); },
+        remove(c)   { this._classes.delete(c); },
+        contains(c) { return this._classes.has(c); },
+      },
+      getBoundingClientRect: () => ({ width: 200, height: 100 }),
+    };
+
+    // Wire up hoverPreview so showHoverPreview can write to it.
+    detailPanel.initDetailPanel({ hoverPreview: mockHover }, {});
+
+    state.activeCatalog = MOCK_CATALOG;
+    state.editor = {
+      profession: "Elementalist",
+      specializations: [],
+      skills: { healId: 0, utilityIds: [0, 0, 0], eliteId: 0 },
+      activeWeaponSet: 1,
+      equipment: {
+        slots: {},
+        weapons: { mainhand1: "", offhand1: "", mainhand2: "", offhand2: "" },
+      },
+    };
+  });
+
+  afterEach(() => {
+    state.editor        = savedEditor;
+    state.activeCatalog = savedCatalog;
+    global.window       = savedWindow;
+    global.document     = savedDocument;
+  });
+
+  test("suppresses Overload flip chain when Catalyst (spec 67) is the active elite spec", () => {
+    state.editor.specializations = [{ specializationId: 67, majorChoices: {} }];
+    detailPanel.showHoverPreview("skill", TEMPEST_ATTUNEMENT, 100, 100);
+    expect(mockHover.innerHTML).not.toContain("hover-preview__chain-divider");
+    expect(mockHover.innerHTML).not.toContain("Overload Fire");
+  });
+
+  test("suppresses Overload flip chain for core Elementalist (no elite spec selected)", () => {
+    state.editor.specializations = [];
+    detailPanel.showHoverPreview("skill", TEMPEST_ATTUNEMENT, 100, 100);
+    expect(mockHover.innerHTML).not.toContain("hover-preview__chain-divider");
+    expect(mockHover.innerHTML).not.toContain("Overload Fire");
+  });
+
+  test("shows Overload flip chain when Tempest (spec 48) is the active elite spec", () => {
+    state.editor.specializations = [{ specializationId: 48, majorChoices: {} }];
+    detailPanel.showHoverPreview("skill", TEMPEST_ATTUNEMENT, 100, 100);
+    expect(mockHover.innerHTML).toContain("hover-preview__chain-divider");
+    expect(mockHover.innerHTML).toContain("Overload Fire");
+  });
+
+  test("does not suppress flip chain for a core (spec 0) skill — only elite-spec mismatches are filtered", () => {
+    // spec=0 entity with a flip to another spec=0 skill should always be allowed through
+    state.editor.specializations = [{ specializationId: 67, majorChoices: {} }];
+    detailPanel.showHoverPreview("skill", CORE_SKILL_WITH_FLIP, 100, 100);
+    expect(mockHover.innerHTML).toContain("hover-preview__chain-divider");
+    expect(mockHover.innerHTML).toContain("Core Flip Target");
+  });
+
+  test("suppresses Overload flip chain for Weaver (spec 56) attunement when Weaver is active elite", () => {
+    // Weaver entity spec (56) matches active elite spec (56) — suppressMismatchedEliteFlip is false,
+    // but suppressElemNonTempestFlip should catch this (Elementalist, active≠48, entitySpec>0).
+    state.editor.specializations = [{ specializationId: 56, majorChoices: {} }];
+    detailPanel.showHoverPreview("skill", WEAVER_ATTUNEMENT, 100, 100);
+    expect(mockHover.innerHTML).not.toContain("hover-preview__chain-divider");
+    expect(mockHover.innerHTML).not.toContain("Overload Fire (Weaver target)");
+  });
+
+  test("suppresses Overload flip chain for Weaver attunement when Catalyst is active elite", () => {
+    state.editor.specializations = [{ specializationId: 67, majorChoices: {} }];
+    detailPanel.showHoverPreview("skill", WEAVER_ATTUNEMENT, 100, 100);
+    expect(mockHover.innerHTML).not.toContain("hover-preview__chain-divider");
+    expect(mockHover.innerHTML).not.toContain("Overload Fire (Weaver target)");
   });
 });
