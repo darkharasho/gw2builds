@@ -60,7 +60,8 @@ export function renderAuth() {
       } catch (err) { showError(err); }
     });
 
-    const rerunSetup = makeButton("Re-run Setup", "secondary", async () => {
+    const setupReady = status?.repoReady && status?.pagesReady;
+    const rerunSetup = makeButton(setupReady ? "Re-run Setup" : "Setup Publishing", "secondary", async () => {
       try {
         if (!target) throw new Error("No target selected.");
         await window.desktopApi.setupRepoPages(target.login, target.type);
