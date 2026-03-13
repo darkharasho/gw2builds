@@ -40,8 +40,19 @@ function createWindow() {
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
+      webviewTag: true,
       preload: path.join(__dirname, "../preload/index.js"),
     },
+  });
+
+  win.webContents.on("will-attach-webview", (event, webPreferences, params) => {
+    // Strip any preload the renderer tries to attach — prevents privilege escalation
+    delete webPreferences.preload;
+    delete webPreferences.preloadURL;
+    // Block any webview whose initial src is not the GW2 wiki
+    if (!params.src.startsWith("https://wiki.guildwars2.com/")) {
+      event.preventDefault();
+    }
   });
 
   if (DEV_SERVER_URL) {
