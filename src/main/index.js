@@ -17,6 +17,7 @@ const {
 } = require("./githubApi");
 const { getProfessionList, getProfessionCatalog, getWikiSummary, getWikiRelatedData } = require("./gw2Data");
 const { buildSiteBundle } = require("./siteBundle");
+const { initAutoUpdate } = require("./autoUpdate");
 
 const DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL || "";
 const IS_DEV_PROFILE = process.env.APP_PROFILE === "dev" && !app.isPackaged;
@@ -143,6 +144,7 @@ async function getOnboardingStatus() {
 app.whenReady().then(async () => {
   await store.init();
   const win = createWindow();
+  initAutoUpdate(win);
 
   // Pre-warm all profession catalogs in the background so class switching is instant.
   // Runs sequentially with a short delay between each to avoid hammering the GW2 API.
