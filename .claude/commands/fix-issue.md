@@ -31,9 +31,9 @@ gh api repos/darkharasho/gw2builds/issues/$ARGUMENTS
 
 - If the issue is not found: stop and report the error.
 - If `gh` is not authenticated: stop with "Run `gh auth login` first."
-- Compute a **slug** from the issue title: first 4–5 words, lowercase, hyphenated.
+- Compute a **slug** from the issue title: take the first 4–5 words, lowercase, strip non-alphanumeric characters (except hyphens), hyphenate, max 40 characters.
   Example: "Cant select any stats on equipment" → `cant-select-any-stats`
-  Reuse this slug unchanged in Steps 4 and 6.
+  Minimum 2 words. Reuse this slug unchanged in Steps 4 and 6.
 
 ### Step 2 — Auto-label
 
@@ -44,6 +44,8 @@ gh issue edit $ARGUMENTS --repo darkharasho/gw2builds --add-label <label>
 ```
 
 If the label is **not** `bug`: stop with "Issue is not a bug — aborting fix agent."
+
+(The label is still applied intentionally for triage purposes — the human can see it was triaged.)
 
 ### Step 3 — Add to Project board + move to "In progress"
 
@@ -56,6 +58,8 @@ gh project item-add 1 --owner darkharasho \
 ```
 
 Capture the `id` field from the JSON response. This is the **item ID** used in 3b and Step 11.
+
+> **Remember this item ID — you will need it again in Step 11.**
 
 **3b. Move to "In progress":**
 
@@ -81,11 +85,14 @@ Use `Glob`, `Grep`, and `Read` to identify the root cause.
 - For UI bugs: start with `src/renderer/renderer.js`
 - For data/API bugs: start with `src/main/gw2Data.js`
 
+If the root cause cannot be identified after 3–4 targeted searches, go to the **Failure Path**.
+
 ### Step 6 — Create or reuse branch
 
 Check whether the fix branch already exists remotely:
 
 ```bash
+git fetch origin 2>/dev/null || true
 git ls-remote --heads origin fix/issue-$ARGUMENTS-<slug>
 ```
 
@@ -108,10 +115,12 @@ If they still fail after 2 attempts: go to the **Failure Path** below.
 ### Step 9 — Commit + push
 
 ```bash
-git add -A
+git add src/ tests/
 git commit -m "fix: <issue title> (closes #$ARGUMENTS)"
 git push -u origin fix/issue-$ARGUMENTS-<slug>
 ```
+
+(Use the actual issue title fetched in Step 1, not the literal text `<issue title>`.)
 
 ### Step 10 — Open PR (or find existing)
 
@@ -120,6 +129,7 @@ Check for an existing PR on this branch:
 ```bash
 gh pr list --repo darkharasho/gw2builds \
   --head fix/issue-$ARGUMENTS-<slug> \
+  --state open \
   --json url
 ```
 
@@ -141,6 +151,8 @@ Closes #$ARGUMENTS" \
 Capture the PR URL.
 
 ### Step 11 — Move to "Done" + close out
+
+Use the item ID you captured in Step 3a.
 
 **Move to Done:**
 
@@ -168,7 +180,13 @@ End your response with: `PR opened: <pr-url>`
 If tests still fail after 2 attempts, or you cannot identify the root cause:
 
 1. Do **not** move the issue status (leave it "In progress").
-2. Post a comment:
+2. Push the WIP branch so it is inspectable:
+
+```bash
+git push -u origin fix/issue-$ARGUMENTS-<slug> 2>/dev/null || true
+```
+
+3. Post a comment:
 
 ```bash
 gh issue comment $ARGUMENTS --repo darkharasho/gw2builds \
@@ -177,4 +195,4 @@ What I tried: <summary of approaches>
 Why it failed: <specific reason>"
 ```
 
-3. End your response with: `Could not fix: <one-line reason>`
+4. End your response with: `Could not fix: <one-line reason>`
