@@ -40,12 +40,16 @@
       "html"
     ],
     "testTimeout": 15000,
-    "clearMocks": true
+    "clearMocks": true,
+    "moduleNameMapper": {
+      "^.*\\?raw$": "<rootDir>/tests/helpers/rawMock.js"
+    }
   },
   "license": "MIT",
   "dependencies": {
     "dotenv": "^17.2.3",
-    "electron": "^37.2.0"
+    "electron": "^37.2.0",
+    "gw2-class-icons": "^0.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
