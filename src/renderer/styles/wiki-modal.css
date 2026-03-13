@@ -77,6 +77,19 @@
   border-color: var(--accent-2);
 }
 
+.wiki-modal-btn--copied {
+  background: rgba(72, 197, 120, 0.15) !important;
+  color: #7de0a0 !important;
+  border-color: #4caf72 !important;
+  animation: wiki-copied-pop 0.15s ease-out;
+}
+
+@keyframes wiki-copied-pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
 .wiki-modal-btn--close:hover {
   background: rgba(197, 72, 95, 0.2);
   color: #e07080;
@@ -84,20 +97,23 @@
 }
 
 .wiki-modal-body {
-  flex: 1;
+  flex: 1 1 0;
+  min-height: 0;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .wiki-modal-loading {
   position: absolute;
   inset: 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 16px;
   background: var(--panel-2);
-  color: var(--muted);
-  font-size: 0.9rem;
   z-index: 1;
   pointer-events: none;
 }
@@ -106,12 +122,38 @@
   display: none;
 }
 
+.wiki-modal-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(255, 255, 255, 0.08);
+  border-top-color: var(--accent-2, #6ab0f5);
+  border-radius: 50%;
+  animation: wiki-spin 0.7s linear infinite;
+}
+
+.wiki-modal-loading-text {
+  font-size: 0.8rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  animation: wiki-fade-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes wiki-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes wiki-fade-pulse {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 1; }
+}
+
 .wiki-modal-webview {
   width: 100%;
   height: 100%;
   border: none;
   display: block;
 }
+
 
 /* "Open Wiki Page" button — styled to look like the former anchor link */
 .wiki-open-btn {

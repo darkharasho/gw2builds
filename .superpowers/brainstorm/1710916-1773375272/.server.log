@@ -1,0 +1,14 @@
+{"type":"server-started","port":52179,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:52179","screen_dir":"/var/home/mstephens/Documents/GitHub/gw2builds/.superpowers/brainstorm/1710916-1773375272"}
+{"type":"screen-added","file":"/var/home/mstephens/Documents/GitHub/gw2builds/.superpowers/brainstorm/1710916-1773375272/modal-design.html"}
+{"source":"user-event","type":"click","text":"B\n    \n      Add back/forward nav\n      ← → buttons before the URL bar so you can navigate to linked wiki pages inside the modal.","choice":"b","id":null,"timestamp":1773375385326}
+{"source":"user-event","type":"click","text":"A\n    \n      As shown above\n      URL bar + Copy + Close in a single toolbar row. Clean, minimal chrome.","choice":"a","id":null,"timestamp":1773375386505}
+{"source":"user-event","type":"click","text":"B\n    \n      Add back/forward nav\n      ← → buttons before the URL bar so you can navigate to linked wiki pages inside the modal.","choice":"b","id":null,"timestamp":1773375387097}
+{"source":"user-event","type":"click","text":"C\n    \n      Escape key closes, no close button\n      Same as A but no ✕ button — Escape key is the only way to close. Cleaner toolbar.","choice":"c","id":null,"timestamp":1773375387778}
+{"source":"user-event","type":"click","text":"B\n    \n      Add back/forward nav\n      ← → buttons before the URL bar so you can navigate to linked wiki pages inside the modal.","choice":"b","id":null,"timestamp":1773375389662}
+{"source":"user-event","type":"click","text":"A\n    \n      As shown above\n      URL bar + Copy + Close in a single toolbar row. Clean, minimal chrome.","choice":"a","id":null,"timestamp":1773375390206}
+{"source":"user-event","type":"click","text":"B\n    \n      Add back/forward nav\n      ← → buttons before the URL bar so you can navigate to linked wiki pages inside the modal.","choice":"b","id":null,"timestamp":1773375391474}
+{"source":"user-event","type":"click","text":"C\n    \n      Escape key closes, no close button\n      Same as A but no ✕ button — Escape key is the only way to close. Cleaner toolbar.","choice":"c","id":null,"timestamp":1773375391865}
+{"type":"server-stopped","reason":"idle timeout"}
+{"source":"user-event","type":"click","text":"B\n    \n      Add back/forward nav\n      ← → buttons before the URL bar so you can navigate to linked wiki pages inside the modal.","choice":"b","id":null,"timestamp":1773379294123}
+{"source":"user-event","type":"click","text":"A\n    \n      As shown above\n      URL bar + Copy + Close in a single toolbar row. Clean, minimal chrome.","choice":"a","id":null,"timestamp":1773379294579}
+{"source":"user-event","type":"click","text":"C\n    \n      Escape key closes, no close button\n      Same as A but no ✕ button — Escape key is the only way to close. Cleaner toolbar.","choice":"c","id":null,"timestamp":1773379294999}

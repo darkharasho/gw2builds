@@ -19,7 +19,10 @@ export function initWikiModal() {
         <button class="wiki-modal-btn wiki-modal-btn--close" id="wiki-modal-close">&#x2715;</button>
       </div>
       <div class="wiki-modal-body">
-        <div class="wiki-modal-loading wiki-modal-loading--hidden" id="wiki-modal-loading">Loading&hellip;</div>
+        <div class="wiki-modal-loading wiki-modal-loading--hidden" id="wiki-modal-loading">
+          <div class="wiki-modal-spinner"></div>
+          <span class="wiki-modal-loading-text">Loading&hellip;</span>
+        </div>
         <webview class="wiki-modal-webview" id="wiki-modal-webview" partition="wiki"></webview>
       </div>
     </div>
@@ -32,8 +35,18 @@ export function initWikiModal() {
 
   document.getElementById("wiki-modal-close").addEventListener("click", closeWikiModal);
 
-  document.getElementById("wiki-modal-copy").addEventListener("click", () => {
-    if (_currentUrl) window.desktopApi?.writeClipboardText(_currentUrl);
+  const copyBtn = document.getElementById("wiki-modal-copy");
+  let _copyResetTimer = null;
+  copyBtn.addEventListener("click", () => {
+    if (!_currentUrl) return;
+    window.desktopApi?.writeClipboardText(_currentUrl);
+    copyBtn.textContent = "✓ Copied";
+    copyBtn.classList.add("wiki-modal-btn--copied");
+    clearTimeout(_copyResetTimer);
+    _copyResetTimer = setTimeout(() => {
+      copyBtn.textContent = "Copy URL";
+      copyBtn.classList.remove("wiki-modal-btn--copied");
+    }, 1800);
   });
 
   _webview.addEventListener("did-navigate", (e) => {
@@ -53,6 +66,15 @@ export function initWikiModal() {
   _webview.addEventListener("did-stop-loading", () => {
     loadingEl.classList.add("wiki-modal-loading--hidden");
   });
+
+  // Electron's backing iframe lives inside the webview's shadow root and has no height set.
+  // CSS selectors can't pierce shadow DOM, so we set it directly via JS.
+  const _fixIframeHeight = () => {
+    const iframe = _webview.shadowRoot?.querySelector("iframe") ?? _webview.querySelector("iframe");
+    if (iframe) iframe.style.height = "100%";
+  };
+  _webview.addEventListener("did-attach", _fixIframeHeight);
+  _webview.addEventListener("dom-ready", _fixIframeHeight);
 }
 
 export function openWikiModal(url) {
