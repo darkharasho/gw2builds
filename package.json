@@ -6,7 +6,10 @@
   "build": {
     "appId": "com.darkharasho.axiforge",
     "productName": "AxiForge",
-    "directories": { "output": "dist_out" },
+    "icon": "public/img/build_logo.png",
+    "directories": {
+      "output": "dist_out"
+    },
     "artifactName": "AxiForge-${version}.${ext}",
     "publish": {
       "provider": "github",
@@ -21,9 +24,20 @@
       "lib/**/*",
       "package.json"
     ],
-    "linux": { "target": ["AppImage"] },
-    "win": { "target": ["nsis"] },
-    "nsis": { "oneClick": true, "differentialPackage": true }
+    "linux": {
+      "target": [
+        "AppImage"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "differentialPackage": true
+    }
   },
   "scripts": {
     "start": "electron .",
@@ -73,7 +87,7 @@
   "license": "MIT",
   "dependencies": {
     "dotenv": "^17.2.3",
-    "electron-updater": "^6.6.2",
+    "electron-updater": "^6.8.3",
     "gw2-class-icons": "^0.1.0"
   },
   "devDependencies": {
