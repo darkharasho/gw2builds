@@ -44,7 +44,6 @@ function q(selector) {
 }
 
 const el = {
-  setupGate:         q("#setupGate"),
   authRow:           q("#authRow"),
   onboarding:        q("#onboarding"),
   workspaceBtn:      q("#workspaceBtn"),

@@ -24,13 +24,12 @@ export function render() {
   closeCustomSelect();
   renderAuth();
   renderOnboarding();
-  renderSetupGate();
   renderBuildList();
   renderEditor();
   // Update titlebar user display
   const titlebarUser = document.querySelector("#titlebarUser");
   if (titlebarUser) {
-    titlebarUser.textContent = state.user ? state.user.login : "";
+    titlebarUser.textContent = state.user ? state.user.login : "Sign in";
   }
   if (_el.workspaceBtn) {
     _el.workspaceBtn.title = state.user ? `Workspace (${state.user.login})` : "Workspace (not signed in)";
@@ -158,123 +157,6 @@ export function renderOnboarding() {
       card.append(btn);
     }
     _el.onboarding.append(card);
-  }
-}
-
-// ---------------------------------------------------------------------------
-// renderSetupGate
-// ---------------------------------------------------------------------------
-export function renderSetupGate() {
-  const status = state.onboarding;
-  if (!status) return;
-  const isReady = status.isAuthenticated && status.repoReady && status.pagesReady && status.siteReady;
-  if (isReady) {
-    _el.setupGate.classList.add("hidden");
-    return;
-  }
-
-  _el.setupGate.classList.remove("hidden");
-  const flow = state.loginFlow;
-  const codeBlock = flow.beginData
-    ? `
-      <article class="gate-card">
-        <h3>GitHub Device Code</h3>
-        <p>Approve login at GitHub using this code.</p>
-        <div class="gate-code">${escapeHtml(flow.beginData.userCode || "")}</div>
-        <button id="copyDeviceCode" class="btn btn-secondary">Copy code</button>
-        <p class="gate-link">Open <a href="${escapeHtml(flow.beginData.verificationUri)}" target="_blank" rel="noreferrer">${escapeHtml(flow.beginData.verificationUri)}</a>.</p>
-      </article>
-    `
-    : "";
-  const pollBlock = state.pagesPoll.active
-    ? `
-      <article class="gate-card gate-card--poll">
-        <h3>Waiting For GitHub Pages</h3>
-        <p>Current status: <strong>${escapeHtml(formatPagesStatus(state.pagesPoll.status))}</strong></p>
-        ${state.pagesPoll.error ? `<p class="error-line">${escapeHtml(state.pagesPoll.error)}</p>` : ""}
-      </article>
-    `
-    : "";
-
-  _el.setupGate.innerHTML = `
-    <div class="gate-shell">
-      <div>
-        <h1>Complete First-Time Setup</h1>
-        <p>AxiForge stays locked until authentication and repository setup are complete.</p>
-      </div>
-      ${codeBlock}
-      ${pollBlock}
-      <div id="targetPicker"></div>
-      <div id="setupGateSteps" class="gate-steps"></div>
-    </div>
-  `;
-
-  const picker = _el.setupGate.querySelector("#targetPicker");
-  renderTargetPicker(picker);
-
-  const host = _el.setupGate.querySelector("#setupGateSteps");
-  const target = getSelectedTarget();
-  const targetHint = target ? `Target: ${target.login}` : "Pick a target first.";
-  const steps = [
-    {
-      title: "1. Authenticate with GitHub",
-      done: status.isAuthenticated,
-      actionLabel: flow.waitingForApproval
-        ? "Waiting for approval..."
-        : status.isAuthenticated
-          ? "Re-authenticate"
-          : "Authenticate",
-      canRun: !flow.pending,
-      action: async () => {
-        await startLoginFlow();
-        await _callbacks.refreshOnboardingStatus();
-        render();
-      },
-    },
-    {
-      title: "2. Create axiforge and enable Pages",
-      done: status.repoReady && status.pagesReady,
-      actionLabel: status.repoReady && status.pagesReady ? "Re-run setup" : "Setup repo + Pages",
-      canRun: status.isAuthenticated && Boolean(target),
-      action: async () => {
-        await window.desktopApi.setupRepoPages(target.login, target.type);
-        await runPagesBuildPoll();
-        await _callbacks.refreshOnboardingStatus();
-        render();
-      },
-    },
-  ];
-
-  for (const step of steps) {
-    const card = document.createElement("article");
-    card.className = `status-card ${step.done ? "status-card--done" : ""}`;
-    card.innerHTML = `<h3>${escapeHtml(step.title)}</h3><p>${step.done ? "Completed" : escapeHtml(targetHint)}</p>`;
-    if (step.canRun) {
-      const btn = makeButton(step.actionLabel, "primary", async () => {
-        try {
-          btn.disabled = true;
-          await step.action();
-        } catch (err) {
-          showError(err);
-        } finally {
-          btn.disabled = false;
-        }
-      });
-      btn.classList.add("mt-8");
-      card.append(btn);
-    }
-    host.append(card);
-  }
-
-  const copyBtn = _el.setupGate.querySelector("#copyDeviceCode");
-  if (copyBtn && flow.beginData?.userCode) {
-    copyBtn.addEventListener("click", async () => {
-      await window.desktopApi.writeClipboardText(flow.beginData.userCode);
-      copyBtn.textContent = "Copied";
-      setTimeout(() => {
-        copyBtn.textContent = "Copy code";
-      }, 1000);
-    });
   }
 }
 
@@ -471,14 +353,14 @@ export async function runPagesBuildPoll() {
   state.pagesPoll.active = true;
   state.pagesPoll.status = "queued";
   state.pagesPoll.error = null;
-  renderSetupGate();
+  renderOnboarding();
 
   try {
     for (let i = 0; i < 120; i += 1) {
       const poll = await window.desktopApi.pollPagesStatus();
       state.pagesPoll.status = poll.status || "unknown";
       state.pagesPoll.error = poll.error || null;
-      renderSetupGate();
+      renderOnboarding();
 
       if (poll.ready && poll.pagesUrl) return;
       if (poll.status === "errored" || poll.status === "error") {
@@ -489,7 +371,7 @@ export async function runPagesBuildPoll() {
     throw new Error("Timed out waiting for GitHub Pages to finish building.");
   } finally {
     state.pagesPoll.active = false;
-    renderSetupGate();
+    renderOnboarding();
   }
 }
 
@@ -499,11 +381,11 @@ export async function runPagesBuildPoll() {
 export async function startLoginFlow() {
   state.loginFlow.pending = true;
   state.loginFlow.waitingForApproval = true;
-  renderSetupGate();
+  renderOnboarding();
   try {
     const beginData = await window.desktopApi.beginLogin();
     state.loginFlow.beginData = beginData;
-    renderSetupGate();
+    renderOnboarding();
     await window.desktopApi.completeLogin(beginData);
   } finally {
     state.loginFlow.waitingForApproval = false;
