@@ -331,6 +331,13 @@ export function renderEditorForm() {
   const status = state.onboarding;
   const canPublish = Boolean(status?.isAuthenticated && status?.repoReady);
   _el.publishSiteBtn.disabled = !canPublish;
+  if (!status?.isAuthenticated) {
+    _el.publishSiteBtn.title = "Sign in and set up publishing to enable this";
+  } else if (!status?.repoReady) {
+    _el.publishSiteBtn.title = "Set up publishing in the user menu to enable this";
+  } else {
+    _el.publishSiteBtn.title = "";
+  }
   _el.copyBuildBtn.disabled = !state.editor.profession;
   _el.duplicateBuildBtn.disabled = !state.editor.profession;
 }
