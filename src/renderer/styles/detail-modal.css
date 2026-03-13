@@ -36,16 +36,6 @@
   flex-shrink: 0;
 }
 
-.detail-modal-title {
-  flex: 1;
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--text);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  min-width: 0;
-}
 
 .detail-modal-body {
   flex: 1 1 0;
@@ -264,15 +254,68 @@
 /* ── Nav buttons (back / forward) ────────────────────────────────────────── */
 
 .dm-nav-btn {
-  padding: 5px 9px;
-  font-size: 1rem;
-  line-height: 1;
+  padding: 5px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .dm-nav-btn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
   pointer-events: none;
+}
+
+/* ── Breadcrumbs ─────────────────────────────────────────────────────────── */
+
+.dm-breadcrumbs {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.dm-crumb {
+  font-size: 0.82rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.dm-crumb--current {
+  font-weight: 600;
+  color: var(--text);
+  flex-shrink: 0;
+  max-width: 240px;
+}
+
+.dm-crumb--link {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: inherit;
+  padding: 2px 4px;
+  border-radius: 3px;
+  max-width: 140px;
+  transition: color 0.12s, background 0.12s;
+}
+
+.dm-crumb--link:hover {
+  color: var(--text);
+  background: var(--bg-2);
+}
+
+.dm-crumb-sep {
+  color: var(--muted);
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  opacity: 0.6;
+  user-select: none;
 }
 
 /* ── Clickable related items ─────────────────────────────────────────────── */

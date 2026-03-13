@@ -22,9 +22,9 @@ export function initDetailModal() {
   _overlay.innerHTML = `
     <div class="detail-modal">
       <div class="detail-modal-toolbar">
-        <button class="wiki-modal-btn dm-nav-btn" id="dm-back" title="Back" disabled>&#8592;</button>
-        <button class="wiki-modal-btn dm-nav-btn" id="dm-fwd" title="Forward" disabled>&#8594;</button>
-        <span class="detail-modal-title" id="dm-title"></span>
+        <button class="wiki-modal-btn dm-nav-btn" id="dm-back" title="Back" disabled><svg viewBox="0 0 7 12" width="7" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6,1 1,6 6,11"/></svg></button>
+        <button class="wiki-modal-btn dm-nav-btn" id="dm-fwd" title="Forward" disabled><svg viewBox="0 0 7 12" width="7" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1,1 6,6 1,11"/></svg></button>
+        <nav class="dm-breadcrumbs" id="dm-breadcrumbs" aria-label="Navigation history"></nav>
         <button class="wiki-modal-btn" id="dm-wiki-btn">Open Wiki Page</button>
         <button class="wiki-modal-btn wiki-modal-btn--close" id="dm-close">&#x2715;</button>
       </div>
@@ -58,7 +58,7 @@ export function initDetailModal() {
   document.body.appendChild(_overlay);
 
   _el = {
-    title:          document.getElementById("dm-title"),
+    breadcrumbs:    document.getElementById("dm-breadcrumbs"),
     wikiBtn:        document.getElementById("dm-wiki-btn"),
     close:          document.getElementById("dm-close"),
     backBtn:        document.getElementById("dm-back"),
@@ -91,7 +91,7 @@ export function initDetailModal() {
       const { detail, catalog, professionName } = _history[_historyIndex];
       _el.body.scrollTop = 0;
       _loadModalContent(detail, catalog, professionName);
-      _updateNavButtons();
+      _updateNav();
     }
   });
 
@@ -101,7 +101,21 @@ export function initDetailModal() {
       const { detail, catalog, professionName } = _history[_historyIndex];
       _el.body.scrollTop = 0;
       _loadModalContent(detail, catalog, professionName);
-      _updateNavButtons();
+      _updateNav();
+    }
+  });
+
+  // Breadcrumb navigation — click a past crumb to jump back
+  _el.breadcrumbs.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-crumb-idx]");
+    if (!btn) return;
+    const idx = Number(btn.dataset.crumbIdx);
+    if (idx >= 0 && idx < _historyIndex) {
+      _historyIndex = idx;
+      const { detail, catalog, professionName } = _history[_historyIndex];
+      _el.body.scrollTop = 0;
+      _loadModalContent(detail, catalog, professionName);
+      _updateNav();
     }
   });
 
@@ -131,7 +145,7 @@ export function openDetailModal(detail, catalog, professionName) {
   document.addEventListener("keydown", _escHandler);
 
   _loadModalContent(detail, catalog, professionName);
-  _updateNavButtons();
+  _updateNav();
 }
 
 export function closeDetailModal() {
@@ -174,7 +188,7 @@ function _navigateToName(name, iconUrl, catalog, professionName) {
   _historyIndex++;
   _el.body.scrollTop = 0;
   _loadModalContent(detail, catalog, professionName);
-  _updateNavButtons();
+  _updateNav();
 }
 
 function _findEntityByName(name, catalog) {
@@ -217,7 +231,6 @@ function _loadModalContent(detail, catalog, professionName) {
   const myId = ++_renderId;
 
   // ── Hero ──────────────────────────────────────────────────────────────────
-  _el.title.textContent = detail.title;
   _el.name.textContent = detail.title;
   _el.desc.textContent = detail.description || "";
 
@@ -277,9 +290,18 @@ function _loadModalContent(detail, catalog, professionName) {
   });
 }
 
-function _updateNavButtons() {
+function _updateNav() {
   _el.backBtn.disabled = _historyIndex <= 0;
   _el.fwdBtn.disabled = _historyIndex >= _history.length - 1;
+
+  // Breadcrumbs — show history trail; past items are clickable, current is plain
+  const parts = _history.slice(0, _historyIndex + 1).map((entry, i) => {
+    const name = escapeHtml(entry.detail.title);
+    return i < _historyIndex
+      ? `<button class="dm-crumb dm-crumb--link" data-crumb-idx="${i}">${name}</button>`
+      : `<span class="dm-crumb dm-crumb--current">${name}</span>`;
+  });
+  _el.breadcrumbs.innerHTML = parts.join('<span class="dm-crumb-sep" aria-hidden="true">›</span>');
 }
 
 function _showRelatedError(section, spinner, list) {

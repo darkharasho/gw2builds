@@ -43,7 +43,7 @@ function makeDom() {
 
   // Pre-populate elements that initDetailModal will look up
   [
-    "dm-title", "dm-wiki-btn", "dm-close", "dm-back", "dm-fwd", "dm-body",
+    "dm-breadcrumbs", "dm-wiki-btn", "dm-close", "dm-back", "dm-fwd", "dm-body",
     "dm-icon", "dm-prof-icon", "dm-name", "dm-meta", "dm-desc", "dm-facts",
     "dm-related-skills-section", "dm-related-traits-section",
     "dm-skills-spinner", "dm-traits-spinner",

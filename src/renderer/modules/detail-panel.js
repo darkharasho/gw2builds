@@ -281,10 +281,13 @@ export function showHoverPreview(kind, entity, x, y) {
   // For skills, follow flipSkill chain to show chained/charged skills as subsequent cards.
   // Weapon skills live in weaponSkillById; profession/utility skills in skillById — check both.
   // Elementalist exception: only Tempest (48) uses a meaningful flip chain (Overload).
-  // Weaver (56) and Catalyst (67) have their own F mechanics that don't need chaining.
-  const ELEM_NO_FLIP_SPECS = new Set([56, 67]);
+  // Weaver, Catalyst, Evoker and any other Elementalist spec should not show the chain —
+  // checked via the professions array so it works even when specialization is 0 in the API.
+  const isElemNonTempest = Array.isArray(entity.professions)
+    && entity.professions.includes("Elementalist")
+    && Number(entity.specialization) !== 48;
   const chainCards = [buildSkillCard(entity, kind, false, dmgStats)];
-  if (kind === "skill" && entity.flipSkill && !ELEM_NO_FLIP_SPECS.has(Number(entity.specialization) || 0)) {
+  if (kind === "skill" && entity.flipSkill && !isElemNonTempest) {
     const catalog = state.activeCatalog;
     const lookupSkill = (id) => catalog?.skillById?.get(id) || catalog?.weaponSkillById?.get(id);
     const exitPattern = /^(Exit|Leave|Deactivate|Stow)\b/i;
