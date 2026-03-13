@@ -8540,7 +8540,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "25%"
+              "value": "25%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
               "type": "Range",
@@ -16372,7 +16373,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "20%"
+              "value": "20%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
               "type": "Buff",
@@ -19852,7 +19854,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "50%"
+              "value": "50%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             }
           ],
           "complete": true
@@ -24508,7 +24511,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "100%"
+              "value": "100%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
               "type": "Range",
@@ -25585,7 +25589,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "100%"
+              "value": "100%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
               "type": "ComboFinisher",
@@ -28506,7 +28511,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "100%"
+              "value": "100%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
               "type": "Range",
@@ -37509,7 +37515,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "100%"
+              "value": "100%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
               "type": "Buff",
@@ -46230,7 +46237,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "33%"
+              "value": "33%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
               "type": "Duration",
@@ -46277,7 +46285,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "20%"
+              "value": "20%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
               "type": "Buff",
@@ -55402,7 +55411,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "33%"
+              "value": "33%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
               "type": "Number",
@@ -56284,7 +56294,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "33%"
+              "value": "33%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
               "type": "Buff",
@@ -57901,7 +57912,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "100%"
+              "value": "100%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
               "type": "Duration",
@@ -58096,7 +58108,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "100%"
+              "value": "100%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
               "type": "Damage",
@@ -58212,7 +58225,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "100%"
+              "value": "100%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
               "type": "Damage",
@@ -59023,7 +59037,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "33%"
+              "value": "33%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
               "type": "Buff",
@@ -60516,7 +60531,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "100%"
+              "value": "100%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
               "type": "Damage",
@@ -60782,7 +60798,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "100%"
+              "value": "100%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
               "type": "Damage",
@@ -61518,7 +61535,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "100%"
+              "value": "100%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
               "type": "Damage",
@@ -63246,7 +63264,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "33%"
+              "value": "33%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
               "type": "Buff",
@@ -70191,7 +70210,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "20%"
+              "value": "20%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
               "type": "Buff",
@@ -70346,7 +70366,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "15%"
+              "value": "15%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             }
           ],
           "complete": true
@@ -70462,7 +70483,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "20%"
+              "value": "20%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             }
           ],
           "complete": true
@@ -70672,7 +70694,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "25%"
+              "value": "25%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
               "type": "Buff",
@@ -71552,7 +71575,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "20%"
+              "value": "20%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             }
           ],
           "complete": true
@@ -72968,7 +72992,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "15%"
+              "value": "15%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             }
           ],
           "complete": true
@@ -73860,7 +73885,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "50%"
+              "value": "50%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             }
           ],
           "complete": true
@@ -73996,7 +74022,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "20%"
+              "value": "20%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             }
           ],
           "complete": true
@@ -75373,7 +75400,8 @@
             {
               "type": "Number",
               "text": "Singularity Delay Reduction",
-              "value": "33%"
+              "value": "33%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             }
           ],
           "complete": true
@@ -76076,7 +76104,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "20%"
+              "value": "20%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
               "type": "Buff",
@@ -76098,7 +76127,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "20%"
+              "value": "20%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             }
           ],
           "complete": true
@@ -77126,7 +77156,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "15%"
+              "value": "15%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             }
           ],
           "complete": true
@@ -80304,7 +80335,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "20%"
+              "value": "20%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             }
           ],
           "complete": true
@@ -81758,7 +81790,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "30%"
+              "value": "30%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             },
             {
               "type": "Buff",
@@ -82165,7 +82198,8 @@
             {
               "type": "Number",
               "text": "Recharge Reduced",
-              "value": "100%"
+              "value": "100%",
+              "icon": "https://wiki.guildwars2.com/images/f/f7/Count_Recharge.png"
             }
           ],
           "complete": true
