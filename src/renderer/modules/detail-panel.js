@@ -1,5 +1,5 @@
 import { state } from "./state.js";
-import { WEAPON_STRENGTH_MIDPOINT, BOON_CONDITION_ICONS, BUFF_FACT_TYPES } from "./constants.js";
+import { WEAPON_STRENGTH_MIDPOINT, BOON_CONDITION_ICONS, BUFF_FACT_TYPES, FACT_TYPE_ICONS } from "./constants.js";
 import { escapeHtml, tierLabel, normalizeText } from "./utils.js";
 import { computeEquipmentStats } from "./stats.js";
 
@@ -416,12 +416,12 @@ export function formatFactHtml(fact, dmgStats = null) {
       const dmg = Math.round(dmgStats.weaponStrength * dmgStats.effectivePower * Number(fact.dmg_multiplier) * hits / 2597);
       text += ` ≈ ${dmg.toLocaleString()}`;
     }
-    const iconUrl = fact.icon || "";
+    const iconUrl = fact.icon || FACT_TYPE_ICONS[fact.type] || "";
     return iconUrl ? `<img class="fact-status-icon" src="${escapeHtml(iconUrl)}" alt="" aria-hidden="true">${escapeHtml(text)}` : escapeHtml(text);
   }
   if (BUFF_FACT_TYPES.has(fact.type)) {
     const text = formatBuffConditionText(fact);
-    const iconUrl = fact.icon || (fact.status && BOON_CONDITION_ICONS[fact.status]) || "";
+    const iconUrl = fact.icon || (fact.status && BOON_CONDITION_ICONS[fact.status]) || FACT_TYPE_ICONS[fact.type] || "";
     return iconUrl ? `<img class="fact-status-icon" src="${escapeHtml(iconUrl)}" alt="" aria-hidden="true">${escapeHtml(text)}` : escapeHtml(text);
   }
   // AttributeConversion: converts a % of one attribute into another (e.g. Precision → Ferocity).
@@ -437,7 +437,7 @@ export function formatFactHtml(fact, dmgStats = null) {
       ? `Gain ${target} Based on a Percentage of ${source}`
       : (fact.text && fact.text !== "AttributeConversion" ? fact.text : "Attribute Conversion");
     const text = pct === "" ? label : `${label}: ${pct}%`;
-    const iconUrl = fact.icon || "";
+    const iconUrl = fact.icon || FACT_TYPE_ICONS["AttributeConversion"] || "";
     return iconUrl ? `<img class="fact-status-icon" src="${escapeHtml(iconUrl)}" alt="" aria-hidden="true">${escapeHtml(text)}` : escapeHtml(text);
   }
   // AttributeAdjust: the API sometimes gives the raw type name as text instead of a
@@ -449,13 +449,13 @@ export function formatFactHtml(fact, dmgStats = null) {
     const val = fact.value ?? "";
     let text = val === "" ? label : `${label}: ${val > 0 ? "+" : ""}${val}`;
     if (fact.coefficient != null) text += ` (×${fact.coefficient})`;
-    const iconUrl = fact.icon || "";
+    const iconUrl = fact.icon || FACT_TYPE_ICONS["AttributeAdjust"] || "";
     return iconUrl ? `<img class="fact-status-icon" src="${escapeHtml(iconUrl)}" alt="" aria-hidden="true">${escapeHtml(text)}` : escapeHtml(text);
   }
   if (fact.type === "Time" && fact.duration != null) {
     const label = String(fact.text || "Duration");
     const text = `${label}: ${fact.duration}s`;
-    const iconUrl = fact.icon || "";
+    const iconUrl = fact.icon || FACT_TYPE_ICONS["Time"] || "";
     return iconUrl ? `<img class="fact-status-icon" src="${escapeHtml(iconUrl)}" alt="" aria-hidden="true">${escapeHtml(text)}` : escapeHtml(text);
   }
   const label = String(fact.text || fact.type || "Fact");
@@ -470,7 +470,7 @@ export function formatFactHtml(fact, dmgStats = null) {
     fact.description ??
     "";
   const text = value === "" ? label : `${label}: ${value}`;
-  const iconUrl = fact.icon || "";
+  const iconUrl = fact.icon || FACT_TYPE_ICONS[fact.type] || "";
   if (!iconUrl) return escapeHtml(text);
   return `<img class="fact-status-icon" src="${escapeHtml(iconUrl)}" alt="" aria-hidden="true">${escapeHtml(text)}`;
 }

@@ -426,3 +426,27 @@ export const BOON_CONDITION_ICONS = {
 
 // Fact types where the icon represents the boon/condition being applied.
 export const BUFF_FACT_TYPES = new Set(["Buff", "ApplyBuffCondition", "PrefixedBuff"]);
+
+// Fallback icons keyed by GW2 API fact type, for facts missing fact.icon.
+// Icons sourced from render.guildwars2.com via /v2/skills API responses.
+export const FACT_TYPE_ICONS = {
+  Damage:              `${_RW}/61AA4919C4A7990903241B680A69530121E994C7/156657.png`,
+  Range:               `${_RW}/0AAB34BEB1C9F4A25EC612DDBEACF3E20B2810FA/156666.png`,
+  Number:              `${_RW}/BBE8191A494B0352259C10EADFDACCE177E6DA5B/1770208.png`,
+  Duration:            `${_RW}/7B2193ACCF77E56C13E608191B082D68AA0FAA71/156659.png`,
+  Time:                `${_RW}/7B2193ACCF77E56C13E608191B082D68AA0FAA71/156659.png`,
+  Recharge:            `${_RW}/D767B963D120F077C3B163A05DC05A7317D7DB70/156651.png`,
+  Radius:              `${_RW}/B0CD8077991E4FB1622D2930337ED7F9B54211D5/156665.png`,
+  Distance:            `${_RW}/B0CD8077991E4FB1622D2930337ED7F9B54211D5/156665.png`,
+  StunBreak:           `${_RW}/DCF0719729165FD8910E034CA4E0780F90582D15/156654.png`,
+  Unblockable:         `${_RW}/9352ED3244417304995F26CB01AE76BB7E547052/156661.png`,
+  AttributeAdjust:     `${_RW}/D4347C52157B040943051D7E09DEAD7AF63D4378/156662.png`,
+  AttributeConversion: `${_RW}/D4347C52157B040943051D7E09DEAD7AF63D4378/156662.png`,
+  ComboFinisher:       `${_RW}/A513F3653D33FBA4220D2D307799F8A327A36A3B/156656.png`,
+  ComboField:          `${_RW}/59E0DB6A699810641C959926ADFEF73E08CC255B/156655.png`,
+  Percent:             `${_RW}/0AAB34BEB1C9F4A25EC612DDBEACF3E20B2810FA/156666.png`,
+  // Generic fallback for Buff/condition types with unknown status names
+  Buff:                `${_RW}/2FA9DF9D6BC17839BBEA14723F1C53D645DDB5E1/102852.png`,
+  ApplyBuffCondition:  `${_RW}/2FA9DF9D6BC17839BBEA14723F1C53D645DDB5E1/102852.png`,
+  PrefixedBuff:        `${_RW}/2FA9DF9D6BC17839BBEA14723F1C53D645DDB5E1/102852.png`,
+};
