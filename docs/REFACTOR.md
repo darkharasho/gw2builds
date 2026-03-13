@@ -145,7 +145,7 @@ src/renderer/
 | `renderBuildList()` | renderer.js:901 | render-pages.js |
 | `renderEditor()`, `renderEditorForm()` | renderer.js:2014 | render-pages.js |
 | `renderEditorMeta()` | renderer.js:2056 | render-pages.js |
-| `renderSetupGate()`, `renderTargetPicker()` | renderer.js:759 | render-pages.js |
+| `renderTargetPicker()` | renderer.js:759 | render-pages.js |
 | `runPagesBuildPoll()`, `setPublishStatus()` | renderer.js:4773 | render-pages.js |
 
 ---
