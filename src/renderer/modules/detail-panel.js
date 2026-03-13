@@ -394,8 +394,15 @@ function formatBuffConditionText(fact) {
   return `${name}${stackPart}${duration}${extra}`;
 }
 
+/** Strip GW2 in-game markup like <c=@abilitytype>text</c> from API strings. */
+function stripGw2Markup(s) {
+  return String(s || "").replace(/<c=[^>]*>(.*?)<\/c>/gi, "$1").trim();
+}
+
 export function formatFactHtml(fact, dmgStats = null) {
   if (!fact || typeof fact !== "object") return "Unknown fact";
+  // Normalise GW2 API markup in text/status fields before any rendering.
+  fact = fact.text && /<c=/.test(fact.text) ? { ...fact, text: stripGw2Markup(fact.text) } : fact;
   // NoData facts are section headers (e.g. conditional legend-stance effects).
   if (fact.type === "NoData") {
     return `<span class="fact-section-header">${escapeHtml(String(fact.text || ""))}</span>`;
@@ -442,6 +449,12 @@ export function formatFactHtml(fact, dmgStats = null) {
     const val = fact.value ?? "";
     let text = val === "" ? label : `${label}: ${val > 0 ? "+" : ""}${val}`;
     if (fact.coefficient != null) text += ` (×${fact.coefficient})`;
+    const iconUrl = fact.icon || "";
+    return iconUrl ? `<img class="fact-status-icon" src="${escapeHtml(iconUrl)}" alt="" aria-hidden="true">${escapeHtml(text)}` : escapeHtml(text);
+  }
+  if (fact.type === "Time" && fact.duration != null) {
+    const label = String(fact.text || "Duration");
+    const text = `${label}: ${fact.duration}s`;
     const iconUrl = fact.icon || "";
     return iconUrl ? `<img class="fact-status-icon" src="${escapeHtml(iconUrl)}" alt="" aria-hidden="true">${escapeHtml(text)}` : escapeHtml(text);
   }
