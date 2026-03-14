@@ -965,32 +965,71 @@ async function getUpgradeCatalog(lang = "en") {
   if (_upgradeCatalogPromise) return _upgradeCatalogPromise;
 
   _upgradeCatalogPromise = (async () => {
-    const { RUNE_ITEM_IDS, SIGIL_ITEM_IDS, INFUSION_ITEM_IDS } = require("./upgradeIds");
+    const { RUNE_ITEM_IDS, SIGIL_ITEM_IDS, INFUSION_ITEM_IDS, WVW_INFUSION_IDS, ENRICHMENT_ITEM_IDS, FOOD_ITEM_IDS, UTILITY_ITEM_IDS } = require("./upgradeIds");
+    const { FOOD_BUFF_OVERRIDES } = require("./foodOverrides");
 
-    const [runeItems, sigilItems, infusionItems] = await Promise.all([
+    const [runeItems, sigilItems, infusionItems, enrichmentItems, foodItems, utilityItems] = await Promise.all([
       fetchGw2ByIds("items", RUNE_ITEM_IDS, lang),
       fetchGw2ByIds("items", SIGIL_ITEM_IDS, lang),
       fetchGw2ByIds("items", INFUSION_ITEM_IDS, lang),
+      fetchGw2ByIds("items", ENRICHMENT_ITEM_IDS, lang),
+      fetchGw2ByIds("items", FOOD_ITEM_IDS, lang),
+      fetchGw2ByIds("items", UTILITY_ITEM_IDS, lang),
     ]);
+
+    const stripGw2Markup = (text) =>
+      (text || "").replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
 
     const mapItem = (item) => ({
       id: item.id,
       name: item.name || "",
       icon: item.icon || "",
-      description: item.description || "",
+      description: stripGw2Markup(item.description),
       bonuses: item.details?.bonuses || [],
+      buffDescription: stripGw2Markup(item.details?.infix_upgrade?.buff?.description),
       infixUpgrade: item.details?.infix_upgrade || null,
+    });
+
+    const mapFood = (item) => {
+      const apiDesc = item.details?.description || "";
+      const overrideDesc = FOOD_BUFF_OVERRIDES.get(item.id);
+      const rawBuff = overrideDesc || apiDesc;
+      return {
+        id: item.id,
+        name: item.name || "",
+        icon: item.icon || "",
+        rarity: item.rarity || "",
+        level: item.level || 0,
+        buff: stripGw2Markup(rawBuff.replace(/\n/g, " | ")),
+        duration: item.details?.duration_ms ? Math.round(item.details.duration_ms / 60000) : 0,
+      };
+    };
+
+    const mapUtility = (item) => ({
+      id: item.id,
+      name: item.name || "",
+      icon: item.icon || "",
+      rarity: item.rarity || "",
+      level: item.level || 0,
+      buff: stripGw2Markup((item.details?.description || "").replace(/\n/g, " | ")),
+      duration: item.details?.duration_ms ? Math.round(item.details.duration_ms / 60000) : 0,
     });
 
     const catalog = {
       runes: runeItems.map(mapItem).sort((a, b) => a.name.localeCompare(b.name)),
       sigils: sigilItems.map(mapItem).sort((a, b) => a.name.localeCompare(b.name)),
-      infusions: infusionItems.map(mapItem).sort((a, b) => a.name.localeCompare(b.name)),
+      infusions: infusionItems.map((item) => ({ ...mapItem(item), category: WVW_INFUSION_IDS.has(item.id) ? "wvw" : "pve" })).sort((a, b) => a.name.localeCompare(b.name)),
+      enrichments: enrichmentItems.map(mapItem).sort((a, b) => a.name.localeCompare(b.name)),
+      foods: foodItems.filter((item) => item.details?.type === "Food").map(mapFood).sort((a, b) => a.name.localeCompare(b.name)),
+      utilities: utilityItems.filter((item) => item.details?.type === "Utility").map(mapUtility).sort((a, b) => a.name.localeCompare(b.name)),
     };
 
     catalog.runeById = new Map(catalog.runes.map((r) => [r.id, r]));
     catalog.sigilById = new Map(catalog.sigils.map((s) => [s.id, s]));
     catalog.infusionById = new Map(catalog.infusions.map((i) => [i.id, i]));
+    catalog.enrichmentById = new Map(catalog.enrichments.map((e) => [e.id, e]));
+    catalog.foodById = new Map(catalog.foods.map((f) => [f.id, f]));
+    catalog.utilityById = new Map(catalog.utilities.map((u) => [u.id, u]));
 
     _upgradeCatalogCache = catalog;
     return catalog;

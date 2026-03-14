@@ -46,6 +46,23 @@
   background: linear-gradient(to left, rgb(11, 18, 34), transparent);
 }
 
+.equip-art-bg-icon {
+  position: absolute;
+  width: 95%;
+  height: 95%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.equip-art-bg-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
 .equip-concept-art {
   width: 60%;
   height: auto;
@@ -53,6 +70,8 @@
   object-fit: contain;
   display: block;
   opacity: 0.85;
+  position: relative;
+  z-index: 1;
 }
 
 .equip-col--right {
@@ -101,6 +120,35 @@
 .equip-section__btns {
   display: flex;
   gap: 4px;
+}
+
+.equip-fill-menu {
+  z-index: 310;
+  background: rgba(8, 15, 30, 0.98);
+  border: 1px solid #2f4368;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(3, 9, 19, 0.7);
+  padding: 3px;
+  display: flex;
+  flex-direction: column;
+  min-width: 90px;
+}
+
+.equip-fill-menu__item {
+  font: inherit;
+  font-size: 11px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: #c0d0e8;
+  cursor: pointer;
+  text-align: left;
+}
+
+.equip-fill-menu__item:hover {
+  background: rgba(80, 132, 163, 0.2);
+  color: #e0ecff;
 }
 
 .equip-clear-btn {
@@ -179,6 +227,48 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+}
+
+/* Consumable slots (food / utility) */
+.equip-slot--consumable {
+  flex-direction: row;
+  align-items: center;
+  padding: 6px 8px;
+  gap: 10px;
+}
+
+.equip-slot--consumable .equip-slot__icon--consumable {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.equip-slot--consumable .equip-slot__info {
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+}
+
+.equip-slot__consumable-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary, #e0ecff);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.equip-slot__consumable-name.equip-slot__value--empty {
+  font-weight: 400;
+  color: var(--text-dim, #7a8a9e);
+  font-size: 11px;
+}
+
+.equip-slot__consumable-buff {
+  font-size: 9px;
+  color: var(--text-dim, #7a8a9e);
+  line-height: 1.4;
 }
 
 .equip-slot {
@@ -361,7 +451,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  text-align: left;
+  text-align: center;
   border-radius: 0 6px 6px 0;
   transition: background 0.12s;
 }
@@ -402,6 +492,38 @@
 }
 
 .slot-picker__search:focus {
+  border-bottom-color: var(--accent-2);
+}
+
+.slot-picker__tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(47, 67, 104, 0.8);
+  background: rgba(6, 11, 21, 0.5);
+  padding: 0 4px;
+  gap: 2px;
+}
+
+.slot-picker__tab {
+  flex: 1;
+  padding: 5px 8px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #7a8a9e;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.slot-picker__tab:hover {
+  color: #c0d0e8;
+}
+
+.slot-picker__tab--active {
+  color: #e0ecff;
   border-bottom-color: var(--accent-2);
 }
 
@@ -518,6 +640,21 @@
 
 .equip-stat-value--derived {
   color: var(--accent-2);
+}
+
+.equip-modifiers {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(47, 67, 104, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.equip-modifier-row {
+  font-size: 11px;
+  color: #6fdc6f;
+  padding: 1px 6px;
 }
 
 /* Text inputs in equipment panel */
@@ -638,4 +775,20 @@
 .equip-upgrade-btn--infusion.equip-upgrade-btn--filled {
   border-color: rgba(120, 60, 180, 0.5);
   background: rgba(120, 60, 180, 0.12);
+}
+
+/* Enrichment — teal/cyan */
+.equip-upgrade-btn--enrichment {
+  border-color: rgba(60, 180, 160, 0.25);
+  background: rgba(60, 180, 160, 0.06);
+  color: rgba(100, 220, 200, 0.4);
+}
+.equip-upgrade-btn--enrichment:hover {
+  border-color: rgba(60, 180, 160, 0.6);
+  background: rgba(60, 180, 160, 0.15);
+  box-shadow: 0 0 6px rgba(60, 180, 160, 0.2);
+}
+.equip-upgrade-btn--enrichment.equip-upgrade-btn--filled {
+  border-color: rgba(60, 180, 160, 0.5);
+  background: rgba(60, 180, 160, 0.12);
 }

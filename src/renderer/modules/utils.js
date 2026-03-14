@@ -62,7 +62,7 @@ export function normalizeText(input) {
   const raw = String(input || "");
   const noTags = raw.replace(/<[^>]*>/g, " ");
   const entityDecoded = decodeHtmlEntities(noTags);
-  return entityDecoded.replace(/\s+/g, " ").trim();
+  return entityDecoded.replace(/[^\S\n]+/g, " ").replace(/\n /g, "\n").trim();
 }
 
 export function decodeHtmlEntities(value) {

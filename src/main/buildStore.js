@@ -188,6 +188,20 @@ function normalizeEquipment(value) {
     }
     return out;
   };
+  const normalizeInfusions = (obj) => {
+    if (!obj || typeof obj !== "object") return {};
+    const arraySlots = { back: 2, ring1: 3, ring2: 3 };
+    const out = {};
+    for (const [k, v] of Object.entries(obj)) {
+      if (arraySlots[k]) {
+        const arr = Array.isArray(v) ? v : [];
+        out[k] = Array.from({ length: arraySlots[k] }, (_, i) => asString(arr[i], 40));
+      } else {
+        out[k] = asString(v, 120);
+      }
+    }
+    return out;
+  };
   return {
     statPackage: asString(equipment.statPackage, 80),
     relic: asString(equipment.relic, 120),
@@ -197,7 +211,8 @@ function normalizeEquipment(value) {
     weapons: normalizeStringMap(equipment.weapons),
     runes: normalizeStringMap(equipment.runes),
     sigils: normalizeSigils(equipment.sigils),
-    infusions: normalizeStringMap(equipment.infusions),
+    infusions: normalizeInfusions(equipment.infusions),
+    enrichment: asString(equipment.enrichment, 40),
   };
 }
 

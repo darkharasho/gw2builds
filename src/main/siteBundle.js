@@ -50,6 +50,7 @@ function normalizeEquipment(equipment) {
     relic: String(source.relic || ""),
     food: String(source.food || ""),
     utility: String(source.utility || ""),
+    enrichment: String(source.enrichment || ""),
   };
 }
 

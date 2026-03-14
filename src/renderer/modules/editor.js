@@ -6,9 +6,21 @@ import { getMajorTraitsByTier } from "./specializations.js";
 import { ANTIQUARY_PROLIFIC_PLUNDERER_TRAIT_ID } from "./constants.js";
 
 // Normalize sigil array to correct shape for a given slot key.
-function normalizeSigilArray(value, slotKey) {
+export function normalizeSigilArray(value, slotKey) {
   const isOffhand = slotKey.startsWith("offhand");
   const expectedLen = isOffhand ? 1 : 2;
+  if (!Array.isArray(value)) return Array(expectedLen).fill("");
+  const arr = value.slice(0, expectedLen).map((v) => String(v || ""));
+  while (arr.length < expectedLen) arr.push("");
+  return arr;
+}
+
+// Normalize infusion value — arrays for multi-slot items (back, rings), strings otherwise.
+export const INFUSION_ARRAY_SLOTS = { back: 2, ring1: 3, ring2: 3 };
+
+export function normalizeInfusionValue(value, slotKey) {
+  const expectedLen = INFUSION_ARRAY_SLOTS[slotKey];
+  if (!expectedLen) return String(value || "");
   if (!Array.isArray(value)) return Array(expectedLen).fill("");
   const arr = value.slice(0, expectedLen).map((v) => String(v || ""));
   while (arr.length < expectedLen) arr.push("");
@@ -350,6 +362,7 @@ export function computeEditorSignature() {
       runes: editor.equipment?.runes || {},
       sigils: editor.equipment?.sigils || {},
       infusions: editor.equipment?.infusions || {},
+      enrichment: String(editor.equipment?.enrichment || ""),
     },
     specializations,
     skills: {
@@ -443,27 +456,13 @@ export function parseBuildImportPayload(text) {
         aquatic1: normalizeSigilArray(source.equipment?.sigils?.aquatic1, "aquatic1"),
         aquatic2: normalizeSigilArray(source.equipment?.sigils?.aquatic2, "aquatic2"),
       },
-      infusions: {
-        head: String(source.equipment?.infusions?.head || ""),
-        shoulders: String(source.equipment?.infusions?.shoulders || ""),
-        chest: String(source.equipment?.infusions?.chest || ""),
-        hands: String(source.equipment?.infusions?.hands || ""),
-        legs: String(source.equipment?.infusions?.legs || ""),
-        feet: String(source.equipment?.infusions?.feet || ""),
-        mainhand1: String(source.equipment?.infusions?.mainhand1 || ""),
-        offhand1: String(source.equipment?.infusions?.offhand1 || ""),
-        mainhand2: String(source.equipment?.infusions?.mainhand2 || ""),
-        offhand2: String(source.equipment?.infusions?.offhand2 || ""),
-        back: String(source.equipment?.infusions?.back || ""),
-        amulet: String(source.equipment?.infusions?.amulet || ""),
-        ring1: String(source.equipment?.infusions?.ring1 || ""),
-        ring2: String(source.equipment?.infusions?.ring2 || ""),
-        accessory1: String(source.equipment?.infusions?.accessory1 || ""),
-        accessory2: String(source.equipment?.infusions?.accessory2 || ""),
-        breather: String(source.equipment?.infusions?.breather || ""),
-        aquatic1: String(source.equipment?.infusions?.aquatic1 || ""),
-        aquatic2: String(source.equipment?.infusions?.aquatic2 || ""),
-      },
+      infusions: Object.fromEntries(
+        Object.keys(createEmptyEditor().equipment.infusions).map((key) => [
+          key,
+          normalizeInfusionValue(source.equipment?.infusions?.[key], key),
+        ])
+      ),
+      enrichment: String(source.equipment?.enrichment || ""),
     },
     specializations,
     skills,
@@ -587,27 +586,13 @@ export async function loadBuildIntoEditor(build, options = {}) {
         aquatic1: normalizeSigilArray(build.equipment?.sigils?.aquatic1, "aquatic1"),
         aquatic2: normalizeSigilArray(build.equipment?.sigils?.aquatic2, "aquatic2"),
       },
-      infusions: {
-        head: String(build.equipment?.infusions?.head || ""),
-        shoulders: String(build.equipment?.infusions?.shoulders || ""),
-        chest: String(build.equipment?.infusions?.chest || ""),
-        hands: String(build.equipment?.infusions?.hands || ""),
-        legs: String(build.equipment?.infusions?.legs || ""),
-        feet: String(build.equipment?.infusions?.feet || ""),
-        mainhand1: String(build.equipment?.infusions?.mainhand1 || ""),
-        offhand1: String(build.equipment?.infusions?.offhand1 || ""),
-        mainhand2: String(build.equipment?.infusions?.mainhand2 || ""),
-        offhand2: String(build.equipment?.infusions?.offhand2 || ""),
-        back: String(build.equipment?.infusions?.back || ""),
-        amulet: String(build.equipment?.infusions?.amulet || ""),
-        ring1: String(build.equipment?.infusions?.ring1 || ""),
-        ring2: String(build.equipment?.infusions?.ring2 || ""),
-        accessory1: String(build.equipment?.infusions?.accessory1 || ""),
-        accessory2: String(build.equipment?.infusions?.accessory2 || ""),
-        breather: String(build.equipment?.infusions?.breather || ""),
-        aquatic1: String(build.equipment?.infusions?.aquatic1 || ""),
-        aquatic2: String(build.equipment?.infusions?.aquatic2 || ""),
-      },
+      infusions: Object.fromEntries(
+        Object.keys(createEmptyEditor().equipment.infusions).map((key) => [
+          key,
+          normalizeInfusionValue(build.equipment?.infusions?.[key], key),
+        ])
+      ),
+      enrichment: String(build.equipment?.enrichment || ""),
     },
     specializations: Array.isArray(build.specializations)
       ? build.specializations.slice(0, 3).map((entry) => ({
@@ -758,7 +743,12 @@ export function serializeEditorToBuild() {
         aquatic1: [...(state.editor.equipment.sigils?.aquatic1 || ["", ""])],
         aquatic2: [...(state.editor.equipment.sigils?.aquatic2 || ["", ""])],
       },
-      infusions: { ...state.editor.equipment.infusions },
+      infusions: Object.fromEntries(
+        Object.entries(state.editor.equipment.infusions || {}).map(([key, val]) =>
+          [key, Array.isArray(val) ? [...val] : String(val || "")]
+        )
+      ),
+      enrichment: String(state.editor.equipment.enrichment || ""),
     },
     tags: parseTags(state.editor.tagsText),
     notes: String(state.editor.notes || ""),

@@ -549,7 +549,7 @@ describe("normalizeBuild — equipment", () => {
 
   test("handles missing equipment gracefully", async () => {
     const result = await store.upsertBuild(makeBuild({ equipment: null }));
-    expect(result.equipment).toEqual({ statPackage: "", relic: "", food: "", utility: "", slots: {}, weapons: {}, runes: {}, sigils: {}, infusions: {} });
+    expect(result.equipment).toEqual({ statPackage: "", relic: "", food: "", utility: "", slots: {}, weapons: {}, runes: {}, sigils: {}, infusions: {}, enrichment: "" });
   });
 
   test("truncates statPackage to 80 chars", async () => {

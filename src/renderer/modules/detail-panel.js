@@ -106,7 +106,7 @@ export function renderDetailPanel() {
         </header>
         <section>
           <h4>In-Game Description</h4>
-          <p>${escapeHtml(detail.description || "No description.")}</p>
+          <p>${escapeHtml(detail.description || "No description.").replace(/\n/g, "<br>")}</p>
         </section>
         <section>
           <h4>Wiki</h4>
@@ -252,7 +252,8 @@ export function buildSkillCard(skill, kind, isChained = false, dmgStats = null) 
         <p class="hover-preview__meta">${escapeHtml(meta)}${skill.hasSplit ? ' <span class="split-badge">WvW split</span>' : ''}</p>
       </div>
     </div>
-    ${description ? `<p class="hover-preview__desc">${escapeHtml(description)}</p>` : (!factsItems.length ? `<p class="hover-preview__desc">No description available.</p>` : "")}
+    ${description ? `<p class="hover-preview__desc">${escapeHtml(description).replace(/\n/g, "<br>")}</p>` : (!factsItems.length && !skill.bonuses?.length ? `<p class="hover-preview__desc">No description available.</p>` : "")}
+    ${skill.bonuses?.length ? `<ul class="hover-preview__bonuses">${skill.bonuses.map((b, i) => `<li class="${i < (skill.activeBonusCount || 0) ? "hover-preview__bonus--active" : "hover-preview__bonus--inactive"}">(${i + 1}): ${escapeHtml(b)}</li>`).join("")}</ul>` : ""}
     ${factsItems.length ? `<ul class="hover-preview__facts">${factsItems.join("")}</ul>` : ""}
   `;
 }
@@ -346,6 +347,7 @@ export function getHoverMetaLine(kind, entity) {
   if (kind === "equip-rune") return "Rune";
   if (kind === "equip-sigil") return "Sigil";
   if (kind === "equip-infusion") return "Infusion";
+  if (kind === "equip-enrichment") return "Enrichment";
   if (kind === "spec") return entity?.elite ? "Elite Specialization" : "Specialization";
   const type = String(entity?.type || "").trim();
   const slot = String(entity?.slot || "").trim();
