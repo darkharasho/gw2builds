@@ -460,6 +460,7 @@ function makeSkill(id, overrides = {}) {
     attunement: overrides.attunement !== undefined ? overrides.attunement : "None",
     dual_attunement: overrides.dual_attunement !== undefined ? overrides.dual_attunement : "None",
     categories: overrides.categories || [],
+    flags: overrides.flags || [],
     facts: overrides.facts || [],
     toolbelt_skill: overrides.toolbelt_skill || 0,
     flip_skill: overrides.flip_skill || 0,
@@ -470,8 +471,8 @@ function makeSkill(id, overrides = {}) {
 
 const MOCK_SKILLS = {
   // ---- Warrior ----
-  14402: makeSkill(14402, { name: "Mending",      slot: "Heal",    type: "Heal",    professions: ["Warrior"] }),
-  14516: makeSkill(14516, { name: "Balanced Stance", slot: "Utility", type: "Utility", professions: ["Warrior"] }),
+  14402: makeSkill(14402, { name: "Mending",      slot: "Heal",    type: "Heal",    professions: ["Warrior"], flags: [] }),
+  14516: makeSkill(14516, { name: "Balanced Stance", slot: "Utility", type: "Utility", professions: ["Warrior"], flags: ["NoUnderwater"] }),
   14404: makeSkill(14404, { name: "Rampage",      slot: "Elite",   type: "Elite",   professions: ["Warrior"] }),
   14360: makeSkill(14360, { name: "Sever Artery", slot: "Weapon_1", type: "Weapon", weapon_type: "Sword" }),
   14521: makeSkill(14521, { name: "Shield Bash",  slot: "Weapon_4", type: "Weapon", weapon_type: "Shield" }),

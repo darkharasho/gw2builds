@@ -282,6 +282,20 @@ describe("mapSkill — weapon_type / attunement normalization", () => {
     expect(Array.isArray(heal.professions)).toBe(true);
     expect(heal.professions).toContain("Warrior");
   });
+
+  test("skills have flags array captured from API", async () => {
+    const catalog = await gw2Data.getProfessionCatalog("Warrior");
+    // Mending (14402) has flags: [] — usable underwater
+    const mending = findSkill(catalog, 14402);
+    expect(mending).toBeTruthy();
+    expect(Array.isArray(mending.flags)).toBe(true);
+    expect(mending.flags).toEqual([]);
+    // Balanced Stance (14516) has flags: ["NoUnderwater"]
+    const balancedStance = findSkill(catalog, 14516);
+    expect(balancedStance).toBeTruthy();
+    expect(Array.isArray(balancedStance.flags)).toBe(true);
+    expect(balancedStance.flags).toContain("NoUnderwater");
+  });
 });
 
 // ---------------------------------------------------------------------------

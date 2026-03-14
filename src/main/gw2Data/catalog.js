@@ -716,6 +716,7 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
       attunement,
       dualWield,
       categories: Array.isArray(skill.categories) ? skill.categories : [],
+      flags: Array.isArray(skill.flags) ? skill.flags : [],
       // Filter out conditional facts (requires_trait) from the base array — same as traits.
       facts: KNOWN_SKILL_FACTS_OVERRIDES.get(skill.id) || (Array.isArray(skill.facts) ? skill.facts.filter((f) => !f.requires_trait) : []),
       traitedFacts: Array.isArray(skill.traited_facts) ? skill.traited_facts : [],
