@@ -605,16 +605,22 @@ export function buildMechanicSlotsForRender({
           const uwOnly = candidates.filter((s) => !hasNoUW(s));
           if (uwOnly.length > 0) candidates = uwOnly;
         } else {
-          // On land: for any weapon type that has both NoUnderwater (land) and non-NoUnderwater
-          // (underwater) variants, remove the underwater-only ones. This applies to ALL weapons
-          // in the pool, not just the active mainhand, since F1 bursts cover all weapon types.
-          const weaponTypesWithLandVariant = new Set(
-            candidates.filter(hasNoUW).map((s) => (s.weaponType || "").toLowerCase()).filter(Boolean)
+          // On land: for skills that have both a NoUnderwater (land) and a non-NoUnderwater
+          // (underwater) variant at the SAME weapon type + specialization, remove the underwater one.
+          // Must match on spec too — e.g. Wild Throw (spear, spec 18, NoUnderwater) should only
+          // exclude Wild Whirl (spear, spec 18, no flag), not Whirling Strike (spear, spec 0).
+          const landKeys = new Set(
+            candidates.filter(hasNoUW).map((s) => {
+              const wt = (s.weaponType || "").toLowerCase();
+              return wt ? `${wt}:${s.specialization || 0}` : "";
+            }).filter(Boolean)
           );
-          if (weaponTypesWithLandVariant.size > 0) {
+          if (landKeys.size > 0) {
             const filtered = candidates.filter((s) => {
               const wt = (s.weaponType || "").toLowerCase();
-              return !wt || !weaponTypesWithLandVariant.has(wt) || hasNoUW(s);
+              if (!wt) return true;
+              const key = `${wt}:${s.specialization || 0}`;
+              return !landKeys.has(key) || hasNoUW(s);
             });
             if (filtered.length > 0) candidates = filtered;
           }
