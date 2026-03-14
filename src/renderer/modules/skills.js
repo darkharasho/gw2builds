@@ -671,12 +671,13 @@ export function buildMechanicSlotsForRender({
   return { mechSlots, options: nextOptions, eliteSpecId, isWeaver, isToolbelt, isRanger };
 }
 
-export function makeSkillSlot(slot, catalog, options, utilitySelection, markSkillIconRendered = null) {
+export function makeSkillSlot(slot, catalog, options, utilitySelection, markSkillIconRendered = null, skillTarget = null) {
+  const target = skillTarget || state.editor.skills;
   const query = "";
   const selectedId =
     slot.index === undefined
-      ? Number(state.editor.skills[slot.key]) || 0
-      : Number(state.editor.skills[slot.key]?.[slot.index]) || 0;
+      ? Number(target[slot.key]) || 0
+      : Number(target[slot.key]?.[slot.index]) || 0;
   const selectedSkill = slot.list.find((skill) => Number(skill.id) === selectedId) || null;
   const filteredList = filterSkillList(slot.list, query, selectedId);
 
@@ -784,7 +785,7 @@ export function makeSkillSlot(slot, catalog, options, utilitySelection, markSkil
         toRect:   toBtn.getBoundingClientRect(),
       } : null;
 
-      const ids = state.editor.skills.utilityIds;
+      const ids = target.utilityIds;
       [ids[fromIdx], ids[toIdx]] = [ids[toIdx], ids[fromIdx]];
       _enforceEditorConsistency();
       state.editor.activeKit = 0;
@@ -807,10 +808,10 @@ export function makeSkillSlot(slot, catalog, options, utilitySelection, markSkil
 
       let swapRects = null;
       if (slot.index === undefined) {
-        state.editor.skills[slot.key] = nextId;
+        target[slot.key] = nextId;
       } else {
         // If the chosen skill is already in another utility slot, swap the two slots.
-        const ids = state.editor.skills[slot.key];
+        const ids = target[slot.key];
         const otherIdx = ids.findIndex((id, i) => i !== slot.index && Number(id) === nextId);
         if (otherIdx !== -1) {
           // Capture icon positions BEFORE re-render for FLIP animation.
@@ -903,8 +904,11 @@ export function renderSkills() {
   _el.skillsHost.prepend(_renderUnderwaterToggle());
 
   let options = getSkillOptionsByType(catalog, state.editor.specializations, state.editor.underwaterMode);
-  const utilitySelection = Array.isArray(state.editor.skills?.utilityIds)
-    ? state.editor.skills.utilityIds.map((value) => Number(value) || 0)
+  const skillSource = state.editor.underwaterMode
+    ? state.editor.underwaterSkills
+    : state.editor.skills;
+  const utilitySelection = Array.isArray(skillSource?.utilityIds)
+    ? skillSource.utilityIds.map((value) => Number(value) || 0)
     : [0, 0, 0];
   const prevRenderedSkillIconIds = state.renderedSkillIconIds || new Map();
   const nextRenderedSkillIconIds = new Map();
@@ -955,9 +959,9 @@ export function renderSkills() {
     const isToolbeltSource = mechSlots.some((s) => !s.isStatic && s.sourceId === activeKit);
     // Also allow heal/utility/elite slot kits (e.g. Mortar Kit in elite slot, Med Kit in heal slot).
     const equippedIds = new Set([
-      Number(state.editor.skills?.healId) || 0,
-      ...(state.editor.skills?.utilityIds || []).map(Number),
-      Number(state.editor.skills?.eliteId) || 0,
+      Number(skillSource?.healId) || 0,
+      ...(skillSource?.utilityIds || []).map(Number),
+      Number(skillSource?.eliteId) || 0,
     ].filter(Boolean));
     const isEquippedSlotKit = (kitSkill?.bundleSkills?.length ?? 0) > 0 && equippedIds.has(activeKit);
     // Soulbeast Beastmode has no bundle_skills in the API; allow it to persist via isBeastmodeToggle.
@@ -993,6 +997,13 @@ export function renderSkills() {
       if (!existing || id < existing.id) slotMap.set(slotNum, s);
     }
     weaponSkills = [1, 2, 3, 4, 5].map((n) => slotMap.get(n) || null);
+  } else if (state.editor.underwaterMode) {
+    // Aquatic weapons are always two-handed; pass as mainhand with empty offhand.
+    const activeAquatic = activeWeaponSet === 2 ? "aquatic2" : "aquatic1";
+    weaponSkills = getEquippedWeaponSkills(catalog, {
+      mainhand: equippedWeapons[activeAquatic] || "",
+      offhand: "",
+    }, activeAttunement, activeAttunement2, isWeaver);
   } else {
     weaponSkills = getEquippedWeaponSkills(catalog, {
       mainhand: equippedWeapons[mhKey] || "",
@@ -1421,7 +1432,7 @@ export function renderSkills() {
     { key: "eliteId", label: "Elite", list: options.elite || [], keybind: "0", flipKey: "utility_elite" },
   ];
   for (const slot of utilitySlots) {
-    utilityGroup.append(makeSkillSlot(slot, catalog, options, utilitySelection, markSkillIconRendered));
+    utilityGroup.append(makeSkillSlot(slot, catalog, options, utilitySelection, markSkillIconRendered, skillSource));
   }
 
   if (f5SlotEl) {
