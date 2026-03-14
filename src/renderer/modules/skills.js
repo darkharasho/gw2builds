@@ -537,6 +537,29 @@ export function buildMechanicSlotsForRender({
           isF5AboveOrb: true,
         });
       }
+    } else if (eliteSpecId === 72) {
+      // Untamed: default state is Unleash Pet (normal pet bar: attack / pet F2 / return).
+      // Toggling F5 activates Unleash Ranger (activeKit=63147), which gives the pet empowered
+      // commands at F1-F3 (Venomous Outburst, Rending Vines, Enveloping Haze).
+      const unleashRangerActive = activeKit === 63147;
+      if (unleashRangerActive) {
+        // Unleash Ranger active: pet gets empowered commands
+        const venomousOutburst = catalog.skillById.get(63209) || null;
+        const rendingVines = catalog.skillById.get(63258) || null;
+        const envHaze = catalog.skillById.get(63094) || null;
+        mechSlots.push({ skill: venomousOutburst, sourceId: venomousOutburst?.id || 0, isStatic: true, isSelectable: false });
+        mechSlots.push({ skill: rendingVines, sourceId: rendingVines?.id || 0, isStatic: true, isSelectable: false });
+        mechSlots.push({ skill: envHaze, sourceId: envHaze?.id || 0, isStatic: true, isSelectable: false });
+      } else {
+        // Unleash Pet active (default): normal pet controls (attack / pet F2 / return)
+        mechSlots.push({ skill: null, sourceId: 0, isStatic: true, isSelectable: false, fakeCommand: "attack" });
+        const petSkills = activePet?.skills || [];
+        const isAquaticSlot = activePetSlotKey === "aquatic1" || activePetSlotKey === "aquatic2";
+        const f2SkillIdx = isAquaticSlot && petSkills.length > 1 ? 1 : 0;
+        const f2Skill = petSkills[f2SkillIdx] || null;
+        mechSlots.push({ skill: f2Skill, sourceId: f2Skill?.id || 0, isStatic: true, isSelectable: false });
+        mechSlots.push({ skill: null, sourceId: 0, isStatic: true, isSelectable: false, fakeCommand: "return" });
+      }
     } else {
       mechSlots.push({ skill: null, sourceId: 0, isStatic: true, isSelectable: false, fakeCommand: "attack" });
       const petSkills = activePet?.skills || [];
@@ -544,17 +567,30 @@ export function buildMechanicSlotsForRender({
       const f2SkillIdx = isAquaticSlot && petSkills.length > 1 ? 1 : 0;
       const f2Skill = petSkills[f2SkillIdx] || null;
       mechSlots.push({ skill: f2Skill, sourceId: f2Skill?.id || 0, isStatic: true, isSelectable: false });
-      if (eliteSpecId === 72) {
-        const envHaze = catalog.skillById.get(63094) || null;
-        mechSlots.push({ skill: envHaze, sourceId: envHaze?.id || 0, isStatic: true, isSelectable: false });
-      } else {
-        mechSlots.push({ skill: null, sourceId: 0, isStatic: true, isSelectable: false, fakeCommand: "return" });
-      }
+      mechSlots.push({ skill: null, sourceId: 0, isStatic: true, isSelectable: false, fakeCommand: "return" });
     }
     if (eliteSpecId !== 55) {
-      const p5Skill = (nextOptions.profession || []).find((s) => s.slot === "Profession_5") || null;
-      if (p5Skill) {
-        mechSlots.push({ skill: p5Skill, sourceId: p5Skill.id, isStatic: true, isSelectable: false, fKeyLabel: "F5", isF5AboveOrb: true });
+      if (eliteSpecId === 72) {
+        // Untamed: F5 is a toggle between "Unleash Ranger" (63147) and "Unleash Pet" (63344).
+        const unleashRanger = catalog.skillById.get(63147) || null;
+        const unleashPet = catalog.skillById.get(63344) || null;
+        const unleashRangerActive = activeKit === 63147;
+        // Show current state: default = Unleash Pet, toggled = Unleash Ranger
+        const displaySkill = unleashRangerActive ? unleashRanger : unleashPet;
+        if (displaySkill) {
+          mechSlots.push({
+            skill: displaySkill, sourceId: displaySkill.id, isStatic: true, isSelectable: false,
+            isUnleashToggle: true,
+            leaveIcon: unleashRanger?.icon || "",
+            fKeyLabel: "F5",
+            isF5AboveOrb: true,
+          });
+        }
+      } else {
+        const p5Skill = (nextOptions.profession || []).find((s) => s.slot === "Profession_5") || null;
+        if (p5Skill) {
+          mechSlots.push({ skill: p5Skill, sourceId: p5Skill.id, isStatic: true, isSelectable: false, fKeyLabel: "F5", isF5AboveOrb: true });
+        }
       }
     }
   } else {
@@ -1029,14 +1065,15 @@ export function renderSkills() {
       Number(skillSource?.eliteId) || 0,
     ].filter(Boolean));
     const isEquippedSlotKit = (kitSkill?.bundleSkills?.length ?? 0) > 0 && equippedIds.has(activeKit);
-    // Soulbeast Beastmode has no bundle_skills in the API; allow it to persist via isBeastmodeToggle.
+    // Soulbeast Beastmode / Untamed Unleash have no bundle_skills in the API; allow them to persist.
     const isBeastmodeKit = mechSlots.some((s) => s.isBeastmodeToggle && s.skill?.id === activeKit);
+    const isUnleashKit = mechSlots.some((s) => s.isUnleashToggle) && activeKit === 63147;
     const isBerserkKit = mechSlots.some((s) => s.isBerserkToggle && s.skill?.id === activeKit);
     // Bladesworn: Gunsaber (62745) and Dragon Trigger (62803) are both valid active kits; the
     // displayed skill changes to the flip variant when active so we can't match by skill.id.
     const isBladeswornKit = (mechSlots.some((s) => s.isGunsaberToggle) || mechSlots.some((s) => s.isDragonTriggerToggle))
       && (activeKit === 62745 || activeKit === 62803);
-    if (!isStaticBundle && !isToolbeltSource && !isEquippedSlotKit && !isBeastmodeKit && !isBerserkKit && !isBladeswornKit) {
+    if (!isStaticBundle && !isToolbeltSource && !isEquippedSlotKit && !isBeastmodeKit && !isUnleashKit && !isBerserkKit && !isBladeswornKit) {
       state.editor.activeKit = 0;
     }
   }
@@ -1116,7 +1153,7 @@ export function renderSkills() {
     mechBar.className = "profession-mechanics-bar";
 
     for (let fIdx = 0; fIdx < mechSlots.length; fIdx++) {
-      const { skill, sourceId, sourceSkill, isStatic, isSelectable, morphIndex, mechIconOverride, fakeCommand, isBeastmodeToggle, isBerserkToggle, isGunsaberToggle, isDragonTriggerToggle, leaveIcon, fKeyLabel, isF5AboveOrb, isAllianceTactics, isAntiquarySkritSwipe } = mechSlots[fIdx];
+      const { skill, sourceId, sourceSkill, isStatic, isSelectable, morphIndex, mechIconOverride, fakeCommand, isBeastmodeToggle, isBerserkToggle, isGunsaberToggle, isDragonTriggerToggle, isUnleashToggle, leaveIcon, fKeyLabel, isF5AboveOrb, isAllianceTactics, isAntiquarySkritSwipe } = mechSlots[fIdx];
       const slotEl = document.createElement("div");
       slotEl.className = "skill-slot";
       const iconBtn = document.createElement("button");
@@ -1128,7 +1165,7 @@ export function renderSkills() {
       const srcSkillForKit = (!isStatic && isToolbelt) ? catalog.skillById.get(sourceId) : null;
       const isKit = !isStatic && isToolbelt
         ? (srcSkillForKit?.bundleSkills?.length ?? 0) > 0
-        : isStatic && ((skill?.bundleSkills?.length ?? 0) > 0 || !!isBeastmodeToggle || !!isBerserkToggle || !!isGunsaberToggle || !!isDragonTriggerToggle);
+        : isStatic && ((skill?.bundleSkills?.length ?? 0) > 0 || !!isBeastmodeToggle || !!isUnleashToggle || !!isBerserkToggle || !!isGunsaberToggle || !!isDragonTriggerToggle);
 
       let isActive = false;
       if (isSelectable) {
@@ -1141,7 +1178,7 @@ export function renderSkills() {
         isActive = resolvedKit === 62745;
       } else if (isDragonTriggerToggle) {
         isActive = resolvedKit === 62803;
-      } else if (isStatic && ((skill?.bundleSkills?.length ?? 0) > 0 || isBeastmodeToggle || isBerserkToggle)) {
+      } else if (isStatic && ((skill?.bundleSkills?.length ?? 0) > 0 || isBeastmodeToggle || isUnleashToggle || isBerserkToggle)) {
         // Static bundle skills: shroud, celestial avatar, Photon Forge, beastmode, Berserk, etc.
         isActive = resolvedKit === skill?.id;
       } else if (isStatic && !isToolbelt) {
@@ -1314,12 +1351,15 @@ export function renderSkills() {
             if (skill) selectDetail("skill", skill);
             return;
           }
-          if (isStatic && ((skill?.bundleSkills?.length ?? 0) > 0 || isBeastmodeToggle || isGunsaberToggle || isDragonTriggerToggle)) {
-            // Static bundle skill (shroud, Photon Forge, beastmode, Gunsaber, Dragon Trigger, etc.): toggle active state.
+          if (isStatic && ((skill?.bundleSkills?.length ?? 0) > 0 || isBeastmodeToggle || isUnleashToggle || isGunsaberToggle || isDragonTriggerToggle)) {
+            // Static bundle skill (shroud, Photon Forge, beastmode, Unleash, Gunsaber, Dragon Trigger, etc.): toggle active state.
             if (isGunsaberToggle) {
               state.editor.activeKit = resolvedKit === 62745 ? 0 : 62745;
             } else if (isDragonTriggerToggle) {
               state.editor.activeKit = resolvedKit === 62803 ? 0 : 62803;
+            } else if (isUnleashToggle) {
+              // Toggle between Unleash Ranger active (63147) and inactive (0)
+              state.editor.activeKit = activeKit === 63147 ? 0 : 63147;
             } else {
               state.editor.activeKit = resolvedKit === skill.id ? 0 : skill.id;
             }

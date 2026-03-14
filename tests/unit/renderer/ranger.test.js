@@ -5,7 +5,7 @@ const { createMechanicsSuite, setupMechanicsHarness } = require("./mechanicsSuit
 createMechanicsSuite("Ranger", [
   { specId: 0, expected: ["fake:attack", "12478", "fake:return"] },
   { specId: 55, expected: ["fake:attack", "12478", "fake:return"] },
-  { specId: 72, expected: ["fake:attack", "12478", "empty"] },
+  { specId: 72, expected: ["fake:attack", "12478", "fake:return", "63344"] },
 ]);
 
 describe("renderer mechanics selection — Ranger core vs elite F skills", () => {
@@ -22,10 +22,49 @@ describe("renderer mechanics selection — Ranger core vs elite F skills", () =>
     expect(soulbeast.signatures).toEqual(core.signatures);
   });
 
-  test("Untamed replaces F3 return command with a profession skill slot", async () => {
+  test("Untamed default (Unleash Pet) shows normal pet bar at F1-F3", async () => {
     const untamed = await resolve({ specId: 72 });
-    expect(untamed.signatures).toEqual(["fake:attack", "12478", "empty"]);
-    expect(untamed.signatures[2]).not.toBe("fake:return");
+    expect(untamed.signatures).toEqual(["fake:attack", "12478", "fake:return", "63344"]);
+  });
+});
+
+describe("renderer mechanics selection — Untamed F5 Unleash toggle", () => {
+  const resolve = setupMechanicsHarness("Ranger");
+
+  test("Untamed has F5 Unleash skill as a toggleable slot", async () => {
+    const untamed = await resolve({ specId: 72 });
+    const f5Slot = untamed.result.mechSlots.find((s) => s.fKeyLabel === "F5");
+    expect(f5Slot).toBeDefined();
+    expect(f5Slot.skill).toBeDefined();
+    expect(f5Slot.isUnleashToggle).toBe(true);
+  });
+
+  test("F5 shows Unleash Pet by default (current state)", async () => {
+    const defaultState = await resolve({ specId: 72 });
+    const f5 = defaultState.result.mechSlots.find((s) => s.fKeyLabel === "F5");
+    expect(f5.skill.id).toBe(63344); // Unleash Pet (current state)
+  });
+
+  test("F5 shows Unleash Ranger when toggled", async () => {
+    const unleashed = await resolve({ specId: 72, activeKit: 63147 });
+    const f5 = unleashed.result.mechSlots.find((s) => s.fKeyLabel === "F5");
+    expect(f5.skill.id).toBe(63147); // Unleash Ranger (current state)
+  });
+
+  test("Unleash Ranger active shows empowered pet commands at F1-F3", async () => {
+    const unleashed = await resolve({ specId: 72, activeKit: 63147 });
+    const sigs = unleashed.signatures;
+    expect(sigs[0]).toBe("63209"); // Venomous Outburst
+    expect(sigs[1]).toBe("63258"); // Rending Vines
+    expect(sigs[2]).toBe("63094"); // Enveloping Haze
+  });
+
+  test("Default state (Unleash Pet) shows normal pet commands at F1-F3", async () => {
+    const untamed = await resolve({ specId: 72 });
+    const sigs = untamed.signatures;
+    expect(sigs[0]).toBe("fake:attack");
+    expect(sigs[1]).toBe("12478");
+    expect(sigs[2]).toBe("fake:return");
   });
 });
 
@@ -72,13 +111,15 @@ describe("renderer mechanics selection — Ranger aquatic pets underwater", () =
     expect(underwater.signatures).toEqual(["fake:attack", "empty", "fake:return"]);
   });
 
-  test("Untamed underwater still replaces F3 return with profession skill", async () => {
+  test("Untamed underwater has F5 Unleash toggle", async () => {
     const underwater = await resolve({
       specId: 72,
       underwaterMode: true,
       selectedPets: aquaticPets,
       activePetSlot: "aquatic1",
     });
-    expect(underwater.signatures[2]).not.toBe("fake:return");
+    const f5 = underwater.result.mechSlots.find((s) => s.fKeyLabel === "F5");
+    expect(f5).toBeDefined();
+    expect(f5.isUnleashToggle).toBe(true);
   });
 });

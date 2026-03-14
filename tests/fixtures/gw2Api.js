@@ -146,6 +146,12 @@ const MOCK_PROFESSIONS = {
       { id: 5503, slot: "Heal",        specialization: 0,  type: "Heal" },
       { id: 12489, slot: "Utility",    specialization: 0,  type: "Utility" },
       { id: 12540, slot: "Elite",      specialization: 0,  type: "Elite" },
+      // Untamed profession skills
+      { id: 63209, slot: "Profession_1", specialization: 72, type: "Profession" },
+      { id: 63258, slot: "Profession_2", specialization: 72, type: "Profession" },
+      { id: 63094, slot: "Profession_3", specialization: 72, type: "Profession" },
+      { id: 63147, slot: "Profession_5", specialization: 72, type: "Profession" },
+      { id: 63344, slot: "Profession_5", specialization: 72, type: "Profession" },
     ],
     weapons: {
       Longbow: {
@@ -594,6 +600,13 @@ const MOCK_SKILLS = {
   12489: makeSkill(12489, { name: "Muddy Terrain", slot: "Utility", type: "Utility", professions: ["Ranger"] }),
   12540: makeSkill(12540, { name: "Entangle",      slot: "Elite",   type: "Elite",   professions: ["Ranger"] }),
   12466: makeSkill(12466, { name: "Long Range Shot", slot: "Weapon_1", type: "Weapon", weapon_type: "Longbow" }),
+  // Untamed profession skills — empowered pet commands (F1-F3 when Unleash Pet active)
+  63209: makeSkill(63209, { name: "Venomous Outburst", slot: "Profession_1", type: "Profession", specialization: 72, professions: ["Ranger"] }),
+  63258: makeSkill(63258, { name: "Rending Vines",     slot: "Profession_2", type: "Profession", specialization: 72, professions: ["Ranger"] }),
+  63094: makeSkill(63094, { name: "Enveloping Haze",   slot: "Profession_3", type: "Profession", specialization: 72, professions: ["Ranger"] }),
+  // Untamed F5 toggle
+  63147: makeSkill(63147, { name: "Unleash Ranger", slot: "Profession_5", type: "Profession", specialization: 72, professions: ["Ranger"] }),
+  63344: makeSkill(63344, { name: "Unleash Pet",    slot: "Profession_5", type: "Profession", specialization: 72, professions: ["Ranger"] }),
 
   // ---- Thief ----
   13050: makeSkill(13050, { name: "Channeled Vigor", slot: "Heal", type: "Heal", professions: ["Thief"] }),
