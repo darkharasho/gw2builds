@@ -47,7 +47,6 @@ function normalizeEquipment(equipment) {
   const source = equipment && typeof equipment === "object" ? equipment : {};
   return {
     statPackage: String(source.statPackage || ""),
-    runeSet: String(source.runeSet || ""),
     relic: String(source.relic || ""),
     food: String(source.food || ""),
     utility: String(source.utility || ""),
@@ -294,7 +293,6 @@ function skillRows(skills) {
 function equipmentTokens(equipment) {
   const tokens = [];
   if (equipment.statPackage) tokens.push(token("Stats: " + equipment.statPackage));
-  if (equipment.runeSet) tokens.push(token("Runes: " + equipment.runeSet));
   if (equipment.relic) tokens.push(token("Relic: " + equipment.relic));
   if (equipment.food) tokens.push(token("Food: " + equipment.food));
   if (equipment.utility) tokens.push(token("Utility: " + equipment.utility));

@@ -585,20 +585,6 @@ export function renderEquipmentPanel() {
     return section;
   }
 
-  function makeTextInput(labelText, value, placeholder, onChange) {
-    const label = document.createElement("label");
-    label.className = "equip-text-label";
-    const span = document.createElement("span");
-    span.textContent = labelText;
-    const input = document.createElement("input");
-    input.type = "text";
-    input.value = value || "";
-    input.placeholder = placeholder;
-    input.addEventListener("input", () => onChange(input.value));
-    label.append(span, input);
-    return label;
-  }
-
   // === LEFT COLUMN ===
   const leftCol = document.createElement("div");
   leftCol.className = "equip-col equip-col--left";

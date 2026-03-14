@@ -174,12 +174,30 @@ function normalizeSkillRef(value) {
 
 function normalizeEquipment(value) {
   const equipment = value && typeof value === "object" ? value : {};
+  const normalizeStringMap = (obj) => {
+    if (!obj || typeof obj !== "object") return {};
+    const out = {};
+    for (const [k, v] of Object.entries(obj)) out[k] = asString(v, 120);
+    return out;
+  };
+  const normalizeSigils = (obj) => {
+    if (!obj || typeof obj !== "object") return {};
+    const out = {};
+    for (const [k, v] of Object.entries(obj)) {
+      out[k] = Array.isArray(v) ? v.map((s) => asString(s, 40)) : [];
+    }
+    return out;
+  };
   return {
     statPackage: asString(equipment.statPackage, 80),
-    runeSet: asString(equipment.runeSet, 120),
     relic: asString(equipment.relic, 120),
     food: asString(equipment.food, 120),
     utility: asString(equipment.utility, 120),
+    slots: normalizeStringMap(equipment.slots),
+    weapons: normalizeStringMap(equipment.weapons),
+    runes: normalizeStringMap(equipment.runes),
+    sigils: normalizeSigils(equipment.sigils),
+    infusions: normalizeStringMap(equipment.infusions),
   };
 }
 
