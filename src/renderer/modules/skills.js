@@ -862,10 +862,45 @@ export function makeSkillSlot(slot, catalog, options, utilitySelection, markSkil
   return slotEl;
 }
 
+function _renderUnderwaterToggle() {
+  const isUnderwater = Boolean(state.editor.underwaterMode);
+  const container = document.createElement("div");
+  container.className = "underwater-toggle";
+  container.innerHTML = `
+    <button class="underwater-toggle__btn ${!isUnderwater ? "underwater-toggle__btn--active" : ""}"
+            data-mode="land" aria-pressed="${!isUnderwater}">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+        <path d="M8 2L2 8l2 2 4-4 4 4 2-2L8 2z" fill="currentColor"/>
+        <rect x="2" y="11" width="12" height="3" rx="1" fill="currentColor" opacity="0.5"/>
+      </svg>
+      Land
+    </button>
+    <button class="underwater-toggle__btn ${isUnderwater ? "underwater-toggle__btn--active" : ""}"
+            data-mode="water" aria-pressed="${isUnderwater}">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+        <path d="M1 7c1.5-2 3-2 4.5 0s3 2 4.5 0 3-2 4.5 0" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        <path d="M1 11c1.5-2 3-2 4.5 0s3 2 4.5 0 3-2 4.5 0" stroke="currentColor" stroke-width="1.5" fill="none"/>
+      </svg>
+      Water
+    </button>
+  `;
+  container.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-mode]");
+    if (!btn) return;
+    const newMode = btn.dataset.mode === "water";
+    if (newMode === state.editor.underwaterMode) return;
+    state.editor.underwaterMode = newMode;
+    _renderEditor();
+  });
+  return container;
+}
+
 export function renderSkills() {
   const catalog = state.activeCatalog;
   _el.skillsHost.innerHTML = "";
   if (!catalog) return;
+
+  _el.skillsHost.prepend(_renderUnderwaterToggle());
 
   let options = getSkillOptionsByType(catalog, state.editor.specializations, state.editor.underwaterMode);
   const utilitySelection = Array.isArray(state.editor.skills?.utilityIds)

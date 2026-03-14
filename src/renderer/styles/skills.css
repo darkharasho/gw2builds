@@ -620,3 +620,45 @@
 .skill-card select option:disabled {
   color: #8095bc;
 }
+
+/* Land / Water segmented pill toggle */
+.underwater-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  margin-bottom: 10px;
+  background: rgba(8, 14, 28, 0.72);
+  border: 1px solid var(--line-soft, rgba(100, 120, 160, 0.25));
+  border-radius: 20px;
+  padding: 3px;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.underwater-toggle__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 14px;
+  border: none;
+  border-radius: 16px;
+  background: transparent;
+  color: var(--text-dim, #7a9abf);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  line-height: 1.2;
+}
+
+.underwater-toggle__btn:hover:not(.underwater-toggle__btn--active) {
+  background: rgba(100, 140, 200, 0.12);
+  color: rgba(180, 200, 230, 0.9);
+}
+
+.underwater-toggle__btn--active {
+  background: rgba(74, 143, 214, 0.45);
+  color: #fff;
+  cursor: default;
+}
