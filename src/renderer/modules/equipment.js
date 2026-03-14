@@ -138,6 +138,74 @@ export function openSlotPicker(anchorEl, currentValue, onSelect, { items = null,
   };
 }
 
+// Build picker items list from upgrade catalog data
+function getUpgradePickerItems(type) {
+  const catalog = state.upgradeCatalog;
+  if (!catalog) return [{ value: "", label: "— Loading… —", subtitle: "Upgrade data not yet loaded" }];
+  const items = catalog[type] || [];
+  return [
+    { value: "", label: "— None —" },
+    ...items.map((item) => ({
+      value: String(item.id),
+      label: type === "runes"
+        ? item.name.replace(/^Superior Rune of (the )?/, "")
+        : type === "sigils"
+          ? item.name.replace(/^Superior Sigil of (the )?/, "")
+          : item.name,
+      subtitle: item.description ? item.description.slice(0, 80) : "",
+      icon: item.icon,
+      _fullName: item.name,
+    })),
+  ];
+}
+
+// Create upgrade sub-slot button for a given equipment slot
+function makeUpgradeBtn(type, slotKey, currentValue, onSelect) {
+  const catalog = state.upgradeCatalog;
+  const btn = document.createElement("button");
+  btn.type = "button";
+  const typeClass = type === "runes" ? "rune" : type === "sigils" ? "sigil" : "infusion";
+  const letter = type === "runes" ? "R" : type === "sigils" ? "S" : "I";
+  btn.className = `equip-upgrade-btn equip-upgrade-btn--${typeClass}` + (currentValue ? " equip-upgrade-btn--filled" : "");
+
+  if (currentValue && catalog) {
+    const lookupMap = type === "runes" ? catalog.runeById : type === "sigils" ? catalog.sigilById : catalog.infusionById;
+    const itemDef = lookupMap?.get(Number(currentValue));
+    if (itemDef?.icon) {
+      const img = document.createElement("img");
+      img.src = itemDef.icon;
+      img.alt = itemDef.name;
+      img.draggable = false;
+      img.addEventListener("error", () => { img.remove(); btn.textContent = letter; });
+      btn.append(img);
+    } else {
+      btn.textContent = letter;
+    }
+  } else {
+    btn.textContent = letter;
+  }
+
+  const pickerType = type === "runes" ? "runes" : type === "sigils" ? "sigils" : "infusions";
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    openSlotPicker(btn, currentValue, onSelect, {
+      items: getUpgradePickerItems(pickerType),
+      searchPlaceholder: `Search ${pickerType}…`,
+    });
+  });
+
+  // Hover preview
+  bindHoverPreview(btn, `equip-${typeClass}`, () => {
+    if (!currentValue || !catalog) return null;
+    const lookupMap = type === "runes" ? catalog.runeById : type === "sigils" ? catalog.sigilById : catalog.infusionById;
+    const itemDef = lookupMap?.get(Number(currentValue));
+    if (!itemDef) return null;
+    return { name: itemDef.name, icon: itemDef.icon, description: itemDef.description || "" };
+  });
+
+  return btn;
+}
+
 export function updateHealthOrb() {
   const orbHp = document.querySelector(".health-orb__hp");
   if (!orbHp) return;
@@ -222,6 +290,36 @@ export function renderEquipmentPanel() {
         .map(({ stat, value }) => ({ text: stat, value: `+${value}` }));
       return { name: combo.label, icon: imgSrc, description: "", facts, slot: slotDef.label };
     });
+
+    // Upgrade sub-slots
+    const upgradeContainer = document.createElement("div");
+    upgradeContainer.className = "equip-upgrade-slots";
+
+    // Rune (armor + breather only)
+    const isArmorSlot = ["head", "shoulders", "chest", "hands", "legs", "feet", "breather"].includes(slotDef.key);
+    if (isArmorSlot) {
+      const runeVal = equip.runes?.[slotDef.key] || "";
+      upgradeContainer.append(makeUpgradeBtn("runes", slotDef.key, runeVal, (newVal) => {
+        if (!equip.runes) equip.runes = {};
+        equip.runes[slotDef.key] = newVal || "";
+        _markEditorChanged();
+        renderEquipmentPanel();
+      }));
+    }
+
+    // Infusion (all slots that have infusion entries)
+    if (equip.infusions && slotDef.key in equip.infusions) {
+      const infVal = equip.infusions[slotDef.key] || "";
+      upgradeContainer.append(makeUpgradeBtn("infusions", slotDef.key, infVal, (newVal) => {
+        equip.infusions[slotDef.key] = newVal || "";
+        _markEditorChanged();
+        renderEquipmentPanel();
+      }));
+    }
+
+    if (upgradeContainer.children.length > 0) {
+      wrapper.append(upgradeContainer);
+    }
 
     return wrapper;
   }
@@ -336,6 +434,10 @@ export function renderEquipmentPanel() {
               equip.weapons[ofKey] = "";
               equip.slots[ofKey] = "";
             }
+            // Clear second sigil on the mainhand when swapping to one-handed
+            if (!newFlags.includes("TwoHand") && equip.sigils?.[slotDef.key]) {
+              equip.sigils[slotDef.key][1] = "";
+            }
             _markEditorChanged();
             renderEquipmentPanel();
             _renderSkills();
@@ -350,6 +452,48 @@ export function renderEquipmentPanel() {
           renderEquipmentPanel();
         });
       });
+    }
+
+    // Upgrade sub-slots for weapons
+    if (!lockedByTwoHanded) {
+      const upgradeContainer = document.createElement("div");
+      upgradeContainer.className = "equip-upgrade-slots";
+
+      // Determine sigil count: two-handed = 2, one-handed/empty = 1
+      const weaponId = weapons[slotDef.key] || "";
+      const wDef = GW2_WEAPONS_BY_ID.get(weaponId);
+      const isTwoHanded = wDef?.hand === "two" || (
+        !slotDef.key.startsWith("offhand") &&
+        (state.activeCatalog?.professionWeapons?.[weaponId]?.flags || []).includes("TwoHand")
+      );
+      // Aquatic weapons are always two-handed; offhand always 1
+      const isAquaticSlot = slotDef.key.startsWith("aquatic");
+      const sigilCount = slotDef.key.startsWith("offhand") ? 1 : (isAquaticSlot || isTwoHanded ? 2 : 1);
+      const sigilArr = equip.sigils?.[slotDef.key] || [];
+
+      for (let i = 0; i < sigilCount; i++) {
+        const sigilVal = String(sigilArr[i] || "");
+        upgradeContainer.append(makeUpgradeBtn("sigils", slotDef.key, sigilVal, (newVal) => {
+          if (!equip.sigils) equip.sigils = {};
+          if (!Array.isArray(equip.sigils[slotDef.key])) {
+            equip.sigils[slotDef.key] = slotDef.key.startsWith("offhand") ? [""] : ["", ""];
+          }
+          equip.sigils[slotDef.key][i] = newVal || "";
+          _markEditorChanged();
+          renderEquipmentPanel();
+        }));
+      }
+
+      // Infusion
+      const infVal = equip.infusions?.[slotDef.key] || "";
+      upgradeContainer.append(makeUpgradeBtn("infusions", slotDef.key, infVal, (newVal) => {
+        if (!equip.infusions) equip.infusions = {};
+        equip.infusions[slotDef.key] = newVal || "";
+        _markEditorChanged();
+        renderEquipmentPanel();
+      }));
+
+      wrapper.append(upgradeContainer);
     }
 
     return wrapper;
