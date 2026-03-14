@@ -3,6 +3,22 @@ import { WEAPON_STRENGTH_MIDPOINT, BOON_CONDITION_ICONS, BUFF_FACT_TYPES, FACT_T
 import { escapeHtml, tierLabel, normalizeText } from "./utils.js";
 import { computeEquipmentStats } from "./stats.js";
 
+/**
+ * Check if a skill is aquatic-only (weapon skill for a weapon with the Aquatic flag,
+ * and the skill itself does NOT have NoUnderwater — i.e. it's the underwater variant).
+ */
+function _isAquaticOnlySkill(kind, entity) {
+  if (kind !== "skill" || !entity) return false;
+  const wt = (entity.weaponType || "").toLowerCase();
+  if (!wt) return false;
+  // Only relevant for weapons that have the Aquatic flag
+  const profWeapons = state.activeCatalog?.professionWeapons || {};
+  const weaponData = profWeapons[wt];
+  if (!weaponData?.flags?.includes("Aquatic")) return false;
+  // The aquatic variant is the one WITHOUT NoUnderwater
+  return !(entity.flags || []).includes("NoUnderwater");
+}
+
 // DOM refs injected by the entry point via initDetailPanel() to keep this module
 // importable in Node.js test environments (no document.querySelector at module scope).
 let _el = { detailHost: null, hoverPreview: null, expandBtn: null };
@@ -108,7 +124,7 @@ export function renderDetailPanel() {
             : `<div class="detail-card__icon-placeholder"></div>`}
           <div>
             <h3>${escapeHtml(detail.title)}</h3>
-            <p>${escapeHtml(detail.kindLabel)}${detail.hasSplit ? ' <span class="split-badge">WvW split</span>' : ''}</p>
+            <p>${escapeHtml(detail.kindLabel)}${detail.hasSplit ? ' <span class="split-badge">WvW split</span>' : ''}${detail.isAquaticOnly ? ' <span class="split-badge aquatic-badge">Aquatic</span>' : ''}</p>
           </div>
         </header>
         <section>
@@ -256,7 +272,7 @@ export function buildSkillCard(skill, kind, isChained = false, dmgStats = null) 
       ${icon ? `<img class="hover-preview__icon" src="${escapeHtml(icon)}" alt="${escapeHtml(skill.name || "Icon")}" onerror="this.onerror=null;this.src='${escapeHtml(String(skill.iconFallback || icon))}'" />` : "<div></div>"}
       <div>
         <h4 class="hover-preview__title">${escapeHtml(skill.name || "Unknown")}</h4>
-        <p class="hover-preview__meta">${escapeHtml(meta)}${skill.hasSplit ? ' <span class="split-badge">WvW split</span>' : ''}</p>
+        <p class="hover-preview__meta">${escapeHtml(meta)}${skill.hasSplit ? ' <span class="split-badge">WvW split</span>' : ''}${_isAquaticOnlySkill(kind, skill) ? ' <span class="split-badge aquatic-badge">Aquatic</span>' : ''}</p>
       </div>
     </div>
     ${description ? `<p class="hover-preview__desc">${escapeHtml(description).replace(/\n/g, "<br>")}</p>` : (!factsItems.length && !skill.bonuses?.length ? `<p class="hover-preview__desc">No description available.</p>` : "")}
@@ -410,6 +426,7 @@ export async function selectDetail(kind, entity) {
     facts: resolveEntityFacts(entity),
     wiki: { loading: true, summary: "", url: "" },
     hasSplit: Boolean(entity.hasSplit),
+    isAquaticOnly: _isAquaticOnlySkill(kind, entity),
   };
   state.detail = detail;
   renderDetailPanel();

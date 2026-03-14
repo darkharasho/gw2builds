@@ -169,7 +169,7 @@ export function filterSkillList(list, query, selectedId) {
   return filtered;
 }
 
-export function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "", activeAttunement2 = "", isWeaver = false) {
+export function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "", activeAttunement2 = "", isWeaver = false, underwaterMode = false) {
   const profWeapons = catalog?.professionWeapons || {};
   const weaponSkillById = catalog?.weaponSkillById || new Map();
   const slots = [null, null, null, null, null];
@@ -216,16 +216,25 @@ export function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "",
     return ref.attunement === effectiveAttunement;
   }
 
+  // For weapons with both land and underwater skills (e.g. spear), filter by mode.
+  // Underwater: skip skills flagged NoUnderwater.
+  // Land: prefer NoUnderwater-flagged skills (land-specific) when duplicates exist.
+  const isNoUW = (skill) => (skill.flags || []).includes("NoUnderwater");
+  const shouldSkipForMode = (skill) => underwaterMode && isNoUW(skill);
+
   if (mhData) {
     for (const ref of mhData.skills) {
       const n = parseWeaponSlotNum(ref.slot);
       if (!matchesAttunement(ref, n)) continue;
       if (n >= 1 && n <= 5) {
         const skill = weaponSkillById.get(ref.id);
-        if (skill && !slots[n - 1]) {
-          // Skip dual-attack skills (dualWield set) for non-Weaver builds, and also for
-          // Weaver slot 3 in single-attunement mode (dual-attack has its own separate loop).
-          if (skill.dualWield && (!isWeaver || n === 3)) continue;
+        if (!skill) continue;
+        if (shouldSkipForMode(skill)) continue;
+        // Skip dual-attack skills (dualWield set) for non-Weaver builds, and also for
+        // Weaver slot 3 in single-attunement mode (dual-attack has its own separate loop).
+        if (skill.dualWield && (!isWeaver || n === 3)) continue;
+        // On land, prefer land-specific (NoUnderwater) skills over underwater variants.
+        if (!slots[n - 1] || (!underwaterMode && isNoUW(skill) && !isNoUW(slots[n - 1]))) {
           slots[n - 1] = skill;
         }
       }
@@ -239,7 +248,11 @@ export function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "",
         if (!matchesAttunement(ref, n)) continue;
         if (n >= 4 && n <= 5) {
           const skill = weaponSkillById.get(ref.id);
-          if (skill && !slots[n - 1]) slots[n - 1] = skill;
+          if (!skill) continue;
+          if (shouldSkipForMode(skill)) continue;
+          if (!slots[n - 1] || (!underwaterMode && isNoUW(skill) && !isNoUW(slots[n - 1]))) {
+            slots[n - 1] = skill;
+          }
         }
       }
     }
@@ -1024,12 +1037,12 @@ export function renderSkills() {
     weaponSkills = getEquippedWeaponSkills(catalog, {
       mainhand: equippedWeapons[activeAquatic] || "",
       offhand: "",
-    }, activeAttunement, "", false);
+    }, activeAttunement, "", false, true);
   } else {
     weaponSkills = getEquippedWeaponSkills(catalog, {
       mainhand: equippedWeapons[mhKey] || "",
       offhand: equippedWeapons[ohKey] || "",
-    }, activeAttunement, activeAttunement2, isWeaver);
+    }, activeAttunement, activeAttunement2, isWeaver, false);
   }
 
   const weaponGroup = document.createElement("div");

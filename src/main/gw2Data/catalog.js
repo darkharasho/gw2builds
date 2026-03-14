@@ -942,6 +942,7 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
         attunement: skill.attunement === "None" ? "" : (skill.attunement || ""),
         dualWield: skill.dual_attunement === "None" ? "" : (skill.dual_attunement || ""),
         weaponType: skill.weapon_type === "None" ? "" : (skill.weapon_type || ""),
+        flags: Array.isArray(skill.flags) ? skill.flags : [],
         facts: Array.isArray(skill.facts) ? skill.facts : [],
         flipSkill: Number(skill.flip_skill) || 0,
       };
