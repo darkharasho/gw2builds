@@ -343,6 +343,9 @@ export function getHoverMetaLine(kind, entity) {
     return handLabel ? `Weapon • ${handLabel}` : "Weapon";
   }
   if (kind === "equip-relic") return "Relic";
+  if (kind === "equip-rune") return "Rune";
+  if (kind === "equip-sigil") return "Sigil";
+  if (kind === "equip-infusion") return "Infusion";
   if (kind === "spec") return entity?.elite ? "Elite Specialization" : "Specialization";
   const type = String(entity?.type || "").trim();
   const slot = String(entity?.slot || "").trim();
