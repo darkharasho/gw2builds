@@ -5,6 +5,16 @@ import { parseTags, simplifyTrait, simplifySkill } from "./utils.js";
 import { getMajorTraitsByTier } from "./specializations.js";
 import { ANTIQUARY_PROLIFIC_PLUNDERER_TRAIT_ID } from "./constants.js";
 
+// Normalize sigil array to correct shape for a given slot key.
+function normalizeSigilArray(value, slotKey) {
+  const isOffhand = slotKey.startsWith("offhand");
+  const expectedLen = isOffhand ? 1 : 2;
+  if (!Array.isArray(value)) return Array(expectedLen).fill("");
+  const arr = value.slice(0, expectedLen).map((v) => String(v || ""));
+  while (arr.length < expectedLen) arr.push("");
+  return arr;
+}
+
 // ---------------------------------------------------------------------------
 // Callback injection (avoids circular deps with render-pages.js / skills.js)
 // ---------------------------------------------------------------------------
@@ -250,6 +260,11 @@ export function enforceEditorConsistency(options = {}) {
       if (!valid) {
         equip.weapons[key] = "";
         if (equip.slots?.[key] !== undefined) equip.slots[key] = "";
+        // Clear associated upgrades
+        if (equip.sigils?.[key]) {
+          equip.sigils[key] = key.startsWith("offhand") ? [""] : ["", ""];
+        }
+        if (equip.infusions?.[key] !== undefined) equip.infusions[key] = "";
       }
     }
   }
@@ -327,12 +342,14 @@ export function computeEditorSignature() {
     notes: String(editor.notes || ""),
     equipment: {
       statPackage: String(editor.equipment?.statPackage || ""),
-      runeSet: String(editor.equipment?.runeSet || ""),
       relic: String(editor.equipment?.relic || ""),
       food: String(editor.equipment?.food || ""),
       utility: String(editor.equipment?.utility || ""),
       slots: editor.equipment?.slots || {},
       weapons: editor.equipment?.weapons || {},
+      runes: editor.equipment?.runes || {},
+      sigils: editor.equipment?.sigils || {},
+      infusions: editor.equipment?.infusions || {},
     },
     specializations,
     skills: {
@@ -377,7 +394,6 @@ export function parseBuildImportPayload(text) {
     notes,
     equipment: {
       statPackage: String(source.equipment?.statPackage || source.stats || ""),
-      runeSet: String(source.equipment?.runeSet || source.runes || ""),
       relic: String(source.equipment?.relic || ""),
       food: String(source.equipment?.food || ""),
       utility: String(source.equipment?.utility || ""),
@@ -409,6 +425,44 @@ export function parseBuildImportPayload(text) {
         offhand2:  String(source.equipment?.weapons?.offhand2  || ""),
         aquatic1:  String(source.equipment?.weapons?.aquatic1  || ""),
         aquatic2:  String(source.equipment?.weapons?.aquatic2  || ""),
+      },
+      runes: {
+        head: String(source.equipment?.runes?.head || ""),
+        shoulders: String(source.equipment?.runes?.shoulders || ""),
+        chest: String(source.equipment?.runes?.chest || ""),
+        hands: String(source.equipment?.runes?.hands || ""),
+        legs: String(source.equipment?.runes?.legs || ""),
+        feet: String(source.equipment?.runes?.feet || ""),
+        breather: String(source.equipment?.runes?.breather || ""),
+      },
+      sigils: {
+        mainhand1: normalizeSigilArray(source.equipment?.sigils?.mainhand1, "mainhand1"),
+        offhand1: normalizeSigilArray(source.equipment?.sigils?.offhand1, "offhand1"),
+        mainhand2: normalizeSigilArray(source.equipment?.sigils?.mainhand2, "mainhand2"),
+        offhand2: normalizeSigilArray(source.equipment?.sigils?.offhand2, "offhand2"),
+        aquatic1: normalizeSigilArray(source.equipment?.sigils?.aquatic1, "aquatic1"),
+        aquatic2: normalizeSigilArray(source.equipment?.sigils?.aquatic2, "aquatic2"),
+      },
+      infusions: {
+        head: String(source.equipment?.infusions?.head || ""),
+        shoulders: String(source.equipment?.infusions?.shoulders || ""),
+        chest: String(source.equipment?.infusions?.chest || ""),
+        hands: String(source.equipment?.infusions?.hands || ""),
+        legs: String(source.equipment?.infusions?.legs || ""),
+        feet: String(source.equipment?.infusions?.feet || ""),
+        mainhand1: String(source.equipment?.infusions?.mainhand1 || ""),
+        offhand1: String(source.equipment?.infusions?.offhand1 || ""),
+        mainhand2: String(source.equipment?.infusions?.mainhand2 || ""),
+        offhand2: String(source.equipment?.infusions?.offhand2 || ""),
+        back: String(source.equipment?.infusions?.back || ""),
+        amulet: String(source.equipment?.infusions?.amulet || ""),
+        ring1: String(source.equipment?.infusions?.ring1 || ""),
+        ring2: String(source.equipment?.infusions?.ring2 || ""),
+        accessory1: String(source.equipment?.infusions?.accessory1 || ""),
+        accessory2: String(source.equipment?.infusions?.accessory2 || ""),
+        breather: String(source.equipment?.infusions?.breather || ""),
+        aquatic1: String(source.equipment?.infusions?.aquatic1 || ""),
+        aquatic2: String(source.equipment?.infusions?.aquatic2 || ""),
       },
     },
     specializations,
@@ -484,7 +538,6 @@ export async function loadBuildIntoEditor(build, options = {}) {
     notes: String(build.notes || ""),
     equipment: {
       statPackage: String(build.equipment?.statPackage || ""),
-      runeSet: String(build.equipment?.runeSet || ""),
       relic: String(build.equipment?.relic || ""),
       food: String(build.equipment?.food || ""),
       utility: String(build.equipment?.utility || ""),
@@ -516,6 +569,44 @@ export async function loadBuildIntoEditor(build, options = {}) {
         offhand2:  String(build.equipment?.weapons?.offhand2  || ""),
         aquatic1:  String(build.equipment?.weapons?.aquatic1  || ""),
         aquatic2:  String(build.equipment?.weapons?.aquatic2  || ""),
+      },
+      runes: {
+        head: String(build.equipment?.runes?.head || ""),
+        shoulders: String(build.equipment?.runes?.shoulders || ""),
+        chest: String(build.equipment?.runes?.chest || ""),
+        hands: String(build.equipment?.runes?.hands || ""),
+        legs: String(build.equipment?.runes?.legs || ""),
+        feet: String(build.equipment?.runes?.feet || ""),
+        breather: String(build.equipment?.runes?.breather || ""),
+      },
+      sigils: {
+        mainhand1: normalizeSigilArray(build.equipment?.sigils?.mainhand1, "mainhand1"),
+        offhand1: normalizeSigilArray(build.equipment?.sigils?.offhand1, "offhand1"),
+        mainhand2: normalizeSigilArray(build.equipment?.sigils?.mainhand2, "mainhand2"),
+        offhand2: normalizeSigilArray(build.equipment?.sigils?.offhand2, "offhand2"),
+        aquatic1: normalizeSigilArray(build.equipment?.sigils?.aquatic1, "aquatic1"),
+        aquatic2: normalizeSigilArray(build.equipment?.sigils?.aquatic2, "aquatic2"),
+      },
+      infusions: {
+        head: String(build.equipment?.infusions?.head || ""),
+        shoulders: String(build.equipment?.infusions?.shoulders || ""),
+        chest: String(build.equipment?.infusions?.chest || ""),
+        hands: String(build.equipment?.infusions?.hands || ""),
+        legs: String(build.equipment?.infusions?.legs || ""),
+        feet: String(build.equipment?.infusions?.feet || ""),
+        mainhand1: String(build.equipment?.infusions?.mainhand1 || ""),
+        offhand1: String(build.equipment?.infusions?.offhand1 || ""),
+        mainhand2: String(build.equipment?.infusions?.mainhand2 || ""),
+        offhand2: String(build.equipment?.infusions?.offhand2 || ""),
+        back: String(build.equipment?.infusions?.back || ""),
+        amulet: String(build.equipment?.infusions?.amulet || ""),
+        ring1: String(build.equipment?.infusions?.ring1 || ""),
+        ring2: String(build.equipment?.infusions?.ring2 || ""),
+        accessory1: String(build.equipment?.infusions?.accessory1 || ""),
+        accessory2: String(build.equipment?.infusions?.accessory2 || ""),
+        breather: String(build.equipment?.infusions?.breather || ""),
+        aquatic1: String(build.equipment?.infusions?.aquatic1 || ""),
+        aquatic2: String(build.equipment?.infusions?.aquatic2 || ""),
       },
     },
     specializations: Array.isArray(build.specializations)
@@ -626,7 +717,6 @@ export function serializeEditorToBuild() {
     },
     equipment: {
       statPackage: String(state.editor.equipment.statPackage || ""),
-      runeSet: String(state.editor.equipment.runeSet || ""),
       relic: String(state.editor.equipment.relic || ""),
       food: String(state.editor.equipment.food || ""),
       utility: String(state.editor.equipment.utility || ""),
@@ -659,6 +749,16 @@ export function serializeEditorToBuild() {
         aquatic1:  String(state.editor.equipment.weapons?.aquatic1  || ""),
         aquatic2:  String(state.editor.equipment.weapons?.aquatic2  || ""),
       },
+      runes: { ...state.editor.equipment.runes },
+      sigils: {
+        mainhand1: [...(state.editor.equipment.sigils?.mainhand1 || ["", ""])],
+        offhand1: [...(state.editor.equipment.sigils?.offhand1 || [""])],
+        mainhand2: [...(state.editor.equipment.sigils?.mainhand2 || ["", ""])],
+        offhand2: [...(state.editor.equipment.sigils?.offhand2 || [""])],
+        aquatic1: [...(state.editor.equipment.sigils?.aquatic1 || ["", ""])],
+        aquatic2: [...(state.editor.equipment.sigils?.aquatic2 || ["", ""])],
+      },
+      infusions: { ...state.editor.equipment.infusions },
     },
     tags: parseTags(state.editor.tagsText),
     notes: String(state.editor.notes || ""),
