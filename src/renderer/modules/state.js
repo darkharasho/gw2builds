@@ -92,6 +92,7 @@ export function createEmptyEditor(profession = "", gameMode = "pve") {
     morphSkillIds: [0, 0, 0],
     // Revenant: two legend slots (active/inactive), identified by legend string ID (e.g. "Legend1")
     selectedLegends: ["", ""],
+    selectedUnderwaterLegends: ["", ""],
     activeLegendSlot: 0,           // 0 = first legend active, 1 = second legend active
     // Ranger/Soulbeast: two pet slots (terrestrial + aquatic) per legend slot (A/B)
     selectedPets: { terrestrial1: 0, terrestrial2: 0, aquatic1: 0, aquatic2: 0 },

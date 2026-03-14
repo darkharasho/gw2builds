@@ -1356,7 +1356,9 @@ export function renderSkills() {
     // Revenant: prepend legend buttons into mechBar so they sit inline before any F2+ elite slots.
     // This avoids a separate wrapper div that would stretch to full column width.
     if (Array.isArray(catalog.legends) && catalog.legends.length > 0) {
-      const legendSlots = state.editor.selectedLegends || ["", ""];
+      const legendSlots = isUnderwater
+        ? (state.editor.selectedUnderwaterLegends || ["", ""])
+        : (state.editor.selectedLegends || ["", ""]);
       const activeLegendSlot = Number(state.editor.activeLegendSlot) || 0;
       const legendStack = document.createElement("div");
       legendStack.className = "legend-stack";
@@ -1391,7 +1393,8 @@ export function renderSkills() {
           if (isActive || !legendId) {
             openLegendPicker(btn, slotIdx, catalog);
           } else {
-            if (!state.editor.selectedLegends) state.editor.selectedLegends = ["", ""];
+            const legendTarget = isUnderwater ? "selectedUnderwaterLegends" : "selectedLegends";
+            if (!state.editor[legendTarget]) state.editor[legendTarget] = ["", ""];
             state.editor.activeLegendSlot = slotIdx;
             // Reset Alliance form when switching to a non-Alliance legend
             if (legendId !== "Legend7") state.editor.allianceTacticsForm = 0;
@@ -1477,9 +1480,10 @@ export function renderSkills() {
 }
 
 export function openLegendPicker(anchorEl, slotIdx, catalog) {
-  const legendSlots = state.editor.selectedLegends || ["", ""];
-  const otherLegendId = legendSlots[1 - slotIdx] || "";
   const isUnderwaterPicker = Boolean(state.editor.underwaterMode);
+  const legendKey = isUnderwaterPicker ? "selectedUnderwaterLegends" : "selectedLegends";
+  const legendSlots = state.editor[legendKey] || ["", ""];
+  const otherLegendId = legendSlots[1 - slotIdx] || "";
   const selectedSpecIds = new Set(
     (state.editor.specializations || []).map((s) => Number(s?.specializationId) || 0).filter(Boolean)
   );
@@ -1495,8 +1499,8 @@ export function openLegendPicker(anchorEl, slotIdx, catalog) {
     }).filter((item) => item.value !== otherLegendId),
   ];
   _openSlotPicker(anchorEl, legendSlots[slotIdx] || "", (newVal) => {
-    if (!state.editor.selectedLegends) state.editor.selectedLegends = ["", ""];
-    state.editor.selectedLegends[slotIdx] = newVal || "";
+    if (!state.editor[legendKey]) state.editor[legendKey] = ["", ""];
+    state.editor[legendKey][slotIdx] = newVal || "";
     syncRevenantSkillsFromLegend(catalog);
     _markEditorChanged();
     renderSkills();
@@ -1525,12 +1529,21 @@ export function openPetPicker(anchorEl, petKey, catalog) {
 }
 
 export function syncRevenantSkillsFromLegend(catalog) {
-  const legendSlots = state.editor.selectedLegends || ["", ""];
+  const isUnderwater = Boolean(state.editor.underwaterMode);
+  const legendSlots = isUnderwater
+    ? (state.editor.selectedUnderwaterLegends || ["", ""])
+    : (state.editor.selectedLegends || ["", ""]);
   const activeLegendSlot = Number(state.editor.activeLegendSlot) || 0;
   const activeLegendId = legendSlots[activeLegendSlot] || "";
   const activeLegend = activeLegendId ? catalog.legendById.get(activeLegendId) : null;
-  if (!activeLegend) return;
-  if (!state.editor.skills) state.editor.skills = { healId: 0, utilityIds: [0, 0, 0], eliteId: 0 };
+  const target = isUnderwater ? state.editor.underwaterSkills : state.editor.skills;
+  if (!target) return;
+  if (!activeLegend) {
+    target.healId = 0;
+    target.utilityIds = [0, 0, 0];
+    target.eliteId = 0;
+    return;
+  }
   // Alliance legend: apply Saint Viktor (Luxon) flip skills when form=1
   const useFlip = activeLegendId === "Legend7" && (Number(state.editor.allianceTacticsForm) || 0) === 1;
   const resolveId = (id) => {
@@ -1541,10 +1554,10 @@ export function syncRevenantSkillsFromLegend(catalog) {
     }
     return id;
   };
-  state.editor.skills.healId = resolveId(activeLegend.heal) || 0;
-  state.editor.skills.utilityIds = [
+  target.healId = resolveId(activeLegend.heal) || 0;
+  target.utilityIds = [
     ...(activeLegend.utilities || []).slice(0, 3).map(resolveId),
     ...Array(3).fill(0),
   ].slice(0, 3);
-  state.editor.skills.eliteId = resolveId(activeLegend.elite) || 0;
+  target.eliteId = resolveId(activeLegend.elite) || 0;
 }

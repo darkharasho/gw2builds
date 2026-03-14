@@ -399,6 +399,9 @@ export function computeEditorSignature() {
         : [0, 0, 0],
       eliteId: Number(editor.underwaterSkills?.eliteId) || 0,
     },
+    selectedUnderwaterLegends: Array.isArray(editor.selectedUnderwaterLegends)
+      ? editor.selectedUnderwaterLegends.slice(0, 2).map(String)
+      : ["", ""],
     gameMode: String(editor.gameMode || "pve"),
   };
   return JSON.stringify(payload);
@@ -664,6 +667,9 @@ export async function loadBuildIntoEditor(build, options = {}) {
     selectedLegends: Array.isArray(build.selectedLegends)
       ? build.selectedLegends.slice(0, 2).map(String)
       : ["", ""],
+    selectedUnderwaterLegends: Array.isArray(build.selectedUnderwaterLegends)
+      ? build.selectedUnderwaterLegends.slice(0, 2).map(String)
+      : ["", ""],
     activeLegendSlot: Number(build.activeLegendSlot) || 0,
     selectedPets: {
       terrestrial1: Number(build.selectedPets?.terrestrial1) || 0,
@@ -807,6 +813,9 @@ export function serializeEditorToBuild() {
       : [0, 0, 0],
     selectedLegends: Array.isArray(state.editor.selectedLegends)
       ? state.editor.selectedLegends.slice(0, 2).map(String)
+      : ["", ""],
+    selectedUnderwaterLegends: Array.isArray(state.editor.selectedUnderwaterLegends)
+      ? state.editor.selectedUnderwaterLegends.slice(0, 2).map(String)
       : ["", ""],
     activeLegendSlot: Number(state.editor.activeLegendSlot) || 0,
     selectedPets: {
