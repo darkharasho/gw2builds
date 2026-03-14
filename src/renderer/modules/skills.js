@@ -605,17 +605,18 @@ export function buildMechanicSlotsForRender({
           const uwOnly = candidates.filter((s) => !hasNoUW(s));
           if (uwOnly.length > 0) candidates = uwOnly;
         } else {
-          // On land: if a land-specific variant (NoUnderwater) exists for the active weapon,
-          // exclude the underwater-only variants of that weapon.
-          const landForWeapon = candidates.filter((s) =>
-            hasNoUW(s) && (s.weaponType || "").toLowerCase() === activeMainhand
+          // On land: for any weapon type that has both NoUnderwater (land) and non-NoUnderwater
+          // (underwater) variants, remove the underwater-only ones. This applies to ALL weapons
+          // in the pool, not just the active mainhand, since F1 bursts cover all weapon types.
+          const weaponTypesWithLandVariant = new Set(
+            candidates.filter(hasNoUW).map((s) => (s.weaponType || "").toLowerCase()).filter(Boolean)
           );
-          if (landForWeapon.length > 0) {
-            const without = candidates.filter((s) => {
+          if (weaponTypesWithLandVariant.size > 0) {
+            const filtered = candidates.filter((s) => {
               const wt = (s.weaponType || "").toLowerCase();
-              return wt !== activeMainhand || hasNoUW(s);
+              return !wt || !weaponTypesWithLandVariant.has(wt) || hasNoUW(s);
             });
-            if (without.length > 0) candidates = without;
+            if (filtered.length > 0) candidates = filtered;
           }
         }
       }
