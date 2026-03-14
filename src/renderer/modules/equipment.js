@@ -499,7 +499,9 @@ export function renderEquipmentPanel() {
       });
       if (weapInfBtn) upgradeContainer.append(weapInfBtn);
 
-      wrapper.append(upgradeContainer);
+      if (upgradeContainer.children.length > 0) {
+        wrapper.append(upgradeContainer);
+      }
     }
 
     return wrapper;
@@ -549,6 +551,8 @@ export function renderEquipmentPanel() {
                   equip.sigils[key] = key.startsWith("offhand") ? [""] : ["", ""];
                 }
                 equip.sigils[key][0] = newVal;
+                // Also fill second sigil slot for two-handed/aquatic weapons
+                if (equip.sigils[key].length > 1) equip.sigils[key][1] = newVal;
               } else if (pickerType === "runes") {
                 if (!equip.runes) equip.runes = {};
                 equip.runes[key] = newVal;
@@ -898,6 +902,7 @@ export function renderEquipmentPanel() {
       }
     },
     upgradeFills: [
+      { label: "Fill Runes", type: "runes", keys: ["breather"] },
       { label: "Fill Infusions", type: "infusions", keys: underwaterKeys },
     ],
   });
