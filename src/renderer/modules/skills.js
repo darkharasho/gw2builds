@@ -611,16 +611,23 @@ export function buildMechanicSlotsForRender({
         // Sort by ID descending: when the API lists multiple skill variants at the same slot
         // the higher ID is the more recently added/updated skill and should be preferred.
         const wt = (s) => (s.weaponType || "").toLowerCase();
+        // Filter out skills incompatible with current land/water mode.
+        // Underwater: skip NoUnderwater skills. Land: prefer NoUnderwater (land-specific) variants.
+        const modeFilter = (arr) => {
+          if (!underwaterMode) return arr;
+          const filtered = arr.filter((s) => !(s.flags || []).includes("NoUnderwater"));
+          return filtered.length > 0 ? filtered : arr;
+        };
         let pool;
         if (isBerserkerBurstSlot) {
           // When Berserk is active show primal bursts (spec=51); otherwise show core bursts.
-          const primalPool = candidates.filter((s) => Number(s.specialization) === 51);
-          const corePool = candidates.filter((s) => !Number(s.specialization));
+          const primalPool = modeFilter(candidates.filter((s) => Number(s.specialization) === 51));
+          const corePool = modeFilter(candidates.filter((s) => !Number(s.specialization)));
           const base = berserkActive ? primalPool : corePool;
-          pool = (base.length > 0 ? base : candidates).sort((a, b) => b.id - a.id);
+          pool = (base.length > 0 ? base : modeFilter(candidates)).sort((a, b) => b.id - a.id);
         } else {
-          pool = [...(eliteCandidates.length > 0 ? eliteCandidates : candidates)]
-            .sort((a, b) => b.id - a.id);
+          const baseCandidates = eliteCandidates.length > 0 ? eliteCandidates : candidates;
+          pool = [...modeFilter(baseCandidates)].sort((a, b) => b.id - a.id);
         }
         const attunementSkill = !isWeaver && activeAttunement
           ? pool.find((s) => s.attunement && s.attunement.toLowerCase() === activeAttunement.toLowerCase())
