@@ -914,7 +914,7 @@ export function renderSkills() {
   _el.skillsHost.innerHTML = "";
   if (!catalog) return;
 
-  _el.skillsHost.prepend(_renderUnderwaterToggle());
+  // Toggle is inserted into the orb column later (to keep health orb centered)
 
   const isUnderwater = Boolean(state.editor.underwaterMode);
   let options = getSkillOptionsByType(catalog, state.editor.specializations, isUnderwater);
@@ -1461,14 +1461,15 @@ export function renderSkills() {
     utilityGroup.append(makeSkillSlot(slot, catalog, options, utilitySelection, markSkillIconRendered, skillSource));
   }
 
+  const orbCol = document.createElement("div");
+  orbCol.className = "skills-bar__orb-col";
+  orbCol.append(_renderUnderwaterToggle());
   if (f5SlotEl) {
-    const orbCol = document.createElement("div");
-    orbCol.className = "skills-bar__orb-col";
     orbCol.append(f5SlotEl, orbEl);
-    bar.append(weaponCol, orbCol, utilityGroup);
   } else {
-    bar.append(weaponCol, orbEl, utilityGroup);
+    orbCol.append(orbEl);
   }
+  bar.append(weaponCol, orbCol, utilityGroup);
   _el.skillsHost.append(bar);
   state.renderedSkillIconIds = nextRenderedSkillIconIds;
 }
