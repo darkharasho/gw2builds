@@ -15,7 +15,7 @@ const {
   triggerPagesWorkflow,
   publishSiteBundle,
 } = require("./githubApi");
-const { getProfessionList, getProfessionCatalog, getWikiSummary, getWikiRelatedData } = require("./gw2Data");
+const { getProfessionList, getProfessionCatalog, getUpgradeCatalog, getWikiSummary, getWikiRelatedData } = require("./gw2Data");
 const { buildSiteBundle } = require("./siteBundle");
 const { initAutoUpdate } = require("./autoUpdate");
 
@@ -293,6 +293,7 @@ app.whenReady().then(async () => {
   ipcMain.handle("gw2:get-profession-catalog", async (_e, professionId, gameMode) =>
     getProfessionCatalog(professionId, "en", gameMode)
   );
+  ipcMain.handle("gw2:get-upgrade-catalog", async () => getUpgradeCatalog("en"));
   ipcMain.handle("wiki:get-summary", async (_e, title) => getWikiSummary(title));
   ipcMain.handle("wiki:get-related-data", async (_e, title) => getWikiRelatedData(title));
   ipcMain.handle("settings:get", async (_e, key) => store.getSetting(key));

@@ -74,8 +74,10 @@ export function makeTraitButton(trait, active, onClick, options = {}) {
 export function drawSpecConnector(body) {
   if (!body) return;
   body.querySelector(".spec-connector")?.remove();
-  const roles = ["minor-1", "major-1", "minor-2", "major-2", "minor-3", "major-3"];
   const bodyRect = body.getBoundingClientRect();
+  // Skip if the panel is hidden — getBoundingClientRect returns zeros
+  if (bodyRect.width === 0 || bodyRect.height === 0) return;
+  const roles = ["minor-1", "major-1", "minor-2", "major-2", "minor-3", "major-3"];
 
   const points = [];
   for (const role of roles) {

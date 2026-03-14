@@ -29,6 +29,9 @@ function buildEditor(caseData, catalog) {
   const utilities = [0, 1, 2].map((index) => Number(options.utility?.[index]?.id || 0));
   const weaponKey = Object.keys(catalog.professionWeapons || {})[0] || "";
 
+  const defaultPets = { terrestrial1: 1, terrestrial2: 5, aquatic1: 0, aquatic2: 0 };
+  const selectedPets = caseData.selectedPets ? { ...defaultPets, ...caseData.selectedPets } : defaultPets;
+
   return {
     profession: caseData.profession,
     specializations: specSelections,
@@ -52,8 +55,8 @@ function buildEditor(caseData, catalog) {
     selectedLegends: caseData.legendSlots || ["Legend1", "Legend2"],
     activeLegendSlot: Number(caseData.activeLegendSlot || 0),
     allianceTacticsForm: Number(caseData.allianceTacticsForm || 0),
-    selectedPets: { terrestrial1: 1, terrestrial2: 5, aquatic1: 0, aquatic2: 0 },
-    activePetSlot: "terrestrial1",
+    selectedPets,
+    activePetSlot: caseData.activePetSlot || "terrestrial1",
     morphSkillIds: [0, 0, 0],
     antiquaryArtifacts: caseData.antiquaryArtifacts || { f2: 0, f3: 0 },
   };
@@ -93,6 +96,7 @@ function setupMechanicsHarness(defaultProfession = "") {
       ohKey: "offhand1",
       activeAttunement: editor.activeAttunement,
       activeKit: editor.activeKit,
+      underwaterMode: Boolean(caseData.underwaterMode),
     });
 
     const signatures = (result.mechSlots || []).map(slotSignature);

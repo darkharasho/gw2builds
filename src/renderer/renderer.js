@@ -13,7 +13,7 @@ import {
   renderDetailPanel, selectDetail, triggerDetailPanelAnimation,
 } from "./modules/detail-panel.js";
 import {
-  initSpecializations, initSpecializationsCallbacks, renderSpecializations,
+  initSpecializations, initSpecializationsCallbacks, renderSpecializations, drawSpecConnector,
 } from "./modules/specializations.js";
 import {
   initSkills, initSkillsCallbacks, renderSkills, syncRevenantSkillsFromLegend,
@@ -250,6 +250,20 @@ async function init() {
   ]);
   state.builds = Array.isArray(builds) ? builds : [];
   state.professions = Array.isArray(professions) ? professions : [];
+
+  // Load upgrade catalog (runes/sigils/infusions) in the background — not profession-dependent.
+  // Maps don't survive IPC serialization, so rebuild them from the arrays.
+  window.desktopApi.getUpgradeCatalog().then((raw) => {
+    raw.runeById = new Map((raw.runes || []).map((r) => [r.id, r]));
+    raw.sigilById = new Map((raw.sigils || []).map((s) => [s.id, s]));
+    raw.infusionById = new Map((raw.infusions || []).map((i) => [i.id, i]));
+    raw.enrichmentById = new Map((raw.enrichments || []).map((e) => [e.id, e]));
+    raw.foodById = new Map((raw.foods || []).map((f) => [f.id, f]));
+    raw.utilityById = new Map((raw.utilities || []).map((u) => [u.id, u]));
+    state.upgradeCatalog = raw;
+  }).catch((err) => {
+    console.warn("Failed to load upgrade catalog:", err);
+  });
   renderEditorForm();
   await refreshOnboardingStatus();
 
@@ -576,6 +590,12 @@ function wireEvents() {
       document.querySelectorAll(".subtab").forEach((t) => t.classList.add("hidden"));
       const target = document.querySelector(`#subtab-${tab}`);
       if (target) target.classList.remove("hidden");
+      // Redraw spec connectors when build tab becomes visible (they need layout dimensions)
+      if (tab === "build") {
+        requestAnimationFrame(() => {
+          document.querySelectorAll(".spec-card__body").forEach((body) => drawSpecConnector(body));
+        });
+      }
     });
   });
 

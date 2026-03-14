@@ -1,6 +1,6 @@
 // Equipment stat computation — pure logic over state + constants, no DOM deps.
 import { state } from "./state.js";
-import { STAT_COMBOS_BY_LABEL, SLOT_WEIGHTS, GW2_FOOD_BY_LABEL } from "./constants.js";
+import { STAT_COMBOS_BY_LABEL, SLOT_WEIGHTS, LAND_ONLY_SLOTS, AQUATIC_SLOTS } from "./constants.js";
 
 export function computeSlotStats(comboLabel, slotKey) {
   const combo = STAT_COMBOS_BY_LABEL.get(comboLabel);
@@ -29,8 +29,10 @@ export function computeEquipmentStats() {
     Power: 1000, Precision: 1000, Toughness: 1000, Vitality: 1000,
     Ferocity: 0, ConditionDamage: 0, Expertise: 0, Concentration: 0, HealingPower: 0,
   };
+  const isUnderwater = Boolean(state.editor.underwaterMode);
+  const EXCLUDED_SLOTS = isUnderwater ? LAND_ONLY_SLOTS : AQUATIC_SLOTS;
   for (const [slotKey, comboLabel] of Object.entries(slots)) {
-    if (!comboLabel) continue;
+    if (!comboLabel || EXCLUDED_SLOTS.has(slotKey)) continue;
     const combo = STAT_COMBOS_BY_LABEL.get(comboLabel);
     const w = SLOT_WEIGHTS[slotKey];
     if (!combo || !w) continue;
@@ -54,17 +56,18 @@ export function computeEquipmentStats() {
   }
 
   // Food flat stat contributions (+N StatName patterns)
-  const foodLabel = state.editor.equipment?.food;
-  if (foodLabel) {
-    const foodDef = GW2_FOOD_BY_LABEL.get(foodLabel);
+  const foodId = state.editor.equipment?.food;
+  if (foodId) {
+    const foodDef = state.upgradeCatalog?.foodById?.get(Number(foodId));
     if (foodDef) {
       const foodStatMap = {
         "Condition Damage": "ConditionDamage", "Healing Power": "HealingPower",
+        "Healing": "HealingPower",
         "Power": "Power", "Precision": "Precision", "Toughness": "Toughness",
         "Vitality": "Vitality", "Ferocity": "Ferocity",
         "Concentration": "Concentration", "Expertise": "Expertise",
       };
-      const re = /\+(\d+)\s+(Condition Damage|Healing Power|Power|Precision|Toughness|Vitality|Ferocity|Concentration|Expertise)/g;
+      const re = /\+(\d+)\s+(Condition Damage|Healing Power|Healing|Power|Precision|Toughness|Vitality|Ferocity|Concentration|Expertise)/g;
       let m;
       while ((m = re.exec(foodDef.buff)) !== null) {
         const key = foodStatMap[m[2]];
@@ -73,5 +76,387 @@ export function computeEquipmentStats() {
     }
   }
 
+  // Upgrade stat contributions (infusions, enrichments, runes)
+  const upgradeCatalog = state.upgradeCatalog;
+  if (upgradeCatalog) {
+    // Helper: resolve API attribute name to our stat key
+    const toStatKey = (attr) =>
+      attr === "Healing" ? "HealingPower"
+      : attr === "ConditionDamage" ? "ConditionDamage"
+      : attr === "HealingPower" ? "HealingPower"
+      : attr;
+
+    // Helper: add infix_upgrade.attributes to totals
+    const addInfixAttributes = (infixUpgrade) => {
+      if (!infixUpgrade?.attributes) return;
+      for (const attr of infixUpgrade.attributes) {
+        const key = toStatKey(attr.attribute);
+        if (totals[key] !== undefined) totals[key] += attr.modifier || 0;
+      }
+    };
+
+    // Infusions (some slots are arrays: back=2, rings=3; exclude underwater)
+    const infusions = state.editor.equipment?.infusions || {};
+    const allInfusionIds = Object.entries(infusions)
+      .filter(([k]) => !EXCLUDED_SLOTS.has(k))
+      .flatMap(([, v]) => Array.isArray(v) ? v : [v]);
+    for (const id of allInfusionIds) {
+      if (!id) continue;
+      const def = upgradeCatalog.infusionById?.get(Number(id));
+      if (def) addInfixAttributes(def.infixUpgrade);
+    }
+
+    // Enrichment (amulet)
+    const enrichmentId = state.editor.equipment?.enrichment;
+    if (enrichmentId) {
+      const def = upgradeCatalog.enrichmentById?.get(Number(enrichmentId));
+      if (def) addInfixAttributes(def.infixUpgrade);
+    }
+
+    // Runes — bonuses are cumulative per piece equipped.
+    // Each bonus line may contain "+N StatName" flat stats to parse.
+    const RUNE_BONUS_STAT_MAP = {
+      "Power": "Power", "Precision": "Precision", "Toughness": "Toughness",
+      "Vitality": "Vitality", "Ferocity": "Ferocity", "Concentration": "Concentration",
+      "Expertise": "Expertise", "Condition Damage": "ConditionDamage",
+      "Healing Power": "HealingPower", "Healing": "HealingPower",
+    };
+    const RUNE_BONUS_RE = /\+(\d+)\s+(Condition Damage|Healing Power|Healing|Power|Precision|Toughness|Vitality|Ferocity|Concentration|Expertise|to All Stats)/;
+    const ALL_STAT_KEYS = ["Power", "Precision", "Toughness", "Vitality", "Ferocity", "ConditionDamage", "HealingPower", "Concentration", "Expertise"];
+
+    const runes = state.editor.equipment?.runes || {};
+    // Count how many of each rune ID are equipped (exclude breather)
+    const runeCounts = new Map();
+    for (const [slot, id] of Object.entries(runes)) {
+      if (!id || EXCLUDED_SLOTS.has(slot)) continue;
+      runeCounts.set(String(id), (runeCounts.get(String(id)) || 0) + 1);
+    }
+    for (const [runeId, count] of runeCounts) {
+      const runeDef = upgradeCatalog.runeById?.get(Number(runeId));
+      if (!runeDef?.bonuses?.length) continue;
+      // Apply bonuses up to the count equipped (max 6)
+      const activeBonuses = runeDef.bonuses.slice(0, Math.min(count, 6));
+      for (const bonus of activeBonuses) {
+        const m = RUNE_BONUS_RE.exec(bonus);
+        if (!m) continue;
+        const value = Number(m[1]);
+        if (m[2] === "to All Stats") {
+          for (const key of ALL_STAT_KEYS) totals[key] += value;
+        } else {
+          const key = RUNE_BONUS_STAT_MAP[m[2]];
+          if (key && totals[key] !== undefined) totals[key] += value;
+        }
+      }
+    }
+  }
+
+  // Utility consumable stat contributions
+  const utilityId = state.editor.equipment?.utility;
+  if (utilityId) {
+    const utilDef = state.upgradeCatalog?.utilityById?.get(Number(utilityId));
+    if (utilDef) {
+      const UTIL_STAT_MAP = {
+        "Power": "Power", "Precision": "Precision", "Toughness": "Toughness",
+        "Vitality": "Vitality", "Ferocity": "Ferocity", "Concentration": "Concentration",
+        "Expertise": "Expertise", "Condition Damage": "ConditionDamage",
+        "Healing Power": "HealingPower",
+      };
+      // Pattern 1: "Gain [Stat] Equal to [N]% of Your [SourceStat]"
+      const convRe = /Gain (Condition Damage|Healing Power|Power|Precision|Toughness|Vitality|Ferocity|Concentration|Expertise) Equal to (\d+(?:\.\d+)?)% of Your (Condition Damage|Healing Power|Power|Precision|Toughness|Vitality|Ferocity|Concentration|Expertise)/g;
+      let m;
+      while ((m = convRe.exec(utilDef.buff)) !== null) {
+        const targetKey = UTIL_STAT_MAP[m[1]];
+        const pct = Number(m[2]) / 100;
+        const sourceKey = UTIL_STAT_MAP[m[3]];
+        if (targetKey && sourceKey && totals[sourceKey] !== undefined) {
+          totals[targetKey] = (totals[targetKey] || 0) + Math.round(totals[sourceKey] * pct);
+        }
+      }
+      // Pattern 2: "Gain [N] [Stat] When Health..." (writs — conditional flat stats)
+      const writRe = /Gain (\d+) (Condition Damage|Healing Power|Power|Precision|Toughness|Vitality|Ferocity|Concentration|Expertise) When Health/g;
+      while ((m = writRe.exec(utilDef.buff)) !== null) {
+        const key = UTIL_STAT_MAP[m[2]];
+        if (key) totals[key] = (totals[key] || 0) + Number(m[1]);
+      }
+      // Pattern 3: "+N StatName" flat bonuses (food-style, some special utils)
+      const flatRe = /\+(\d+)\s+(Condition Damage|Healing Power|Power|Precision|Toughness|Vitality|Ferocity|Concentration|Expertise)/g;
+      while ((m = flatRe.exec(utilDef.buff)) !== null) {
+        const key = UTIL_STAT_MAP[m[2]];
+        if (key) totals[key] = (totals[key] || 0) + Number(m[1]);
+      }
+    }
+  }
+
   return totals;
+}
+
+/**
+ * Compute a detailed breakdown of all sources contributing to a given stat key.
+ * Returns an array of { source: string, value: number } entries.
+ */
+export function computeStatBreakdown(statKey) {
+  const entries = [];
+  const BASE_STATS = new Set(["Power", "Precision", "Toughness", "Vitality"]);
+  if (BASE_STATS.has(statKey)) entries.push({ source: "Base", value: 1000 });
+
+  const slots = state.editor.equipment?.slots || {};
+  const isUnderwater = Boolean(state.editor.underwaterMode);
+  const EXCLUDED_SLOTS = isUnderwater ? LAND_ONLY_SLOTS : AQUATIC_SLOTS;
+  const SLOT_LABELS = {
+    head: "Head", shoulders: "Shoulders", chest: "Chest", hands: "Hands", legs: "Legs", feet: "Feet",
+    mainhand1: "Mainhand 1", offhand1: "Offhand 1", mainhand2: "Mainhand 2", offhand2: "Offhand 2",
+    back: "Back", amulet: "Amulet", ring1: "Ring 1", ring2: "Ring 2", accessory1: "Accessory 1", accessory2: "Accessory 2",
+    breather: "Breather", aquatic1: "Aquatic 1", aquatic2: "Aquatic 2",
+  };
+
+  // Equipment slots
+  for (const [slotKey, comboLabel] of Object.entries(slots)) {
+    if (!comboLabel || EXCLUDED_SLOTS.has(slotKey)) continue;
+    const combo = STAT_COMBOS_BY_LABEL.get(comboLabel);
+    const w = SLOT_WEIGHTS[slotKey];
+    if (!combo || !w) continue;
+    const n = combo.stats.length;
+    let val = 0;
+    if (n <= 3) {
+      if (combo.stats[0] === statKey) val = w.p;
+      else if (combo.stats.includes(statKey)) val = w.s;
+    } else if (n === 4) {
+      const idx = combo.stats.indexOf(statKey);
+      if (idx === 0) val = Math.round(w.p * 0.895);
+      else if (idx === 1 || idx === 2) val = Math.round(w.s * 0.889);
+      else if (idx === 3) val = Math.round(w.p * 0.452);
+    } else {
+      if (combo.stats.includes(statKey)) val = Math.round((w.p + 2 * w.s) / n);
+    }
+    if (val) entries.push({ source: `${SLOT_LABELS[slotKey] || slotKey} (${comboLabel})`, value: val });
+  }
+
+  const upgradeCatalog = state.upgradeCatalog;
+
+  // Food
+  const foodId = state.editor.equipment?.food;
+  if (foodId && upgradeCatalog) {
+    const foodDef = upgradeCatalog.foodById?.get(Number(foodId));
+    if (foodDef) {
+      const STAT_NAMES = { Power: "Power", Precision: "Precision", Toughness: "Toughness", Vitality: "Vitality",
+        Ferocity: "Ferocity", ConditionDamage: "Condition Damage", HealingPower: "Healing Power",
+        Concentration: "Concentration", Expertise: "Expertise" };
+      const re = /\+(\d+)\s+(Condition Damage|Healing Power|Healing|Power|Precision|Toughness|Vitality|Ferocity|Concentration|Expertise)/g;
+      const MAP = { "Condition Damage": "ConditionDamage", "Healing Power": "HealingPower", "Healing": "HealingPower" };
+      let m;
+      while ((m = re.exec(foodDef.buff)) !== null) {
+        const key = MAP[m[2]] || m[2];
+        if (key === statKey) entries.push({ source: `Food (${foodDef.name})`, value: Number(m[1]) });
+      }
+    }
+  }
+
+  // Infusions
+  if (upgradeCatalog) {
+    const toStatKey = (attr) => attr === "Healing" ? "HealingPower" : attr;
+    const infusions = state.editor.equipment?.infusions || {};
+    const allInfusions = Object.entries(infusions)
+      .filter(([k]) => !EXCLUDED_SLOTS.has(k))
+      .flatMap(([, v]) => Array.isArray(v) ? v : [v]);
+    for (const id of allInfusions) {
+      if (!id) continue;
+      const def = upgradeCatalog.infusionById?.get(Number(id));
+      if (!def?.infixUpgrade?.attributes) continue;
+      for (const attr of def.infixUpgrade.attributes) {
+        if (toStatKey(attr.attribute) === statKey && attr.modifier) {
+          entries.push({ source: `Infusion (${def.name})`, value: attr.modifier });
+        }
+      }
+    }
+
+    // Enrichment
+    const enrichmentId = state.editor.equipment?.enrichment;
+    if (enrichmentId) {
+      const def = upgradeCatalog.enrichmentById?.get(Number(enrichmentId));
+      if (def?.infixUpgrade?.attributes) {
+        for (const attr of def.infixUpgrade.attributes) {
+          if (toStatKey(attr.attribute) === statKey && attr.modifier) {
+            entries.push({ source: `Enrichment (${def.name})`, value: attr.modifier });
+          }
+        }
+      }
+    }
+
+    // Runes
+    const RUNE_BONUS_RE = /\+(\d+)\s+(Condition Damage|Healing Power|Healing|Power|Precision|Toughness|Vitality|Ferocity|Concentration|Expertise|to All Stats)/;
+    const MAP = { "Condition Damage": "ConditionDamage", "Healing Power": "HealingPower", "Healing": "HealingPower" };
+    const runes = state.editor.equipment?.runes || {};
+    const runeCounts = new Map();
+    for (const [slot, id] of Object.entries(runes)) {
+      if (!id || EXCLUDED_SLOTS.has(slot)) continue;
+      runeCounts.set(String(id), (runeCounts.get(String(id)) || 0) + 1);
+    }
+    for (const [runeId, count] of runeCounts) {
+      const runeDef = upgradeCatalog.runeById?.get(Number(runeId));
+      if (!runeDef?.bonuses?.length) continue;
+      const activeBonuses = runeDef.bonuses.slice(0, Math.min(count, 6));
+      let runeTotal = 0;
+      for (const bonus of activeBonuses) {
+        const m = RUNE_BONUS_RE.exec(bonus);
+        if (!m) continue;
+        const val = Number(m[1]);
+        if (m[2] === "to All Stats") runeTotal += val;
+        else { const key = MAP[m[2]] || m[2]; if (key === statKey) runeTotal += val; }
+      }
+      if (runeTotal) entries.push({ source: `Rune (${runeDef.name})`, value: runeTotal });
+    }
+  }
+
+  // Utility
+  const utilityId = state.editor.equipment?.utility;
+  if (utilityId && upgradeCatalog) {
+    const utilDef = upgradeCatalog.utilityById?.get(Number(utilityId));
+    if (utilDef) {
+      const MAP = { "Condition Damage": "ConditionDamage", "Healing Power": "HealingPower" };
+      // Percentage conversions — need current totals for source stats
+      const totals = computeEquipmentStats();
+      const convRe = /Gain (Condition Damage|Healing Power|Power|Precision|Toughness|Vitality|Ferocity|Concentration|Expertise) Equal to (\d+(?:\.\d+)?)% of Your (Condition Damage|Healing Power|Power|Precision|Toughness|Vitality|Ferocity|Concentration|Expertise)/g;
+      let m;
+      while ((m = convRe.exec(utilDef.buff)) !== null) {
+        const targetKey = MAP[m[1]] || m[1];
+        if (targetKey !== statKey) continue;
+        const pct = Number(m[2]) / 100;
+        const sourceKey = MAP[m[3]] || m[3];
+        // Subtract own utility contribution to get pre-utility source value
+        const sourceBase = (totals[sourceKey] || 0);
+        const val = Math.round(sourceBase * pct);
+        if (val) entries.push({ source: `${utilDef.name} (${m[2]}% of ${m[3]})`, value: val });
+      }
+      // Conditional flat (writs)
+      const writRe = /Gain (\d+) (Condition Damage|Healing Power|Power|Precision|Toughness|Vitality|Ferocity|Concentration|Expertise) When Health/g;
+      while ((m = writRe.exec(utilDef.buff)) !== null) {
+        const key = MAP[m[2]] || m[2];
+        if (key === statKey) entries.push({ source: `${utilDef.name}`, value: Number(m[1]) });
+      }
+      // Flat bonuses
+      const flatRe = /\+(\d+)\s+(Condition Damage|Healing Power|Power|Precision|Toughness|Vitality|Ferocity|Concentration|Expertise)/g;
+      while ((m = flatRe.exec(utilDef.buff)) !== null) {
+        const key = MAP[m[2]] || m[2];
+        if (key === statKey) entries.push({ source: `${utilDef.name}`, value: Number(m[1]) });
+      }
+    }
+  }
+
+  return entries;
+}
+
+/**
+ * Collect non-attribute modifiers from equipped upgrades (rune %, sigil buffs, infusion buffs).
+ * Returns a Map of modifier text → total value (aggregated where possible).
+ * Example: "+10% Might Duration" from 2 rune bonuses → { "Might Duration": 20 }
+ */
+export function computeUpgradeModifiers() {
+  const modifiers = new Map(); // label → numeric total
+  const addMod = (label, value) => modifiers.set(label, (modifiers.get(label) || 0) + value);
+
+  const upgradeCatalog = state.upgradeCatalog;
+  if (!upgradeCatalog) return modifiers;
+
+  // Regex for percentage bonuses in rune bonus text: "+N% Something"
+  const PCT_RE = /\+(\d+)%\s+(.+)/;
+  // Regex for flat bonuses we already handle as stats — skip these
+  const FLAT_STAT_RE = /\+\d+\s+(Condition Damage|Healing Power|Healing|Power|Precision|Toughness|Vitality|Ferocity|Concentration|Expertise|to All Stats)/;
+
+  const isUnderwater = Boolean(state.editor.underwaterMode);
+  const EXCLUDED_SLOTS = isUnderwater ? LAND_ONLY_SLOTS : AQUATIC_SLOTS;
+
+  // Rune percentage modifiers (cumulative per piece, exclude breather)
+  const runes = state.editor.equipment?.runes || {};
+  const runeCounts = new Map();
+  for (const [slot, id] of Object.entries(runes)) {
+    if (!id || EXCLUDED_SLOTS.has(slot)) continue;
+    runeCounts.set(String(id), (runeCounts.get(String(id)) || 0) + 1);
+  }
+  for (const [runeId, count] of runeCounts) {
+    const runeDef = upgradeCatalog.runeById?.get(Number(runeId));
+    if (!runeDef?.bonuses?.length) continue;
+    const activeBonuses = runeDef.bonuses.slice(0, Math.min(count, 6));
+    for (const bonus of activeBonuses) {
+      if (FLAT_STAT_RE.test(bonus)) continue;
+      const m = PCT_RE.exec(bonus);
+      if (m) addMod(m[2], Number(m[1]));
+    }
+  }
+
+  // Sigil buff modifiers (from active weapon set)
+  const sigils = state.editor.equipment?.sigils || {};
+  let activeSigilIds;
+  if (isUnderwater) {
+    const aquaticSet = (Number(state.editor.activeWeaponSet) || 1) === 2 ? "aquatic2" : "aquatic1";
+    activeSigilIds = [...(Array.isArray(sigils[aquaticSet]) ? sigils[aquaticSet] : [])].filter(Boolean);
+  } else {
+    const activeSet = Number(state.editor.activeWeaponSet) || 1;
+    const mhKey = activeSet === 2 ? "mainhand2" : "mainhand1";
+    const ohKey = activeSet === 2 ? "offhand2" : "offhand1";
+    activeSigilIds = [
+      ...(Array.isArray(sigils[mhKey]) ? sigils[mhKey] : []),
+      ...(Array.isArray(sigils[ohKey]) ? sigils[ohKey] : []),
+    ].filter(Boolean);
+  }
+  for (const sigilId of activeSigilIds) {
+    const def = upgradeCatalog.sigilById?.get(Number(sigilId));
+    const desc = def?.buffDescription || "";
+    const m = PCT_RE.exec(desc);
+    if (m) addMod(m[2], Number(m[1]));
+  }
+
+  // Infusion buff modifiers (percentage lines from buffDescription, exclude underwater)
+  const infusions = state.editor.equipment?.infusions || {};
+  const allInfusionIds = Object.entries(infusions)
+    .filter(([k]) => !EXCLUDED_SLOTS.has(k))
+    .flatMap(([, v]) => Array.isArray(v) ? v : [v]);
+  for (const id of allInfusionIds) {
+    if (!id) continue;
+    const def = upgradeCatalog.infusionById?.get(Number(id));
+    const desc = def?.buffDescription || "";
+    // Infusion buff can have multiple lines
+    for (const line of desc.split("\n")) {
+      const m = PCT_RE.exec(line.trim());
+      if (m) addMod(m[2], Number(m[1]));
+    }
+  }
+
+  // Enrichment buff modifiers
+  const enrichmentId = state.editor.equipment?.enrichment;
+  if (enrichmentId) {
+    const def = upgradeCatalog.enrichmentById?.get(Number(enrichmentId));
+    const desc = def?.buffDescription || "";
+    for (const line of desc.split("\n")) {
+      const m = PCT_RE.exec(line.trim());
+      if (m) addMod(m[2], Number(m[1]));
+    }
+  }
+
+  // Food percentage modifiers
+  const foodId = state.editor.equipment?.food;
+  if (foodId) {
+    const foodDef = upgradeCatalog.foodById?.get(Number(foodId));
+    if (foodDef?.buff) {
+      for (const segment of foodDef.buff.split(" | ")) {
+        if (FLAT_STAT_RE.test(segment)) continue;
+        const m = PCT_RE.exec(segment.trim());
+        if (m) addMod(m[2], Number(m[1]));
+      }
+    }
+  }
+
+  // Utility percentage modifiers
+  const utilityId = state.editor.equipment?.utility;
+  if (utilityId) {
+    const utilDef = upgradeCatalog.utilityById?.get(Number(utilityId));
+    if (utilDef?.buff) {
+      for (const segment of utilDef.buff.split(" | ")) {
+        if (FLAT_STAT_RE.test(segment)) continue;
+        const m = PCT_RE.exec(segment.trim());
+        if (m) addMod(m[2], Number(m[1]));
+      }
+    }
+  }
+
+  return modifiers;
 }

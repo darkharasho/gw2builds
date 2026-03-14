@@ -17,7 +17,6 @@ function makeBuild(overrides = {}) {
     tags: ["pve", "dps", "power"],
     equipment: {
       statPackage: "Berserker",
-      runeSet: "Superior Rune of the Scholar",
       relic: "Relic of the Thief",
       food: "Bowl of Seaweed Salad",
       utility: "Superior Sharpening Stone",
@@ -421,7 +420,6 @@ describe("normalizeBuildsForSite — equipment", () => {
   test("maps all equipment fields", () => {
     const [b] = getBuilds([makeBuild()]);
     expect(b.equipment.statPackage).toBe("Berserker");
-    expect(b.equipment.runeSet).toBe("Superior Rune of the Scholar");
     expect(b.equipment.relic).toBe("Relic of the Thief");
     expect(b.equipment.food).toBe("Bowl of Seaweed Salad");
     expect(b.equipment.utility).toBe("Superior Sharpening Stone");
@@ -430,7 +428,6 @@ describe("normalizeBuildsForSite — equipment", () => {
   test("empty strings for missing equipment fields", () => {
     const [b] = getBuilds([makeBuild({ equipment: {} })]);
     expect(b.equipment.statPackage).toBe("");
-    expect(b.equipment.runeSet).toBe("");
     expect(b.equipment.relic).toBe("");
     expect(b.equipment.food).toBe("");
     expect(b.equipment.utility).toBe("");
@@ -439,7 +436,6 @@ describe("normalizeBuildsForSite — equipment", () => {
   test("null equipment produces empty string fields", () => {
     const [b] = getBuilds([makeBuild({ equipment: null })]);
     expect(b.equipment.statPackage).toBe("");
-    expect(b.equipment.runeSet).toBe("");
   });
 });
 

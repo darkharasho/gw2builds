@@ -7,6 +7,10 @@ import {
   ANTIQUARY_PROLIFIC_PLUNDERER_TRAIT_ID,
   RANGER_PET_FAMILY_SKILLS,
   PROFESSION_BASE_HP,
+  MECHANIST_DEPTH_CHARGES_ID,
+  MECHANIST_SPEC_ID,
+  UNDERWATER_BLOCKED_LEGENDS,
+  AQUATIC_PET_IDS,
 } from "./constants.js";
 import { escapeHtml, parseWeaponSlotNum } from "./utils.js";
 import { bindHoverPreview, selectDetail, buildSkillCard, showHoverPreview } from "./detail-panel.js";
@@ -76,7 +80,7 @@ export function buildRevenantEliteByProfSlot(eliteFixedSkills, eliteSpecId, isAl
   return eliteByProfSlot;
 }
 
-export function getSkillOptionsByType(catalog, specializationSelections) {
+export function getSkillOptionsByType(catalog, specializationSelections, underwaterMode = false) {
   const selectedSpecIds = new Set(
     (specializationSelections || [])
       .map((entry) => Number(entry?.specializationId) || 0)
@@ -91,6 +95,7 @@ export function getSkillOptionsByType(catalog, specializationSelections) {
 
   const filtered = allSkills.filter((skill) => {
     if (flipSkillIds.has(skill.id)) return false;
+    if (underwaterMode && (skill.flags || []).includes("NoUnderwater")) return false;
     const lockSpec = Number(skill.specialization) || 0;
     return !lockSpec || selectedSpecIds.has(lockSpec);
   });
@@ -164,7 +169,7 @@ export function filterSkillList(list, query, selectedId) {
   return filtered;
 }
 
-export function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "", activeAttunement2 = "", isWeaver = false) {
+export function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "", activeAttunement2 = "", isWeaver = false, underwaterMode = false) {
   const profWeapons = catalog?.professionWeapons || {};
   const weaponSkillById = catalog?.weaponSkillById || new Map();
   const slots = [null, null, null, null, null];
@@ -211,16 +216,25 @@ export function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "",
     return ref.attunement === effectiveAttunement;
   }
 
+  // For weapons with both land and underwater skills (e.g. spear), filter by mode.
+  // Underwater: skip skills flagged NoUnderwater.
+  // Land: prefer NoUnderwater-flagged skills (land-specific) when duplicates exist.
+  const isNoUW = (skill) => (skill.flags || []).includes("NoUnderwater");
+  const shouldSkipForMode = (skill) => underwaterMode && isNoUW(skill);
+
   if (mhData) {
     for (const ref of mhData.skills) {
       const n = parseWeaponSlotNum(ref.slot);
       if (!matchesAttunement(ref, n)) continue;
       if (n >= 1 && n <= 5) {
         const skill = weaponSkillById.get(ref.id);
-        if (skill && !slots[n - 1]) {
-          // Skip dual-attack skills (dualWield set) for non-Weaver builds, and also for
-          // Weaver slot 3 in single-attunement mode (dual-attack has its own separate loop).
-          if (skill.dualWield && (!isWeaver || n === 3)) continue;
+        if (!skill) continue;
+        if (shouldSkipForMode(skill)) continue;
+        // Skip dual-attack skills (dualWield set) for non-Weaver builds, and also for
+        // Weaver slot 3 in single-attunement mode (dual-attack has its own separate loop).
+        if (skill.dualWield && (!isWeaver || n === 3)) continue;
+        // On land, prefer land-specific (NoUnderwater) skills over underwater variants.
+        if (!slots[n - 1] || (!underwaterMode && isNoUW(skill) && !isNoUW(slots[n - 1]))) {
           slots[n - 1] = skill;
         }
       }
@@ -234,7 +248,11 @@ export function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "",
         if (!matchesAttunement(ref, n)) continue;
         if (n >= 4 && n <= 5) {
           const skill = weaponSkillById.get(ref.id);
-          if (skill && !slots[n - 1]) slots[n - 1] = skill;
+          if (!skill) continue;
+          if (shouldSkipForMode(skill)) continue;
+          if (!slots[n - 1] || (!underwaterMode && isNoUW(skill) && !isNoUW(slots[n - 1]))) {
+            slots[n - 1] = skill;
+          }
         }
       }
     }
@@ -311,6 +329,7 @@ export function buildMechanicSlotsForRender({
   ohKey,
   activeAttunement,
   activeKit,
+  underwaterMode = false,
 }) {
   const nextOptions = options;
   const isToolbelt = catalog.skills.some((s) => s.toolbeltSkill > 0);
@@ -382,9 +401,15 @@ export function buildMechanicSlotsForRender({
       }
       mechSlots.push({ skill, sourceId: 0, isStatic: true, isSelectable: false, mechIconOverride });
     }
-    // F4: Crash Down (first Profession_4 entry)
-    const f4 = eliteFixedSkills.find((s) => s.slot === "Profession_4");
+    // F4: Crash Down (first Profession_4 entry, excluding underwater-only Depth Charges)
+    const f4 = eliteFixedSkills.find((s) => s.slot === "Profession_4" && s.id !== MECHANIST_DEPTH_CHARGES_ID);
     if (f4) mechSlots.push({ skill: f4, sourceId: 0, isStatic: true, isSelectable: false });
+
+    // Mechanist underwater: replace all mech F-slots with a single Depth Charges F4 skill.
+    if (underwaterMode) {
+      const depthCharges = catalog.skillById.get(MECHANIST_DEPTH_CHARGES_ID) || null;
+      mechSlots = [{ skill: depthCharges, sourceId: MECHANIST_DEPTH_CHARGES_ID, isStatic: true, isSelectable: false, fKeyLabel: "F4" }];
+    }
   } else if (isSelectablePool) {
     // Amalgam: F1 = heal toolbelt; F2–F4 = "Locked" morph slots (player-selectable); F5 = Evolve
     const healSrc = catalog.skillById.get(Number(editor.skills?.healId) || 0);
@@ -478,7 +503,10 @@ export function buildMechanicSlotsForRender({
       nextOptions.elite = [ls(activeLegend.elite)].filter(Boolean);
     }
   } else if (isRanger) {
-    const activePetSlotKey = editor.activePetSlot === "terrestrial2" ? "terrestrial2" : "terrestrial1";
+    // When underwater, show aquatic pet slots instead of terrestrial
+    const petSlot1Key = underwaterMode ? "aquatic1" : "terrestrial1";
+    const petSlot2Key = underwaterMode ? "aquatic2" : "terrestrial2";
+    const activePetSlotKey = editor.activePetSlot === petSlot2Key ? petSlot2Key : petSlot1Key;
     const activePetId = Number(editor.selectedPets?.[activePetSlotKey]) || 0;
     const activePet = activePetId && catalog.petById ? catalog.petById.get(activePetId) : null;
 
@@ -566,7 +594,39 @@ export function buildMechanicSlotsForRender({
     const berserkActive = berserkSkillId > 0 && activeKit === berserkSkillId;
 
     mechSlots = renderSlotKeys.map((slotKey) => {
-      const candidates = bySlot.get(slotKey);
+      let candidates = bySlot.get(slotKey);
+
+      // Pre-filter candidates by land/water mode: remove skills incompatible with current mode.
+      // This must happen before the single-candidate shortcut so that dual-mode weapons (spear)
+      // don't short-circuit to the wrong variant.
+      if (candidates.length > 1) {
+        const hasNoUW = (s) => (s.flags || []).includes("NoUnderwater");
+        if (underwaterMode) {
+          const uwOnly = candidates.filter((s) => !hasNoUW(s));
+          if (uwOnly.length > 0) candidates = uwOnly;
+        } else {
+          // On land: for skills that have both a NoUnderwater (land) and a non-NoUnderwater
+          // (underwater) variant at the SAME weapon type + specialization, remove the underwater one.
+          // Must match on spec too — e.g. Wild Throw (spear, spec 18, NoUnderwater) should only
+          // exclude Wild Whirl (spear, spec 18, no flag), not Whirling Strike (spear, spec 0).
+          const landKeys = new Set(
+            candidates.filter(hasNoUW).map((s) => {
+              const wt = (s.weaponType || "").toLowerCase();
+              return wt ? `${wt}:${s.specialization || 0}` : "";
+            }).filter(Boolean)
+          );
+          if (landKeys.size > 0) {
+            const filtered = candidates.filter((s) => {
+              const wt = (s.weaponType || "").toLowerCase();
+              if (!wt) return true;
+              const key = `${wt}:${s.specialization || 0}`;
+              return !landKeys.has(key) || hasNoUW(s);
+            });
+            if (filtered.length > 0) candidates = filtered;
+          }
+        }
+      }
+
       let skill;
       if (candidates.length === 1) {
         skill = candidates[0];
@@ -670,12 +730,13 @@ export function buildMechanicSlotsForRender({
   return { mechSlots, options: nextOptions, eliteSpecId, isWeaver, isToolbelt, isRanger };
 }
 
-export function makeSkillSlot(slot, catalog, options, utilitySelection, markSkillIconRendered = null) {
+export function makeSkillSlot(slot, catalog, options, utilitySelection, markSkillIconRendered = null, skillTarget = null) {
+  const target = skillTarget || state.editor.skills;
   const query = "";
   const selectedId =
     slot.index === undefined
-      ? Number(state.editor.skills[slot.key]) || 0
-      : Number(state.editor.skills[slot.key]?.[slot.index]) || 0;
+      ? Number(target[slot.key]) || 0
+      : Number(target[slot.key]?.[slot.index]) || 0;
   const selectedSkill = slot.list.find((skill) => Number(skill.id) === selectedId) || null;
   const filteredList = filterSkillList(slot.list, query, selectedId);
 
@@ -783,7 +844,7 @@ export function makeSkillSlot(slot, catalog, options, utilitySelection, markSkil
         toRect:   toBtn.getBoundingClientRect(),
       } : null;
 
-      const ids = state.editor.skills.utilityIds;
+      const ids = target.utilityIds;
       [ids[fromIdx], ids[toIdx]] = [ids[toIdx], ids[fromIdx]];
       _enforceEditorConsistency();
       state.editor.activeKit = 0;
@@ -806,10 +867,10 @@ export function makeSkillSlot(slot, catalog, options, utilitySelection, markSkil
 
       let swapRects = null;
       if (slot.index === undefined) {
-        state.editor.skills[slot.key] = nextId;
+        target[slot.key] = nextId;
       } else {
         // If the chosen skill is already in another utility slot, swap the two slots.
-        const ids = state.editor.skills[slot.key];
+        const ids = target[slot.key];
         const otherIdx = ids.findIndex((id, i) => i !== slot.index && Number(id) === nextId);
         if (otherIdx !== -1) {
           // Capture icon positions BEFORE re-render for FLIP animation.
@@ -861,14 +922,53 @@ export function makeSkillSlot(slot, catalog, options, utilitySelection, markSkil
   return slotEl;
 }
 
+function _renderUnderwaterToggle() {
+  const isUnderwater = Boolean(state.editor.underwaterMode);
+  const container = document.createElement("div");
+  container.className = "underwater-toggle";
+  container.innerHTML = `
+    <button class="underwater-toggle__btn ${!isUnderwater ? "underwater-toggle__btn--active" : ""}"
+            data-mode="land" aria-pressed="${!isUnderwater}">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+        <path d="M8 2L2 8l2 2 4-4 4 4 2-2L8 2z" fill="currentColor"/>
+        <rect x="2" y="11" width="12" height="3" rx="1" fill="currentColor" opacity="0.5"/>
+      </svg>
+      Land
+    </button>
+    <button class="underwater-toggle__btn ${isUnderwater ? "underwater-toggle__btn--active" : ""}"
+            data-mode="water" aria-pressed="${isUnderwater}">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+        <path d="M1 7c1.5-2 3-2 4.5 0s3 2 4.5 0 3-2 4.5 0" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        <path d="M1 11c1.5-2 3-2 4.5 0s3 2 4.5 0 3-2 4.5 0" stroke="currentColor" stroke-width="1.5" fill="none"/>
+      </svg>
+      Water
+    </button>
+  `;
+  container.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-mode]");
+    if (!btn) return;
+    const newMode = btn.dataset.mode === "water";
+    if (newMode === state.editor.underwaterMode) return;
+    state.editor.underwaterMode = newMode;
+    _renderEditor();
+  });
+  return container;
+}
+
 export function renderSkills() {
   const catalog = state.activeCatalog;
   _el.skillsHost.innerHTML = "";
   if (!catalog) return;
 
-  let options = getSkillOptionsByType(catalog, state.editor.specializations);
-  const utilitySelection = Array.isArray(state.editor.skills?.utilityIds)
-    ? state.editor.skills.utilityIds.map((value) => Number(value) || 0)
+  // Toggle is inserted into the orb column later (to keep health orb centered)
+
+  const isUnderwater = Boolean(state.editor.underwaterMode);
+  let options = getSkillOptionsByType(catalog, state.editor.specializations, isUnderwater);
+  const skillSource = isUnderwater
+    ? state.editor.underwaterSkills
+    : state.editor.skills;
+  const utilitySelection = Array.isArray(skillSource?.utilityIds)
+    ? skillSource.utilityIds.map((value) => Number(value) || 0)
     : [0, 0, 0];
   const prevRenderedSkillIconIds = state.renderedSkillIconIds || new Map();
   const nextRenderedSkillIconIds = new Map();
@@ -891,9 +991,13 @@ export function renderSkills() {
   const activeWeaponSet = Number(state.editor.activeWeaponSet) || 1;
   const equippedWeapons = state.editor.equipment?.weapons || {};
 
-  const mhKey = activeWeaponSet === 2 ? "mainhand2" : "mainhand1";
-  const ohKey = activeWeaponSet === 2 ? "offhand2" : "offhand1";
-  const hasWeaponSet2 = !!(equippedWeapons.mainhand2 || equippedWeapons.offhand2);
+  const mhKey = isUnderwater
+    ? (activeWeaponSet === 2 ? "aquatic2" : "aquatic1")
+    : (activeWeaponSet === 2 ? "mainhand2" : "mainhand1");
+  const ohKey = isUnderwater ? "" : (activeWeaponSet === 2 ? "offhand2" : "offhand1");
+  const hasWeaponSet2 = isUnderwater
+    ? !!equippedWeapons.aquatic2
+    : !!(equippedWeapons.mainhand2 || equippedWeapons.offhand2);
 
   const mechanicState = buildMechanicSlotsForRender({
     catalog,
@@ -905,6 +1009,7 @@ export function renderSkills() {
     ohKey,
     activeAttunement,
     activeKit,
+    underwaterMode: isUnderwater,
   });
   const { mechSlots, eliteSpecId, isWeaver, isToolbelt, isRanger } = mechanicState;
   options = mechanicState.options;
@@ -919,9 +1024,9 @@ export function renderSkills() {
     const isToolbeltSource = mechSlots.some((s) => !s.isStatic && s.sourceId === activeKit);
     // Also allow heal/utility/elite slot kits (e.g. Mortar Kit in elite slot, Med Kit in heal slot).
     const equippedIds = new Set([
-      Number(state.editor.skills?.healId) || 0,
-      ...(state.editor.skills?.utilityIds || []).map(Number),
-      Number(state.editor.skills?.eliteId) || 0,
+      Number(skillSource?.healId) || 0,
+      ...(skillSource?.utilityIds || []).map(Number),
+      Number(skillSource?.eliteId) || 0,
     ].filter(Boolean));
     const isEquippedSlotKit = (kitSkill?.bundleSkills?.length ?? 0) > 0 && equippedIds.has(activeKit);
     // Soulbeast Beastmode has no bundle_skills in the API; allow it to persist via isBeastmodeToggle.
@@ -957,11 +1062,19 @@ export function renderSkills() {
       if (!existing || id < existing.id) slotMap.set(slotNum, s);
     }
     weaponSkills = [1, 2, 3, 4, 5].map((n) => slotMap.get(n) || null);
+  } else if (state.editor.underwaterMode) {
+    // Aquatic weapons are always two-handed; pass as mainhand with empty offhand.
+    // Weaver dual-attunement does not apply underwater — use single attunement (isWeaver=false).
+    const activeAquatic = activeWeaponSet === 2 ? "aquatic2" : "aquatic1";
+    weaponSkills = getEquippedWeaponSkills(catalog, {
+      mainhand: equippedWeapons[activeAquatic] || "",
+      offhand: "",
+    }, activeAttunement, "", false, true);
   } else {
     weaponSkills = getEquippedWeaponSkills(catalog, {
       mainhand: equippedWeapons[mhKey] || "",
       offhand: equippedWeapons[ohKey] || "",
-    }, activeAttunement, activeAttunement2, isWeaver);
+    }, activeAttunement, activeAttunement2, isWeaver, false);
   }
 
   const weaponGroup = document.createElement("div");
@@ -1243,8 +1356,10 @@ export function renderSkills() {
     }
     // Ranger: add pet selector directly inside mechBar (right side, pushed by auto-margin spacer)
     if (Array.isArray(catalog.pets) && catalog.pets.length > 0) {
-      const activeSlotKey = state.editor.activePetSlot === "terrestrial2" ? "terrestrial2" : "terrestrial1";
-      const inactiveSlotKey = activeSlotKey === "terrestrial1" ? "terrestrial2" : "terrestrial1";
+      const petSlot1 = isUnderwater ? "aquatic1" : "terrestrial1";
+      const petSlot2 = isUnderwater ? "aquatic2" : "terrestrial2";
+      const activeSlotKey = state.editor.activePetSlot === petSlot2 ? petSlot2 : petSlot1;
+      const inactiveSlotKey = activeSlotKey === petSlot1 ? petSlot2 : petSlot1;
       const activePetId = Number(state.editor.selectedPets?.[activeSlotKey]) || 0;
       const inactivePetId = Number(state.editor.selectedPets?.[inactiveSlotKey]) || 0;
       const activePet = activePetId ? catalog.petById.get(activePetId) : null;
@@ -1258,7 +1373,7 @@ export function renderSkills() {
       const petBtn = document.createElement("button");
       petBtn.type = "button";
       petBtn.className = "pet-slot-btn" + (activePet ? " pet-slot-btn--filled" : "");
-      petBtn.title = activePet?.name || `Click to select ${activeSlotKey === "terrestrial1" ? "Pet 1" : "Pet 2"}`;
+      petBtn.title = activePet?.name || `Click to select ${activeSlotKey === petSlot1 ? "Pet 1" : "Pet 2"}`;
       if (activePet?.icon) {
         petBtn.innerHTML = `<img src="${escapeHtml(activePet.icon)}" alt="${escapeHtml(activePet.name || "")}" />`;
       }
@@ -1266,15 +1381,15 @@ export function renderSkills() {
 
       const petLabel = document.createElement("span");
       petLabel.className = "pet-slot-btn__label";
-      petLabel.textContent = activePet?.name?.replace(/^Juvenile\s+/i, "") || (activeSlotKey === "terrestrial1" ? "Pet 1" : "Pet 2");
+      petLabel.textContent = activePet?.name?.replace(/^Juvenile\s+/i, "") || (activeSlotKey === petSlot1 ? "Pet 1" : "Pet 2");
 
       petWrapper.append(petBtn, petLabel);
 
       const petSwapBtn = document.createElement("button");
       petSwapBtn.type = "button";
-      petSwapBtn.className = "pet-swap-btn" + (activeSlotKey === "terrestrial2" ? " pet-swap-btn--active" : "");
+      petSwapBtn.className = "pet-swap-btn" + (activeSlotKey === petSlot2 ? " pet-swap-btn--active" : "");
       petSwapBtn.title = inactivePetId
-        ? `Switch to pet ${activeSlotKey === "terrestrial1" ? 2 : 1}`
+        ? `Switch to pet ${activeSlotKey === petSlot1 ? 2 : 1}`
         : "No second pet equipped";
       petSwapBtn.innerHTML = `<svg viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="2,3.5 13,3.5"/><polyline points="10,1 13,3.5 10,6"/><polyline points="16,10.5 5,10.5"/><polyline points="8,8 5,10.5 8,13"/></svg>`;
       petSwapBtn.addEventListener("click", () => {
@@ -1288,7 +1403,9 @@ export function renderSkills() {
     // Revenant: prepend legend buttons into mechBar so they sit inline before any F2+ elite slots.
     // This avoids a separate wrapper div that would stretch to full column width.
     if (Array.isArray(catalog.legends) && catalog.legends.length > 0) {
-      const legendSlots = state.editor.selectedLegends || ["", ""];
+      const legendSlots = isUnderwater
+        ? (state.editor.selectedUnderwaterLegends || ["", ""])
+        : (state.editor.selectedLegends || ["", ""]);
       const activeLegendSlot = Number(state.editor.activeLegendSlot) || 0;
       const legendStack = document.createElement("div");
       legendStack.className = "legend-stack";
@@ -1300,10 +1417,17 @@ export function renderSkills() {
         const legendName = swapSkill?.name || legend?.id || "—";
         const legendIcon = swapSkill?.icon || "";
         const isActive = slotIdx === activeLegendSlot;
+        const isBlockedLegend = isUnderwater && legendId && UNDERWATER_BLOCKED_LEGENDS.has(legendId);
         const btn = document.createElement("button");
         btn.type = "button";
-        btn.className = "legend-slot-btn" + (isActive ? " legend-slot-btn--active" : "");
-        btn.title = legendName + (isActive ? " (active — right-click to change)" : " — click to swap, right-click to change");
+        btn.className = "legend-slot-btn" + (isActive ? " legend-slot-btn--active" : "") + (isBlockedLegend ? " legend-slot-btn--blocked" : "");
+        if (isBlockedLegend) {
+          btn.style.opacity = "0.4";
+          btn.style.pointerEvents = "none";
+          btn.title = legendName + " (unavailable underwater)";
+        } else {
+          btn.title = legendName + (isActive ? " (active — right-click to change)" : " — click to swap, right-click to change");
+        }
         if (legendIcon) {
           btn.innerHTML = `<img src="${escapeHtml(legendIcon)}" alt="${escapeHtml(legendName)}" />`;
         }
@@ -1316,7 +1440,8 @@ export function renderSkills() {
           if (isActive || !legendId) {
             openLegendPicker(btn, slotIdx, catalog);
           } else {
-            if (!state.editor.selectedLegends) state.editor.selectedLegends = ["", ""];
+            const legendTarget = isUnderwater ? "selectedUnderwaterLegends" : "selectedLegends";
+            if (!state.editor[legendTarget]) state.editor[legendTarget] = ["", ""];
             state.editor.activeLegendSlot = slotIdx;
             // Reset Alliance form when switching to a non-Alliance legend
             if (legendId !== "Legend7") state.editor.allianceTacticsForm = 0;
@@ -1343,8 +1468,8 @@ export function renderSkills() {
   swapBtn.className = "weapon-swap-btn" + (activeWeaponSet === 2 ? " weapon-swap-btn--active" : "");
   swapBtn.disabled = !hasWeaponSet2;
   swapBtn.title = hasWeaponSet2
-    ? `Switch to weapon set ${activeWeaponSet === 1 ? 2 : 1}`
-    : "No second weapon set equipped";
+    ? `Switch to ${isUnderwater ? "aquatic" : "weapon set"} ${activeWeaponSet === 1 ? 2 : 1}`
+    : isUnderwater ? "No second aquatic weapon equipped" : "No second weapon set equipped";
   swapBtn.innerHTML = `<svg viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     <polyline points="2,3.5 13,3.5"/><polyline points="10,1 13,3.5 10,6"/>
     <polyline points="16,10.5 5,10.5"/><polyline points="8,8 5,10.5 8,13"/>
@@ -1385,23 +1510,26 @@ export function renderSkills() {
     { key: "eliteId", label: "Elite", list: options.elite || [], keybind: "0", flipKey: "utility_elite" },
   ];
   for (const slot of utilitySlots) {
-    utilityGroup.append(makeSkillSlot(slot, catalog, options, utilitySelection, markSkillIconRendered));
+    utilityGroup.append(makeSkillSlot(slot, catalog, options, utilitySelection, markSkillIconRendered, skillSource));
   }
 
+  const orbCol = document.createElement("div");
+  orbCol.className = "skills-bar__orb-col";
+  orbCol.append(_renderUnderwaterToggle());
   if (f5SlotEl) {
-    const orbCol = document.createElement("div");
-    orbCol.className = "skills-bar__orb-col";
     orbCol.append(f5SlotEl, orbEl);
-    bar.append(weaponCol, orbCol, utilityGroup);
   } else {
-    bar.append(weaponCol, orbEl, utilityGroup);
+    orbCol.append(orbEl);
   }
+  bar.append(weaponCol, orbCol, utilityGroup);
   _el.skillsHost.append(bar);
   state.renderedSkillIconIds = nextRenderedSkillIconIds;
 }
 
 export function openLegendPicker(anchorEl, slotIdx, catalog) {
-  const legendSlots = state.editor.selectedLegends || ["", ""];
+  const isUnderwaterPicker = Boolean(state.editor.underwaterMode);
+  const legendKey = isUnderwaterPicker ? "selectedUnderwaterLegends" : "selectedLegends";
+  const legendSlots = state.editor[legendKey] || ["", ""];
   const otherLegendId = legendSlots[1 - slotIdx] || "";
   const selectedSpecIds = new Set(
     (state.editor.specializations || []).map((s) => Number(s?.specializationId) || 0).filter(Boolean)
@@ -1413,12 +1541,13 @@ export function openLegendPicker(anchorEl, slotIdx, catalog) {
       // Elite-spec-only legends: swap skill has a non-zero specialization requirement
       const reqSpec = Number(swapSkill?.specialization) || 0;
       if (reqSpec && !selectedSpecIds.has(reqSpec)) return [];
-      return [{ value: l.id, label: swapSkill?.name || l.id, icon: swapSkill?.icon || "" }];
+      const blocked = isUnderwaterPicker && UNDERWATER_BLOCKED_LEGENDS.has(l.id);
+      return [{ value: l.id, label: swapSkill?.name || l.id, icon: swapSkill?.icon || "", disabled: blocked }];
     }).filter((item) => item.value !== otherLegendId),
   ];
   _openSlotPicker(anchorEl, legendSlots[slotIdx] || "", (newVal) => {
-    if (!state.editor.selectedLegends) state.editor.selectedLegends = ["", ""];
-    state.editor.selectedLegends[slotIdx] = newVal || "";
+    if (!state.editor[legendKey]) state.editor[legendKey] = ["", ""];
+    state.editor[legendKey][slotIdx] = newVal || "";
     syncRevenantSkillsFromLegend(catalog);
     _markEditorChanged();
     renderSkills();
@@ -1428,10 +1557,10 @@ export function openLegendPicker(anchorEl, slotIdx, catalog) {
 export function openPetPicker(anchorEl, petKey, catalog) {
   const currentPetId = Number(state.editor.selectedPets?.[petKey]) || 0;
   const isAquatic = petKey.startsWith("aquatic");
-  // Filter pets: aquatic slots show aquatic family pets; terrestrial slots show non-aquatic
-  const aquaticFamilies = new Set(["Amphibious", "Aquatic"]);
+  // Filter pets: aquatic slots show aquatic/amphibious pets; terrestrial slots show non-aquatic.
+  // The GW2 API has no type field on pets, so we use a hardcoded set of aquatic pet IDs.
   const filteredPets = (catalog.pets || []).filter((p) => {
-    const isAquaticPet = aquaticFamilies.has(p.type);
+    const isAquaticPet = AQUATIC_PET_IDS.has(p.id);
     return isAquatic ? isAquaticPet : !isAquaticPet;
   });
   const items = [
@@ -1447,12 +1576,21 @@ export function openPetPicker(anchorEl, petKey, catalog) {
 }
 
 export function syncRevenantSkillsFromLegend(catalog) {
-  const legendSlots = state.editor.selectedLegends || ["", ""];
+  const isUnderwater = Boolean(state.editor.underwaterMode);
+  const legendSlots = isUnderwater
+    ? (state.editor.selectedUnderwaterLegends || ["", ""])
+    : (state.editor.selectedLegends || ["", ""]);
   const activeLegendSlot = Number(state.editor.activeLegendSlot) || 0;
   const activeLegendId = legendSlots[activeLegendSlot] || "";
   const activeLegend = activeLegendId ? catalog.legendById.get(activeLegendId) : null;
-  if (!activeLegend) return;
-  if (!state.editor.skills) state.editor.skills = { healId: 0, utilityIds: [0, 0, 0], eliteId: 0 };
+  const target = isUnderwater ? state.editor.underwaterSkills : state.editor.skills;
+  if (!target) return;
+  if (!activeLegend) {
+    target.healId = 0;
+    target.utilityIds = [0, 0, 0];
+    target.eliteId = 0;
+    return;
+  }
   // Alliance legend: apply Saint Viktor (Luxon) flip skills when form=1
   const useFlip = activeLegendId === "Legend7" && (Number(state.editor.allianceTacticsForm) || 0) === 1;
   const resolveId = (id) => {
@@ -1463,10 +1601,10 @@ export function syncRevenantSkillsFromLegend(catalog) {
     }
     return id;
   };
-  state.editor.skills.healId = resolveId(activeLegend.heal) || 0;
-  state.editor.skills.utilityIds = [
+  target.healId = resolveId(activeLegend.heal) || 0;
+  target.utilityIds = [
     ...(activeLegend.utilities || []).slice(0, 3).map(resolveId),
     ...Array(3).fill(0),
   ].slice(0, 3);
-  state.editor.skills.eliteId = resolveId(activeLegend.elite) || 0;
+  target.eliteId = resolveId(activeLegend.elite) || 0;
 }

@@ -115,6 +115,23 @@ function _buildSplitMatchTables(baseFacts, splitFacts) {
     }
   }
 
+  // Pass 1.5: cross-type exact text match — the wiki scraper often assigns
+  // type "Buff" to facts that the API types as Number, Percent, Time, etc.
+  // Match by exact text equality regardless of type mismatch.
+  for (let si = 0; si < splitFacts.length; si++) {
+    if (splitToBase.has(si)) continue;
+    const sfText = (splitFacts[si].text || "").toLowerCase().trim();
+    if (!sfText) continue;
+    for (let bi = 0; bi < baseFacts.length; bi++) {
+      if (baseToSplit.has(bi)) continue;
+      if ((baseFacts[bi].text || "").toLowerCase().trim() === sfText) {
+        baseToSplit.set(bi, si);
+        splitToBase.set(si, bi);
+        break;
+      }
+    }
+  }
+
   // Pass 2: type-group positional for remaining unmatched facts
   const unmatchedByGroup = {};
   for (let si = 0; si < splitFacts.length; si++) {
@@ -136,6 +153,31 @@ function _buildSplitMatchTables(baseFacts, splitFacts) {
     }
   }
 
+  // Pass 3: keyword overlap — the wiki scraper rewrites fact text (e.g.
+  // "Maximum Stacks" → "Maximum count", "Number of Allied Targets" → "Allied targets").
+  // Match remaining unmatched facts if they share at least one significant word (>3 chars).
+  // Score by number of shared words and pick the best match to avoid false positives.
+  const _stopWords = new Set(["the", "and", "per", "for", "with", "from", "based", "gain"]);
+  function _keywords(text) {
+    return (text || "").toLowerCase().split(/\s+/).filter((w) => w.length > 3 && !_stopWords.has(w));
+  }
+  for (let si = 0; si < splitFacts.length; si++) {
+    if (splitToBase.has(si)) continue;
+    const sfKw = _keywords(splitFacts[si].text);
+    if (!sfKw.length) continue;
+    let bestBi = -1, bestScore = 0;
+    for (let bi = 0; bi < baseFacts.length; bi++) {
+      if (baseToSplit.has(bi)) continue;
+      const bfKw = _keywords(baseFacts[bi].text);
+      const shared = sfKw.filter((w) => bfKw.includes(w)).length;
+      if (shared > bestScore) { bestScore = shared; bestBi = bi; }
+    }
+    if (bestScore > 0) {
+      baseToSplit.set(bestBi, si);
+      splitToBase.set(si, bestBi);
+    }
+  }
+
   return { baseToSplit, splitToBase };
 }
 
@@ -152,6 +194,37 @@ function _mergeSplitValues(bf, sf) {
     merged.value = sf.distance;
   }
   return merged;
+}
+
+/**
+ * Sanitise a WvW-only split fact (no base match) so it renders correctly.
+ * The wiki scraper emits type:"Buff" for many facts that are not actual buffs
+ * (e.g. "Maximum count", "Allied targets"). Without a matching base fact to
+ * inherit type/icon from, these render with a generic Might icon and buff
+ * formatting. Strip the misleading Buff type so the renderer uses the generic
+ * text-based fallback instead.
+ */
+function _sanitiseUnmatchedSplitFact(sf) {
+  const clean = { ...sf, _splitFact: true };
+  const status = (sf.status || "").toLowerCase();
+  // If it's a real buff/condition (known boon/condition name or has a recognized
+  // icon from the GW2 render CDN), keep it. Otherwise demote to generic.
+  const isRenderCdn = sf.icon && sf.icon.includes("render.guildwars2.com");
+  if (sf.type === "Buff" && !isRenderCdn) {
+    // Check if status looks like a real buff/condition name
+    const KNOWN_EFFECTS = [
+      "might", "fury", "quickness", "alacrity", "swiftness", "vigor", "regeneration",
+      "protection", "resolution", "resistance", "stability", "aegis", "retaliation",
+      "bleeding", "burning", "confusion", "poison", "torment", "vulnerability",
+      "weakness", "crippled", "chilled", "blinded", "immobile", "slow", "fear",
+      "taunt", "daze", "stun", "knockdown", "knockback", "float", "pull", "sink",
+      "stealth", "superspeed", "revealed",
+    ];
+    if (!KNOWN_EFFECTS.includes(status)) {
+      clean.type = "Untyped";
+    }
+  }
+  return clean;
 }
 
 /**
@@ -191,7 +264,7 @@ function applyBalanceSplit(mapped, entityType, gameMode) {
     // matching PvE base label. PvE facts with no WvW counterpart are dropped.
     const wvwFacts = splitFacts.map((sf, si) => {
       const bi = splitToBase.get(si);
-      if (bi === undefined) return { ...sf, _splitFact: true }; // WvW-only fact (added in WvW)
+      if (bi === undefined) return _sanitiseUnmatchedSplitFact(sf); // WvW-only fact (added in WvW)
       const merged = _mergeSplitValues(baseFacts[bi], sf);
       if (_splitValueChanged(baseFacts[bi], merged)) merged._splitFact = true;
       return merged;
@@ -217,7 +290,7 @@ function applyBalanceSplit(mapped, entityType, gameMode) {
       return merged;
     });
     for (let si = 0; si < splitFacts.length; si++) {
-      if (!splitToBase.has(si)) result.push({ ...splitFacts[si], _splitFact: true });
+      if (!splitToBase.has(si)) result.push(_sanitiseUnmatchedSplitFact(splitFacts[si]));
     }
     mapped.facts = result;
   }
@@ -389,6 +462,8 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
     ...(professionId === "Engineer" ? PHOTON_FORGE_BUNDLE : []),
     // Include correct Toss Elixir toolbelt skills (API points to Detonate variants instead).
     ...(professionId === "Engineer" ? [...ELIXIR_TOOLBELT_OVERRIDES.values()] : []),
+    // Include Mechanist Depth Charges (63210) — underwater replacement for all mech F-slots.
+    ...(professionId === "Engineer" ? [63210] : []),
     // Include Radiant Forge weapon skills + their flip skills (Luminary, Guardian).
     ...(professionId === "Guardian" ? [...RADIANT_FORGE_BUNDLE, ...RADIANT_FORGE_FLIP_SKILLS] : []),
     // Include flip_skills of Death Shroud and Lich Form transform children (not auto-fetched).
@@ -596,7 +671,8 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
   ];
 
   function mapSkill(skill) {
-    const specId = KNOWN_SKILL_SPEC_OVERRIDES.get(skill.id) || Number(skill.specialization) || 0;
+    const specOverride = KNOWN_SKILL_SPEC_OVERRIDES.get(skill.id);
+    const specId = specOverride !== undefined ? specOverride : (Number(skill.specialization) || 0);
     const rawBundleSkills = Array.isArray(skill.bundle_skills)
       ? skill.bundle_skills.map(Number).filter(Boolean)
       : [];
@@ -643,6 +719,7 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
       attunement,
       dualWield,
       categories: Array.isArray(skill.categories) ? skill.categories : [],
+      flags: Array.isArray(skill.flags) ? skill.flags : [],
       // Filter out conditional facts (requires_trait) from the base array — same as traits.
       facts: KNOWN_SKILL_FACTS_OVERRIDES.get(skill.id) || (Array.isArray(skill.facts) ? skill.facts.filter((f) => !f.requires_trait) : []),
       traitedFacts: Array.isArray(skill.traited_facts) ? skill.traited_facts : [],
@@ -786,9 +863,9 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
   }
 
   // Normalize GW2 API weapon type keys (e.g. "ShortBow") to our lowercase IDs (e.g. "shortbow")
-  // Special case: "HarpoonGun" → "harpoon"
+  // Special cases: "HarpoonGun" and "Speargun" both refer to the same aquatic weapon → "harpoon"
   function normalizeWeaponKey(apiKey) {
-    if (apiKey === "HarpoonGun") return "harpoon";
+    if (apiKey === "HarpoonGun" || apiKey === "Speargun") return "harpoon";
     return apiKey.toLowerCase();
   }
 
@@ -866,6 +943,7 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
         attunement: skill.attunement === "None" ? "" : (skill.attunement || ""),
         dualWield: skill.dual_attunement === "None" ? "" : (skill.dual_attunement || ""),
         weaponType: skill.weapon_type === "None" ? "" : (skill.weapon_type || ""),
+        flags: Array.isArray(skill.flags) ? skill.flags : [],
         facts: Array.isArray(skill.facts) ? skill.facts : [],
         flipSkill: Number(skill.flip_skill) || 0,
       };
@@ -880,8 +958,98 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
   };
 }
 
+// ---------------------------------------------------------------------------
+// Upgrade items (runes, sigils, infusions) — fetched by curated ID lists
+// ---------------------------------------------------------------------------
+
+let _upgradeCatalogCache = null;
+let _upgradeCatalogPromise = null;
+
+async function getUpgradeCatalog(lang = "en") {
+  if (_upgradeCatalogCache) return _upgradeCatalogCache;
+  if (_upgradeCatalogPromise) return _upgradeCatalogPromise;
+
+  _upgradeCatalogPromise = (async () => {
+    const { RUNE_ITEM_IDS, SIGIL_ITEM_IDS, INFUSION_ITEM_IDS, WVW_INFUSION_IDS, ENRICHMENT_ITEM_IDS, FOOD_ITEM_IDS, UTILITY_ITEM_IDS } = require("./upgradeIds");
+    const { FOOD_BUFF_OVERRIDES } = require("./foodOverrides");
+
+    const [runeItems, sigilItems, infusionItems, enrichmentItems, foodItems, utilityItems] = await Promise.all([
+      fetchGw2ByIds("items", RUNE_ITEM_IDS, lang),
+      fetchGw2ByIds("items", SIGIL_ITEM_IDS, lang),
+      fetchGw2ByIds("items", INFUSION_ITEM_IDS, lang),
+      fetchGw2ByIds("items", ENRICHMENT_ITEM_IDS, lang),
+      fetchGw2ByIds("items", FOOD_ITEM_IDS, lang),
+      fetchGw2ByIds("items", UTILITY_ITEM_IDS, lang),
+    ]);
+
+    const stripGw2Markup = (text) =>
+      (text || "").replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+
+    const mapItem = (item) => ({
+      id: item.id,
+      name: item.name || "",
+      icon: item.icon || "",
+      description: stripGw2Markup(item.description),
+      bonuses: item.details?.bonuses || [],
+      buffDescription: stripGw2Markup(item.details?.infix_upgrade?.buff?.description),
+      infixUpgrade: item.details?.infix_upgrade || null,
+    });
+
+    const mapFood = (item) => {
+      const apiDesc = item.details?.description || "";
+      const overrideDesc = FOOD_BUFF_OVERRIDES.get(item.id);
+      const rawBuff = overrideDesc || apiDesc;
+      return {
+        id: item.id,
+        name: item.name || "",
+        icon: item.icon || "",
+        rarity: item.rarity || "",
+        level: item.level || 0,
+        buff: stripGw2Markup(rawBuff.replace(/\n/g, " | ")),
+        duration: item.details?.duration_ms ? Math.round(item.details.duration_ms / 60000) : 0,
+      };
+    };
+
+    const mapUtility = (item) => ({
+      id: item.id,
+      name: item.name || "",
+      icon: item.icon || "",
+      rarity: item.rarity || "",
+      level: item.level || 0,
+      buff: stripGw2Markup((item.details?.description || "").replace(/\n/g, " | ")),
+      duration: item.details?.duration_ms ? Math.round(item.details.duration_ms / 60000) : 0,
+    });
+
+    const catalog = {
+      runes: runeItems.map(mapItem).sort((a, b) => a.name.localeCompare(b.name)),
+      sigils: sigilItems.map(mapItem).sort((a, b) => a.name.localeCompare(b.name)),
+      infusions: infusionItems.map((item) => ({ ...mapItem(item), category: WVW_INFUSION_IDS.has(item.id) ? "wvw" : "pve" })).sort((a, b) => a.name.localeCompare(b.name)),
+      enrichments: enrichmentItems.map(mapItem).sort((a, b) => a.name.localeCompare(b.name)),
+      foods: foodItems.filter((item) => item.details?.type === "Food").map(mapFood).sort((a, b) => a.name.localeCompare(b.name)),
+      utilities: utilityItems.filter((item) => item.details?.type === "Utility").map(mapUtility).sort((a, b) => a.name.localeCompare(b.name)),
+    };
+
+    catalog.runeById = new Map(catalog.runes.map((r) => [r.id, r]));
+    catalog.sigilById = new Map(catalog.sigils.map((s) => [s.id, s]));
+    catalog.infusionById = new Map(catalog.infusions.map((i) => [i.id, i]));
+    catalog.enrichmentById = new Map(catalog.enrichments.map((e) => [e.id, e]));
+    catalog.foodById = new Map(catalog.foods.map((f) => [f.id, f]));
+    catalog.utilityById = new Map(catalog.utilities.map((u) => [u.id, u]));
+
+    _upgradeCatalogCache = catalog;
+    return catalog;
+  })();
+
+  try {
+    return await _upgradeCatalogPromise;
+  } finally {
+    _upgradeCatalogPromise = null;
+  }
+}
+
 module.exports = {
   getProfessionList,
   getProfessionCatalog,
+  getUpgradeCatalog,
   applyBalanceSplit,
 };

@@ -23,6 +23,7 @@ export const state = {
   skillSearch: "",
   catalogCache: new Map(),
   activeCatalog: null,
+  upgradeCatalog: null,  // { runes, sigils, infusions, enrichments, runeById, sigilById, infusionById, enrichmentById }
   renderedSkillIconIds: new Map(),
   editor: null,  // populated by init() after createEmptyEditor() is available
   editorBaselineSignature: "",
@@ -41,7 +42,6 @@ export function createEmptyEditor(profession = "", gameMode = "pve") {
     notes: "",
     equipment: {
       statPackage: "",
-      runeSet: "",
       relic: "",
       food: "",
       utility: "",
@@ -54,6 +54,24 @@ export function createEmptyEditor(profession = "", gameMode = "pve") {
       weapons: {
         mainhand1: "", offhand1: "", mainhand2: "", offhand2: "", aquatic1: "", aquatic2: "",
       },
+      runes: {
+        head: "", shoulders: "", chest: "", hands: "", legs: "", feet: "",
+        breather: "",
+      },
+      sigils: {
+        mainhand1: ["", ""], offhand1: [""],
+        mainhand2: ["", ""], offhand2: [""],
+        aquatic1: ["", ""], aquatic2: ["", ""],
+      },
+      infusions: {
+        head: "", shoulders: "", chest: "", hands: "", legs: "", feet: "",
+        mainhand1: "", offhand1: "", mainhand2: "", offhand2: "",
+        back: ["", ""],
+        ring1: ["", "", ""], ring2: ["", "", ""],
+        accessory1: "", accessory2: "",
+        breather: "", aquatic1: "", aquatic2: "",
+      },
+      enrichment: "",
     },
     specializations: [],
     skills: {
@@ -61,6 +79,12 @@ export function createEmptyEditor(profession = "", gameMode = "pve") {
       utilityIds: [0, 0, 0],
       eliteId: 0,
     },
+    underwaterSkills: {
+      healId: 0,
+      utilityIds: [0, 0, 0],
+      eliteId: 0,
+    },
+    underwaterMode: false,
     activeAttunement: "",
     activeAttunement2: "",
     activeKit: 0,
@@ -68,6 +92,7 @@ export function createEmptyEditor(profession = "", gameMode = "pve") {
     morphSkillIds: [0, 0, 0],
     // Revenant: two legend slots (active/inactive), identified by legend string ID (e.g. "Legend1")
     selectedLegends: ["", ""],
+    selectedUnderwaterLegends: ["", ""],
     activeLegendSlot: 0,           // 0 = first legend active, 1 = second legend active
     // Ranger/Soulbeast: two pet slots (terrestrial + aquatic) per legend slot (A/B)
     selectedPets: { terrestrial1: 0, terrestrial2: 0, aquatic1: 0, aquatic2: 0 },

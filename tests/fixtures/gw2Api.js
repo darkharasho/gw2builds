@@ -460,6 +460,7 @@ function makeSkill(id, overrides = {}) {
     attunement: overrides.attunement !== undefined ? overrides.attunement : "None",
     dual_attunement: overrides.dual_attunement !== undefined ? overrides.dual_attunement : "None",
     categories: overrides.categories || [],
+    flags: overrides.flags || [],
     facts: overrides.facts || [],
     toolbelt_skill: overrides.toolbelt_skill || 0,
     flip_skill: overrides.flip_skill || 0,
@@ -470,8 +471,8 @@ function makeSkill(id, overrides = {}) {
 
 const MOCK_SKILLS = {
   // ---- Warrior ----
-  14402: makeSkill(14402, { name: "Mending",      slot: "Heal",    type: "Heal",    professions: ["Warrior"] }),
-  14516: makeSkill(14516, { name: "Balanced Stance", slot: "Utility", type: "Utility", professions: ["Warrior"] }),
+  14402: makeSkill(14402, { name: "Mending",      slot: "Heal",    type: "Heal",    professions: ["Warrior"], flags: [] }),
+  14516: makeSkill(14516, { name: "Balanced Stance", slot: "Utility", type: "Utility", professions: ["Warrior"], flags: ["NoUnderwater"] }),
   14404: makeSkill(14404, { name: "Rampage",      slot: "Elite",   type: "Elite",   professions: ["Warrior"] }),
   14360: makeSkill(14360, { name: "Sever Artery", slot: "Weapon_1", type: "Weapon", weapon_type: "Sword" }),
   14521: makeSkill(14521, { name: "Shield Bash",  slot: "Weapon_4", type: "Weapon", weapon_type: "Shield" }),
@@ -531,6 +532,9 @@ const MOCK_SKILLS = {
   // Scrapper Function Gyro variants — API says spec=57 (Holosmith), but correct is spec=43 (Scrapper)
   72103: makeSkill(72103, { name: "Function Gyro",            slot: "Profession_5", type: "Profession", specialization: 57 }),
   72114: makeSkill(72114, { name: "Function Gyro (variant)",  slot: "Profession_5", type: "Profession", specialization: 57 }),
+
+  // Mechanist underwater skill — Depth Charges (replaces all mech F-slots when underwater)
+  63210: makeSkill(63210, { name: "Depth Charges", slot: "Profession_4", type: "Profession", specialization: 70, professions: ["Engineer"] }),
 
   // Radiant Forge (Luminary, Guardian)
   77073: makeSkill(77073, { name: "Enter Radiant Forge", slot: "Profession_1", type: "Profession", specialization: 81, professions: ["Guardian"], bundle_skills: [] }),

@@ -105,12 +105,12 @@ export const WEAPON_STRENGTH_MIDPOINT = {
 };
 
 export const EQUIP_TRINKET_SLOTS = [
-  { key: "back",       label: "Back",        icon: "Back_slot.png" },
-  { key: "amulet",     label: "Amulet",      icon: "Amulet_slot.png" },
-  { key: "ring1",      label: "Ring 1",      icon: "Trinket_slot.png" },
-  { key: "ring2",      label: "Ring 2",      icon: "Trinket_slot.png" },
-  { key: "accessory1", label: "Accessory 1", icon: "Trinket_slot.png" },
-  { key: "accessory2", label: "Accessory 2", icon: "Trinket_slot.png" },
+  { key: "back",       label: "Back",        icon: "Back_slot.png",    filledIcon: "https://render.guildwars2.com/file/5EBEA1A467236237FCBACDC09969647956C4A371/1701118.png" },
+  { key: "amulet",     label: "Amulet",      icon: "Amulet_slot.png",  filledIcon: "https://render.guildwars2.com/file/4944FD054FD80D805B0BFFB2DA60363A7DD31FDB/1614376.png" },
+  { key: "ring1",      label: "Ring 1",      icon: "Trinket_slot.png", filledIcon: "https://render.guildwars2.com/file/EAA61AAF9BEF031104FD063C0A301A520EF5F5E6/1614682.png" },
+  { key: "ring2",      label: "Ring 2",      icon: "Trinket_slot.png", filledIcon: "https://render.guildwars2.com/file/EAA61AAF9BEF031104FD063C0A301A520EF5F5E6/1614682.png" },
+  { key: "accessory1", label: "Accessory 1", icon: "Trinket_slot.png", filledIcon: "https://render.guildwars2.com/file/741D3F520D1DFD7BB9A35AD50FC75152D2B3CA6B/1614709.png" },
+  { key: "accessory2", label: "Accessory 2", icon: "Trinket_slot.png", filledIcon: "https://render.guildwars2.com/file/741D3F520D1DFD7BB9A35AD50FC75152D2B3CA6B/1614709.png" },
 ];
 
 export const EQUIP_UNDERWATER_SLOTS = [
@@ -118,6 +118,29 @@ export const EQUIP_UNDERWATER_SLOTS = [
   { key: "aquatic1", label: "Weapon 1",  hand: "aquatic" },
   { key: "aquatic2", label: "Weapon 2",  hand: "aquatic" },
 ];
+
+// Underwater mode constants
+export const MECHANIST_DEPTH_CHARGES_ID = 63210;
+export const MECHANIST_SPEC_ID = 70;
+
+// Revenant legends blocked underwater (legend string IDs from GW2 API)
+// Legend1 = Glint (Herald elite spec, spec ID 52), Legend5 = Kalla (Renegade elite spec, spec ID 63)
+export const UNDERWATER_BLOCKED_LEGENDS = new Set(["Legend1", "Legend5"]);
+
+// Ranger pets usable underwater (GW2 API has no type field — this is hardcoded).
+// Aquatic-only: Shark, Armor Fish, Jellyfish variants
+// Amphibious (land + water): all Drakes, Siege Turtle
+export const AQUATIC_PET_IDS = new Set([
+  7, 12, 18, 19, 45,          // Drakes: Salamander, Marsh, Ice, River, Reef
+  21,                           // Shark
+  40,                           // Armor Fish
+  41, 42, 43,                   // Jellyfish: Blue, Red, Rainbow
+  66,                           // Siege Turtle
+]);
+
+// Slot sets for stat computation mode switching
+export const LAND_ONLY_SLOTS = new Set(["head", "mainhand1", "offhand1", "mainhand2", "offhand2"]);
+export const AQUATIC_SLOTS = new Set(["breather", "aquatic1", "aquatic2"]);
 
 export const PROFESSION_WEIGHT = {
   Elementalist: "light", Mesmer: "light", Necromancer: "light",

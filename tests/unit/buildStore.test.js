@@ -26,7 +26,7 @@ function makeBuild(overrides = {}) {
     profession: "Warrior",
     specializations: [],
     skills: { heal: null, utility: [null, null, null], elite: null },
-    equipment: { statPackage: "Berserker", runeSet: "Scholar", relic: "", food: "", utility: "" },
+    equipment: { statPackage: "Berserker", relic: "", food: "", utility: "" },
     tags: ["pve", "dps"],
     notes: "A test build",
     ...overrides,
@@ -536,14 +536,12 @@ describe("normalizeBuild — equipment", () => {
     const result = await store.upsertBuild(makeBuild({
       equipment: {
         statPackage: "Berserker",
-        runeSet: "Superior Rune of the Scholar",
         relic: "Relic of the Thief",
         food: "Bowl of Seaweed Salad",
         utility: "Superior Sharpening Stone",
       },
     }));
     expect(result.equipment.statPackage).toBe("Berserker");
-    expect(result.equipment.runeSet).toBe("Superior Rune of the Scholar");
     expect(result.equipment.relic).toBe("Relic of the Thief");
     expect(result.equipment.food).toBe("Bowl of Seaweed Salad");
     expect(result.equipment.utility).toBe("Superior Sharpening Stone");
@@ -551,7 +549,7 @@ describe("normalizeBuild — equipment", () => {
 
   test("handles missing equipment gracefully", async () => {
     const result = await store.upsertBuild(makeBuild({ equipment: null }));
-    expect(result.equipment).toEqual({ statPackage: "", runeSet: "", relic: "", food: "", utility: "" });
+    expect(result.equipment).toEqual({ statPackage: "", relic: "", food: "", utility: "", slots: {}, weapons: {}, runes: {}, sigils: {}, infusions: {}, enrichment: "" });
   });
 
   test("truncates statPackage to 80 chars", async () => {
@@ -559,10 +557,6 @@ describe("normalizeBuild — equipment", () => {
     expect(result.equipment.statPackage).toHaveLength(80);
   });
 
-  test("truncates runeSet to 120 chars", async () => {
-    const result = await store.upsertBuild(makeBuild({ equipment: { runeSet: "x".repeat(150) } }));
-    expect(result.equipment.runeSet).toHaveLength(120);
-  });
 });
 
 describe("normalizeBuild — timestamps", () => {
@@ -686,6 +680,42 @@ describe("BuildStore — concurrent operations", () => {
     }
     const builds = await store.listBuilds();
     expect(builds).toHaveLength(titles.length);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// normalizeBuild — underwaterSkills
+// ---------------------------------------------------------------------------
+
+describe("normalizeBuild — underwaterSkills", () => {
+  test("missing underwaterSkills defaults to null refs", async () => {
+    const { store, dir } = await makeTempStore();
+    try {
+      const result = await store.upsertBuild(makeBuild());
+      expect(result.underwaterSkills).toEqual({
+        heal: null,
+        utility: [null, null, null],
+        elite: null,
+      });
+    } finally {
+      await cleanupDir(dir);
+    }
+  });
+
+  test("underwaterSkills with valid refs are preserved", async () => {
+    const { store, dir } = await makeTempStore();
+    try {
+      const uwSkills = {
+        heal: { id: 5503, name: "Signet of Restoration", icon: "", description: "", slot: "Heal", type: "Heal", specialization: 0 },
+        utility: [null, null, null],
+        elite: null,
+      };
+      const result = await store.upsertBuild(makeBuild({ underwaterSkills: uwSkills }));
+      expect(result.underwaterSkills.heal.id).toBe(5503);
+      expect(result.underwaterSkills.heal.name).toBe("Signet of Restoration");
+    } finally {
+      await cleanupDir(dir);
+    }
   });
 });
 

@@ -3,6 +3,22 @@ import { WEAPON_STRENGTH_MIDPOINT, BOON_CONDITION_ICONS, BUFF_FACT_TYPES, FACT_T
 import { escapeHtml, tierLabel, normalizeText } from "./utils.js";
 import { computeEquipmentStats } from "./stats.js";
 
+/**
+ * Check if a skill is aquatic-only (weapon skill for a weapon with the Aquatic flag,
+ * and the skill itself does NOT have NoUnderwater — i.e. it's the underwater variant).
+ */
+function _isAquaticOnlySkill(kind, entity) {
+  if (kind !== "skill" || !entity) return false;
+  const wt = (entity.weaponType || "").toLowerCase();
+  if (!wt) return false;
+  // Only relevant for weapons that have the Aquatic flag
+  const profWeapons = state.activeCatalog?.professionWeapons || {};
+  const weaponData = profWeapons[wt];
+  if (!weaponData?.flags?.includes("Aquatic")) return false;
+  // The aquatic variant is the one WITHOUT NoUnderwater
+  return !(entity.flags || []).includes("NoUnderwater");
+}
+
 // DOM refs injected by the entry point via initDetailPanel() to keep this module
 // importable in Node.js test environments (no document.querySelector at module scope).
 let _el = { detailHost: null, hoverPreview: null, expandBtn: null };
@@ -65,9 +81,16 @@ export function renderDetailPanel() {
     const power = computed.Power || 1000;
     const precision = computed.Precision || 1000;
     const ferocity = computed.Ferocity || 0;
+    const isUnderwater = Boolean(state.editor.underwaterMode);
     const activeWeaponSet = Number(state.editor.activeWeaponSet) || 1;
-    const mhKey = activeWeaponSet === 2 ? "mainhand2" : "mainhand1";
-    const mhId = state.editor?.equipment?.weapons?.[mhKey] || "";
+    let mhId;
+    if (isUnderwater) {
+      const aquaticKey = activeWeaponSet === 2 ? "aquatic2" : "aquatic1";
+      mhId = state.editor?.equipment?.weapons?.[aquaticKey] || "";
+    } else {
+      const mhKey = activeWeaponSet === 2 ? "mainhand2" : "mainhand1";
+      mhId = state.editor?.equipment?.weapons?.[mhKey] || "";
+    }
     const weaponStrength = WEAPON_STRENGTH_MIDPOINT[mhId] || 952.5;
     const critChance = Math.min(1, (precision - 895) / 2100);
     const effectivePower = power * (1 + critChance * (0.5 + ferocity / 1500));
@@ -101,12 +124,12 @@ export function renderDetailPanel() {
             : `<div class="detail-card__icon-placeholder"></div>`}
           <div>
             <h3>${escapeHtml(detail.title)}</h3>
-            <p>${escapeHtml(detail.kindLabel)}${detail.hasSplit ? ' <span class="split-badge">WvW split</span>' : ''}</p>
+            <p>${escapeHtml(detail.kindLabel)}${detail.hasSplit ? ' <span class="split-badge">WvW split</span>' : ''}${detail.isAquaticOnly ? ' <span class="split-badge aquatic-badge">Aquatic</span>' : ''}</p>
           </div>
         </header>
         <section>
           <h4>In-Game Description</h4>
-          <p>${escapeHtml(detail.description || "No description.")}</p>
+          <p>${escapeHtml(detail.description || "No description.").replace(/\n/g, "<br>")}</p>
         </section>
         <section>
           <h4>Wiki</h4>
@@ -249,10 +272,11 @@ export function buildSkillCard(skill, kind, isChained = false, dmgStats = null) 
       ${icon ? `<img class="hover-preview__icon" src="${escapeHtml(icon)}" alt="${escapeHtml(skill.name || "Icon")}" onerror="this.onerror=null;this.src='${escapeHtml(String(skill.iconFallback || icon))}'" />` : "<div></div>"}
       <div>
         <h4 class="hover-preview__title">${escapeHtml(skill.name || "Unknown")}</h4>
-        <p class="hover-preview__meta">${escapeHtml(meta)}${skill.hasSplit ? ' <span class="split-badge">WvW split</span>' : ''}</p>
+        <p class="hover-preview__meta">${escapeHtml(meta)}${skill.hasSplit ? ' <span class="split-badge">WvW split</span>' : ''}${_isAquaticOnlySkill(kind, skill) ? ' <span class="split-badge aquatic-badge">Aquatic</span>' : ''}</p>
       </div>
     </div>
-    ${description ? `<p class="hover-preview__desc">${escapeHtml(description)}</p>` : (!factsItems.length ? `<p class="hover-preview__desc">No description available.</p>` : "")}
+    ${description ? `<p class="hover-preview__desc">${escapeHtml(description).replace(/\n/g, "<br>")}</p>` : (!factsItems.length && !skill.bonuses?.length ? `<p class="hover-preview__desc">No description available.</p>` : "")}
+    ${skill.bonuses?.length ? `<ul class="hover-preview__bonuses">${skill.bonuses.map((b, i) => `<li class="${i < (skill.activeBonusCount || 0) ? "hover-preview__bonus--active" : "hover-preview__bonus--inactive"}">(${i + 1}): ${escapeHtml(b)}</li>`).join("")}</ul>` : ""}
     ${factsItems.length ? `<ul class="hover-preview__facts">${factsItems.join("")}</ul>` : ""}
   `;
 }
@@ -269,9 +293,16 @@ export function showHoverPreview(kind, entity, x, y) {
     const power = computed.Power || 1000;
     const precision = computed.Precision || 1000;
     const ferocity = computed.Ferocity || 0;
+    const isUnderwater = Boolean(state.editor.underwaterMode);
     const activeWeaponSet = Number(state.editor.activeWeaponSet) || 1;
-    const mhKey = activeWeaponSet === 2 ? "mainhand2" : "mainhand1";
-    const mhId = state.editor?.equipment?.weapons?.[mhKey] || "";
+    let mhId;
+    if (isUnderwater) {
+      const aquaticKey = activeWeaponSet === 2 ? "aquatic2" : "aquatic1";
+      mhId = state.editor?.equipment?.weapons?.[aquaticKey] || "";
+    } else {
+      const mhKey = activeWeaponSet === 2 ? "mainhand2" : "mainhand1";
+      mhId = state.editor?.equipment?.weapons?.[mhKey] || "";
+    }
     const weaponStrength = WEAPON_STRENGTH_MIDPOINT[mhId] || 952.5;
     const critChance = Math.min(1, (precision - 895) / 2100);
     const effectivePower = power * (1 + critChance * (0.5 + ferocity / 1500));
@@ -343,6 +374,10 @@ export function getHoverMetaLine(kind, entity) {
     return handLabel ? `Weapon • ${handLabel}` : "Weapon";
   }
   if (kind === "equip-relic") return "Relic";
+  if (kind === "equip-rune") return "Rune";
+  if (kind === "equip-sigil") return "Sigil";
+  if (kind === "equip-infusion") return "Infusion";
+  if (kind === "equip-enrichment") return "Enrichment";
   if (kind === "spec") return entity?.elite ? "Elite Specialization" : "Specialization";
   const type = String(entity?.type || "").trim();
   const slot = String(entity?.slot || "").trim();
@@ -391,6 +426,7 @@ export async function selectDetail(kind, entity) {
     facts: resolveEntityFacts(entity),
     wiki: { loading: true, summary: "", url: "" },
     hasSplit: Boolean(entity.hasSplit),
+    isAquaticOnly: _isAquaticOnlySkill(kind, entity),
   };
   state.detail = detail;
   renderDetailPanel();

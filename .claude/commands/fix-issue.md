@@ -99,20 +99,32 @@ git ls-remote --heads origin fix/issue-$ARGUMENTS-<slug>
 - If it exists: `git checkout fix/issue-$ARGUMENTS-<slug>`
 - If not: `git checkout -b fix/issue-$ARGUMENTS-<slug>`
 
-### Step 7 — Fix the bug
+### Step 7 — Write test coverage
+
+**Before writing the fix**, add test(s) that reproduce the bug. The test(s) should:
+
+1. Fail before the fix is applied (confirming the bug exists)
+2. Pass after the fix is applied
+
+Place tests in the appropriate file under `tests/`. If no suitable file exists, create one following existing naming conventions (e.g. `tests/<module>.test.js`).
+
+Run `npm test` to confirm the new test(s) fail as expected. If they pass already, the test isn't capturing the bug — revise it.
+
+### Step 8 — Fix the bug
 
 Use `Edit` or `Write` to fix the root cause. Make targeted, minimal changes. Do not refactor unrelated code.
 
-### Step 8 — Run tests (max 2 attempts)
+### Step 9 — Run tests (max 2 attempts)
 
 ```bash
 npm test
 ```
 
+All tests (including the new ones from Step 7) must pass.
 If tests fail: revise the fix and run once more.
 If they still fail after 2 attempts: go to the **Failure Path** below.
 
-### Step 9 — Manual test checkpoint
+### Step 10 — Manual test checkpoint
 
 **Stop and ask the user to manually test the fix before proceeding.**
 
@@ -123,9 +135,9 @@ Tell the user:
 
 Then ask: "Please test this and let me know if the fix looks good, or if anything needs adjusting."
 
-**Wait for user confirmation before continuing.** If the user reports issues, revise the fix (go back to Step 7) and re-run tests.
+**Wait for user confirmation before continuing.** If the user reports issues, revise the fix (go back to Step 8) and re-run tests.
 
-### Step 10 — Commit + push
+### Step 11 — Commit + push
 
 ```bash
 git add src/ tests/
@@ -135,7 +147,7 @@ git push -u origin fix/issue-$ARGUMENTS-<slug>
 
 (Use the actual issue title fetched in Step 1, not the literal text `<issue title>`.)
 
-### Step 11 — Open PR (or find existing)
+### Step 12 — Open PR (or find existing)
 
 Check for an existing PR on this branch:
 
@@ -163,7 +175,7 @@ Closes #$ARGUMENTS" \
 
 Capture the PR URL.
 
-### Step 12 — Move to "Done" + close out
+### Step 13 — Move to "Done" + close out
 
 Use the item ID you captured in Step 3a.
 

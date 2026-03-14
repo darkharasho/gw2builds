@@ -14,10 +14,10 @@ const { state } = require("../../../src/renderer/modules/state");
 // Helpers — reset state.editor before each test
 // ---------------------------------------------------------------------------
 
-function makeEditor(slots = {}, food = "") {
+function makeEditor(slots = {}, food = "", utility = "") {
   return {
     profession: "Warrior",
-    equipment: { slots, food, weapons: {}, utility: "" },
+    equipment: { slots, food, utility, weapons: {} },
     specializations: [],
     skills: { healId: 0, utilityIds: [0, 0, 0], eliteId: 0 },
   };
@@ -179,9 +179,19 @@ describe("computeEquipmentStats — multiple slot accumulation", () => {
 });
 
 describe("computeEquipmentStats — food contributions", () => {
+  const mockFoodCatalog = {
+    foodById: new Map([
+      [91734, { id: 91734, name: "Peppercorn-Crusted Sous-Vide Steak", buff: "-10% Incoming Damage | +100 Power | +70 Ferocity" }],
+      [91690, { id: 91690, name: "Bowl of Fruit Salad with Mint Garnish", buff: "+10% Outgoing Healing | +100 Healing Power | +70 Concentration" }],
+    ]),
+  };
+
+  beforeEach(() => { state.upgradeCatalog = mockFoodCatalog; });
+  afterEach(() => { state.upgradeCatalog = null; });
+
   test("Peppercorn-Crusted Sous-Vide Steak adds Power and Ferocity", () => {
     // buff: "-10% Incoming Damage | +100 Power | +70 Ferocity"
-    state.editor = makeEditor({}, "Peppercorn-Crusted Sous-Vide Steak");
+    state.editor = makeEditor({}, "91734");
     const result = computeEquipmentStats();
     expect(result.Power).toBe(1000 + 100);
     expect(result.Ferocity).toBe(70);
@@ -189,14 +199,14 @@ describe("computeEquipmentStats — food contributions", () => {
 
   test("Bowl of Fruit Salad with Mint Garnish adds HealingPower and Concentration", () => {
     // buff: "+10% Outgoing Healing | +100 Healing Power | +70 Concentration"
-    state.editor = makeEditor({}, "Bowl of Fruit Salad with Mint Garnish");
+    state.editor = makeEditor({}, "91690");
     const result = computeEquipmentStats();
     expect(result.HealingPower).toBe(100);
     expect(result.Concentration).toBe(70);
   });
 
-  test("unknown food label adds nothing", () => {
-    state.editor = makeEditor({}, "Pizza That Does Not Exist");
+  test("unknown food ID adds nothing", () => {
+    state.editor = makeEditor({}, "99999999");
     const result = computeEquipmentStats();
     expect(result.Power).toBe(1000);
   });
@@ -209,7 +219,7 @@ describe("computeEquipmentStats — food contributions", () => {
 
   test("food stacks on top of equipment stats", () => {
     // Berserker's chest + food with +100 Power
-    state.editor = makeEditor({ chest: "Berserker's" }, "Peppercorn-Crusted Sous-Vide Steak");
+    state.editor = makeEditor({ chest: "Berserker's" }, "91734");
     const result = computeEquipmentStats();
     expect(result.Power).toBe(1000 + 134 + 100);
     expect(result.Ferocity).toBe(96 + 70);
@@ -226,5 +236,121 @@ describe("computeEquipmentStats — 4-stat combo accumulation", () => {
     expect(result.ConditionDamage).toBe(Math.round(96 * 0.889));
     expect(result.Precision).toBe(1000 + Math.round(96 * 0.889));
     expect(result.Expertise).toBe(Math.round(134 * 0.452));
+  });
+});
+
+describe("computeEquipmentStats — utility contributions", () => {
+  const mockUtilityCatalog = {
+    foodById: new Map(),
+    utilityById: new Map([
+      [9443, { id: 9443, name: "Superior Sharpening Stone",
+        buff: "Gain Power Equal to 3% of Your Precision | Gain Power Equal to 6% of Your Ferocity | +10% Experience from Kills" }],
+      [67530, { id: 67530, name: "Furious Sharpening Stone",
+        buff: "Gain Power Equal to 3% of Your Precision | Gain Ferocity Equal to 3% of Your Precision | +10% Experience from Kills" }],
+      [73191, { id: 73191, name: "Writ of Masterful Strength",
+        buff: "Gain 200 Power When Health above 90% | +10% Experience from Kills" }],
+    ]),
+  };
+
+  beforeEach(() => { state.upgradeCatalog = mockUtilityCatalog; });
+  afterEach(() => { state.upgradeCatalog = null; });
+
+  test("Superior Sharpening Stone converts Precision and Ferocity to Power", () => {
+    // base Precision = 1000, base Ferocity = 0
+    state.editor = makeEditor({}, "", "9443");
+    const result = computeEquipmentStats();
+    // Power += round(1000 * 0.03) + round(0 * 0.06) = 30
+    expect(result.Power).toBe(1000 + 30);
+  });
+
+  test("Furious Sharpening Stone converts Precision to Power and Ferocity", () => {
+    state.editor = makeEditor({}, "", "67530");
+    const result = computeEquipmentStats();
+    // Power += round(1000 * 0.03) = 30, Ferocity += round(1000 * 0.03) = 30
+    expect(result.Power).toBe(1000 + 30);
+    expect(result.Ferocity).toBe(30);
+  });
+
+  test("Writ of Masterful Strength adds flat Power", () => {
+    state.editor = makeEditor({}, "", "73191");
+    const result = computeEquipmentStats();
+    expect(result.Power).toBe(1000 + 200);
+  });
+
+  test("utility stacks on top of equipment stats", () => {
+    // Berserker's chest (Power 134, Precision 96, Ferocity 96) + Superior Sharpening Stone
+    state.editor = makeEditor({ chest: "Berserker's" }, "", "9443");
+    const result = computeEquipmentStats();
+    // Power += round((1000+96) * 0.03) + round(96 * 0.06) = 33 + 6 = 39
+    expect(result.Power).toBe(1000 + 134 + 33 + 6);
+  });
+
+  test("unknown utility ID adds nothing", () => {
+    state.editor = makeEditor({}, "", "99999999");
+    const result = computeEquipmentStats();
+    expect(result.Power).toBe(1000);
+  });
+
+  test("empty utility string adds nothing", () => {
+    state.editor = makeEditor({}, "", "");
+    const result = computeEquipmentStats();
+    expect(result.Power).toBe(1000);
+  });
+});
+
+describe("computeEquipmentStats — underwater mode", () => {
+  test("underwater mode uses breather instead of head", () => {
+    state.editor = {
+      ...makeEditor({
+        head: "Berserker's",
+        shoulders: "Berserker's",
+        chest: "Berserker's",
+        hands: "Berserker's",
+        legs: "Berserker's",
+        feet: "Berserker's",
+        breather: "Marauder's",
+      }),
+      underwaterMode: true,
+      underwaterSkills: { healId: 0, utilityIds: [0, 0, 0], eliteId: 0 },
+    };
+    const result = computeEquipmentStats();
+    expect(result.Vitality).toBeGreaterThan(1000);
+  });
+
+  test("underwater mode excludes land weapon stats", () => {
+    state.editor = {
+      ...makeEditor({
+        mainhand1: "Berserker's",
+      }),
+      underwaterMode: true,
+      underwaterSkills: { healId: 0, utilityIds: [0, 0, 0], eliteId: 0 },
+    };
+    const result = computeEquipmentStats();
+    expect(result.Power).toBe(1000);
+  });
+
+  test("underwater mode includes aquatic weapon stats", () => {
+    state.editor = {
+      ...makeEditor({
+        aquatic1: "Berserker's",
+      }),
+      underwaterMode: true,
+      underwaterSkills: { healId: 0, utilityIds: [0, 0, 0], eliteId: 0 },
+    };
+    const result = computeEquipmentStats();
+    expect(result.Power).toBeGreaterThan(1000);
+  });
+
+  test("land mode still excludes aquatic slots (existing behavior)", () => {
+    state.editor = {
+      ...makeEditor({
+        aquatic1: "Berserker's",
+        breather: "Berserker's",
+      }),
+      underwaterMode: false,
+      underwaterSkills: { healId: 0, utilityIds: [0, 0, 0], eliteId: 0 },
+    };
+    const result = computeEquipmentStats();
+    expect(result.Power).toBe(1000);
   });
 });

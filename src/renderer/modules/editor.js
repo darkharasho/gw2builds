@@ -3,7 +3,29 @@
 import { state, createEmptyEditor } from "./state.js";
 import { parseTags, simplifyTrait, simplifySkill } from "./utils.js";
 import { getMajorTraitsByTier } from "./specializations.js";
-import { ANTIQUARY_PROLIFIC_PLUNDERER_TRAIT_ID } from "./constants.js";
+import { ANTIQUARY_PROLIFIC_PLUNDERER_TRAIT_ID, UNDERWATER_BLOCKED_LEGENDS } from "./constants.js";
+
+// Normalize sigil array to correct shape for a given slot key.
+export function normalizeSigilArray(value, slotKey) {
+  const isOffhand = slotKey.startsWith("offhand");
+  const expectedLen = isOffhand ? 1 : 2;
+  if (!Array.isArray(value)) return Array(expectedLen).fill("");
+  const arr = value.slice(0, expectedLen).map((v) => String(v || ""));
+  while (arr.length < expectedLen) arr.push("");
+  return arr;
+}
+
+// Normalize infusion value — arrays for multi-slot items (back, rings), strings otherwise.
+export const INFUSION_ARRAY_SLOTS = { back: 2, ring1: 3, ring2: 3 };
+
+export function normalizeInfusionValue(value, slotKey) {
+  const expectedLen = INFUSION_ARRAY_SLOTS[slotKey];
+  if (!expectedLen) return String(value || "");
+  if (!Array.isArray(value)) return Array(expectedLen).fill("");
+  const arr = value.slice(0, expectedLen).map((v) => String(v || ""));
+  while (arr.length < expectedLen) arr.push("");
+  return arr;
+}
 
 // ---------------------------------------------------------------------------
 // Callback injection (avoids circular deps with render-pages.js / skills.js)
@@ -213,6 +235,28 @@ export function enforceEditorConsistency(options = {}) {
     });
   }
 
+  if (state.editor.underwaterSkills) {
+    const uwHealId = Number(state.editor.underwaterSkills.healId) || 0;
+    const uwEliteId = Number(state.editor.underwaterSkills.eliteId) || 0;
+    const uwUtilityIds = state.editor.underwaterSkills.utilityIds || [0, 0, 0];
+
+    if (isRevenant) {
+      const activeLegend = state.editor.selectedLegends?.[state.editor.activeLegendSlot];
+      if (UNDERWATER_BLOCKED_LEGENDS.has(activeLegend)) {
+        state.editor.underwaterSkills = { healId: 0, utilityIds: [0, 0, 0], eliteId: 0 };
+      }
+    } else {
+      const skillOptions = _getSkillOptionsByType(catalog, state.editor.specializations, true);
+      const isValidUW = (id, list) => !id || list.some((s) => s.id === id);
+
+      if (!isValidUW(uwHealId, skillOptions.heal || [])) state.editor.underwaterSkills.healId = 0;
+      if (!isValidUW(uwEliteId, skillOptions.elite || [])) state.editor.underwaterSkills.eliteId = 0;
+      for (let i = 0; i < 3; i++) {
+        if (!isValidUW(uwUtilityIds[i], skillOptions.utility || [])) state.editor.underwaterSkills.utilityIds[i] = 0;
+      }
+    }
+  }
+
   // Weaver: primary (mainhand) is always set; secondary (offhand) can be any element including
   // the same as primary, producing a single-attunement skill bar (identical to core Ele slot 3).
   const weaverEliteId = 56;
@@ -245,11 +289,22 @@ export function enforceEditorConsistency(options = {}) {
       if (wData) {
         if (isOffhand) valid = wData.flags.includes("Offhand");
         else if (isMainhand) valid = wData.flags.includes("Mainhand") || wData.flags.includes("TwoHand");
-        else valid = true; // aquatic — keep as-is (no per-profession filtering in picker)
+        else {
+          // Aquatic slot: weapon must have the Aquatic flag AND at least one non-NoUnderwater skill
+          valid = wData.flags.includes("Aquatic") && wData.skills.some((ref) => {
+            const skill = catalog.weaponSkillById?.get(ref.id);
+            return skill && !(skill.flags || []).includes("NoUnderwater");
+          });
+        }
       }
       if (!valid) {
         equip.weapons[key] = "";
         if (equip.slots?.[key] !== undefined) equip.slots[key] = "";
+        // Clear associated upgrades
+        if (equip.sigils?.[key]) {
+          equip.sigils[key] = key.startsWith("offhand") ? [""] : ["", ""];
+        }
+        if (equip.infusions?.[key] !== undefined) equip.infusions[key] = "";
       }
     }
   }
@@ -327,12 +382,15 @@ export function computeEditorSignature() {
     notes: String(editor.notes || ""),
     equipment: {
       statPackage: String(editor.equipment?.statPackage || ""),
-      runeSet: String(editor.equipment?.runeSet || ""),
       relic: String(editor.equipment?.relic || ""),
       food: String(editor.equipment?.food || ""),
       utility: String(editor.equipment?.utility || ""),
       slots: editor.equipment?.slots || {},
       weapons: editor.equipment?.weapons || {},
+      runes: editor.equipment?.runes || {},
+      sigils: editor.equipment?.sigils || {},
+      infusions: editor.equipment?.infusions || {},
+      enrichment: String(editor.equipment?.enrichment || ""),
     },
     specializations,
     skills: {
@@ -340,6 +398,16 @@ export function computeEditorSignature() {
       utilityIds,
       eliteId: Number(editor.skills?.eliteId) || 0,
     },
+    underwaterSkills: {
+      healId: Number(editor.underwaterSkills?.healId) || 0,
+      utilityIds: Array.isArray(editor.underwaterSkills?.utilityIds)
+        ? editor.underwaterSkills.utilityIds.slice(0, 3).map((v) => Number(v) || 0)
+        : [0, 0, 0],
+      eliteId: Number(editor.underwaterSkills?.eliteId) || 0,
+    },
+    selectedUnderwaterLegends: Array.isArray(editor.selectedUnderwaterLegends)
+      ? editor.selectedUnderwaterLegends.slice(0, 2).map(String)
+      : ["", ""],
     gameMode: String(editor.gameMode || "pve"),
   };
   return JSON.stringify(payload);
@@ -362,6 +430,7 @@ export function parseBuildImportPayload(text) {
   const source = parsed.build && typeof parsed.build === "object" ? parsed.build : parsed;
   const profession = resolveImportedProfession(source);
   const skills = normalizeImportedSkills(source);
+  const underwaterSkills = normalizeImportedSkills({ skills: source.underwaterSkills || {} });
   const specializations = normalizeImportedSpecializations(source.specializations);
   const notes = String(source.notes || source.description || "");
   const tags = Array.isArray(source.tags)
@@ -377,7 +446,6 @@ export function parseBuildImportPayload(text) {
     notes,
     equipment: {
       statPackage: String(source.equipment?.statPackage || source.stats || ""),
-      runeSet: String(source.equipment?.runeSet || source.runes || ""),
       relic: String(source.equipment?.relic || ""),
       food: String(source.equipment?.food || ""),
       utility: String(source.equipment?.utility || ""),
@@ -410,9 +478,34 @@ export function parseBuildImportPayload(text) {
         aquatic1:  String(source.equipment?.weapons?.aquatic1  || ""),
         aquatic2:  String(source.equipment?.weapons?.aquatic2  || ""),
       },
+      runes: {
+        head: String(source.equipment?.runes?.head || ""),
+        shoulders: String(source.equipment?.runes?.shoulders || ""),
+        chest: String(source.equipment?.runes?.chest || ""),
+        hands: String(source.equipment?.runes?.hands || ""),
+        legs: String(source.equipment?.runes?.legs || ""),
+        feet: String(source.equipment?.runes?.feet || ""),
+        breather: String(source.equipment?.runes?.breather || ""),
+      },
+      sigils: {
+        mainhand1: normalizeSigilArray(source.equipment?.sigils?.mainhand1, "mainhand1"),
+        offhand1: normalizeSigilArray(source.equipment?.sigils?.offhand1, "offhand1"),
+        mainhand2: normalizeSigilArray(source.equipment?.sigils?.mainhand2, "mainhand2"),
+        offhand2: normalizeSigilArray(source.equipment?.sigils?.offhand2, "offhand2"),
+        aquatic1: normalizeSigilArray(source.equipment?.sigils?.aquatic1, "aquatic1"),
+        aquatic2: normalizeSigilArray(source.equipment?.sigils?.aquatic2, "aquatic2"),
+      },
+      infusions: Object.fromEntries(
+        Object.keys(createEmptyEditor().equipment.infusions).map((key) => [
+          key,
+          normalizeInfusionValue(source.equipment?.infusions?.[key], key),
+        ])
+      ),
+      enrichment: String(source.equipment?.enrichment || ""),
     },
     specializations,
     skills,
+    underwaterSkills,
     gameMode: String(source.gameMode || "pve"),
   };
 }
@@ -484,7 +577,6 @@ export async function loadBuildIntoEditor(build, options = {}) {
     notes: String(build.notes || ""),
     equipment: {
       statPackage: String(build.equipment?.statPackage || ""),
-      runeSet: String(build.equipment?.runeSet || ""),
       relic: String(build.equipment?.relic || ""),
       food: String(build.equipment?.food || ""),
       utility: String(build.equipment?.utility || ""),
@@ -517,6 +609,30 @@ export async function loadBuildIntoEditor(build, options = {}) {
         aquatic1:  String(build.equipment?.weapons?.aquatic1  || ""),
         aquatic2:  String(build.equipment?.weapons?.aquatic2  || ""),
       },
+      runes: {
+        head: String(build.equipment?.runes?.head || ""),
+        shoulders: String(build.equipment?.runes?.shoulders || ""),
+        chest: String(build.equipment?.runes?.chest || ""),
+        hands: String(build.equipment?.runes?.hands || ""),
+        legs: String(build.equipment?.runes?.legs || ""),
+        feet: String(build.equipment?.runes?.feet || ""),
+        breather: String(build.equipment?.runes?.breather || ""),
+      },
+      sigils: {
+        mainhand1: normalizeSigilArray(build.equipment?.sigils?.mainhand1, "mainhand1"),
+        offhand1: normalizeSigilArray(build.equipment?.sigils?.offhand1, "offhand1"),
+        mainhand2: normalizeSigilArray(build.equipment?.sigils?.mainhand2, "mainhand2"),
+        offhand2: normalizeSigilArray(build.equipment?.sigils?.offhand2, "offhand2"),
+        aquatic1: normalizeSigilArray(build.equipment?.sigils?.aquatic1, "aquatic1"),
+        aquatic2: normalizeSigilArray(build.equipment?.sigils?.aquatic2, "aquatic2"),
+      },
+      infusions: Object.fromEntries(
+        Object.keys(createEmptyEditor().equipment.infusions).map((key) => [
+          key,
+          normalizeInfusionValue(build.equipment?.infusions?.[key], key),
+        ])
+      ),
+      enrichment: String(build.equipment?.enrichment || ""),
     },
     specializations: Array.isArray(build.specializations)
       ? build.specializations.slice(0, 3).map((entry) => ({
@@ -535,6 +651,17 @@ export async function loadBuildIntoEditor(build, options = {}) {
         : [0, 0, 0],
       eliteId: Number(build.skills?.elite?.id) || 0,
     },
+    underwaterSkills: (() => {
+      const uwSkills = build.underwaterSkills || {};
+      return {
+        healId: Number(uwSkills.heal?.id) || 0,
+        utilityIds: Array.isArray(uwSkills.utility)
+          ? uwSkills.utility.slice(0, 3).map((s) => Number(s?.id) || 0)
+          : [0, 0, 0],
+        eliteId: Number(uwSkills.elite?.id) || 0,
+      };
+    })(),
+    underwaterMode: false,
     activeAttunement: "",
     activeAttunement2: "",
     activeKit: 0,
@@ -545,6 +672,9 @@ export async function loadBuildIntoEditor(build, options = {}) {
       : [0, 0, 0],
     selectedLegends: Array.isArray(build.selectedLegends)
       ? build.selectedLegends.slice(0, 2).map(String)
+      : ["", ""],
+    selectedUnderwaterLegends: Array.isArray(build.selectedUnderwaterLegends)
+      ? build.selectedUnderwaterLegends.slice(0, 2).map(String)
       : ["", ""],
     activeLegendSlot: Number(build.activeLegendSlot) || 0,
     selectedPets: {
@@ -624,9 +754,16 @@ export function serializeEditorToBuild() {
       utility,
       elite,
     },
+    underwaterSkills: {
+      heal: simplifySkill(skillById.get(Number(state.editor.underwaterSkills?.healId))),
+      utility: (state.editor.underwaterSkills?.utilityIds || [])
+        .slice(0, 3)
+        .map((skillId) => simplifySkill(skillById.get(Number(skillId))))
+        .filter(Boolean),
+      elite: simplifySkill(skillById.get(Number(state.editor.underwaterSkills?.eliteId))),
+    },
     equipment: {
       statPackage: String(state.editor.equipment.statPackage || ""),
-      runeSet: String(state.editor.equipment.runeSet || ""),
       relic: String(state.editor.equipment.relic || ""),
       food: String(state.editor.equipment.food || ""),
       utility: String(state.editor.equipment.utility || ""),
@@ -659,6 +796,21 @@ export function serializeEditorToBuild() {
         aquatic1:  String(state.editor.equipment.weapons?.aquatic1  || ""),
         aquatic2:  String(state.editor.equipment.weapons?.aquatic2  || ""),
       },
+      runes: { ...state.editor.equipment.runes },
+      sigils: {
+        mainhand1: [...(state.editor.equipment.sigils?.mainhand1 || ["", ""])],
+        offhand1: [...(state.editor.equipment.sigils?.offhand1 || [""])],
+        mainhand2: [...(state.editor.equipment.sigils?.mainhand2 || ["", ""])],
+        offhand2: [...(state.editor.equipment.sigils?.offhand2 || [""])],
+        aquatic1: [...(state.editor.equipment.sigils?.aquatic1 || ["", ""])],
+        aquatic2: [...(state.editor.equipment.sigils?.aquatic2 || ["", ""])],
+      },
+      infusions: Object.fromEntries(
+        Object.entries(state.editor.equipment.infusions || {}).map(([key, val]) =>
+          [key, Array.isArray(val) ? [...val] : String(val || "")]
+        )
+      ),
+      enrichment: String(state.editor.equipment.enrichment || ""),
     },
     tags: parseTags(state.editor.tagsText),
     notes: String(state.editor.notes || ""),
@@ -667,6 +819,9 @@ export function serializeEditorToBuild() {
       : [0, 0, 0],
     selectedLegends: Array.isArray(state.editor.selectedLegends)
       ? state.editor.selectedLegends.slice(0, 2).map(String)
+      : ["", ""],
+    selectedUnderwaterLegends: Array.isArray(state.editor.selectedUnderwaterLegends)
+      ? state.editor.selectedUnderwaterLegends.slice(0, 2).map(String)
       : ["", ""],
     activeLegendSlot: Number(state.editor.activeLegendSlot) || 0,
     selectedPets: {

@@ -46,3 +46,38 @@ describe("renderer mechanics selection — Engineer core vs elite F skills", () 
     expect(amalgam.signatures).toEqual(core.signatures);
   });
 });
+
+describe("renderer mechanics selection — Mechanist underwater mode", () => {
+  const resolve = setupMechanicsHarness("Engineer");
+
+  test("Mechanist underwater returns only Depth Charges (63210) at F4", async () => {
+    const mechanist = await resolve({ specId: 70, underwaterMode: true });
+    expect(mechanist.signatures).toEqual(["63210"]);
+  });
+
+  test("Mechanist underwater has exactly one F-slot instead of three mech command slots", async () => {
+    const terrestrial = await resolve({ specId: 70 });
+    const underwater = await resolve({ specId: 70, underwaterMode: true });
+    expect(terrestrial.result.mechSlots).toHaveLength(3);
+    expect(underwater.result.mechSlots).toHaveLength(1);
+  });
+
+  test("Mechanist underwater F-slot has fKeyLabel F4", async () => {
+    const mechanist = await resolve({ specId: 70, underwaterMode: true });
+    expect(mechanist.result.mechSlots[0].fKeyLabel).toBe("F4");
+  });
+
+  test("Mechanist underwater F-slot does not contain any toolbelt-derived skills", async () => {
+    const mechanist = await resolve({ specId: 70, underwaterMode: true });
+    expect(mechanist.signatures).not.toContain("6092");
+    expect(mechanist.signatures).not.toContain("6077");
+    expect(mechanist.signatures).not.toContain("6118");
+    expect(mechanist.signatures).not.toContain("6119");
+  });
+
+  test("core Engineer underwater does not change toolbelt F slot count", async () => {
+    const terrestrial = await resolve({ specId: 0 });
+    const underwater = await resolve({ specId: 0, underwaterMode: true });
+    expect(underwater.result.mechSlots).toHaveLength(terrestrial.result.mechSlots.length);
+  });
+});

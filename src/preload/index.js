@@ -26,6 +26,7 @@ contextBridge.exposeInMainWorld("desktopApi", {
   listProfessions: () => ipcRenderer.invoke("gw2:list-professions"),
   getProfessionCatalog: (professionId, gameMode) =>
     ipcRenderer.invoke("gw2:get-profession-catalog", professionId, gameMode),
+  getUpgradeCatalog: () => ipcRenderer.invoke("gw2:get-upgrade-catalog"),
   getWikiSummary: (title) => ipcRenderer.invoke("wiki:get-summary", title),
   getWikiRelatedData: (title) => ipcRenderer.invoke("wiki:get-related-data", title),
   showError: (title, body) => ipcRenderer.invoke("dialog:error", title, body),

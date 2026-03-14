@@ -37,6 +37,10 @@ const KNOWN_SKILL_FACTS_OVERRIDES = new Map([
 // Some GW2 skills have specialization: null in /v2/skills despite belonging to an elite spec,
 // or their spec is inconsistent between API endpoints. Override the specialization for known skills.
 const KNOWN_SKILL_SPEC_OVERRIDES = new Map([
+  // Warrior land spear burst (Harrier's Toss) — API tags as Paragon (74) or Spellbreaker (61)
+  // but land spear is available to all Warriors. Override to spec 0 (core).
+  [73024, 0], [72911, 0], [73042, 0], [73006, 0],  // Harrier's Toss (spec 74 → 0)
+  [73014, 0],  // Harrier's Toss (spec 61 → 0)
   [30792, 34],  // Reaper's Shroud → Reaper
   [62567, 64],  // Harbinger Shroud → Harbinger
   [77238, 76],  // Ritualist's Shroud → Ritualist (API returns spec=0)
@@ -79,7 +83,7 @@ const KNOWN_SKILL_SPEC_OVERRIDES = new Map([
   // Paragon (spec 74) burst skills — API returns spec=null for these weapon-specific variants.
   // Without overrides they pass the spec filter for all warrior builds (lockSpec=0 → !lockSpec=true).
   [71922, 74], [71932, 74], [71950, 74], [72029, 74],  // Path to Victory variants
-  [72911, 74], [73006, 74], [73024, 74], [73042, 74],  // Harrier's Toss variants
+  // Harrier's Toss variants moved to top of map (overridden to spec 0 for underwater mode)
 ]);
 
 // The GW2 profession API assigns incorrect slot values to Weaver's 4 attunement button skills.

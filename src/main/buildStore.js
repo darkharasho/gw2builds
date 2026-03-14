@@ -102,6 +102,7 @@ function normalizeBuild(input, fallbackCreatedAt) {
     profession: asString(input.profession || input.professionName, 80),
     specializations: normalizeSpecializations(input.specializations),
     skills: normalizeSkills(input.skills),
+    underwaterSkills: normalizeSkills(input.underwaterSkills),
     equipment: normalizeEquipment(input.equipment),
     tags: normalizeTags(input.tags),
     notes: asString(input.notes, 12000),
@@ -174,12 +175,45 @@ function normalizeSkillRef(value) {
 
 function normalizeEquipment(value) {
   const equipment = value && typeof value === "object" ? value : {};
+  const normalizeStringMap = (obj) => {
+    if (!obj || typeof obj !== "object") return {};
+    const out = {};
+    for (const [k, v] of Object.entries(obj)) out[k] = asString(v, 120);
+    return out;
+  };
+  const normalizeSigils = (obj) => {
+    if (!obj || typeof obj !== "object") return {};
+    const out = {};
+    for (const [k, v] of Object.entries(obj)) {
+      out[k] = Array.isArray(v) ? v.map((s) => asString(s, 40)) : [];
+    }
+    return out;
+  };
+  const normalizeInfusions = (obj) => {
+    if (!obj || typeof obj !== "object") return {};
+    const arraySlots = { back: 2, ring1: 3, ring2: 3 };
+    const out = {};
+    for (const [k, v] of Object.entries(obj)) {
+      if (arraySlots[k]) {
+        const arr = Array.isArray(v) ? v : [];
+        out[k] = Array.from({ length: arraySlots[k] }, (_, i) => asString(arr[i], 40));
+      } else {
+        out[k] = asString(v, 120);
+      }
+    }
+    return out;
+  };
   return {
     statPackage: asString(equipment.statPackage, 80),
-    runeSet: asString(equipment.runeSet, 120),
     relic: asString(equipment.relic, 120),
     food: asString(equipment.food, 120),
     utility: asString(equipment.utility, 120),
+    slots: normalizeStringMap(equipment.slots),
+    weapons: normalizeStringMap(equipment.weapons),
+    runes: normalizeStringMap(equipment.runes),
+    sigils: normalizeSigils(equipment.sigils),
+    infusions: normalizeInfusions(equipment.infusions),
+    enrichment: asString(equipment.enrichment, 40),
   };
 }
 

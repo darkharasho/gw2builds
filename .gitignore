@@ -3,4 +3,5 @@ dist/
 .DS_Store
 .env
 .worktrees/
+.superpowers/
 dist_out/
