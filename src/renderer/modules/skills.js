@@ -947,7 +947,9 @@ export function renderSkills() {
 
   const mhKey = activeWeaponSet === 2 ? "mainhand2" : "mainhand1";
   const ohKey = activeWeaponSet === 2 ? "offhand2" : "offhand1";
-  const hasWeaponSet2 = !!(equippedWeapons.mainhand2 || equippedWeapons.offhand2);
+  const hasWeaponSet2 = isUnderwater
+    ? !!equippedWeapons.aquatic2
+    : !!(equippedWeapons.mainhand2 || equippedWeapons.offhand2);
 
   const mechanicState = buildMechanicSlotsForRender({
     catalog,
@@ -1414,8 +1416,8 @@ export function renderSkills() {
   swapBtn.className = "weapon-swap-btn" + (activeWeaponSet === 2 ? " weapon-swap-btn--active" : "");
   swapBtn.disabled = !hasWeaponSet2;
   swapBtn.title = hasWeaponSet2
-    ? `Switch to weapon set ${activeWeaponSet === 1 ? 2 : 1}`
-    : "No second weapon set equipped";
+    ? `Switch to ${isUnderwater ? "aquatic" : "weapon set"} ${activeWeaponSet === 1 ? 2 : 1}`
+    : isUnderwater ? "No second aquatic weapon equipped" : "No second weapon set equipped";
   swapBtn.innerHTML = `<svg viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     <polyline points="2,3.5 13,3.5"/><polyline points="10,1 13,3.5 10,6"/>
     <polyline points="16,10.5 5,10.5"/><polyline points="8,8 5,10.5 8,13"/>
