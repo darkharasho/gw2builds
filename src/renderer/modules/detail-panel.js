@@ -65,9 +65,16 @@ export function renderDetailPanel() {
     const power = computed.Power || 1000;
     const precision = computed.Precision || 1000;
     const ferocity = computed.Ferocity || 0;
+    const isUnderwater = Boolean(state.editor.underwaterMode);
     const activeWeaponSet = Number(state.editor.activeWeaponSet) || 1;
-    const mhKey = activeWeaponSet === 2 ? "mainhand2" : "mainhand1";
-    const mhId = state.editor?.equipment?.weapons?.[mhKey] || "";
+    let mhId;
+    if (isUnderwater) {
+      const aquaticKey = activeWeaponSet === 2 ? "aquatic2" : "aquatic1";
+      mhId = state.editor?.equipment?.weapons?.[aquaticKey] || "";
+    } else {
+      const mhKey = activeWeaponSet === 2 ? "mainhand2" : "mainhand1";
+      mhId = state.editor?.equipment?.weapons?.[mhKey] || "";
+    }
     const weaponStrength = WEAPON_STRENGTH_MIDPOINT[mhId] || 952.5;
     const critChance = Math.min(1, (precision - 895) / 2100);
     const effectivePower = power * (1 + critChance * (0.5 + ferocity / 1500));
@@ -270,9 +277,16 @@ export function showHoverPreview(kind, entity, x, y) {
     const power = computed.Power || 1000;
     const precision = computed.Precision || 1000;
     const ferocity = computed.Ferocity || 0;
+    const isUnderwater = Boolean(state.editor.underwaterMode);
     const activeWeaponSet = Number(state.editor.activeWeaponSet) || 1;
-    const mhKey = activeWeaponSet === 2 ? "mainhand2" : "mainhand1";
-    const mhId = state.editor?.equipment?.weapons?.[mhKey] || "";
+    let mhId;
+    if (isUnderwater) {
+      const aquaticKey = activeWeaponSet === 2 ? "aquatic2" : "aquatic1";
+      mhId = state.editor?.equipment?.weapons?.[aquaticKey] || "";
+    } else {
+      const mhKey = activeWeaponSet === 2 ? "mainhand2" : "mainhand1";
+      mhId = state.editor?.equipment?.weapons?.[mhKey] || "";
+    }
     const weaponStrength = WEAPON_STRENGTH_MIDPOINT[mhId] || 952.5;
     const critChance = Math.min(1, (precision - 895) / 2100);
     const effectivePower = power * (1 + critChance * (0.5 + ferocity / 1500));
