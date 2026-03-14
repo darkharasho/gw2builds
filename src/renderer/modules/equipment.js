@@ -297,10 +297,11 @@ export function renderEquipmentPanel() {
       const weight = PROFESSION_WEIGHT[prof];
       return weight ? (LEGENDARY_ARMOR_ICONS[weight]?.[slotDef.key] ?? null) : null;
     })();
+    const slotIcon = (currentCombo && slotDef.filledIcon) ? slotDef.filledIcon : slotDef.icon;
     const imgSrc = legendaryUrl
       ? legendaryUrl
-      : slotDef.icon
-        ? (slotDef.icon.startsWith("https://") ? slotDef.icon : `https://wiki.guildwars2.com/wiki/Special:FilePath/${slotDef.icon}`)
+      : slotIcon
+        ? (slotIcon.startsWith("https://") ? slotIcon : `https://wiki.guildwars2.com/wiki/Special:FilePath/${slotIcon}`)
         : null;
     if (imgSrc) {
       const img = document.createElement("img");

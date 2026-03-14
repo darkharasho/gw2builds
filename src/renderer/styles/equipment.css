@@ -2,7 +2,7 @@
 /* Equipment Panel */
 .equip-layout {
   display: grid;
-  grid-template-columns: 340px 1fr 340px;
+  grid-template-columns: 340px 1fr 370px;
   gap: 0;
   align-items: stretch;
 }
@@ -181,6 +181,12 @@
   padding: 6px 4px 5px;
   text-align: center;
   gap: 4px;
+  min-width: 0;
+}
+
+.equip-slot--compact .equip-upgrade-slots {
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .equip-slot--compact .equip-slot__icon {
@@ -322,6 +328,11 @@
 /* Legendary armor icons are full-art squares */
 .equip-slot__icon--filled:not(.equip-slot__icon--weapon) img {
   object-fit: cover;
+}
+
+/* Trinket icons (render-service) should not crop */
+.equip-slot--compact .equip-slot__icon--filled img {
+  object-fit: contain;
 }
 
 .equip-slot__icon--filled {
@@ -692,6 +703,7 @@
   display: flex;
   gap: 3px;
   margin-left: auto;
+  margin-right: 4px;
   flex-shrink: 0;
 }
 

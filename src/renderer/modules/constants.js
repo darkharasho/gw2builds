@@ -105,12 +105,12 @@ export const WEAPON_STRENGTH_MIDPOINT = {
 };
 
 export const EQUIP_TRINKET_SLOTS = [
-  { key: "back",       label: "Back",        icon: "Back_slot.png" },
-  { key: "amulet",     label: "Amulet",      icon: "Amulet_slot.png" },
-  { key: "ring1",      label: "Ring 1",      icon: "Trinket_slot.png" },
-  { key: "ring2",      label: "Ring 2",      icon: "Trinket_slot.png" },
-  { key: "accessory1", label: "Accessory 1", icon: "Trinket_slot.png" },
-  { key: "accessory2", label: "Accessory 2", icon: "Trinket_slot.png" },
+  { key: "back",       label: "Back",        icon: "Back_slot.png",    filledIcon: "https://render.guildwars2.com/file/5EBEA1A467236237FCBACDC09969647956C4A371/1701118.png" },
+  { key: "amulet",     label: "Amulet",      icon: "Amulet_slot.png",  filledIcon: "https://render.guildwars2.com/file/4944FD054FD80D805B0BFFB2DA60363A7DD31FDB/1614376.png" },
+  { key: "ring1",      label: "Ring 1",      icon: "Trinket_slot.png", filledIcon: "https://render.guildwars2.com/file/EAA61AAF9BEF031104FD063C0A301A520EF5F5E6/1614682.png" },
+  { key: "ring2",      label: "Ring 2",      icon: "Trinket_slot.png", filledIcon: "https://render.guildwars2.com/file/EAA61AAF9BEF031104FD063C0A301A520EF5F5E6/1614682.png" },
+  { key: "accessory1", label: "Accessory 1", icon: "Trinket_slot.png", filledIcon: "https://render.guildwars2.com/file/741D3F520D1DFD7BB9A35AD50FC75152D2B3CA6B/1614709.png" },
+  { key: "accessory2", label: "Accessory 2", icon: "Trinket_slot.png", filledIcon: "https://render.guildwars2.com/file/741D3F520D1DFD7BB9A35AD50FC75152D2B3CA6B/1614709.png" },
 ];
 
 export const EQUIP_UNDERWATER_SLOTS = [
