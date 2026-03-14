@@ -115,6 +115,23 @@ function _buildSplitMatchTables(baseFacts, splitFacts) {
     }
   }
 
+  // Pass 1.5: cross-type exact text match — the wiki scraper often assigns
+  // type "Buff" to facts that the API types as Number, Percent, Time, etc.
+  // Match by exact text equality regardless of type mismatch.
+  for (let si = 0; si < splitFacts.length; si++) {
+    if (splitToBase.has(si)) continue;
+    const sfText = (splitFacts[si].text || "").toLowerCase().trim();
+    if (!sfText) continue;
+    for (let bi = 0; bi < baseFacts.length; bi++) {
+      if (baseToSplit.has(bi)) continue;
+      if ((baseFacts[bi].text || "").toLowerCase().trim() === sfText) {
+        baseToSplit.set(bi, si);
+        splitToBase.set(si, bi);
+        break;
+      }
+    }
+  }
+
   // Pass 2: type-group positional for remaining unmatched facts
   const unmatchedByGroup = {};
   for (let si = 0; si < splitFacts.length; si++) {
@@ -136,6 +153,31 @@ function _buildSplitMatchTables(baseFacts, splitFacts) {
     }
   }
 
+  // Pass 3: keyword overlap — the wiki scraper rewrites fact text (e.g.
+  // "Maximum Stacks" → "Maximum count", "Number of Allied Targets" → "Allied targets").
+  // Match remaining unmatched facts if they share at least one significant word (>3 chars).
+  // Score by number of shared words and pick the best match to avoid false positives.
+  const _stopWords = new Set(["the", "and", "per", "for", "with", "from", "based", "gain"]);
+  function _keywords(text) {
+    return (text || "").toLowerCase().split(/\s+/).filter((w) => w.length > 3 && !_stopWords.has(w));
+  }
+  for (let si = 0; si < splitFacts.length; si++) {
+    if (splitToBase.has(si)) continue;
+    const sfKw = _keywords(splitFacts[si].text);
+    if (!sfKw.length) continue;
+    let bestBi = -1, bestScore = 0;
+    for (let bi = 0; bi < baseFacts.length; bi++) {
+      if (baseToSplit.has(bi)) continue;
+      const bfKw = _keywords(baseFacts[bi].text);
+      const shared = sfKw.filter((w) => bfKw.includes(w)).length;
+      if (shared > bestScore) { bestScore = shared; bestBi = bi; }
+    }
+    if (bestScore > 0) {
+      baseToSplit.set(bestBi, si);
+      splitToBase.set(si, bestBi);
+    }
+  }
+
   return { baseToSplit, splitToBase };
 }
 
@@ -152,6 +194,37 @@ function _mergeSplitValues(bf, sf) {
     merged.value = sf.distance;
   }
   return merged;
+}
+
+/**
+ * Sanitise a WvW-only split fact (no base match) so it renders correctly.
+ * The wiki scraper emits type:"Buff" for many facts that are not actual buffs
+ * (e.g. "Maximum count", "Allied targets"). Without a matching base fact to
+ * inherit type/icon from, these render with a generic Might icon and buff
+ * formatting. Strip the misleading Buff type so the renderer uses the generic
+ * text-based fallback instead.
+ */
+function _sanitiseUnmatchedSplitFact(sf) {
+  const clean = { ...sf, _splitFact: true };
+  const status = (sf.status || "").toLowerCase();
+  // If it's a real buff/condition (known boon/condition name or has a recognized
+  // icon from the GW2 render CDN), keep it. Otherwise demote to generic.
+  const isRenderCdn = sf.icon && sf.icon.includes("render.guildwars2.com");
+  if (sf.type === "Buff" && !isRenderCdn) {
+    // Check if status looks like a real buff/condition name
+    const KNOWN_EFFECTS = [
+      "might", "fury", "quickness", "alacrity", "swiftness", "vigor", "regeneration",
+      "protection", "resolution", "resistance", "stability", "aegis", "retaliation",
+      "bleeding", "burning", "confusion", "poison", "torment", "vulnerability",
+      "weakness", "crippled", "chilled", "blinded", "immobile", "slow", "fear",
+      "taunt", "daze", "stun", "knockdown", "knockback", "float", "pull", "sink",
+      "stealth", "superspeed", "revealed",
+    ];
+    if (!KNOWN_EFFECTS.includes(status)) {
+      clean.type = "Untyped";
+    }
+  }
+  return clean;
 }
 
 /**
@@ -191,7 +264,7 @@ function applyBalanceSplit(mapped, entityType, gameMode) {
     // matching PvE base label. PvE facts with no WvW counterpart are dropped.
     const wvwFacts = splitFacts.map((sf, si) => {
       const bi = splitToBase.get(si);
-      if (bi === undefined) return { ...sf, _splitFact: true }; // WvW-only fact (added in WvW)
+      if (bi === undefined) return _sanitiseUnmatchedSplitFact(sf); // WvW-only fact (added in WvW)
       const merged = _mergeSplitValues(baseFacts[bi], sf);
       if (_splitValueChanged(baseFacts[bi], merged)) merged._splitFact = true;
       return merged;
@@ -217,7 +290,7 @@ function applyBalanceSplit(mapped, entityType, gameMode) {
       return merged;
     });
     for (let si = 0; si < splitFacts.length; si++) {
-      if (!splitToBase.has(si)) result.push({ ...splitFacts[si], _splitFact: true });
+      if (!splitToBase.has(si)) result.push(_sanitiseUnmatchedSplitFact(splitFacts[si]));
     }
     mapped.facts = result;
   }
