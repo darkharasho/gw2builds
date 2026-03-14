@@ -953,8 +953,59 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
   };
 }
 
+// ---------------------------------------------------------------------------
+// Upgrade items (runes, sigils, infusions) — fetched by curated ID lists
+// ---------------------------------------------------------------------------
+
+let _upgradeCatalogCache = null;
+let _upgradeCatalogPromise = null;
+
+async function getUpgradeCatalog(lang = "en") {
+  if (_upgradeCatalogCache) return _upgradeCatalogCache;
+  if (_upgradeCatalogPromise) return _upgradeCatalogPromise;
+
+  _upgradeCatalogPromise = (async () => {
+    const { RUNE_ITEM_IDS, SIGIL_ITEM_IDS, INFUSION_ITEM_IDS } = require("./upgradeIds");
+
+    const [runeItems, sigilItems, infusionItems] = await Promise.all([
+      fetchGw2ByIds("items", RUNE_ITEM_IDS, lang),
+      fetchGw2ByIds("items", SIGIL_ITEM_IDS, lang),
+      fetchGw2ByIds("items", INFUSION_ITEM_IDS, lang),
+    ]);
+
+    const mapItem = (item) => ({
+      id: item.id,
+      name: item.name || "",
+      icon: item.icon || "",
+      description: item.description || "",
+      bonuses: item.details?.bonuses || [],
+      infixUpgrade: item.details?.infix_upgrade || null,
+    });
+
+    const catalog = {
+      runes: runeItems.map(mapItem).sort((a, b) => a.name.localeCompare(b.name)),
+      sigils: sigilItems.map(mapItem).sort((a, b) => a.name.localeCompare(b.name)),
+      infusions: infusionItems.map(mapItem).sort((a, b) => a.name.localeCompare(b.name)),
+    };
+
+    catalog.runeById = new Map(catalog.runes.map((r) => [r.id, r]));
+    catalog.sigilById = new Map(catalog.sigils.map((s) => [s.id, s]));
+    catalog.infusionById = new Map(catalog.infusions.map((i) => [i.id, i]));
+
+    _upgradeCatalogCache = catalog;
+    return catalog;
+  })();
+
+  try {
+    return await _upgradeCatalogPromise;
+  } finally {
+    _upgradeCatalogPromise = null;
+  }
+}
+
 module.exports = {
   getProfessionList,
   getProfessionCatalog,
+  getUpgradeCatalog,
   applyBalanceSplit,
 };
