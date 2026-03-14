@@ -499,7 +499,7 @@ export function renderEquipmentPanel() {
     return wrapper;
   }
 
-  function makeSection(title, { fillSlotKeys, onClear } = {}) {
+  function makeSection(title, { fillSlotKeys, onClear, upgradeFills } = {}) {
     const section = document.createElement("div");
     section.className = "equip-section panel";
     const head = document.createElement("div");
@@ -524,6 +524,42 @@ export function renderEquipmentPanel() {
         });
       });
       btnGroup.append(fillBtn);
+    }
+    if (upgradeFills && upgradeFills.length) {
+      for (const fill of upgradeFills) {
+        const uBtn = document.createElement("button");
+        uBtn.type = "button";
+        uBtn.className = "equip-fill-btn";
+        uBtn.textContent = fill.label;
+        uBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const pickerType = fill.type;
+          openSlotPicker(uBtn, "", (newVal) => {
+            if (newVal === "") return;
+            for (const key of fill.keys) {
+              if (pickerType === "sigils") {
+                if (!equip.sigils) equip.sigils = {};
+                if (!Array.isArray(equip.sigils[key])) {
+                  equip.sigils[key] = key.startsWith("offhand") ? [""] : ["", ""];
+                }
+                equip.sigils[key][0] = newVal;
+              } else if (pickerType === "runes") {
+                if (!equip.runes) equip.runes = {};
+                equip.runes[key] = newVal;
+              } else {
+                if (!equip.infusions) equip.infusions = {};
+                equip.infusions[key] = newVal;
+              }
+            }
+            _markEditorChanged();
+            renderEquipmentPanel();
+          }, {
+            items: getUpgradePickerItems(pickerType),
+            searchPlaceholder: `Search ${pickerType}…`,
+          });
+        });
+        btnGroup.append(uBtn);
+      }
     }
     if (onClear) {
       const clearBtn = document.createElement("button");
@@ -569,7 +605,13 @@ export function renderEquipmentPanel() {
   clearAllBtn.addEventListener("click", () => {
     for (const key of Object.keys(equip.slots)) equip.slots[key] = "";
     for (const key of Object.keys(equip.weapons)) equip.weapons[key] = "";
-    equip.runeSet = "";
+    if (equip.runes) for (const key of Object.keys(equip.runes)) equip.runes[key] = "";
+    if (equip.sigils) {
+      for (const key of Object.keys(equip.sigils)) {
+        equip.sigils[key] = key.startsWith("offhand") ? [""] : ["", ""];
+      }
+    }
+    if (equip.infusions) for (const key of Object.keys(equip.infusions)) equip.infusions[key] = "";
     equip.relic = "";
     equip.food = "";
     equip.utility = "";
@@ -581,7 +623,17 @@ export function renderEquipmentPanel() {
   const armorKeys = EQUIP_ARMOR_SLOTS.map((s) => s.key);
   const armorSection = makeSection("Armor", {
     fillSlotKeys: armorKeys,
-    onClear: () => { for (const key of armorKeys) equip.slots[key] = ""; },
+    onClear: () => {
+      for (const key of armorKeys) {
+        equip.slots[key] = "";
+        if (equip.runes) equip.runes[key] = "";
+        if (equip.infusions) equip.infusions[key] = "";
+      }
+    },
+    upgradeFills: [
+      { label: "Fill Runes", type: "runes", keys: armorKeys },
+      { label: "Fill Infusions", type: "infusions", keys: armorKeys },
+    ],
   });
   for (const slotDef of EQUIP_ARMOR_SLOTS) armorSection.append(makeSlot(slotDef));
   leftCol.append(armorSection);
@@ -590,8 +642,17 @@ export function renderEquipmentPanel() {
   const weaponKeys = EQUIP_WEAPON_SETS.flat().map((s) => s.key);
   const weaponSection = makeSection("Weapons", {
     onClear: () => {
-      for (const key of weaponKeys) { equip.slots[key] = ""; equip.weapons[key] = ""; }
+      for (const key of weaponKeys) {
+        equip.slots[key] = "";
+        equip.weapons[key] = "";
+        if (equip.sigils?.[key]) equip.sigils[key] = key.startsWith("offhand") ? [""] : ["", ""];
+        if (equip.infusions) equip.infusions[key] = "";
+      }
     },
+    upgradeFills: [
+      { label: "Fill Sigils", type: "sigils", keys: weaponKeys },
+      { label: "Fill Infusions", type: "infusions", keys: weaponKeys },
+    ],
   });
   EQUIP_WEAPON_SETS.forEach((setSlots, i) => {
     const setLabel = document.createElement("div");
@@ -742,15 +803,6 @@ export function renderEquipmentPanel() {
   statsSection.append(statsGrid);
   rightCol.append(statsSection);
 
-  // Upgrades (rune only now — relic moved to trinkets row)
-  const upgradesSection = makeSection("Upgrades", {
-    onClear: () => { equip.runeSet = ""; },
-  });
-  upgradesSection.append(
-    makeTextInput("Rune", equip.runeSet, "Rune of the Scholar", (v) => { equip.runeSet = v; _markEditorChanged(); }),
-  );
-  rightCol.append(upgradesSection);
-
   // Trinkets — row1 (4 cols): Back, Accessory 1, Accessory 2, Relic
   //            row2 (3 cols): Amulet, Ring 1, Ring 2
   const relicItems = [
@@ -812,9 +864,15 @@ export function renderEquipmentPanel() {
   const trinketSection = makeSection("Trinkets", {
     fillSlotKeys: allTrinketKeys,
     onClear: () => {
-      for (const key of allTrinketKeys) equip.slots[key] = "";
+      for (const key of allTrinketKeys) {
+        equip.slots[key] = "";
+        if (equip.infusions) equip.infusions[key] = "";
+      }
       equip.relic = "";
     },
+    upgradeFills: [
+      { label: "Fill Infusions", type: "infusions", keys: allTrinketKeys },
+    ],
   });
 
   const trinketRow1 = document.createElement("div");
@@ -842,8 +900,14 @@ export function renderEquipmentPanel() {
       for (const key of underwaterKeys) {
         equip.slots[key] = "";
         if (equip.weapons[key] !== undefined) equip.weapons[key] = "";
+        if (equip.runes?.[key] !== undefined) equip.runes[key] = "";
+        if (equip.sigils?.[key]) equip.sigils[key] = ["", ""];
+        if (equip.infusions?.[key] !== undefined) equip.infusions[key] = "";
       }
     },
+    upgradeFills: [
+      { label: "Fill Infusions", type: "infusions", keys: underwaterKeys },
+    ],
   });
   for (const slotDef of EQUIP_UNDERWATER_SLOTS) {
     underwaterSection.append(slotDef.hand === "aquatic" ? makeWeaponSlot(slotDef, { isAquatic: true }) : makeSlot(slotDef));
