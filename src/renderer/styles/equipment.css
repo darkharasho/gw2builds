@@ -561,3 +561,81 @@
 .equip-notes:focus {
   border-color: var(--accent-2);
 }
+
+/* Upgrade sub-slots (rune / sigil / infusion) */
+.equip-upgrade-slots {
+  display: flex;
+  gap: 3px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.equip-upgrade-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 10px;
+  border: 1px solid;
+  background: transparent;
+  padding: 0;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  overflow: hidden;
+}
+
+.equip-upgrade-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Rune — amber/gold */
+.equip-upgrade-btn--rune {
+  border-color: rgba(180, 120, 40, 0.25);
+  background: rgba(180, 120, 40, 0.06);
+  color: rgba(220, 170, 80, 0.4);
+}
+.equip-upgrade-btn--rune:hover {
+  border-color: rgba(180, 120, 40, 0.6);
+  background: rgba(180, 120, 40, 0.15);
+  box-shadow: 0 0 6px rgba(180, 120, 40, 0.2);
+}
+.equip-upgrade-btn--rune.equip-upgrade-btn--filled {
+  border-color: rgba(180, 120, 40, 0.5);
+  background: rgba(180, 120, 40, 0.12);
+}
+
+/* Sigil — blue */
+.equip-upgrade-btn--sigil {
+  border-color: rgba(40, 120, 180, 0.25);
+  background: rgba(40, 120, 180, 0.06);
+  color: rgba(80, 170, 240, 0.4);
+}
+.equip-upgrade-btn--sigil:hover {
+  border-color: rgba(40, 120, 180, 0.6);
+  background: rgba(40, 120, 180, 0.15);
+  box-shadow: 0 0 6px rgba(40, 120, 180, 0.2);
+}
+.equip-upgrade-btn--sigil.equip-upgrade-btn--filled {
+  border-color: rgba(40, 120, 180, 0.5);
+  background: rgba(40, 120, 180, 0.12);
+}
+
+/* Infusion — purple */
+.equip-upgrade-btn--infusion {
+  border-color: rgba(120, 60, 180, 0.25);
+  background: rgba(120, 60, 180, 0.06);
+  color: rgba(180, 120, 240, 0.4);
+}
+.equip-upgrade-btn--infusion:hover {
+  border-color: rgba(120, 60, 180, 0.6);
+  background: rgba(120, 60, 180, 0.15);
+  box-shadow: 0 0 6px rgba(120, 60, 180, 0.2);
+}
+.equip-upgrade-btn--infusion.equip-upgrade-btn--filled {
+  border-color: rgba(120, 60, 180, 0.5);
+  background: rgba(120, 60, 180, 0.12);
+}
