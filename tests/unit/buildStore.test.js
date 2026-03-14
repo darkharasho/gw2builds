@@ -684,6 +684,42 @@ describe("BuildStore — concurrent operations", () => {
 });
 
 // ---------------------------------------------------------------------------
+// normalizeBuild — underwaterSkills
+// ---------------------------------------------------------------------------
+
+describe("normalizeBuild — underwaterSkills", () => {
+  test("missing underwaterSkills defaults to null refs", async () => {
+    const { store, dir } = await makeTempStore();
+    try {
+      const result = await store.upsertBuild(makeBuild());
+      expect(result.underwaterSkills).toEqual({
+        heal: null,
+        utility: [null, null, null],
+        elite: null,
+      });
+    } finally {
+      await cleanupDir(dir);
+    }
+  });
+
+  test("underwaterSkills with valid refs are preserved", async () => {
+    const { store, dir } = await makeTempStore();
+    try {
+      const uwSkills = {
+        heal: { id: 5503, name: "Signet of Restoration", icon: "", description: "", slot: "Heal", type: "Heal", specialization: 0 },
+        utility: [null, null, null],
+        elite: null,
+      };
+      const result = await store.upsertBuild(makeBuild({ underwaterSkills: uwSkills }));
+      expect(result.underwaterSkills.heal.id).toBe(5503);
+      expect(result.underwaterSkills.heal.name).toBe("Signet of Restoration");
+    } finally {
+      await cleanupDir(dir);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
 // BuildStore — gameMode normalization
 // ---------------------------------------------------------------------------
 

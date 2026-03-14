@@ -102,6 +102,7 @@ function normalizeBuild(input, fallbackCreatedAt) {
     profession: asString(input.profession || input.professionName, 80),
     specializations: normalizeSpecializations(input.specializations),
     skills: normalizeSkills(input.skills),
+    underwaterSkills: normalizeSkills(input.underwaterSkills),
     equipment: normalizeEquipment(input.equipment),
     tags: normalizeTags(input.tags),
     notes: asString(input.notes, 12000),
