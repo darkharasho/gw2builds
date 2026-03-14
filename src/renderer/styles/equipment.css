@@ -47,15 +47,13 @@
 }
 
 .equip-art-bg-icon {
-  position: absolute;
-  width: 95%;
-  height: 95%;
+  width: 55%;
+  height: 55%;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.35;
+  opacity: 0.12;
   pointer-events: none;
-  z-index: 0;
 }
 
 .equip-art-bg-icon svg {
@@ -63,16 +61,6 @@
   height: 100%;
 }
 
-.equip-concept-art {
-  width: 60%;
-  height: auto;
-  max-height: 70%;
-  object-fit: contain;
-  display: block;
-  opacity: 0.85;
-  position: relative;
-  z-index: 1;
-}
 
 .equip-col--right {
   border-left: none;

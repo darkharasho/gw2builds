@@ -1088,7 +1088,7 @@ export function renderEquipmentPanel() {
   }
   rightCol.append(underwaterSection);
 
-  // Center: profession concept art with class/elite spec icon background
+  // Center: profession / elite spec class icon
   const artCol = document.createElement("div");
   artCol.className = "equip-col equip-col--art";
   if (state.editor.profession) {
@@ -1107,13 +1107,6 @@ export function renderEquipmentPanel() {
       bgIcon.innerHTML = svg;
       artCol.append(bgIcon);
     }
-
-    const artImg = document.createElement("img");
-    artImg.className = "equip-concept-art";
-    artImg.src = `img/class_avatars/${state.editor.profession}.png`;
-    artImg.alt = state.editor.profession || "";
-    artImg.draggable = false;
-    artCol.append(artImg);
   }
 
   // Layout
