@@ -161,6 +161,8 @@ function getUpgradePickerItems(type) {
 
 // Create upgrade sub-slot button for a given equipment slot
 function makeUpgradeBtn(type, slotKey, currentValue, onSelect) {
+  // PvP mode has no rune/sigil/infusion customization
+  if (state.editor.gameMode === "pvp") return null;
   const catalog = state.upgradeCatalog;
   const btn = document.createElement("button");
   btn.type = "button";
@@ -299,22 +301,24 @@ export function renderEquipmentPanel() {
     const isArmorSlot = ["head", "shoulders", "chest", "hands", "legs", "feet", "breather"].includes(slotDef.key);
     if (isArmorSlot) {
       const runeVal = equip.runes?.[slotDef.key] || "";
-      upgradeContainer.append(makeUpgradeBtn("runes", slotDef.key, runeVal, (newVal) => {
+      const runeBtn = makeUpgradeBtn("runes", slotDef.key, runeVal, (newVal) => {
         if (!equip.runes) equip.runes = {};
         equip.runes[slotDef.key] = newVal || "";
         _markEditorChanged();
         renderEquipmentPanel();
-      }));
+      });
+      if (runeBtn) upgradeContainer.append(runeBtn);
     }
 
     // Infusion (all slots that have infusion entries)
     if (equip.infusions && slotDef.key in equip.infusions) {
       const infVal = equip.infusions[slotDef.key] || "";
-      upgradeContainer.append(makeUpgradeBtn("infusions", slotDef.key, infVal, (newVal) => {
+      const infBtn = makeUpgradeBtn("infusions", slotDef.key, infVal, (newVal) => {
         equip.infusions[slotDef.key] = newVal || "";
         _markEditorChanged();
         renderEquipmentPanel();
-      }));
+      });
+      if (infBtn) upgradeContainer.append(infBtn);
     }
 
     if (upgradeContainer.children.length > 0) {
@@ -473,7 +477,7 @@ export function renderEquipmentPanel() {
 
       for (let i = 0; i < sigilCount; i++) {
         const sigilVal = String(sigilArr[i] || "");
-        upgradeContainer.append(makeUpgradeBtn("sigils", slotDef.key, sigilVal, (newVal) => {
+        const sigilBtn = makeUpgradeBtn("sigils", slotDef.key, sigilVal, (newVal) => {
           if (!equip.sigils) equip.sigils = {};
           if (!Array.isArray(equip.sigils[slotDef.key])) {
             equip.sigils[slotDef.key] = slotDef.key.startsWith("offhand") ? [""] : ["", ""];
@@ -481,17 +485,19 @@ export function renderEquipmentPanel() {
           equip.sigils[slotDef.key][i] = newVal || "";
           _markEditorChanged();
           renderEquipmentPanel();
-        }));
+        });
+        if (sigilBtn) upgradeContainer.append(sigilBtn);
       }
 
       // Infusion
       const infVal = equip.infusions?.[slotDef.key] || "";
-      upgradeContainer.append(makeUpgradeBtn("infusions", slotDef.key, infVal, (newVal) => {
+      const weapInfBtn = makeUpgradeBtn("infusions", slotDef.key, infVal, (newVal) => {
         if (!equip.infusions) equip.infusions = {};
         equip.infusions[slotDef.key] = newVal || "";
         _markEditorChanged();
         renderEquipmentPanel();
-      }));
+      });
+      if (weapInfBtn) upgradeContainer.append(weapInfBtn);
 
       wrapper.append(upgradeContainer);
     }
@@ -525,7 +531,7 @@ export function renderEquipmentPanel() {
       });
       btnGroup.append(fillBtn);
     }
-    if (upgradeFills && upgradeFills.length) {
+    if (upgradeFills && upgradeFills.length && state.editor.gameMode !== "pvp") {
       for (const fill of upgradeFills) {
         const uBtn = document.createElement("button");
         uBtn.type = "button";
