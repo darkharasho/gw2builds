@@ -23,6 +23,7 @@ export const state = {
   skillSearch: "",
   catalogCache: new Map(),
   activeCatalog: null,
+  upgradeCatalog: null,  // { runes, sigils, infusions, runeById, sigilById, infusionById }
   renderedSkillIconIds: new Map(),
   editor: null,  // populated by init() after createEmptyEditor() is available
   editorBaselineSignature: "",

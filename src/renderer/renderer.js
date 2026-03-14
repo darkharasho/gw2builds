@@ -250,6 +250,17 @@ async function init() {
   ]);
   state.builds = Array.isArray(builds) ? builds : [];
   state.professions = Array.isArray(professions) ? professions : [];
+
+  // Load upgrade catalog (runes/sigils/infusions) in the background — not profession-dependent.
+  // Maps don't survive IPC serialization, so rebuild them from the arrays.
+  window.desktopApi.getUpgradeCatalog().then((raw) => {
+    raw.runeById = new Map((raw.runes || []).map((r) => [r.id, r]));
+    raw.sigilById = new Map((raw.sigils || []).map((s) => [s.id, s]));
+    raw.infusionById = new Map((raw.infusions || []).map((i) => [i.id, i]));
+    state.upgradeCatalog = raw;
+  }).catch((err) => {
+    console.warn("Failed to load upgrade catalog:", err);
+  });
   renderEditorForm();
   await refreshOnboardingStatus();
 
