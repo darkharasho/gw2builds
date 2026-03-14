@@ -671,7 +671,8 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
   ];
 
   function mapSkill(skill) {
-    const specId = KNOWN_SKILL_SPEC_OVERRIDES.get(skill.id) || Number(skill.specialization) || 0;
+    const specOverride = KNOWN_SKILL_SPEC_OVERRIDES.get(skill.id);
+    const specId = specOverride !== undefined ? specOverride : (Number(skill.specialization) || 0);
     const rawBundleSkills = Array.isArray(skill.bundle_skills)
       ? skill.bundle_skills.map(Number).filter(Boolean)
       : [];
