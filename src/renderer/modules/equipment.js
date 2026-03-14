@@ -479,9 +479,16 @@ export function renderEquipmentPanel() {
 
     if (!lockedByTwoHanded) {
       if (isAquatic) {
+        // Show weapons the profession can use underwater (Aquatic flag in professionWeapons),
+        // plus any weapon with hand=aquatic in our constants (harpoon, trident).
+        // This handles spear which is both land (hand="two") and aquatic per the API.
+        const profWeaponsData = state.activeCatalog?.professionWeapons || {};
         const aquaticItems = [
           { value: "", label: "— Empty —" },
-          ...GW2_WEAPONS.filter((w) => w.hand === "aquatic").map((w) => ({
+          ...GW2_WEAPONS.filter((w) => {
+            if (w.hand === "aquatic") return !!profWeaponsData[w.id];
+            return profWeaponsData[w.id]?.flags?.includes("Aquatic");
+          }).map((w) => ({
             value: w.id, label: w.label, icon: w.icon,
           })),
         ];
