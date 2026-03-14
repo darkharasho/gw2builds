@@ -127,6 +127,17 @@ export const MECHANIST_SPEC_ID = 70;
 // Legend1 = Glint (Herald elite spec, spec ID 52), Legend5 = Kalla (Renegade elite spec, spec ID 63)
 export const UNDERWATER_BLOCKED_LEGENDS = new Set(["Legend1", "Legend5"]);
 
+// Ranger pets usable underwater (GW2 API has no type field — this is hardcoded).
+// Aquatic-only: Shark, Armor Fish, Jellyfish variants
+// Amphibious (land + water): all Drakes, Siege Turtle
+export const AQUATIC_PET_IDS = new Set([
+  7, 12, 18, 19, 45,          // Drakes: Salamander, Marsh, Ice, River, Reef
+  21,                           // Shark
+  40,                           // Armor Fish
+  41, 42, 43,                   // Jellyfish: Blue, Red, Rainbow
+  66,                           // Siege Turtle
+]);
+
 // Slot sets for stat computation mode switching
 export const LAND_ONLY_SLOTS = new Set(["head", "mainhand1", "offhand1", "mainhand2", "offhand2"]);
 export const AQUATIC_SLOTS = new Set(["breather", "aquatic1", "aquatic2"]);
