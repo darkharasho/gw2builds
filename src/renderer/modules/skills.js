@@ -612,11 +612,27 @@ export function buildMechanicSlotsForRender({
         // the higher ID is the more recently added/updated skill and should be preferred.
         const wt = (s) => (s.weaponType || "").toLowerCase();
         // Filter out skills incompatible with current land/water mode.
-        // Underwater: skip NoUnderwater skills. Land: prefer NoUnderwater (land-specific) variants.
+        // Underwater: skip NoUnderwater skills.
+        // Land: skip underwater-only skills (those without NoUnderwater when a NoUnderwater
+        // variant exists for the same weapon). This handles spear which has separate land/water bursts.
+        const hasNoUW = (s) => (s.flags || []).includes("NoUnderwater");
         const modeFilter = (arr) => {
-          if (!underwaterMode) return arr;
-          const filtered = arr.filter((s) => !(s.flags || []).includes("NoUnderwater"));
-          return filtered.length > 0 ? filtered : arr;
+          if (underwaterMode) {
+            const filtered = arr.filter((s) => !hasNoUW(s));
+            return filtered.length > 0 ? filtered : arr;
+          }
+          // Land: if any skill for the active weapon has NoUnderwater, exclude the non-NoUnderwater
+          // variants of that same weapon (they're the underwater-only versions).
+          const landVariants = arr.filter((s) => hasNoUW(s) && (s.weaponType || "").toLowerCase() === activeMainhand);
+          if (landVariants.length > 0) {
+            const filtered = arr.filter((s) => {
+              const wt = (s.weaponType || "").toLowerCase();
+              // Keep this skill if: it's for a different weapon, OR it has NoUnderwater
+              return wt !== activeMainhand || hasNoUW(s);
+            });
+            return filtered.length > 0 ? filtered : arr;
+          }
+          return arr;
         };
         let pool;
         if (isBerserkerBurstSlot) {
