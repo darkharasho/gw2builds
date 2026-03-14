@@ -1016,11 +1016,12 @@ export function renderSkills() {
     weaponSkills = [1, 2, 3, 4, 5].map((n) => slotMap.get(n) || null);
   } else if (state.editor.underwaterMode) {
     // Aquatic weapons are always two-handed; pass as mainhand with empty offhand.
+    // Weaver dual-attunement does not apply underwater — use single attunement (isWeaver=false).
     const activeAquatic = activeWeaponSet === 2 ? "aquatic2" : "aquatic1";
     weaponSkills = getEquippedWeaponSkills(catalog, {
       mainhand: equippedWeapons[activeAquatic] || "",
       offhand: "",
-    }, activeAttunement, activeAttunement2, isWeaver);
+    }, activeAttunement, "", false);
   } else {
     weaponSkills = getEquippedWeaponSkills(catalog, {
       mainhand: equippedWeapons[mhKey] || "",
