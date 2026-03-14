@@ -21,9 +21,11 @@ Build system is electron-builder (v26) with Vite as the renderer bundler.
 
 **Last build marker:** `.last-build-commit` in project root — stores the full commit SHA of HEAD at build time. Updated after every successful build.
 
-**GitHub release:** Created with `gh release create v{version} --repo darkharasho/axiforge --title v{version} --notes "{notes}" --latest dist_out/*.AppImage dist_out/*.exe`
+**GitHub release:** Created with `gh release create v{version} --repo darkharasho/axiforge --title v{version} --notes "{notes}" --latest dist_out/*.AppImage dist_out/*.exe dist_out/*.blockmap dist_out/latest*.yml`
 
-**Discord posting:** Post text-only via JSON payload (`content` field). Use Python/json.dumps for safe serialization — raw shell string interpolation causes HTTP 400. Artifacts are too large to attach (see discord limits memory).
+**Discord posting:** Post text-only via JSON payload (`content` field). Use `python3 -c "import json; ..."` to generate payload to a temp file, then pass with `curl -d @/tmp/discord_payload.json`. Do NOT use Python's `urllib.request.urlopen` — it returns HTTP 403 even with a valid webhook (curl returns 204 for the same URL). Artifacts are too large to attach (see discord limits memory).
+
+**Last build:** v0.1.0-beta.20260313T2008 built 2026-03-13. Last build commit: 5a5ab464a49fd087f7b5c63ec5468a7e8bb2bd34.
 
 **Why:** Electron-builder targets are linux AppImage and win nsis. Wine on Linux handles Windows cross-compilation.
 
