@@ -200,16 +200,18 @@ export function computeStatBreakdown(statKey) {
   if (BASE_STATS.has(statKey)) entries.push({ source: "Base", value: 1000 });
 
   const slots = state.editor.equipment?.slots || {};
-  const UNDERWATER_SLOTS = new Set(["breather", "aquatic1", "aquatic2"]);
+  const isUnderwater = Boolean(state.editor.underwaterMode);
+  const EXCLUDED_SLOTS = isUnderwater ? LAND_ONLY_SLOTS : AQUATIC_SLOTS;
   const SLOT_LABELS = {
     head: "Head", shoulders: "Shoulders", chest: "Chest", hands: "Hands", legs: "Legs", feet: "Feet",
     mainhand1: "Mainhand 1", offhand1: "Offhand 1", mainhand2: "Mainhand 2", offhand2: "Offhand 2",
     back: "Back", amulet: "Amulet", ring1: "Ring 1", ring2: "Ring 2", accessory1: "Accessory 1", accessory2: "Accessory 2",
+    breather: "Breather", aquatic1: "Aquatic 1", aquatic2: "Aquatic 2",
   };
 
   // Equipment slots
   for (const [slotKey, comboLabel] of Object.entries(slots)) {
-    if (!comboLabel || UNDERWATER_SLOTS.has(slotKey)) continue;
+    if (!comboLabel || EXCLUDED_SLOTS.has(slotKey)) continue;
     const combo = STAT_COMBOS_BY_LABEL.get(comboLabel);
     const w = SLOT_WEIGHTS[slotKey];
     if (!combo || !w) continue;
@@ -254,7 +256,7 @@ export function computeStatBreakdown(statKey) {
     const toStatKey = (attr) => attr === "Healing" ? "HealingPower" : attr;
     const infusions = state.editor.equipment?.infusions || {};
     const allInfusions = Object.entries(infusions)
-      .filter(([k]) => !UNDERWATER_SLOTS.has(k))
+      .filter(([k]) => !EXCLUDED_SLOTS.has(k))
       .flatMap(([, v]) => Array.isArray(v) ? v : [v]);
     for (const id of allInfusions) {
       if (!id) continue;
@@ -286,7 +288,7 @@ export function computeStatBreakdown(statKey) {
     const runes = state.editor.equipment?.runes || {};
     const runeCounts = new Map();
     for (const [slot, id] of Object.entries(runes)) {
-      if (!id || UNDERWATER_SLOTS.has(slot)) continue;
+      if (!id || EXCLUDED_SLOTS.has(slot)) continue;
       runeCounts.set(String(id), (runeCounts.get(String(id)) || 0) + 1);
     }
     for (const [runeId, count] of runeCounts) {
@@ -360,13 +362,14 @@ export function computeUpgradeModifiers() {
   // Regex for flat bonuses we already handle as stats — skip these
   const FLAT_STAT_RE = /\+\d+\s+(Condition Damage|Healing Power|Healing|Power|Precision|Toughness|Vitality|Ferocity|Concentration|Expertise|to All Stats)/;
 
-  const UNDERWATER_SLOTS = new Set(["breather", "aquatic1", "aquatic2"]);
+  const isUnderwater = Boolean(state.editor.underwaterMode);
+  const EXCLUDED_SLOTS = isUnderwater ? LAND_ONLY_SLOTS : AQUATIC_SLOTS;
 
   // Rune percentage modifiers (cumulative per piece, exclude breather)
   const runes = state.editor.equipment?.runes || {};
   const runeCounts = new Map();
   for (const [slot, id] of Object.entries(runes)) {
-    if (!id || UNDERWATER_SLOTS.has(slot)) continue;
+    if (!id || EXCLUDED_SLOTS.has(slot)) continue;
     runeCounts.set(String(id), (runeCounts.get(String(id)) || 0) + 1);
   }
   for (const [runeId, count] of runeCounts) {
@@ -382,13 +385,19 @@ export function computeUpgradeModifiers() {
 
   // Sigil buff modifiers (from active weapon set)
   const sigils = state.editor.equipment?.sigils || {};
-  const activeSet = Number(state.editor.activeWeaponSet) || 1;
-  const mhKey = activeSet === 2 ? "mainhand2" : "mainhand1";
-  const ohKey = activeSet === 2 ? "offhand2" : "offhand1";
-  const activeSigilIds = [
-    ...(Array.isArray(sigils[mhKey]) ? sigils[mhKey] : []),
-    ...(Array.isArray(sigils[ohKey]) ? sigils[ohKey] : []),
-  ].filter(Boolean);
+  let activeSigilIds;
+  if (isUnderwater) {
+    const aquaticSet = (Number(state.editor.activeWeaponSet) || 1) === 2 ? "aquatic2" : "aquatic1";
+    activeSigilIds = [...(Array.isArray(sigils[aquaticSet]) ? sigils[aquaticSet] : [])].filter(Boolean);
+  } else {
+    const activeSet = Number(state.editor.activeWeaponSet) || 1;
+    const mhKey = activeSet === 2 ? "mainhand2" : "mainhand1";
+    const ohKey = activeSet === 2 ? "offhand2" : "offhand1";
+    activeSigilIds = [
+      ...(Array.isArray(sigils[mhKey]) ? sigils[mhKey] : []),
+      ...(Array.isArray(sigils[ohKey]) ? sigils[ohKey] : []),
+    ].filter(Boolean);
+  }
   for (const sigilId of activeSigilIds) {
     const def = upgradeCatalog.sigilById?.get(Number(sigilId));
     const desc = def?.buffDescription || "";
@@ -399,7 +408,7 @@ export function computeUpgradeModifiers() {
   // Infusion buff modifiers (percentage lines from buffDescription, exclude underwater)
   const infusions = state.editor.equipment?.infusions || {};
   const allInfusionIds = Object.entries(infusions)
-    .filter(([k]) => !UNDERWATER_SLOTS.has(k))
+    .filter(([k]) => !EXCLUDED_SLOTS.has(k))
     .flatMap(([, v]) => Array.isArray(v) ? v : [v]);
   for (const id of allInfusionIds) {
     if (!id) continue;
