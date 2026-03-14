@@ -69,7 +69,7 @@ git checkout package.json
      --title "v{version}" \
      --notes "{patch_notes}" \
      --latest \
-     dist_out/*.AppImage dist_out/*.exe
+     dist_out/*.AppImage dist_out/*.exe dist_out/*.blockmap dist_out/latest*.yml
    ```
 5. If a release with that tag already exists, delete it first with `gh release delete v{version} --repo darkharasho/axiforge --yes` and re-run the `gh release create`, also delete the old tag with `git tag -d v{version}; git push origin :refs/tags/v{version}` before recreating.
 
