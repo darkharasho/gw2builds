@@ -3,7 +3,7 @@
 import { state, createEmptyEditor } from "./state.js";
 import { parseTags, simplifyTrait, simplifySkill } from "./utils.js";
 import { getMajorTraitsByTier } from "./specializations.js";
-import { ANTIQUARY_PROLIFIC_PLUNDERER_TRAIT_ID } from "./constants.js";
+import { ANTIQUARY_PROLIFIC_PLUNDERER_TRAIT_ID, UNDERWATER_BLOCKED_LEGENDS } from "./constants.js";
 
 // Normalize sigil array to correct shape for a given slot key.
 export function normalizeSigilArray(value, slotKey) {
@@ -233,6 +233,32 @@ export function enforceEditorConsistency(options = {}) {
       if (selected) usedUtility.add(selected);
       return selected;
     });
+  }
+
+  if (state.editor.underwaterSkills) {
+    const uwHealId = Number(state.editor.underwaterSkills.healId) || 0;
+    const uwEliteId = Number(state.editor.underwaterSkills.eliteId) || 0;
+    const uwUtilityIds = state.editor.underwaterSkills.utilityIds || [0, 0, 0];
+
+    if (isRevenant) {
+      const activeLegend = state.editor.selectedLegends?.[state.editor.activeLegendSlot];
+      if (UNDERWATER_BLOCKED_LEGENDS.has(activeLegend)) {
+        state.editor.underwaterSkills = { healId: 0, utilityIds: [0, 0, 0], eliteId: 0 };
+      }
+    } else {
+      const skillOptions = _getSkillOptionsByType(catalog, state.editor.specializations);
+      const isValidUW = (id, list) => !id || list.some((s) => s.id === id);
+      const noUW = (s) => !(s.flags || []).includes("NoUnderwater");
+      const uwHealOptions = (skillOptions.heal || []).filter(noUW);
+      const uwUtilOptions = (skillOptions.utility || []).filter(noUW);
+      const uwEliteOptions = (skillOptions.elite || []).filter(noUW);
+
+      if (!isValidUW(uwHealId, uwHealOptions)) state.editor.underwaterSkills.healId = 0;
+      if (!isValidUW(uwEliteId, uwEliteOptions)) state.editor.underwaterSkills.eliteId = 0;
+      for (let i = 0; i < 3; i++) {
+        if (!isValidUW(uwUtilityIds[i], uwUtilOptions)) state.editor.underwaterSkills.utilityIds[i] = 0;
+      }
+    }
   }
 
   // Weaver: primary (mainhand) is always set; secondary (offhand) can be any element including
