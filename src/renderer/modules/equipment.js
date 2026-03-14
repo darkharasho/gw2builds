@@ -107,7 +107,12 @@ export function openSlotPicker(anchorEl, currentValue, onSelect, { items = null,
         text.innerHTML = `<span class="slot-picker__name">${escapeHtml(opt.label)}</span>`;
       }
       btn.append(text);
-      btn.addEventListener("click", () => { onSelect(opt.value); closeSlotPicker(); });
+      if (opt.disabled) {
+        btn.disabled = true;
+        btn.style.opacity = "0.4";
+        btn.style.pointerEvents = "none";
+      }
+      btn.addEventListener("click", () => { if (opt.disabled) return; onSelect(opt.value); closeSlotPicker(); });
       list.append(btn);
     }
   }

@@ -9,6 +9,7 @@ import {
   PROFESSION_BASE_HP,
   MECHANIST_DEPTH_CHARGES_ID,
   MECHANIST_SPEC_ID,
+  UNDERWATER_BLOCKED_LEGENDS,
 } from "./constants.js";
 import { escapeHtml, parseWeaponSlotNum } from "./utils.js";
 import { bindHoverPreview, selectDetail, buildSkillCard, showHoverPreview } from "./detail-panel.js";
@@ -1362,10 +1363,17 @@ export function renderSkills() {
         const legendName = swapSkill?.name || legend?.id || "—";
         const legendIcon = swapSkill?.icon || "";
         const isActive = slotIdx === activeLegendSlot;
+        const isBlockedLegend = isUnderwater && legendId && UNDERWATER_BLOCKED_LEGENDS.has(legendId);
         const btn = document.createElement("button");
         btn.type = "button";
-        btn.className = "legend-slot-btn" + (isActive ? " legend-slot-btn--active" : "");
-        btn.title = legendName + (isActive ? " (active — right-click to change)" : " — click to swap, right-click to change");
+        btn.className = "legend-slot-btn" + (isActive ? " legend-slot-btn--active" : "") + (isBlockedLegend ? " legend-slot-btn--blocked" : "");
+        if (isBlockedLegend) {
+          btn.style.opacity = "0.4";
+          btn.style.pointerEvents = "none";
+          btn.title = legendName + " (unavailable underwater)";
+        } else {
+          btn.title = legendName + (isActive ? " (active — right-click to change)" : " — click to swap, right-click to change");
+        }
         if (legendIcon) {
           btn.innerHTML = `<img src="${escapeHtml(legendIcon)}" alt="${escapeHtml(legendName)}" />`;
         }
@@ -1465,6 +1473,7 @@ export function renderSkills() {
 export function openLegendPicker(anchorEl, slotIdx, catalog) {
   const legendSlots = state.editor.selectedLegends || ["", ""];
   const otherLegendId = legendSlots[1 - slotIdx] || "";
+  const isUnderwaterPicker = Boolean(state.editor.underwaterMode);
   const selectedSpecIds = new Set(
     (state.editor.specializations || []).map((s) => Number(s?.specializationId) || 0).filter(Boolean)
   );
@@ -1475,7 +1484,8 @@ export function openLegendPicker(anchorEl, slotIdx, catalog) {
       // Elite-spec-only legends: swap skill has a non-zero specialization requirement
       const reqSpec = Number(swapSkill?.specialization) || 0;
       if (reqSpec && !selectedSpecIds.has(reqSpec)) return [];
-      return [{ value: l.id, label: swapSkill?.name || l.id, icon: swapSkill?.icon || "" }];
+      const blocked = isUnderwaterPicker && UNDERWATER_BLOCKED_LEGENDS.has(l.id);
+      return [{ value: l.id, label: swapSkill?.name || l.id, icon: swapSkill?.icon || "", disabled: blocked }];
     }).filter((item) => item.value !== otherLegendId),
   ];
   _openSlotPicker(anchorEl, legendSlots[slotIdx] || "", (newVal) => {
