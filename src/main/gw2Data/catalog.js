@@ -862,9 +862,9 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
   }
 
   // Normalize GW2 API weapon type keys (e.g. "ShortBow") to our lowercase IDs (e.g. "shortbow")
-  // Special case: "HarpoonGun" → "harpoon"
+  // Special cases: "HarpoonGun" and "Speargun" both refer to the same aquatic weapon → "harpoon"
   function normalizeWeaponKey(apiKey) {
-    if (apiKey === "HarpoonGun") return "harpoon";
+    if (apiKey === "HarpoonGun" || apiKey === "Speargun") return "harpoon";
     return apiKey.toLowerCase();
   }
 
