@@ -297,3 +297,60 @@ describe("computeEquipmentStats — utility contributions", () => {
     expect(result.Power).toBe(1000);
   });
 });
+
+describe("computeEquipmentStats — underwater mode", () => {
+  test("underwater mode uses breather instead of head", () => {
+    state.editor = {
+      ...makeEditor({
+        head: "Berserker's",
+        shoulders: "Berserker's",
+        chest: "Berserker's",
+        hands: "Berserker's",
+        legs: "Berserker's",
+        feet: "Berserker's",
+        breather: "Marauder's",
+      }),
+      underwaterMode: true,
+      underwaterSkills: { healId: 0, utilityIds: [0, 0, 0], eliteId: 0 },
+    };
+    const result = computeEquipmentStats();
+    expect(result.Vitality).toBeGreaterThan(1000);
+  });
+
+  test("underwater mode excludes land weapon stats", () => {
+    state.editor = {
+      ...makeEditor({
+        mainhand1: "Berserker's",
+      }),
+      underwaterMode: true,
+      underwaterSkills: { healId: 0, utilityIds: [0, 0, 0], eliteId: 0 },
+    };
+    const result = computeEquipmentStats();
+    expect(result.Power).toBe(1000);
+  });
+
+  test("underwater mode includes aquatic weapon stats", () => {
+    state.editor = {
+      ...makeEditor({
+        aquatic1: "Berserker's",
+      }),
+      underwaterMode: true,
+      underwaterSkills: { healId: 0, utilityIds: [0, 0, 0], eliteId: 0 },
+    };
+    const result = computeEquipmentStats();
+    expect(result.Power).toBeGreaterThan(1000);
+  });
+
+  test("land mode still excludes aquatic slots (existing behavior)", () => {
+    state.editor = {
+      ...makeEditor({
+        aquatic1: "Berserker's",
+        breather: "Berserker's",
+      }),
+      underwaterMode: false,
+      underwaterSkills: { healId: 0, utilityIds: [0, 0, 0], eliteId: 0 },
+    };
+    const result = computeEquipmentStats();
+    expect(result.Power).toBe(1000);
+  });
+});

@@ -1,6 +1,6 @@
 // Equipment stat computation — pure logic over state + constants, no DOM deps.
 import { state } from "./state.js";
-import { STAT_COMBOS_BY_LABEL, SLOT_WEIGHTS } from "./constants.js";
+import { STAT_COMBOS_BY_LABEL, SLOT_WEIGHTS, LAND_ONLY_SLOTS, AQUATIC_SLOTS } from "./constants.js";
 
 export function computeSlotStats(comboLabel, slotKey) {
   const combo = STAT_COMBOS_BY_LABEL.get(comboLabel);
@@ -29,9 +29,10 @@ export function computeEquipmentStats() {
     Power: 1000, Precision: 1000, Toughness: 1000, Vitality: 1000,
     Ferocity: 0, ConditionDamage: 0, Expertise: 0, Concentration: 0, HealingPower: 0,
   };
-  const UNDERWATER_SLOTS = new Set(["breather", "aquatic1", "aquatic2"]);
+  const isUnderwater = Boolean(state.editor.underwaterMode);
+  const EXCLUDED_SLOTS = isUnderwater ? LAND_ONLY_SLOTS : AQUATIC_SLOTS;
   for (const [slotKey, comboLabel] of Object.entries(slots)) {
-    if (!comboLabel || UNDERWATER_SLOTS.has(slotKey)) continue;
+    if (!comboLabel || EXCLUDED_SLOTS.has(slotKey)) continue;
     const combo = STAT_COMBOS_BY_LABEL.get(comboLabel);
     const w = SLOT_WEIGHTS[slotKey];
     if (!combo || !w) continue;
@@ -97,7 +98,7 @@ export function computeEquipmentStats() {
     // Infusions (some slots are arrays: back=2, rings=3; exclude underwater)
     const infusions = state.editor.equipment?.infusions || {};
     const allInfusionIds = Object.entries(infusions)
-      .filter(([k]) => !UNDERWATER_SLOTS.has(k))
+      .filter(([k]) => !EXCLUDED_SLOTS.has(k))
       .flatMap(([, v]) => Array.isArray(v) ? v : [v]);
     for (const id of allInfusionIds) {
       if (!id) continue;
@@ -127,7 +128,7 @@ export function computeEquipmentStats() {
     // Count how many of each rune ID are equipped (exclude breather)
     const runeCounts = new Map();
     for (const [slot, id] of Object.entries(runes)) {
-      if (!id || UNDERWATER_SLOTS.has(slot)) continue;
+      if (!id || EXCLUDED_SLOTS.has(slot)) continue;
       runeCounts.set(String(id), (runeCounts.get(String(id)) || 0) + 1);
     }
     for (const [runeId, count] of runeCounts) {
