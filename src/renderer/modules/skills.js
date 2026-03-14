@@ -488,7 +488,10 @@ export function buildMechanicSlotsForRender({
       nextOptions.elite = [ls(activeLegend.elite)].filter(Boolean);
     }
   } else if (isRanger) {
-    const activePetSlotKey = editor.activePetSlot === "terrestrial2" ? "terrestrial2" : "terrestrial1";
+    // When underwater, show aquatic pet slots instead of terrestrial
+    const petSlot1Key = underwaterMode ? "aquatic1" : "terrestrial1";
+    const petSlot2Key = underwaterMode ? "aquatic2" : "terrestrial2";
+    const activePetSlotKey = editor.activePetSlot === petSlot2Key ? petSlot2Key : petSlot1Key;
     const activePetId = Number(editor.selectedPets?.[activePetSlotKey]) || 0;
     const activePet = activePetId && catalog.petById ? catalog.petById.get(activePetId) : null;
 
@@ -1300,8 +1303,10 @@ export function renderSkills() {
     }
     // Ranger: add pet selector directly inside mechBar (right side, pushed by auto-margin spacer)
     if (Array.isArray(catalog.pets) && catalog.pets.length > 0) {
-      const activeSlotKey = state.editor.activePetSlot === "terrestrial2" ? "terrestrial2" : "terrestrial1";
-      const inactiveSlotKey = activeSlotKey === "terrestrial1" ? "terrestrial2" : "terrestrial1";
+      const petSlot1 = isUnderwater ? "aquatic1" : "terrestrial1";
+      const petSlot2 = isUnderwater ? "aquatic2" : "terrestrial2";
+      const activeSlotKey = state.editor.activePetSlot === petSlot2 ? petSlot2 : petSlot1;
+      const inactiveSlotKey = activeSlotKey === petSlot1 ? petSlot2 : petSlot1;
       const activePetId = Number(state.editor.selectedPets?.[activeSlotKey]) || 0;
       const inactivePetId = Number(state.editor.selectedPets?.[inactiveSlotKey]) || 0;
       const activePet = activePetId ? catalog.petById.get(activePetId) : null;
@@ -1315,7 +1320,7 @@ export function renderSkills() {
       const petBtn = document.createElement("button");
       petBtn.type = "button";
       petBtn.className = "pet-slot-btn" + (activePet ? " pet-slot-btn--filled" : "");
-      petBtn.title = activePet?.name || `Click to select ${activeSlotKey === "terrestrial1" ? "Pet 1" : "Pet 2"}`;
+      petBtn.title = activePet?.name || `Click to select ${activeSlotKey === petSlot1 ? "Pet 1" : "Pet 2"}`;
       if (activePet?.icon) {
         petBtn.innerHTML = `<img src="${escapeHtml(activePet.icon)}" alt="${escapeHtml(activePet.name || "")}" />`;
       }
@@ -1323,15 +1328,15 @@ export function renderSkills() {
 
       const petLabel = document.createElement("span");
       petLabel.className = "pet-slot-btn__label";
-      petLabel.textContent = activePet?.name?.replace(/^Juvenile\s+/i, "") || (activeSlotKey === "terrestrial1" ? "Pet 1" : "Pet 2");
+      petLabel.textContent = activePet?.name?.replace(/^Juvenile\s+/i, "") || (activeSlotKey === petSlot1 ? "Pet 1" : "Pet 2");
 
       petWrapper.append(petBtn, petLabel);
 
       const petSwapBtn = document.createElement("button");
       petSwapBtn.type = "button";
-      petSwapBtn.className = "pet-swap-btn" + (activeSlotKey === "terrestrial2" ? " pet-swap-btn--active" : "");
+      petSwapBtn.className = "pet-swap-btn" + (activeSlotKey === petSlot2 ? " pet-swap-btn--active" : "");
       petSwapBtn.title = inactivePetId
-        ? `Switch to pet ${activeSlotKey === "terrestrial1" ? 2 : 1}`
+        ? `Switch to pet ${activeSlotKey === petSlot1 ? 2 : 1}`
         : "No second pet equipped";
       petSwapBtn.innerHTML = `<svg viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="2,3.5 13,3.5"/><polyline points="10,1 13,3.5 10,6"/><polyline points="16,10.5 5,10.5"/><polyline points="8,8 5,10.5 8,13"/></svg>`;
       petSwapBtn.addEventListener("click", () => {
