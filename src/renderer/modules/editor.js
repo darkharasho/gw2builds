@@ -289,7 +289,13 @@ export function enforceEditorConsistency(options = {}) {
       if (wData) {
         if (isOffhand) valid = wData.flags.includes("Offhand");
         else if (isMainhand) valid = wData.flags.includes("Mainhand") || wData.flags.includes("TwoHand");
-        else valid = true; // aquatic — keep as-is (no per-profession filtering in picker)
+        else {
+          // Aquatic slot: weapon must have the Aquatic flag AND at least one non-NoUnderwater skill
+          valid = wData.flags.includes("Aquatic") && wData.skills.some((ref) => {
+            const skill = catalog.weaponSkillById?.get(ref.id);
+            return skill && !(skill.flags || []).includes("NoUnderwater");
+          });
+        }
       }
       if (!valid) {
         equip.weapons[key] = "";
