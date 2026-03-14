@@ -355,7 +355,7 @@ export function renderEquipmentPanel() {
     return wrapper;
   }
 
-  function makeSection(title, fillSlotKeys) {
+  function makeSection(title, { fillSlotKeys, onClear } = {}) {
     const section = document.createElement("div");
     section.className = "equip-section panel";
     const head = document.createElement("div");
@@ -363,6 +363,8 @@ export function renderEquipmentPanel() {
     const titleEl = document.createElement("span");
     titleEl.textContent = title;
     head.append(titleEl);
+    const btnGroup = document.createElement("div");
+    btnGroup.className = "equip-section__btns";
     if (fillSlotKeys && fillSlotKeys.length) {
       const fillBtn = document.createElement("button");
       fillBtn.type = "button";
@@ -377,8 +379,22 @@ export function renderEquipmentPanel() {
           renderEquipmentPanel();
         });
       });
-      head.append(fillBtn);
+      btnGroup.append(fillBtn);
     }
+    if (onClear) {
+      const clearBtn = document.createElement("button");
+      clearBtn.type = "button";
+      clearBtn.className = "equip-fill-btn equip-clear-btn";
+      clearBtn.textContent = "Clear";
+      clearBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        onClear();
+        _markEditorChanged();
+        renderEquipmentPanel();
+      });
+      btnGroup.append(clearBtn);
+    }
+    head.append(btnGroup);
     section.append(head);
     return section;
   }
@@ -401,13 +417,38 @@ export function renderEquipmentPanel() {
   const leftCol = document.createElement("div");
   leftCol.className = "equip-col equip-col--left";
 
+  // Clear All button
+  const clearAllBtn = document.createElement("button");
+  clearAllBtn.type = "button";
+  clearAllBtn.className = "equip-fill-btn equip-clear-btn equip-clear-all-btn";
+  clearAllBtn.textContent = "Clear All Equipment";
+  clearAllBtn.addEventListener("click", () => {
+    for (const key of Object.keys(equip.slots)) equip.slots[key] = "";
+    for (const key of Object.keys(equip.weapons)) equip.weapons[key] = "";
+    equip.runeSet = "";
+    equip.relic = "";
+    equip.food = "";
+    equip.utility = "";
+    _markEditorChanged();
+    renderEquipmentPanel();
+  });
+
   // Armor
-  const armorSection = makeSection("Armor", EQUIP_ARMOR_SLOTS.map((s) => s.key));
+  const armorKeys = EQUIP_ARMOR_SLOTS.map((s) => s.key);
+  const armorSection = makeSection("Armor", {
+    fillSlotKeys: armorKeys,
+    onClear: () => { for (const key of armorKeys) equip.slots[key] = ""; },
+  });
   for (const slotDef of EQUIP_ARMOR_SLOTS) armorSection.append(makeSlot(slotDef));
   leftCol.append(armorSection);
 
   // Weapons
-  const weaponSection = makeSection("Weapons");
+  const weaponKeys = EQUIP_WEAPON_SETS.flat().map((s) => s.key);
+  const weaponSection = makeSection("Weapons", {
+    onClear: () => {
+      for (const key of weaponKeys) { equip.slots[key] = ""; equip.weapons[key] = ""; }
+    },
+  });
   EQUIP_WEAPON_SETS.forEach((setSlots, i) => {
     const setLabel = document.createElement("div");
     setLabel.className = "equip-set-label";
@@ -418,7 +459,9 @@ export function renderEquipmentPanel() {
   leftCol.append(weaponSection);
 
   // Consumables
-  const consumeSection = makeSection("Consumables");
+  const consumeSection = makeSection("Consumables", {
+    onClear: () => { equip.food = ""; equip.utility = ""; },
+  });
 
   const foodItems = [
     { value: "", label: "— None —" },
@@ -556,7 +599,9 @@ export function renderEquipmentPanel() {
   rightCol.append(statsSection);
 
   // Upgrades (rune only now — relic moved to trinkets row)
-  const upgradesSection = makeSection("Upgrades");
+  const upgradesSection = makeSection("Upgrades", {
+    onClear: () => { equip.runeSet = ""; },
+  });
   upgradesSection.append(
     makeTextInput("Rune", equip.runeSet, "Rune of the Scholar", (v) => { equip.runeSet = v; _markEditorChanged(); }),
   );
@@ -620,7 +665,13 @@ export function renderEquipmentPanel() {
   }
 
   const allTrinketKeys = ["back", "accessory1", "accessory2", "amulet", "ring1", "ring2"];
-  const trinketSection = makeSection("Trinkets", allTrinketKeys);
+  const trinketSection = makeSection("Trinkets", {
+    fillSlotKeys: allTrinketKeys,
+    onClear: () => {
+      for (const key of allTrinketKeys) equip.slots[key] = "";
+      equip.relic = "";
+    },
+  });
 
   const trinketRow1 = document.createElement("div");
   trinketRow1.className = "equip-trinket-grid equip-trinket-grid--4";
@@ -641,7 +692,15 @@ export function renderEquipmentPanel() {
   rightCol.append(trinketSection);
 
   // Underwater
-  const underwaterSection = makeSection("Underwater");
+  const underwaterKeys = EQUIP_UNDERWATER_SLOTS.map((s) => s.key);
+  const underwaterSection = makeSection("Underwater", {
+    onClear: () => {
+      for (const key of underwaterKeys) {
+        equip.slots[key] = "";
+        if (equip.weapons[key] !== undefined) equip.weapons[key] = "";
+      }
+    },
+  });
   for (const slotDef of EQUIP_UNDERWATER_SLOTS) {
     underwaterSection.append(slotDef.hand === "aquatic" ? makeWeaponSlot(slotDef, { isAquatic: true }) : makeSlot(slotDef));
   }
@@ -664,6 +723,6 @@ export function renderEquipmentPanel() {
   const layout = document.createElement("div");
   layout.className = "equip-layout";
   layout.append(leftCol, artCol, rightCol);
-  panel.append(layout);
+  panel.append(clearAllBtn, layout);
   updateHealthOrb();
 }

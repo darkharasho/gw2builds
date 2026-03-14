@@ -98,6 +98,29 @@
   border-color: var(--accent-2);
 }
 
+.equip-section__btns {
+  display: flex;
+  gap: 4px;
+}
+
+.equip-clear-btn {
+  border-color: rgba(180, 80, 80, 0.4);
+  background: rgba(180, 80, 80, 0.08);
+  color: rgba(255, 140, 140, 0.8);
+}
+
+.equip-clear-btn:hover {
+  background: rgba(180, 80, 80, 0.2);
+  border-color: rgba(255, 120, 120, 0.6);
+}
+
+.equip-clear-all-btn {
+  display: block;
+  margin: 0 0 8px auto;
+  font-size: 10px;
+  padding: 3px 10px;
+}
+
 .equip-set-label {
   font-size: 10px;
   color: var(--text-dim);

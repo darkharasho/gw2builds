@@ -1,6 +1,6 @@
 You are a build agent for the axiforge Electron desktop app.
 
-Your task: build the app locally for beta testing. No git tag, no GitHub release.
+Your task: build the app locally for beta testing. No git tag.
 
 ## Steps
 
@@ -54,20 +54,47 @@ Reset `package.json` so the stamped version doesn't linger in the working tree:
 git checkout package.json
 ```
 
-### Step 6 — Report artifacts
+### Step 6 — Create GitHub Release
 
-List the built artifacts:
+1. Read the version from the built artifact filenames (the stamped beta version, e.g., `0.1.0-beta.20260313T1530`).
+2. Use the version as the tag, prefixed with `v` (e.g., `v0.1.0-beta.20260313T1530`).
+3. Generate patch notes from commits since the last tag (or all commits if no prior tag):
+   ```bash
+   git log $(git describe --tags --abbrev=0 2>/dev/null || git rev-list --max-parents=0 HEAD)..HEAD --oneline
+   ```
+4. Create a GitHub release with the built artifacts attached:
+   ```bash
+   gh release create v{version} \
+     --repo darkharasho/axiforge \
+     --title "v{version}" \
+     --notes "{patch_notes}" \
+     --latest \
+     dist_out/*.AppImage dist_out/*.exe
+   ```
+5. If a release with that tag already exists, delete it first with `gh release delete v{version} --repo darkharasho/axiforge --yes` and re-run the `gh release create`, also delete the old tag with `git tag -d v{version}; git push origin :refs/tags/v{version}` before recreating.
+
+### Step 7 — Post to Discord
+
+Read `DISCORD_WEBHOOK_URL` from the `.env` file. Post the GitHub release URL and patch notes to Discord using the webhook:
 
 ```bash
-ls -lh dist_out/*.AppImage dist_out/*.exe 2>/dev/null
+curl -H "Content-Type: application/json" \
+  -d '{"content": "**AxiForge v{version}** released!\n\n{patch_notes}\n\nDownload: https://github.com/darkharasho/axiforge/releases/tag/v{version}"}' \
+  "$DISCORD_WEBHOOK_URL"
 ```
 
-End your response with the full paths of each artifact, e.g.:
+Use proper JSON escaping for the patch notes content. Keep the message concise — include the version, a brief summary of changes, and the release link.
+
+### Step 8 — Report
+
+End your response with the full paths of each artifact, the GitHub release URL, and confirmation that Discord was notified, e.g.:
 
 ```
 Build complete:
-  Linux: dist_out/AxiForge-0.1.0.AppImage
-  Windows: dist_out/AxiForge-0.1.0.exe
+  Linux: dist_out/AxiForge-0.1.0-beta.20260313T1530.AppImage
+  Windows: dist_out/AxiForge-0.1.0-beta.20260313T1530.exe
+  Release: https://github.com/darkharasho/axiforge/releases/tag/v0.1.0-beta.20260313T1530
+  Discord: notified
 ```
 
 If only one platform was built, list only that one.
