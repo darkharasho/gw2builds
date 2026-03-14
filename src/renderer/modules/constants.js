@@ -119,6 +119,18 @@ export const EQUIP_UNDERWATER_SLOTS = [
   { key: "aquatic2", label: "Weapon 2",  hand: "aquatic" },
 ];
 
+// Underwater mode constants
+export const MECHANIST_DEPTH_CHARGES_ID = 63210;
+export const MECHANIST_SPEC_ID = 70;
+
+// Revenant legends blocked underwater (legend string IDs from GW2 API)
+// Legend1 = Glint (Herald elite spec, spec ID 52), Legend5 = Kalla (Renegade elite spec, spec ID 63)
+export const UNDERWATER_BLOCKED_LEGENDS = new Set(["Legend1", "Legend5"]);
+
+// Slot sets for stat computation mode switching
+export const LAND_ONLY_SLOTS = new Set(["head", "mainhand1", "offhand1", "mainhand2", "offhand2"]);
+export const AQUATIC_SLOTS = new Set(["breather", "aquatic1", "aquatic2"]);
+
 export const PROFESSION_WEIGHT = {
   Elementalist: "light", Mesmer: "light", Necromancer: "light",
   Engineer: "medium", Ranger: "medium", Thief: "medium",
