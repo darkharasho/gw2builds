@@ -68,15 +68,18 @@ describe("Ranger — end-to-end profession mechanics", () => {
   test("Untamed (spec 72) replaces F3 Return command with an empty profession skill slot", async () => {
     const catalog = await h.loadCatalog();
     const untamed = h.resolveMechSlots(catalog, 72);
-    expect(untamed).toEqual(["fake:attack", "12478", "empty"]);
-    expect(untamed[2]).not.toBe("fake:return");
+    // Default Untamed: Unleash Pet active → normal pet bar F1-F3 + Unleash Ranger F5
+    expect(untamed).toEqual(["fake:attack", "12478", "fake:return", "63344"]);
+    expect(untamed[2]).toBe("fake:return");
   });
 
-  test("Untamed F3 differs from core and Soulbeast F3", async () => {
+  test("Untamed default has same F1-F3 as core (normal pet bar), but adds F5 Unleash", async () => {
     const catalog = await h.loadCatalog();
     const core = h.resolveMechSlots(catalog, 0);
     const untamed = h.resolveMechSlots(catalog, 72);
-    expect(untamed[2]).not.toBe(core[2]);
+    // Default Untamed (Unleash Pet) has normal pet bar like core, plus F5
+    expect(untamed.slice(0, 3)).toEqual(core);
+    expect(untamed[3]).toBe("63344"); // Unleash Pet F5 (default state)
   });
 
   // ---------------------------------------------------------------------------
