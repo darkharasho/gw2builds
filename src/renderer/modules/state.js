@@ -41,7 +41,6 @@ export function createEmptyEditor(profession = "", gameMode = "pve") {
     notes: "",
     equipment: {
       statPackage: "",
-      runeSet: "",
       relic: "",
       food: "",
       utility: "",
@@ -53,6 +52,21 @@ export function createEmptyEditor(profession = "", gameMode = "pve") {
       },
       weapons: {
         mainhand1: "", offhand1: "", mainhand2: "", offhand2: "", aquatic1: "", aquatic2: "",
+      },
+      runes: {
+        head: "", shoulders: "", chest: "", hands: "", legs: "", feet: "",
+        breather: "",
+      },
+      sigils: {
+        mainhand1: ["", ""], offhand1: [""],
+        mainhand2: ["", ""], offhand2: [""],
+        aquatic1: ["", ""], aquatic2: ["", ""],
+      },
+      infusions: {
+        head: "", shoulders: "", chest: "", hands: "", legs: "", feet: "",
+        mainhand1: "", offhand1: "", mainhand2: "", offhand2: "",
+        back: "", amulet: "", ring1: "", ring2: "", accessory1: "", accessory2: "",
+        breather: "", aquatic1: "", aquatic2: "",
       },
     },
     specializations: [],
