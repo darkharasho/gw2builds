@@ -15,6 +15,7 @@
 
 .skills-host {
   margin-top: 10px;
+  position: relative;
 }
 
 #skillSearch {
@@ -623,17 +624,18 @@
 
 /* Land / Water segmented pill toggle */
 .underwater-toggle {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
   display: flex;
-  justify-content: center;
   gap: 2px;
-  margin-bottom: 10px;
   background: rgba(8, 14, 28, 0.72);
   border: 1px solid var(--line-soft, rgba(100, 120, 160, 0.25));
   border-radius: 20px;
   padding: 3px;
   width: fit-content;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .underwater-toggle__btn {
