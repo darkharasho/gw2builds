@@ -223,10 +223,15 @@ export function getEquippedWeaponSkills(catalog, weapons, activeAttunement = "",
   const shouldSkipForMode = (skill) => underwaterMode && isNoUW(skill);
 
   if (mhData) {
+    // Mainhand weapons only fill slots 1-3 (unless two-handed, which fills all 5).
+    // This prevents dual-wield weapons like dagger from filling offhand slots 4-5
+    // when only equipped in mainhand.
+    const mhMaxSlot = isTwoHanded ? 5 : 3;
     for (const ref of mhData.skills) {
       const n = parseWeaponSlotNum(ref.slot);
+      if (n > mhMaxSlot) continue;
       if (!matchesAttunement(ref, n)) continue;
-      if (n >= 1 && n <= 5) {
+      if (n >= 1 && n <= mhMaxSlot) {
         const skill = weaponSkillById.get(ref.id);
         if (!skill) continue;
         if (shouldSkipForMode(skill)) continue;
