@@ -533,6 +533,9 @@ const MOCK_SKILLS = {
   72103: makeSkill(72103, { name: "Function Gyro",            slot: "Profession_5", type: "Profession", specialization: 57 }),
   72114: makeSkill(72114, { name: "Function Gyro (variant)",  slot: "Profession_5", type: "Profession", specialization: 57 }),
 
+  // Mechanist underwater skill — Depth Charges (replaces all mech F-slots when underwater)
+  63210: makeSkill(63210, { name: "Depth Charges", slot: "Profession_4", type: "Profession", specialization: 70, professions: ["Engineer"] }),
+
   // Radiant Forge (Luminary, Guardian)
   77073: makeSkill(77073, { name: "Enter Radiant Forge", slot: "Profession_1", type: "Profession", specialization: 81, professions: ["Guardian"], bundle_skills: [] }),
   76950: makeSkill(76950, { name: "Glaring Burst",    slot: "Weapon_1", type: "Weapon", specialization: 81 }),

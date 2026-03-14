@@ -387,8 +387,8 @@ export function buildMechanicSlotsForRender({
       }
       mechSlots.push({ skill, sourceId: 0, isStatic: true, isSelectable: false, mechIconOverride });
     }
-    // F4: Crash Down (first Profession_4 entry)
-    const f4 = eliteFixedSkills.find((s) => s.slot === "Profession_4");
+    // F4: Crash Down (first Profession_4 entry, excluding underwater-only Depth Charges)
+    const f4 = eliteFixedSkills.find((s) => s.slot === "Profession_4" && s.id !== MECHANIST_DEPTH_CHARGES_ID);
     if (f4) mechSlots.push({ skill: f4, sourceId: 0, isStatic: true, isSelectable: false });
 
     // Mechanist underwater: replace all mech F-slots with a single Depth Charges F4 skill.

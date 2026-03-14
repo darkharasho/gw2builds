@@ -84,3 +84,49 @@ describe("renderer mechanics selection — Revenant core vs elite F skills", () 
     expect(allianceInactive.signatures).toEqual([]);
   });
 });
+
+describe("renderer mechanics selection — Revenant underwater blocked legends", () => {
+  // Legend blocking happens in the UI rendering layer (renderLegendSlots), not in
+  // buildMechanicSlotsForRender. These tests verify the UNDERWATER_BLOCKED_LEGENDS
+  // constant encodes the correct blocked set and that the mechanic slots themselves
+  // are unaffected by underwaterMode (since F-slot display logic for Revenant does
+  // not change underwater — only legend picker availability is restricted).
+
+  test("UNDERWATER_BLOCKED_LEGENDS blocks the correct legend IDs", () => {
+    const { UNDERWATER_BLOCKED_LEGENDS } = require("../../../src/renderer/modules/constants");
+    // Legend1 (Assassin / Mallyx) and Legend5 (Ventari) are land-only legends
+    expect(UNDERWATER_BLOCKED_LEGENDS.has("Legend1")).toBe(true);
+    expect(UNDERWATER_BLOCKED_LEGENDS.has("Legend5")).toBe(true);
+  });
+
+  test("UNDERWATER_BLOCKED_LEGENDS does not block non-restricted legends", () => {
+    const { UNDERWATER_BLOCKED_LEGENDS } = require("../../../src/renderer/modules/constants");
+    // Legend2 (Glint/Herald), Legend3 (Jalis), Legend4 (Shiro), Legend6, Legend7 are available underwater
+    for (const id of ["Legend2", "Legend3", "Legend4", "Legend6", "Legend7"]) {
+      expect(UNDERWATER_BLOCKED_LEGENDS.has(id)).toBe(false);
+    }
+  });
+
+  const resolve = setupMechanicsHarness("Revenant");
+
+  test("Revenant mechanic slots are unchanged by underwaterMode (blocking is UI-layer only)", async () => {
+    const terrestrial = await resolve({ specId: 0 });
+    const underwater = await resolve({ specId: 0, underwaterMode: true });
+    expect(underwater.signatures).toEqual(terrestrial.signatures);
+  });
+
+  test("Vindicator Alliance Tactics mechanic slot is unaffected by underwaterMode", async () => {
+    const terrestrialActive = await resolve({
+      specId: 69,
+      legendSlots: ["Legend7", "Legend1"],
+      activeLegendSlot: 0,
+    });
+    const underwaterActive = await resolve({
+      specId: 69,
+      legendSlots: ["Legend7", "Legend1"],
+      activeLegendSlot: 0,
+      underwaterMode: true,
+    });
+    expect(underwaterActive.signatures).toEqual(terrestrialActive.signatures);
+  });
+});

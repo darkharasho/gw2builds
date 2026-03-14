@@ -462,6 +462,8 @@ async function getProfessionCatalog(professionId, lang = "en", gameMode = "pve")
     ...(professionId === "Engineer" ? PHOTON_FORGE_BUNDLE : []),
     // Include correct Toss Elixir toolbelt skills (API points to Detonate variants instead).
     ...(professionId === "Engineer" ? [...ELIXIR_TOOLBELT_OVERRIDES.values()] : []),
+    // Include Mechanist Depth Charges (63210) — underwater replacement for all mech F-slots.
+    ...(professionId === "Engineer" ? [63210] : []),
     // Include Radiant Forge weapon skills + their flip skills (Luminary, Guardian).
     ...(professionId === "Guardian" ? [...RADIANT_FORGE_BUNDLE, ...RADIANT_FORGE_FLIP_SKILLS] : []),
     // Include flip_skills of Death Shroud and Lich Form transform children (not auto-fetched).
