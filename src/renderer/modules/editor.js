@@ -246,17 +246,13 @@ export function enforceEditorConsistency(options = {}) {
         state.editor.underwaterSkills = { healId: 0, utilityIds: [0, 0, 0], eliteId: 0 };
       }
     } else {
-      const skillOptions = _getSkillOptionsByType(catalog, state.editor.specializations);
+      const skillOptions = _getSkillOptionsByType(catalog, state.editor.specializations, true);
       const isValidUW = (id, list) => !id || list.some((s) => s.id === id);
-      const noUW = (s) => !(s.flags || []).includes("NoUnderwater");
-      const uwHealOptions = (skillOptions.heal || []).filter(noUW);
-      const uwUtilOptions = (skillOptions.utility || []).filter(noUW);
-      const uwEliteOptions = (skillOptions.elite || []).filter(noUW);
 
-      if (!isValidUW(uwHealId, uwHealOptions)) state.editor.underwaterSkills.healId = 0;
-      if (!isValidUW(uwEliteId, uwEliteOptions)) state.editor.underwaterSkills.eliteId = 0;
+      if (!isValidUW(uwHealId, skillOptions.heal || [])) state.editor.underwaterSkills.healId = 0;
+      if (!isValidUW(uwEliteId, skillOptions.elite || [])) state.editor.underwaterSkills.eliteId = 0;
       for (let i = 0; i < 3; i++) {
-        if (!isValidUW(uwUtilityIds[i], uwUtilOptions)) state.editor.underwaterSkills.utilityIds[i] = 0;
+        if (!isValidUW(uwUtilityIds[i], skillOptions.utility || [])) state.editor.underwaterSkills.utilityIds[i] = 0;
       }
     }
   }

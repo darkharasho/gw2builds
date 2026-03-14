@@ -76,7 +76,7 @@ export function buildRevenantEliteByProfSlot(eliteFixedSkills, eliteSpecId, isAl
   return eliteByProfSlot;
 }
 
-export function getSkillOptionsByType(catalog, specializationSelections) {
+export function getSkillOptionsByType(catalog, specializationSelections, underwaterMode = false) {
   const selectedSpecIds = new Set(
     (specializationSelections || [])
       .map((entry) => Number(entry?.specializationId) || 0)
@@ -91,6 +91,7 @@ export function getSkillOptionsByType(catalog, specializationSelections) {
 
   const filtered = allSkills.filter((skill) => {
     if (flipSkillIds.has(skill.id)) return false;
+    if (underwaterMode && (skill.flags || []).includes("NoUnderwater")) return false;
     const lockSpec = Number(skill.specialization) || 0;
     return !lockSpec || selectedSpecIds.has(lockSpec);
   });
@@ -866,7 +867,7 @@ export function renderSkills() {
   _el.skillsHost.innerHTML = "";
   if (!catalog) return;
 
-  let options = getSkillOptionsByType(catalog, state.editor.specializations);
+  let options = getSkillOptionsByType(catalog, state.editor.specializations, state.editor.underwaterMode);
   const utilitySelection = Array.isArray(state.editor.skills?.utilityIds)
     ? state.editor.skills.utilityIds.map((value) => Number(value) || 0)
     : [0, 0, 0];
