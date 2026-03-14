@@ -40,12 +40,21 @@ describe("skeletonTemplates", () => {
     expect(skeletonTemplates.specs).toContain("skel-spec-card__minor");
   });
 
-  test("equipment template contains grid layout with stat cells and trinkets", () => {
+  test("equipment template contains full structure with sections and slot types", () => {
     expect(skeletonTemplates.equipment).toContain("skel-equip__col--art");
     expect(skeletonTemplates.equipment).toContain("skel-equip__col--right");
     expect(skeletonTemplates.equipment).toContain("skel-equip__slot-icon");
     expect(skeletonTemplates.equipment).toContain("skel-equip__stat-cell");
-    expect(skeletonTemplates.equipment).toContain("skel-equip__trinket");
+    expect(skeletonTemplates.equipment).toContain("skel-equip__section");
+    expect(skeletonTemplates.equipment).toContain("skel-equip__section-head");
+    expect(skeletonTemplates.equipment).toContain("skel-equip__slot--weapon");
+    expect(skeletonTemplates.equipment).toContain("skel-equip__weapon-type");
+    expect(skeletonTemplates.equipment).toContain("skel-equip__weapon-stat");
+    expect(skeletonTemplates.equipment).toContain("skel-equip__slot--compact");
+    expect(skeletonTemplates.equipment).toContain("skel-equip__set-label");
+    expect(skeletonTemplates.equipment).toContain("skel-equip__notes");
+    expect(skeletonTemplates.equipment).toContain("skel-equip__text-input");
+    expect(skeletonTemplates.equipment).toContain("skel-equip__trinket-grid--4");
   });
 
   test("detail template has card wrapper, icon, and fact rows", () => {

@@ -1,7 +1,7 @@
-- [ ] Reaper shroud 5 is inaccurate in wvw split from the wiki
-- [ ] when clicking on an overload skill it should update the reference panel to that overload skill
+- [x] Reaper shroud 5 is inaccurate in wvw split from the wiki
+- [x] when clicking on an overload skill it should update the reference panel to that overload skill
 - [x] Ele flip skills are STILL getting picked up in core/cata/evoker. they shouldnt ever have overload skills.
 - [x] Redo first time setup to be optional, dont require setting up the github pages
 - [x] rename the github page repo to AxiForge instead of gw2builds
 - [x] have the buildSummary collapsed by default and expandable
-- [ ] loading states on first load
+- [x] loading states on first load

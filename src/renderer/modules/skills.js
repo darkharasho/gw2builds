@@ -1054,6 +1054,7 @@ export function renderSkills() {
         : skill?.name || (isSelectable ? "Choose morph skill…" : "");
 
       let mechIconSignature = "";
+      let flipSkill = null;
       if (fakeCommand) {
         // Ranger client-side pet commands — no API skill, render a placeholder icon
         iconBtn.disabled = true;
@@ -1079,7 +1080,7 @@ export function renderSkills() {
           && (catalog?.profession?.id || "") === "Elementalist" && eliteSpecId !== 48;
         const flipSkillId = isActive && isStatic && !isDragonTriggerToggle
           && !isElemNonTempestAttunement && (skill?.flipSkill ?? 0);
-        const flipSkill = flipSkillId ? catalog.skillById.get(flipSkillId) : null;
+        flipSkill = flipSkillId ? catalog.skillById.get(flipSkillId) : null;
         // Elixir toolbelt skills ("Detonate Elixir X") share a generic icon in the API.
         // Fall back to the source elixir's own icon so each slot looks distinct.
         // All other toolbelt skills (Defense Field, turret actions, etc.) have correct distinct icons.
@@ -1228,7 +1229,8 @@ export function renderSkills() {
               renderSkills();
             }
           }
-          if (skill) selectDetail("skill", skill);
+          const detailTarget = flipSkill || skill;
+          if (detailTarget) selectDetail("skill", detailTarget);
         });
       }
 

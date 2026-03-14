@@ -112,7 +112,20 @@ npm test
 If tests fail: revise the fix and run once more.
 If they still fail after 2 attempts: go to the **Failure Path** below.
 
-### Step 9 — Commit + push
+### Step 9 — Manual test checkpoint
+
+**Stop and ask the user to manually test the fix before proceeding.**
+
+Tell the user:
+1. What was changed and why
+2. How to reproduce the original bug
+3. What they should verify is now working
+
+Then ask: "Please test this and let me know if the fix looks good, or if anything needs adjusting."
+
+**Wait for user confirmation before continuing.** If the user reports issues, revise the fix (go back to Step 7) and re-run tests.
+
+### Step 10 — Commit + push
 
 ```bash
 git add src/ tests/
@@ -122,7 +135,7 @@ git push -u origin fix/issue-$ARGUMENTS-<slug>
 
 (Use the actual issue title fetched in Step 1, not the literal text `<issue title>`.)
 
-### Step 10 — Open PR (or find existing)
+### Step 11 — Open PR (or find existing)
 
 Check for an existing PR on this branch:
 
@@ -150,7 +163,7 @@ Closes #$ARGUMENTS" \
 
 Capture the PR URL.
 
-### Step 11 — Move to "Done" + close out
+### Step 12 — Move to "Done" + close out
 
 Use the item ID you captured in Step 3a.
 
