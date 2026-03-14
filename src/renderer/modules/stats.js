@@ -73,5 +73,45 @@ export function computeEquipmentStats() {
     }
   }
 
+  // Infusion stat contributions
+  const infusions = state.editor.equipment?.infusions || {};
+  const upgradeCatalog = state.upgradeCatalog;
+  if (upgradeCatalog) {
+    for (const infusionId of Object.values(infusions)) {
+      if (!infusionId) continue;
+      const infDef = upgradeCatalog.infusionById?.get(Number(infusionId));
+      if (!infDef?.infixUpgrade?.attributes) continue;
+      for (const attr of infDef.infixUpgrade.attributes) {
+        const statKey = attr.attribute === "ConditionDamage" ? "ConditionDamage"
+          : attr.attribute === "HealingPower" ? "HealingPower"
+          : attr.attribute;
+        if (totals[statKey] !== undefined) {
+          totals[statKey] += attr.modifier || 0;
+        }
+      }
+    }
+
+    // Rune 6-piece set bonus stat contribution
+    const runes = state.editor.equipment?.runes || {};
+    const armorRuneKeys = ["head", "shoulders", "chest", "hands", "legs", "feet"];
+    const armorRuneIds = armorRuneKeys.map((k) => runes[k] || "").filter(Boolean);
+    if (armorRuneIds.length === 6) {
+      const allSame = armorRuneIds.every((id) => id === armorRuneIds[0]);
+      if (allSame) {
+        const runeDef = upgradeCatalog.runeById?.get(Number(armorRuneIds[0]));
+        if (runeDef?.infixUpgrade?.attributes) {
+          for (const attr of runeDef.infixUpgrade.attributes) {
+            const statKey = attr.attribute === "ConditionDamage" ? "ConditionDamage"
+              : attr.attribute === "HealingPower" ? "HealingPower"
+              : attr.attribute;
+            if (totals[statKey] !== undefined) {
+              totals[statKey] += attr.modifier || 0;
+            }
+          }
+        }
+      }
+    }
+  }
+
   return totals;
 }
