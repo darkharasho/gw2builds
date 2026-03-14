@@ -370,6 +370,13 @@ export function computeEditorSignature() {
       utilityIds,
       eliteId: Number(editor.skills?.eliteId) || 0,
     },
+    underwaterSkills: {
+      healId: Number(editor.underwaterSkills?.healId) || 0,
+      utilityIds: Array.isArray(editor.underwaterSkills?.utilityIds)
+        ? editor.underwaterSkills.utilityIds.slice(0, 3).map((v) => Number(v) || 0)
+        : [0, 0, 0],
+      eliteId: Number(editor.underwaterSkills?.eliteId) || 0,
+    },
     gameMode: String(editor.gameMode || "pve"),
   };
   return JSON.stringify(payload);
