@@ -79,6 +79,12 @@ export function createEmptyEditor(profession = "", gameMode = "pve") {
       utilityIds: [0, 0, 0],
       eliteId: 0,
     },
+    underwaterSkills: {
+      healId: 0,
+      utilityIds: [0, 0, 0],
+      eliteId: 0,
+    },
+    underwaterMode: false,
     activeAttunement: "",
     activeAttunement2: "",
     activeKit: 0,
