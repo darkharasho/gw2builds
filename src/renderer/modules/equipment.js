@@ -479,15 +479,26 @@ export function renderEquipmentPanel() {
 
     if (!lockedByTwoHanded) {
       if (isAquatic) {
-        // Show weapons the profession can use underwater (Aquatic flag in professionWeapons),
-        // plus any weapon with hand=aquatic in our constants (harpoon, trident).
-        // This handles spear which is both land (hand="two") and aquatic per the API.
+        // Show weapons the profession can use underwater. A weapon qualifies if:
+        // 1. It has the Aquatic flag in professionWeapons, AND
+        // 2. It has at least one skill without the NoUnderwater flag
+        // This correctly excludes spear for professions where all spear skills are land-only.
         const profWeaponsData = state.activeCatalog?.professionWeapons || {};
+        const weaponSkillById = state.activeCatalog?.weaponSkillById || new Map();
+        const hasUnderwaterSkills = (wData) => {
+          if (!wData?.skills?.length) return false;
+          return wData.skills.some((ref) => {
+            const skill = weaponSkillById.get(ref.id);
+            return skill && !(skill.flags || []).includes("NoUnderwater");
+          });
+        };
         const aquaticItems = [
           { value: "", label: "— Empty —" },
           ...GW2_WEAPONS.filter((w) => {
-            if (w.hand === "aquatic") return !!profWeaponsData[w.id];
-            return profWeaponsData[w.id]?.flags?.includes("Aquatic");
+            const wData = profWeaponsData[w.id];
+            if (!wData) return false;
+            if (w.hand === "aquatic") return true;
+            return wData.flags?.includes("Aquatic") && hasUnderwaterSkills(wData);
           }).map((w) => ({
             value: w.id, label: w.label, icon: w.icon,
           })),
