@@ -34,7 +34,7 @@
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 12px;
-  width: 180px;
+  width: 280px;
   display: flex;
   flex-direction: column;
   gap: 8px;

@@ -68,6 +68,8 @@
   border-radius: 10px;
   background: rgba(9, 16, 32, 0.76);
   padding: 10px;
+  overflow: hidden;
+  overflow-wrap: break-word;
 }
 
 .status-card h3 {
