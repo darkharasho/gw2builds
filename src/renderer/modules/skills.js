@@ -946,8 +946,10 @@ export function renderSkills() {
   const activeWeaponSet = Number(state.editor.activeWeaponSet) || 1;
   const equippedWeapons = state.editor.equipment?.weapons || {};
 
-  const mhKey = activeWeaponSet === 2 ? "mainhand2" : "mainhand1";
-  const ohKey = activeWeaponSet === 2 ? "offhand2" : "offhand1";
+  const mhKey = isUnderwater
+    ? (activeWeaponSet === 2 ? "aquatic2" : "aquatic1")
+    : (activeWeaponSet === 2 ? "mainhand2" : "mainhand1");
+  const ohKey = isUnderwater ? "" : (activeWeaponSet === 2 ? "offhand2" : "offhand1");
   const hasWeaponSet2 = isUnderwater
     ? !!equippedWeapons.aquatic2
     : !!(equippedWeapons.mainhand2 || equippedWeapons.offhand2);
