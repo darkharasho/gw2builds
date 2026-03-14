@@ -7,6 +7,8 @@ import {
   ANTIQUARY_PROLIFIC_PLUNDERER_TRAIT_ID,
   RANGER_PET_FAMILY_SKILLS,
   PROFESSION_BASE_HP,
+  MECHANIST_DEPTH_CHARGES_ID,
+  MECHANIST_SPEC_ID,
 } from "./constants.js";
 import { escapeHtml, parseWeaponSlotNum } from "./utils.js";
 import { bindHoverPreview, selectDetail, buildSkillCard, showHoverPreview } from "./detail-panel.js";
@@ -312,6 +314,7 @@ export function buildMechanicSlotsForRender({
   ohKey,
   activeAttunement,
   activeKit,
+  underwaterMode = false,
 }) {
   const nextOptions = options;
   const isToolbelt = catalog.skills.some((s) => s.toolbeltSkill > 0);
@@ -386,6 +389,12 @@ export function buildMechanicSlotsForRender({
     // F4: Crash Down (first Profession_4 entry)
     const f4 = eliteFixedSkills.find((s) => s.slot === "Profession_4");
     if (f4) mechSlots.push({ skill: f4, sourceId: 0, isStatic: true, isSelectable: false });
+
+    // Mechanist underwater: replace all mech F-slots with a single Depth Charges F4 skill.
+    if (underwaterMode) {
+      const depthCharges = catalog.skillById.get(MECHANIST_DEPTH_CHARGES_ID) || null;
+      mechSlots = [{ skill: depthCharges, sourceId: MECHANIST_DEPTH_CHARGES_ID, isStatic: true, isSelectable: false, fKeyLabel: "F4" }];
+    }
   } else if (isSelectablePool) {
     // Amalgam: F1 = heal toolbelt; F2–F4 = "Locked" morph slots (player-selectable); F5 = Evolve
     const healSrc = catalog.skillById.get(Number(editor.skills?.healId) || 0);
@@ -945,6 +954,7 @@ export function renderSkills() {
     ohKey,
     activeAttunement,
     activeKit,
+    underwaterMode: isUnderwater,
   });
   const { mechSlots, eliteSpecId, isWeaver, isToolbelt, isRanger } = mechanicState;
   options = mechanicState.options;
