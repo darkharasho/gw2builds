@@ -49,7 +49,7 @@ function makeRealisticBuild(profession, overrides = {}) {
         ],
         elite: { id: 14404, name: "Rampage", icon: "rampage.png", description: "Transform", slot: "Elite", type: "Elite", specialization: 0 },
       },
-      equipment: { statPackage: "Berserker", runeSet: "Superior Rune of the Scholar", relic: "Relic of the Thief", food: "Bowl of Sweet and Spicy Butternut Squash Soup", utility: "Superior Sharpening Stone" },
+      equipment: { statPackage: "Berserker", relic: "Relic of the Thief", food: "Bowl of Sweet and Spicy Butternut Squash Soup", utility: "Superior Sharpening Stone" },
       tags: ["pve", "dps", "power", "warrior"],
       notes: "Best-in-slot power warrior for raids.",
     },
@@ -66,7 +66,7 @@ function makeRealisticBuild(profession, overrides = {}) {
         utility: [null, null, null],
         elite: { id: 6161, name: "Supply Drop", icon: "", description: "", slot: "Elite", type: "Elite", specialization: 0 },
       },
-      equipment: { statPackage: "Berserker", runeSet: "Superior Rune of the Scholar", relic: "", food: "", utility: "" },
+      equipment: { statPackage: "Berserker", relic: "", food: "", utility: "" },
       tags: ["pve", "dps", "engineer"],
       notes: "Photon Forge burst windows.",
     },
@@ -87,7 +87,7 @@ function makeRealisticBuild(profession, overrides = {}) {
         ],
         elite: { id: 9, name: "Renewed Focus", icon: "", description: "", slot: "Elite", type: "Elite", specialization: 0 },
       },
-      equipment: { statPackage: "Ritualist", runeSet: "Superior Rune of the Trapper", relic: "Relic of the Fireworks", food: "Bowl of Beef Rendang", utility: "Toxic Focusing Crystal" },
+      equipment: { statPackage: "Ritualist", relic: "Relic of the Fireworks", food: "Bowl of Beef Rendang", utility: "Toxic Focusing Crystal" },
       tags: ["pve", "condi", "guardian", "support"],
       notes: "Tome rotations for maximum condition uptime.",
     },
@@ -104,7 +104,7 @@ function makeRealisticBuild(profession, overrides = {}) {
         utility: [null, null, null],
         elite: { id: 12540, name: "Entangle", icon: "", description: "", slot: "Elite", type: "Elite", specialization: 0 },
       },
-      equipment: { statPackage: "Berserker", runeSet: "Superior Rune of the Scholar", relic: "Relic of the Thief", food: "", utility: "" },
+      equipment: { statPackage: "Berserker", relic: "Relic of the Thief", food: "", utility: "" },
       tags: ["pve", "dps", "ranger"],
       notes: "",
     },
@@ -121,7 +121,7 @@ function makeRealisticBuild(profession, overrides = {}) {
         utility: [null, null, null],
         elite: { id: 13050, name: "Dagger Storm", icon: "", description: "", slot: "Elite", type: "Elite", specialization: 0 },
       },
-      equipment: { statPackage: "Berserker", runeSet: "Superior Rune of the Scholar", relic: "Relic of the Thief", food: "", utility: "" },
+      equipment: { statPackage: "Berserker", relic: "Relic of the Thief", food: "", utility: "" },
       tags: ["pve", "dps", "thief"],
       notes: "",
     },
@@ -138,7 +138,7 @@ function makeRealisticBuild(profession, overrides = {}) {
         utility: [null, null, null],
         elite: { id: 5505, name: "Tornado", icon: "", description: "", slot: "Elite", type: "Elite", specialization: 0 },
       },
-      equipment: { statPackage: "Berserker", runeSet: "Superior Rune of the Scholar", relic: "Relic of the Thief", food: "", utility: "" },
+      equipment: { statPackage: "Berserker", relic: "Relic of the Thief", food: "", utility: "" },
       tags: ["pve", "dps", "elementalist"],
       notes: "",
     },
@@ -155,7 +155,7 @@ function makeRealisticBuild(profession, overrides = {}) {
         utility: [null, null, null],
         elite: { id: 10211, name: "Moa Morph", icon: "", description: "", slot: "Elite", type: "Elite", specialization: 0 },
       },
-      equipment: { statPackage: "Berserker", runeSet: "Superior Rune of the Scholar", relic: "", food: "", utility: "" },
+      equipment: { statPackage: "Berserker", relic: "", food: "", utility: "" },
       tags: ["pve", "dps", "mesmer"],
       notes: "",
     },
@@ -172,7 +172,7 @@ function makeRealisticBuild(profession, overrides = {}) {
         utility: [null, null, null],
         elite: { id: 10550, name: "Lich Form", icon: "", description: "", slot: "Elite", type: "Elite", specialization: 0 },
       },
-      equipment: { statPackage: "Berserker", runeSet: "Superior Rune of the Scholar", relic: "Relic of the Thief", food: "", utility: "" },
+      equipment: { statPackage: "Berserker", relic: "Relic of the Thief", food: "", utility: "" },
       tags: ["pve", "dps", "necromancer"],
       notes: "",
     },
@@ -189,13 +189,13 @@ function makeRealisticBuild(profession, overrides = {}) {
         utility: [null, null, null],
         elite: { id: 26821, name: "Jade Winds", icon: "", description: "", slot: "Elite", type: "Elite", specialization: 0 },
       },
-      equipment: { statPackage: "Berserker", runeSet: "Superior Rune of the Scholar", relic: "Relic of the Thief", food: "", utility: "" },
+      equipment: { statPackage: "Berserker", relic: "Relic of the Thief", food: "", utility: "" },
       tags: ["pve", "dps", "revenant"],
       notes: "",
     },
   };
 
-  const base = profBuilds[profession] || { title: profession, profession, specializations: [], skills: { heal: null, utility: [null, null, null], elite: null }, equipment: { statPackage: "", runeSet: "", relic: "", food: "", utility: "" }, tags: [], notes: "" };
+  const base = profBuilds[profession] || { title: profession, profession, specializations: [], skills: { heal: null, utility: [null, null, null], elite: null }, equipment: { statPackage: "", relic: "", food: "", utility: "" }, tags: [], notes: "" };
   return { ...base, ...overrides };
 }
 
@@ -245,13 +245,12 @@ describe("Build persistence — round-trip serialization", () => {
     expect(spec.majorChoices[3]).toBe(1451);
   });
 
-  test("equipment all 5 fields round-trip", async () => {
+  test("equipment fields round-trip", async () => {
     const build = makeRealisticBuild("Guardian");
     const saved = await store.upsertBuild(build);
     const retrieved = (await store.listBuilds()).find((b) => b.id === saved.id);
 
     expect(retrieved.equipment.statPackage).toBe("Ritualist");
-    expect(retrieved.equipment.runeSet).toBe("Superior Rune of the Trapper");
     expect(retrieved.equipment.relic).toBe("Relic of the Fireworks");
     expect(retrieved.equipment.food).toBe("Bowl of Beef Rendang");
     expect(retrieved.equipment.utility).toBe("Toxic Focusing Crystal");
