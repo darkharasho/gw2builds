@@ -399,6 +399,7 @@ export function parseBuildImportPayload(text) {
   const source = parsed.build && typeof parsed.build === "object" ? parsed.build : parsed;
   const profession = resolveImportedProfession(source);
   const skills = normalizeImportedSkills(source);
+  const underwaterSkills = normalizeImportedSkills({ skills: source.underwaterSkills || {} });
   const specializations = normalizeImportedSpecializations(source.specializations);
   const notes = String(source.notes || source.description || "");
   const tags = Array.isArray(source.tags)
@@ -473,6 +474,7 @@ export function parseBuildImportPayload(text) {
     },
     specializations,
     skills,
+    underwaterSkills,
     gameMode: String(source.gameMode || "pve"),
   };
 }
@@ -618,6 +620,17 @@ export async function loadBuildIntoEditor(build, options = {}) {
         : [0, 0, 0],
       eliteId: Number(build.skills?.elite?.id) || 0,
     },
+    underwaterSkills: (() => {
+      const uwSkills = build.underwaterSkills || {};
+      return {
+        healId: Number(uwSkills.heal?.id) || 0,
+        utilityIds: Array.isArray(uwSkills.utility)
+          ? uwSkills.utility.slice(0, 3).map((s) => Number(s?.id) || 0)
+          : [0, 0, 0],
+        eliteId: Number(uwSkills.elite?.id) || 0,
+      };
+    })(),
+    underwaterMode: false,
     activeAttunement: "",
     activeAttunement2: "",
     activeKit: 0,
@@ -706,6 +719,14 @@ export function serializeEditorToBuild() {
       heal,
       utility,
       elite,
+    },
+    underwaterSkills: {
+      heal: simplifySkill(skillById.get(Number(state.editor.underwaterSkills?.healId))),
+      utility: (state.editor.underwaterSkills?.utilityIds || [])
+        .slice(0, 3)
+        .map((skillId) => simplifySkill(skillById.get(Number(skillId))))
+        .filter(Boolean),
+      elite: simplifySkill(skillById.get(Number(state.editor.underwaterSkills?.eliteId))),
     },
     equipment: {
       statPackage: String(state.editor.equipment.statPackage || ""),
