@@ -594,7 +594,32 @@ export function buildMechanicSlotsForRender({
     const berserkActive = berserkSkillId > 0 && activeKit === berserkSkillId;
 
     mechSlots = renderSlotKeys.map((slotKey) => {
-      const candidates = bySlot.get(slotKey);
+      let candidates = bySlot.get(slotKey);
+
+      // Pre-filter candidates by land/water mode: remove skills incompatible with current mode.
+      // This must happen before the single-candidate shortcut so that dual-mode weapons (spear)
+      // don't short-circuit to the wrong variant.
+      if (candidates.length > 1) {
+        const hasNoUW = (s) => (s.flags || []).includes("NoUnderwater");
+        if (underwaterMode) {
+          const uwOnly = candidates.filter((s) => !hasNoUW(s));
+          if (uwOnly.length > 0) candidates = uwOnly;
+        } else {
+          // On land: if a land-specific variant (NoUnderwater) exists for the active weapon,
+          // exclude the underwater-only variants of that weapon.
+          const landForWeapon = candidates.filter((s) =>
+            hasNoUW(s) && (s.weaponType || "").toLowerCase() === activeMainhand
+          );
+          if (landForWeapon.length > 0) {
+            const without = candidates.filter((s) => {
+              const wt = (s.weaponType || "").toLowerCase();
+              return wt !== activeMainhand || hasNoUW(s);
+            });
+            if (without.length > 0) candidates = without;
+          }
+        }
+      }
+
       let skill;
       if (candidates.length === 1) {
         skill = candidates[0];
@@ -611,39 +636,16 @@ export function buildMechanicSlotsForRender({
         // Sort by ID descending: when the API lists multiple skill variants at the same slot
         // the higher ID is the more recently added/updated skill and should be preferred.
         const wt = (s) => (s.weaponType || "").toLowerCase();
-        // Filter out skills incompatible with current land/water mode.
-        // Underwater: skip NoUnderwater skills.
-        // Land: skip underwater-only skills (those without NoUnderwater when a NoUnderwater
-        // variant exists for the same weapon). This handles spear which has separate land/water bursts.
-        const hasNoUW = (s) => (s.flags || []).includes("NoUnderwater");
-        const modeFilter = (arr) => {
-          if (underwaterMode) {
-            const filtered = arr.filter((s) => !hasNoUW(s));
-            return filtered.length > 0 ? filtered : arr;
-          }
-          // Land: if any skill for the active weapon has NoUnderwater, exclude the non-NoUnderwater
-          // variants of that same weapon (they're the underwater-only versions).
-          const landVariants = arr.filter((s) => hasNoUW(s) && (s.weaponType || "").toLowerCase() === activeMainhand);
-          if (landVariants.length > 0) {
-            const filtered = arr.filter((s) => {
-              const wt = (s.weaponType || "").toLowerCase();
-              // Keep this skill if: it's for a different weapon, OR it has NoUnderwater
-              return wt !== activeMainhand || hasNoUW(s);
-            });
-            return filtered.length > 0 ? filtered : arr;
-          }
-          return arr;
-        };
         let pool;
         if (isBerserkerBurstSlot) {
           // When Berserk is active show primal bursts (spec=51); otherwise show core bursts.
-          const primalPool = modeFilter(candidates.filter((s) => Number(s.specialization) === 51));
-          const corePool = modeFilter(candidates.filter((s) => !Number(s.specialization)));
+          const primalPool = candidates.filter((s) => Number(s.specialization) === 51);
+          const corePool = candidates.filter((s) => !Number(s.specialization));
           const base = berserkActive ? primalPool : corePool;
-          pool = (base.length > 0 ? base : modeFilter(candidates)).sort((a, b) => b.id - a.id);
+          pool = (base.length > 0 ? base : candidates).sort((a, b) => b.id - a.id);
         } else {
-          const baseCandidates = eliteCandidates.length > 0 ? eliteCandidates : candidates;
-          pool = [...modeFilter(baseCandidates)].sort((a, b) => b.id - a.id);
+          pool = [...(eliteCandidates.length > 0 ? eliteCandidates : candidates)]
+            .sort((a, b) => b.id - a.id);
         }
         const attunementSkill = !isWeaver && activeAttunement
           ? pool.find((s) => s.attunement && s.attunement.toLowerCase() === activeAttunement.toLowerCase())
