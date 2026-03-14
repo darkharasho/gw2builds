@@ -916,8 +916,9 @@ export function renderSkills() {
 
   _el.skillsHost.prepend(_renderUnderwaterToggle());
 
-  let options = getSkillOptionsByType(catalog, state.editor.specializations, state.editor.underwaterMode);
-  const skillSource = state.editor.underwaterMode
+  const isUnderwater = Boolean(state.editor.underwaterMode);
+  let options = getSkillOptionsByType(catalog, state.editor.specializations, isUnderwater);
+  const skillSource = isUnderwater
     ? state.editor.underwaterSkills
     : state.editor.skills;
   const utilitySelection = Array.isArray(skillSource?.utilityIds)
