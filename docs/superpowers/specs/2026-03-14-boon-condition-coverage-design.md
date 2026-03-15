@@ -159,6 +159,12 @@ export const CONDITION_NAMES = new Set([
   "Vulnerability", "Weakness"
 ]);
 
+// Maps API spelling variants to canonical display names for grouping
+export const CONDITION_NAME_NORMALIZE = {
+  "Blind": "Blinded", "Chill": "Chilled", "Cripple": "Crippled",
+  "Immobilize": "Immobile", "Immobilized": "Immobile", "Poison": "Poisoned",
+};
+
 export const BOON_DISPLAY_ORDER = [
   "Aegis", "Alacrity", "Fury", "Might", "Protection", "Quickness",
   "Regeneration", "Resistance", "Resolution", "Stability", "Swiftness", "Vigor"
