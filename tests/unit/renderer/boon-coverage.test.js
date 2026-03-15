@@ -151,6 +151,19 @@ describe("computeBoonCoverage", () => {
     expect(result.boons[0].allyOnly).toBe(true);
   });
 
+  test("marks as ally when description mentions allies but not the specific boon name", () => {
+    // Generic: "Grant boons to nearby allies." without naming Protection
+    const trait = makeTrait(500, "Protective Ward", [buffFact("Protection", 3)], {
+      description: "Grant boons to nearby allies.",
+    });
+    const catalog = makeCatalog({ traitById: new Map([[500, trait]]) });
+    const editor = makeEditor({
+      specializations: [{ specializationId: 42, majorChoices: { 1: 500, 2: 0, 3: 0 } }],
+    });
+    const result = computeBoonCoverage(catalog, editor);
+    expect(result.boons[0].allyOnly).toBe(true);
+  });
+
   test("marks boon as self when any source lacks ally description", () => {
     const s1 = makeSkill(100, "Self Might", [buffFact("Might", 5)], { description: "Gain might." });
     const s2 = makeSkill(200, "Ally Might", [buffFact("Might", 5)], { description: "Grant allies might." });

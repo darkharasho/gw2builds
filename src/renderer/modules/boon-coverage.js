@@ -3,25 +3,56 @@ import {
   BOON_DISPLAY_ORDER, BUFF_FACT_TYPES, BOON_CONDITION_ICONS,
 } from "./constants.js";
 
+const ALL_KNOWN_NAMES = [...BOON_NAMES, ...CONDITION_NAMES];
+
 function normalizeName(status) {
   return CONDITION_NAME_NORMALIZE[status] || status;
 }
 
 // Check whether a specific boon/condition is described as ally-targeted in the description.
-// Looks for the boon name appearing in a sentence that also contains "allies" or "ally".
-// Falls back to false (self-applied) when uncertain.
-function isAllyTargeted(description, statusName) {
+// Strategy:
+// 1. If the boon name appears in a sentence with "allies/ally" → ally.
+// 2. If the boon name appears in description but NOT in an ally sentence → self.
+// 3. If the boon is NOT named in the description at all:
+//    a. If the description mentions allies generically (no other boon names appear
+//       near "allies" either) → ally (e.g. "grant boons to allies").
+//    b. If other specific boons ARE named with allies → self (the ally mention
+//       is about those specific boons, not this unnamed one).
+// 4. No allies mentioned → self.
+function isAllyTargeted(description, statusName, allBoonNames) {
   if (!description) return false;
   const desc = description.toLowerCase();
   const name = statusName.toLowerCase();
-  // Split into sentences (roughly) and check if any sentence mentions both the boon and allies
+  const hasAllyWord = /\b(allies|ally)\b/.test(desc);
+  if (!hasAllyWord) return false;
+
   const sentences = desc.split(/[.!;]/);
+
+  // If the boon name appears in the description, check per-sentence
+  if (desc.includes(name)) {
+    for (const sentence of sentences) {
+      if (sentence.includes(name) && /\b(allies|ally)\b/.test(sentence)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Boon not named in description — check if the ally mentions are generic or specific
+  // If any other known boon/condition name appears in an ally sentence, the ally
+  // mention is specific to those boons → this unnamed boon defaults to self
+  const knownNames = allBoonNames || [];
   for (const sentence of sentences) {
-    if (sentence.includes(name) && /\b(allies|ally)\b/.test(sentence)) {
-      return true;
+    if (!/\b(allies|ally)\b/.test(sentence)) continue;
+    for (const known of knownNames) {
+      if (sentence.includes(known.toLowerCase())) {
+        // Ally mention is about a specific named boon, not generic
+        return false;
+      }
     }
   }
-  return false;
+  // Ally mentions are generic (no specific boon named) → ally
+  return true;
 }
 
 function extractBuffFacts(entity, sourceType) {
@@ -40,7 +71,7 @@ function extractBuffFacts(entity, sourceType) {
       sourceName: entity.name || "",
       stacks: fact.apply_count || 0,
       duration: fact.duration || 0,
-      isAlly: isAllyTargeted(desc, rawStatus),
+      isAlly: isAllyTargeted(desc, rawStatus, ALL_KNOWN_NAMES),
     });
   }
   return results;
