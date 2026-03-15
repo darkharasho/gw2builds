@@ -146,6 +146,16 @@ describe("computeBoonCoverage", () => {
     expect(result.boons[0].sources).toHaveLength(2);
   });
 
+  test("extracts boons from weapon skills passed as third argument", () => {
+    const ws = makeSkill(400, "Sword Strike", [buffFact("Might", 4, 1)]);
+    const catalog = makeCatalog();
+    const editor = makeEditor();
+    const result = computeBoonCoverage(catalog, editor, [ws, null, null, null, null]);
+    expect(result.boons).toHaveLength(1);
+    expect(result.boons[0].name).toBe("Might");
+    expect(result.boons[0].sources[0]).toMatchObject({ type: "skill", name: "Sword Strike" });
+  });
+
   test("extracts boons from selected traits", () => {
     const trait = makeTrait(500, "Radiant Power", [buffFact("Fury", 3)]);
     const catalog = makeCatalog({ traitById: new Map([[500, trait]]) });
@@ -381,10 +391,20 @@ function collectTraitIds(editor) {
   return ids;
 }
 
-export function computeBoonCoverage(catalog, editor) {
+export function computeBoonCoverage(catalog, editor, weaponSkills = []) {
   if (!catalog) return { boons: [], conditions: [] };
 
   const allFacts = [];
+
+  // Collect from weapon skills (passed in by caller, already resolved)
+  for (const ws of weaponSkills) {
+    if (!ws) continue;
+    allFacts.push(...extractBuffFacts(ws, "skill"));
+    if (ws.flipSkill) {
+      const flip = catalog.skillById?.get(ws.flipSkill) || catalog.weaponSkillById?.get(ws.flipSkill);
+      if (flip) allFacts.push(...extractBuffFacts(flip, "skill"));
+    }
+  }
 
   // Collect from skills (heal, utility, elite, profession mechanics)
   const skillIds = collectSkillIds(editor, catalog);
@@ -407,14 +427,13 @@ export function computeBoonCoverage(catalog, editor) {
     allFacts.push(...extractBuffFacts(trait, "trait"));
   }
 
-  // Group by normalized name
+  // Group by name (already normalized in extractBuffFacts)
   const grouped = new Map();
   for (const f of allFacts) {
-    const canonical = normalizeName(f.name);
-    if (!grouped.has(canonical)) {
-      grouped.set(canonical, { sources: [], hasAnySelf: false });
+    if (!grouped.has(f.name)) {
+      grouped.set(f.name, { sources: [], hasAnySelf: false });
     }
-    const entry = grouped.get(canonical);
+    const entry = grouped.get(f.name);
     entry.sources.push({
       type: f.sourceType,
       name: f.sourceName,
@@ -625,8 +644,8 @@ import { computeBoonCoverage } from "./boon-coverage.js";
 Add between the `_renderUnderwaterToggle()` function and the `renderSkills()` function declaration (insert just before the `export function renderSkills()` line at line 1002). This function creates the boon/condition coverage DOM from the computed data:
 
 ```js
-function _renderBoonCoverage(catalog, editor) {
-  const coverage = computeBoonCoverage(catalog, editor);
+function _renderBoonCoverage(catalog, editor, weaponSkills = []) {
+  const coverage = computeBoonCoverage(catalog, editor, weaponSkills);
   const hasBoons = coverage.boons.length > 0;
   const hasConditions = coverage.conditions.length > 0;
   if (!hasBoons && !hasConditions) return null;
@@ -730,7 +749,7 @@ to:
 ```js
   const utilCol = document.createElement("div");
   utilCol.className = "skills-bar__util-col";
-  const coverageEl = _renderBoonCoverage(catalog, state.editor);
+  const coverageEl = _renderBoonCoverage(catalog, state.editor, weaponSkills);
   if (coverageEl) utilCol.append(coverageEl);
   utilCol.append(utilityGroup);
   bar.append(weaponCol, orbCol, utilCol);
