@@ -17,33 +17,9 @@
 .equip-col--art {
   padding: 0;
   position: relative;
-  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-left: 1px solid rgba(80, 132, 163, 0.2);
-  border-right: 1px solid rgba(80, 132, 163, 0.2);
-}
-
-.equip-col--art::before,
-.equip-col--art::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 40px;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.equip-col--art::before {
-  left: 0;
-  background: linear-gradient(to right, rgb(11, 18, 34), transparent);
-}
-
-.equip-col--art::after {
-  right: 0;
-  background: linear-gradient(to left, rgb(11, 18, 34), transparent);
 }
 
 .equip-art-bg-icon {
