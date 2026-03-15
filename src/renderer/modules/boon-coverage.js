@@ -3,20 +3,31 @@ import {
   BOON_DISPLAY_ORDER, BUFF_FACT_TYPES, BOON_CONDITION_ICONS,
 } from "./constants.js";
 
-const ALLY_PATTERNS = /\b(allies|ally)\b/i;
-
 function normalizeName(status) {
   return CONDITION_NAME_NORMALIZE[status] || status;
 }
 
-function isAllyDescription(description) {
-  return ALLY_PATTERNS.test(description || "");
+// Check whether a specific boon/condition is described as ally-targeted in the description.
+// Looks for the boon name appearing in a sentence that also contains "allies" or "ally".
+// Falls back to false (self-applied) when uncertain.
+function isAllyTargeted(description, statusName) {
+  if (!description) return false;
+  const desc = description.toLowerCase();
+  const name = statusName.toLowerCase();
+  // Split into sentences (roughly) and check if any sentence mentions both the boon and allies
+  const sentences = desc.split(/[.!;]/);
+  for (const sentence of sentences) {
+    if (sentence.includes(name) && /\b(allies|ally)\b/.test(sentence)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function extractBuffFacts(entity, sourceType) {
   const results = [];
   const facts = entity.facts || [];
-  const isAlly = isAllyDescription(entity.description);
+  const desc = entity.description || "";
   for (const fact of facts) {
     if (!BUFF_FACT_TYPES.has(fact.type)) continue;
     const rawStatus = fact.status;
@@ -29,7 +40,7 @@ function extractBuffFacts(entity, sourceType) {
       sourceName: entity.name || "",
       stacks: fact.apply_count || 0,
       duration: fact.duration || 0,
-      isAlly,
+      isAlly: isAllyTargeted(desc, rawStatus),
     });
   }
   return results;

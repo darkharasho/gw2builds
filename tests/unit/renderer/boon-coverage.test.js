@@ -145,6 +145,28 @@ describe("computeBoonCoverage", () => {
     expect(result.boons[0].allyOnly).toBe(false);
   });
 
+  test("per-fact ally detection: only marks the specific boon mentioned with allies", () => {
+    // Simulates Tempestuous Aria: "Using a shout grants allies might. Granting an aura..."
+    // Might should be ally, but Stability from same trait should NOT be ally
+    const trait = makeTrait(500, "Tempestuous Aria", [
+      buffFact("Might", 6, 3),
+      buffFact("Stability", 3, 1),
+    ], {
+      description: "Using a shout grants allies might. Granting an aura to an ally increases your outgoing damage.",
+    });
+    const catalog = makeCatalog({ traitById: new Map([[500, trait]]) });
+    const editor = makeEditor({
+      specializations: [{ specializationId: 42, majorChoices: { 1: 500, 2: 0, 3: 0 } }],
+    });
+    const result = computeBoonCoverage(catalog, editor);
+    const might = result.boons.find((b) => b.name === "Might");
+    const stab = result.boons.find((b) => b.name === "Stability");
+    expect(might).toBeDefined();
+    expect(stab).toBeDefined();
+    expect(might.allyOnly).toBe(true);
+    expect(stab.allyOnly).toBe(false);
+  });
+
   test("boons are sorted in GW2 display order", () => {
     const s1 = makeSkill(100, "S1", [buffFact("Vigor", 3)]);
     const s2 = makeSkill(200, "S2", [buffFact("Aegis", 3)]);
