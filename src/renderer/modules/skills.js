@@ -1024,7 +1024,7 @@ function _renderBoonCoverage(catalog, editor, weaponSkills = []) {
       img.height = 18;
       icon.append(img);
 
-      if (item.allyOnly) {
+      if (item.hasAllySource) {
         const badge = document.createElement("div");
         badge.className = "boon-coverage__ally-badge";
         badge.textContent = "⇧";

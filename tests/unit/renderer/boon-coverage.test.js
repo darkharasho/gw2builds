@@ -148,7 +148,7 @@ describe("computeBoonCoverage", () => {
     const catalog = makeCatalog({ skillById: new Map([[100, skill]]) });
     const editor = makeEditor({ skills: { healId: 100, utilityIds: [0, 0, 0], eliteId: 0 } });
     const result = computeBoonCoverage(catalog, editor);
-    expect(result.boons[0].allyOnly).toBe(true);
+    expect(result.boons[0].hasAllySource).toBe(true);
   });
 
   test("marks as ally when description mentions allies but not the specific boon name", () => {
@@ -161,16 +161,16 @@ describe("computeBoonCoverage", () => {
       specializations: [{ specializationId: 42, majorChoices: { 1: 500, 2: 0, 3: 0 } }],
     });
     const result = computeBoonCoverage(catalog, editor);
-    expect(result.boons[0].allyOnly).toBe(true);
+    expect(result.boons[0].hasAllySource).toBe(true);
   });
 
-  test("marks boon as self when any source lacks ally description", () => {
+  test("shows ally badge when any source targets allies, even if others are self", () => {
     const s1 = makeSkill(100, "Self Might", [buffFact("Might", 5)], { description: "Gain might." });
     const s2 = makeSkill(200, "Ally Might", [buffFact("Might", 5)], { description: "Grant allies might." });
     const catalog = makeCatalog({ skillById: new Map([[100, s1], [200, s2]]) });
     const editor = makeEditor({ skills: { healId: 100, utilityIds: [200, 0, 0], eliteId: 0 } });
     const result = computeBoonCoverage(catalog, editor);
-    expect(result.boons[0].allyOnly).toBe(false);
+    expect(result.boons[0].hasAllySource).toBe(true);
   });
 
   test("per-fact ally detection: only marks the specific boon mentioned with allies", () => {
@@ -191,8 +191,8 @@ describe("computeBoonCoverage", () => {
     const stab = result.boons.find((b) => b.name === "Stability");
     expect(might).toBeDefined();
     expect(stab).toBeDefined();
-    expect(might.allyOnly).toBe(true);
-    expect(stab.allyOnly).toBe(false);
+    expect(might.hasAllySource).toBe(true);
+    expect(stab.hasAllySource).toBe(false);
   });
 
   test("boons are sorted in GW2 display order", () => {

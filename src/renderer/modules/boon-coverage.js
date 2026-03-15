@@ -157,7 +157,7 @@ export function computeBoonCoverage(catalog, editor, weaponSkills = []) {
   const grouped = new Map();
   for (const f of allFacts) {
     if (!grouped.has(f.name)) {
-      grouped.set(f.name, { sources: [], hasAnySelf: false });
+      grouped.set(f.name, { sources: [], hasAnyAlly: false });
     }
     const entry = grouped.get(f.name);
     entry.sources.push({
@@ -166,7 +166,7 @@ export function computeBoonCoverage(catalog, editor, weaponSkills = []) {
       stacks: f.stacks,
       duration: f.duration,
     });
-    if (!f.isAlly) entry.hasAnySelf = true;
+    if (f.isAlly) entry.hasAnyAlly = true;
   }
 
   // Build output arrays
@@ -176,7 +176,7 @@ export function computeBoonCoverage(catalog, editor, weaponSkills = []) {
     const entry = {
       name,
       icon: BOON_CONDITION_ICONS[name] || "",
-      allyOnly: !data.hasAnySelf,
+      hasAllySource: data.hasAnyAlly,
       sources: data.sources,
     };
     if (BOON_NAMES.has(name)) {
