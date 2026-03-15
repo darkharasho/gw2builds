@@ -1655,7 +1655,6 @@ export function renderSkills() {
 
   const orbCol = document.createElement("div");
   orbCol.className = "skills-bar__orb-col";
-  orbCol.append(_renderUnderwaterToggle());
   if (f5SlotEl) {
     orbCol.append(f5SlotEl, orbEl);
   } else {
@@ -1667,7 +1666,7 @@ export function renderSkills() {
   if (coverageEl) utilCol.append(coverageEl);
   utilCol.append(utilityGroup);
   bar.append(weaponCol, orbCol, utilCol);
-  _el.skillsHost.append(bar);
+  _el.skillsHost.append(_renderUnderwaterToggle(), bar);
   state.renderedSkillIconIds = nextRenderedSkillIconIds;
 }
 
