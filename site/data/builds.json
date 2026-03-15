@@ -1,4 +1,259 @@
 {
-  "generatedAt": "2026-03-15T06:53:48.909Z",
-  "builds": []
+  "generatedAt": "2026-03-15T06:56:43.605Z",
+  "builds": [
+    {
+      "id": "484cb3ec-0d51-4176-aa8b-1ef739b5570e",
+      "title": "Core Elementalist - Test 1",
+      "profession": "Elementalist",
+      "updatedAt": "2026-03-15T06:56:34.888Z",
+      "createdAt": "2026-03-13T19:51:04.202Z",
+      "notes": "",
+      "tags": [],
+      "equipment": {
+        "statPackage": "",
+        "relic": "Relic of the Thief",
+        "food": "",
+        "utility": "",
+        "enrichment": "87417"
+      },
+      "specializations": [
+        {
+          "id": 31,
+          "name": "Fire",
+          "icon": "https://render.guildwars2.com/file/B4BDAB2452DEF1A34615DDC4F30A157DADC743C5/1011986.png",
+          "background": "https://render.guildwars2.com/file/6BB3E8FDEA6E679050D59E411A4AA956D347B045/1012038.png",
+          "majorChoices": {
+            "1": 296,
+            "2": 325,
+            "3": 1510
+          },
+          "majorTraitsByTier": {
+            "1": [
+              {
+                "id": 296,
+                "name": "Burning Precision",
+                "icon": "https://render.guildwars2.com/file/774471FA3841BB90EB6F935A76D8017A0C4B005E/1012306.png"
+              },
+              {
+                "id": 328,
+                "name": "Conjurer",
+                "icon": "https://render.guildwars2.com/file/6BE466F790D5410D2E10512B1F0A523EEEB776B0/1012307.png"
+              },
+              {
+                "id": 335,
+                "name": "Burning Fire",
+                "icon": "https://render.guildwars2.com/file/0850B1BC61637D04045533CCDACFB5796F47B4CF/1012308.png"
+              }
+            ],
+            "2": [
+              {
+                "id": 325,
+                "name": "Burning Rage",
+                "icon": "https://render.guildwars2.com/file/AB4E6CB3066DFF2D3C179B026C9BC371799E5D67/2175045.png"
+              },
+              {
+                "id": 340,
+                "name": "Smothering Auras",
+                "icon": "https://render.guildwars2.com/file/32EB577B3EC6D2AC0AC4EDB4A799EE5E4F2B1341/1012310.png"
+              },
+              {
+                "id": 334,
+                "name": "Power Overwhelming",
+                "icon": "https://render.guildwars2.com/file/5D0937674DCD7AAAE80B4D243AFBDC753DFF220B/1012311.png"
+              }
+            ],
+            "3": [
+              {
+                "id": 1510,
+                "name": "Persisting Flames",
+                "icon": "https://render.guildwars2.com/file/38496307B7C27BCB08D6800F2A699B4998DD1935/1012312.png"
+              },
+              {
+                "id": 294,
+                "name": "Pyromancer's Puissance",
+                "icon": "https://render.guildwars2.com/file/998095CB1FD2CF0164B8A36BABFDB911DF08DB02/1012313.png"
+              },
+              {
+                "id": 1675,
+                "name": "Inferno",
+                "icon": "https://render.guildwars2.com/file/150B4E2CB4039B33152D496FF04E9B1644E22E0A/1012314.png"
+              }
+            ]
+          }
+        },
+        {
+          "id": 41,
+          "name": "Air",
+          "icon": "https://render.guildwars2.com/file/D3DB62FF6055021A717F3C6A0C19502F2C4EC1FF/1011983.png",
+          "background": "https://render.guildwars2.com/file/97BE972EC832ABC4F8645FF4A063EFF89B2942B8/1012034.png",
+          "majorChoices": {
+            "1": 227,
+            "2": 229,
+            "3": 226
+          },
+          "majorTraitsByTier": {
+            "1": [
+              {
+                "id": 227,
+                "name": "Zephyr's Boon",
+                "icon": "https://render.guildwars2.com/file/0542900C005EB41CEDFAF003D91A9104D479A848/1012270.png"
+              },
+              {
+                "id": 224,
+                "name": "One with Air",
+                "icon": "https://render.guildwars2.com/file/200BAEAD2FCD181E102556B02AF5F326EC583DD0/1012271.png"
+              },
+              {
+                "id": 232,
+                "name": "Ferocious Winds",
+                "icon": "https://render.guildwars2.com/file/A0EB166CD43079B2F7206ED305FD6C3D049BB704/1012272.png"
+              }
+            ],
+            "2": [
+              {
+                "id": 229,
+                "name": "Inscription",
+                "icon": "https://render.guildwars2.com/file/0157D1D40CF9B505B907DB95149F767A6FDB09DD/1012273.png"
+              },
+              {
+                "id": 214,
+                "name": "Raging Storm",
+                "icon": "https://render.guildwars2.com/file/74A414B378B54431EF183A37DA37CCFFFC0E04BD/2175040.png"
+              },
+              {
+                "id": 1502,
+                "name": "Stormsoul",
+                "icon": "https://render.guildwars2.com/file/4505D3D02606283B02124C3304697304E663ECAE/1012275.png"
+              }
+            ],
+            "3": [
+              {
+                "id": 226,
+                "name": "Bolt to the Heart",
+                "icon": "https://render.guildwars2.com/file/3E4E727D6D23DFEF4205F272A15E2136799DE291/1012276.png"
+              },
+              {
+                "id": 1503,
+                "name": "Fresh Air",
+                "icon": "https://render.guildwars2.com/file/FA64C9F2750F986E52E8376F22EDBA3844A8C603/1012277.png"
+              },
+              {
+                "id": 1672,
+                "name": "Lightning Rod",
+                "icon": "https://render.guildwars2.com/file/0D26024404D06BBB0A3BD70340251740C73E0F2C/1012278.png"
+              }
+            ]
+          }
+        },
+        {
+          "id": 26,
+          "name": "Earth",
+          "icon": "https://render.guildwars2.com/file/BA6BC962A7ABA1330B3AC4141299397C0036559F/1011985.png",
+          "background": "https://render.guildwars2.com/file/B9C5BE9716010E3F7F170A52B5B272327CDA49A1/1012037.png",
+          "majorChoices": {
+            "1": 282,
+            "2": 275,
+            "3": 1508
+          },
+          "majorTraitsByTier": {
+            "1": [
+              {
+                "id": 282,
+                "name": "Earth's Embrace",
+                "icon": "https://render.guildwars2.com/file/94B6E0582A0CC93604F12220F703C5D22C59097A/1012294.png"
+              },
+              {
+                "id": 1507,
+                "name": "Serrated Stones",
+                "icon": "https://render.guildwars2.com/file/0A2B6F1BC25AC118B67DC31F9A0BA6427ABB6A6A/1012295.png"
+              },
+              {
+                "id": 289,
+                "name": "Elemental Shielding",
+                "icon": "https://render.guildwars2.com/file/9EA9E5B50D71ACE02E1413073901CD2B152E559C/1012296.png"
+              }
+            ],
+            "2": [
+              {
+                "id": 275,
+                "name": "Strength of Stone",
+                "icon": "https://render.guildwars2.com/file/567BA00AEB795B5021E5924CC3511DE3AAC26438/1012297.png"
+              },
+              {
+                "id": 281,
+                "name": "Rock Solid",
+                "icon": "https://render.guildwars2.com/file/4D23C1FE504D402ABF3E80F30FE396A9FA55A63E/1012298.png"
+              },
+              {
+                "id": 277,
+                "name": "Earthen Blessing",
+                "icon": "https://render.guildwars2.com/file/9A2144F4A44AFF9AA3B9099405F0EA36F226CD27/2175042.png"
+              }
+            ],
+            "3": [
+              {
+                "id": 1508,
+                "name": "Diamond Skin",
+                "icon": "https://render.guildwars2.com/file/D1014421F0E06325664204C905200002987E38C5/1012300.png"
+              },
+              {
+                "id": 287,
+                "name": "Written in Stone",
+                "icon": "https://render.guildwars2.com/file/5160CCF906702A4478C533EF5DA6BD02956E9378/1012301.png"
+              },
+              {
+                "id": 1674,
+                "name": "Stone Heart",
+                "icon": "https://render.guildwars2.com/file/22F1BDACFBEBC8FF2BF77B22B3E535D2BA03D140/1012302.png"
+              }
+            ]
+          }
+        }
+      ],
+      "skills": {
+        "heal": {
+          "id": 21656,
+          "name": "Arcane Brilliance",
+          "icon": "https://render.guildwars2.com/file/09A60F4FF1020AD1CB78FC7FF21F10306AF7DF0E/699524.png",
+          "description": "Arcane. Blast the area, hitting foes with critical damage and healing yourself. Healing effectiveness is increased per target hit. If this skill finishes a combo, you heal an additional amount.",
+          "type": "Heal",
+          "slot": "Heal"
+        },
+        "utility": [
+          {
+            "id": 5539,
+            "name": "Arcane Blast",
+            "icon": "https://render.guildwars2.com/file/BCEB22C05BD13F226612C81339AF9A7647F7B454/103229.png",
+            "description": "Arcane. Blast your foe with energy for critical damage.",
+            "type": "Utility",
+            "slot": "Utility"
+          },
+          {
+            "id": 5635,
+            "name": "Arcane Echo",
+            "icon": "https://render.guildwars2.com/file/AD24BD1B231424D2A8F223A6F899AC34D6AAAB26/103356.png",
+            "description": "Arcane. The next weapon skill you use has significantly reduced recharge, and this skill's recharge is increased by the original recharge of the affected skill.",
+            "type": "Utility",
+            "slot": "Utility"
+          },
+          {
+            "id": 5641,
+            "name": "Arcane Shield",
+            "icon": "https://render.guildwars2.com/file/A20219EB6F5FC52A0E537163B4A9051606C11B52/65735.png",
+            "description": "Arcane. Block attacks with an energy shield. If it blocks three attacks, it explodes for critical damage.",
+            "type": "Utility",
+            "slot": "Utility"
+          }
+        ],
+        "elite": {
+          "id": 5516,
+          "name": "Conjure Fiery Greatsword",
+          "icon": "https://render.guildwars2.com/file/EEDA0B1847077DE93DBB0575D44BE0615FBCE728/103328.png",
+          "description": "Conjure. Manifest a fiery greatsword in your hands and at the target location. When it lands, it damages and burns foes. Wielders of this weapon gain increased power and condition damage and cast Lesser Fiery Eruption at regular intervals on random enemies.",
+          "type": "Elite",
+          "slot": "Elite"
+        }
+      }
+    }
+  ]
 }
