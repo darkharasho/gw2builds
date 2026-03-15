@@ -450,6 +450,28 @@ export const BOON_CONDITION_ICONS = {
 // Fact types where the icon represents the boon/condition being applied.
 export const BUFF_FACT_TYPES = new Set(["Buff", "ApplyBuffCondition", "PrefixedBuff"]);
 
+export const BOON_NAMES = new Set([
+  "Aegis", "Alacrity", "Fury", "Might", "Protection", "Quickness",
+  "Regeneration", "Resistance", "Resolution", "Stability", "Swiftness", "Vigor",
+]);
+
+export const CONDITION_NAMES = new Set([
+  "Bleeding", "Blind", "Blinded", "Burning", "Chill", "Chilled",
+  "Confusion", "Cripple", "Crippled", "Fear", "Immobile", "Immobilize", "Immobilized",
+  "Poison", "Poisoned", "Slow", "Taunt", "Torment",
+  "Vulnerability", "Weakness",
+]);
+
+export const CONDITION_NAME_NORMALIZE = {
+  Blind: "Blinded", Chill: "Chilled", Cripple: "Crippled",
+  Immobilize: "Immobile", Immobilized: "Immobile", Poison: "Poisoned",
+};
+
+export const BOON_DISPLAY_ORDER = [
+  "Aegis", "Alacrity", "Fury", "Might", "Protection", "Quickness",
+  "Regeneration", "Resistance", "Resolution", "Stability", "Swiftness", "Vigor",
+];
+
 // Fallback icons keyed by GW2 API fact type, for facts missing fact.icon.
 // Icons sourced from render.guildwars2.com via /v2/skills API responses.
 export const FACT_TYPE_ICONS = {
