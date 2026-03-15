@@ -16,7 +16,11 @@ export function normalizeSigilArray(value, slotKey) {
 }
 
 // Normalize infusion value — arrays for multi-slot items (back, rings), strings otherwise.
-export const INFUSION_ARRAY_SLOTS = { back: 2, ring1: 3, ring2: 3 };
+export const INFUSION_ARRAY_SLOTS = {
+  back: 2, ring1: 3, ring2: 3,
+  mainhand1: 2, offhand1: 1, mainhand2: 2, offhand2: 1,
+  aquatic1: 2, aquatic2: 2, breather: 1,
+};
 
 export function normalizeInfusionValue(value, slotKey) {
   const expectedLen = INFUSION_ARRAY_SLOTS[slotKey];
