@@ -173,16 +173,19 @@ export function computeBoonCoverage(catalog, editor, weaponSkills = []) {
   const boons = [];
   const conditions = [];
   for (const [name, data] of grouped) {
-    const entry = {
-      name,
-      icon: BOON_CONDITION_ICONS[name] || "",
-      hasAllySource: data.hasAnyAlly,
-      sources: data.sources,
-    };
     if (BOON_NAMES.has(name)) {
-      boons.push(entry);
+      boons.push({
+        name,
+        icon: BOON_CONDITION_ICONS[name] || "",
+        hasAllySource: data.hasAnyAlly,
+        sources: data.sources,
+      });
     } else {
-      conditions.push(entry);
+      conditions.push({
+        name,
+        icon: BOON_CONDITION_ICONS[name] || "",
+        sources: data.sources,
+      });
     }
   }
 
