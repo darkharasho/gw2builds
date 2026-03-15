@@ -658,3 +658,126 @@
   color: #fff;
   cursor: default;
 }
+
+/* Boon & Condition Coverage */
+.skills-bar__util-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.boon-coverage {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.boon-coverage__boons,
+.boon-coverage__conditions {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.boon-coverage__icon {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  border-radius: 3px;
+  background: rgba(2, 8, 16, 0.5);
+  border: 1px solid rgba(180, 180, 180, 0.25);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.boon-coverage__icon:hover {
+  border-color: rgba(255, 220, 100, 0.7);
+  box-shadow: 0 0 6px rgba(255, 200, 50, 0.3);
+}
+
+.boon-coverage__icon img {
+  width: 24px;
+  height: 24px;
+  border-radius: 2px;
+  display: block;
+}
+
+.boon-coverage__ally-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(100, 180, 255, 0.9);
+  display: grid;
+  place-items: center;
+  font-size: 6px;
+  color: #fff;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.boon-coverage__tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(12, 18, 32, 0.96);
+  border: 1px solid rgba(100, 140, 200, 0.3);
+  border-radius: 6px;
+  padding: 8px 12px;
+  min-width: 200px;
+  max-width: 320px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.boon-coverage__tooltip-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 5px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(100, 140, 200, 0.15);
+}
+
+.boon-coverage__tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 11px;
+}
+
+.boon-coverage__tooltip-tag {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.boon-coverage__tooltip-tag--skill {
+  color: rgba(100, 180, 255, 0.9);
+  background: rgba(100, 180, 255, 0.15);
+}
+
+.boon-coverage__tooltip-tag--trait {
+  color: rgba(255, 180, 80, 0.9);
+  background: rgba(255, 180, 80, 0.15);
+}
+
+.boon-coverage__tooltip-name {
+  color: rgba(220, 220, 240, 0.9);
+}
+
+.boon-coverage__tooltip-detail {
+  color: rgba(180, 200, 230, 0.5);
+  margin-left: auto;
+}
