@@ -105,6 +105,21 @@ describe("computeBoonCoverage", () => {
     expect(result.boons[0].sources[0]).toMatchObject({ type: "trait", name: "Radiant Power" });
   });
 
+  test("extracts boons from minor traits (always active on equipped spec)", () => {
+    const minorTrait = makeTrait(600, "Protector's Restoration", [buffFact("Protection", 3)]);
+    const catalog = makeCatalog({
+      traitById: new Map([[600, minorTrait]]),
+      specializationById: new Map([[42, { minorTraits: [600] }]]),
+    });
+    const editor = makeEditor({
+      specializations: [{ specializationId: 42, majorChoices: { 1: 0, 2: 0, 3: 0 } }],
+    });
+    const result = computeBoonCoverage(catalog, editor);
+    expect(result.boons).toHaveLength(1);
+    expect(result.boons[0].name).toBe("Protection");
+    expect(result.boons[0].sources[0]).toMatchObject({ type: "trait", name: "Protector's Restoration" });
+  });
+
   test("follows flipSkill one level deep", () => {
     const flip = makeSkill(101, "Flip Skill", [buffFact("Might", 5, 2)]);
     const base = makeSkill(100, "Base Skill", [], { flipSkill: 101 });

@@ -68,13 +68,20 @@ function collectSkillIds(editor, catalog) {
   return ids;
 }
 
-function collectTraitIds(editor) {
+function collectTraitIds(editor, catalog) {
   const ids = new Set();
   for (const spec of editor.specializations || []) {
+    // Selected major traits
     const choices = spec?.majorChoices || {};
     for (const tier of [1, 2, 3]) {
       const traitId = Number(choices[tier]) || 0;
       if (traitId) ids.add(traitId);
+    }
+    // Minor traits (always active when spec line is equipped)
+    const specId = Number(spec?.specializationId) || 0;
+    const specData = specId ? catalog?.specializationById?.get(specId) : null;
+    for (const minorId of specData?.minorTraits || []) {
+      if (minorId) ids.add(Number(minorId));
     }
   }
   return ids;
@@ -108,7 +115,7 @@ export function computeBoonCoverage(catalog, editor, weaponSkills = []) {
   }
 
   // Collect from traits
-  const traitIds = collectTraitIds(editor);
+  const traitIds = collectTraitIds(editor, catalog);
   for (const id of traitIds) {
     const trait = catalog.traitById?.get(id);
     if (!trait) continue;
