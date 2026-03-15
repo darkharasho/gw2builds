@@ -106,9 +106,9 @@ const MOCK_PROFESSIONS = {
       // Luminary Radiant Forge
       { id: 77073, slot: "Profession_1",  specialization: 81,   type: "Profession" }, // Enter Radiant Forge
       // Virtues (core)
-      { id: 29887, slot: "Profession_1",  specialization: null, type: "Profession" }, // DH F1 (from trait)
-      { id: 30783, slot: "Profession_2",  specialization: null, type: "Profession" }, // DH F2 (from trait)
-      { id: 30029, slot: "Profession_3",  specialization: null, type: "Profession" }, // DH F3 (from trait)
+      { id: 29887, slot: "Profession_1",  specialization: 27,   type: "Profession" }, // DH F1 (from trait)
+      { id: 30783, slot: "Profession_2",  specialization: 27,   type: "Profession" }, // DH F2 (from trait)
+      { id: 30029, slot: "Profession_3",  specialization: 27,   type: "Profession" }, // DH F3 (from trait)
       { id: 9,     slot: "Elite",         specialization: null, type: "Elite" },
     ],
     weapons: {
@@ -476,6 +476,26 @@ function makeSkill(id, overrides = {}) {
 }
 
 const MOCK_SKILLS = {
+  // ---- Guardian ----
+  9083:  makeSkill(9083,  { name: "Shelter",          slot: "Heal",         type: "Heal",       professions: ["Guardian"] }),
+  9168:  makeSkill(9168,  { name: "Bane Signet",      slot: "Utility",      type: "Utility",    professions: ["Guardian"] }),
+  9:     makeSkill(9,     { name: "Renewed Focus",    slot: "Elite",        type: "Elite",      professions: ["Guardian"] }),
+  // Core Guardian virtues — Virtue of Justice flips to Spear of Justice (DH)
+  9115:  makeSkill(9115,  { name: "Virtue of Justice",  slot: "Profession_1", type: "Profession", professions: ["Guardian"], flip_skill: 29887 }),
+  9120:  makeSkill(9120,  { name: "Virtue of Resolve",  slot: "Profession_2", type: "Profession", professions: ["Guardian"], flip_skill: 30783 }),
+  9107:  makeSkill(9107,  { name: "Virtue of Courage",  slot: "Profession_3", type: "Profession", professions: ["Guardian"], flip_skill: 30029 }),
+  // Dragonhunter F1-F3 (flip targets of core virtues, spec 27)
+  29887: makeSkill(29887, { name: "Spear of Justice",   slot: "Profession_1", type: "Profession", specialization: 27, professions: ["Guardian"], flip_skill: 33134 }),
+  30783: makeSkill(30783, { name: "Wings of Resolve",   slot: "Profession_2", type: "Profession", specialization: 27, professions: ["Guardian"] }),
+  30029: makeSkill(30029, { name: "Shield of Courage",  slot: "Profession_3", type: "Profession", specialization: 27, professions: ["Guardian"] }),
+  33134: makeSkill(33134, { name: "Hunter's Verdict",   slot: "Profession_1", type: "Profession", specialization: 27, professions: ["Guardian"] }),
+  // Firebrand tomes (spec 62)
+  44364: makeSkill(44364, { name: "Tome of Justice",  slot: "Profession_1", type: "Profession", specialization: 62, professions: ["Guardian"] }),
+  41780: makeSkill(41780, { name: "Tome of Resolve",  slot: "Profession_2", type: "Profession", specialization: 62, professions: ["Guardian"] }),
+  42259: makeSkill(42259, { name: "Tome of Courage",  slot: "Profession_3", type: "Profession", specialization: 62, professions: ["Guardian"] }),
+  // Luminary (spec 81)
+  77073: makeSkill(77073, { name: "Enter Radiant Forge", slot: "Profession_1", type: "Profession", specialization: 81, professions: ["Guardian"] }),
+
   // ---- Warrior ----
   14402: makeSkill(14402, { name: "Mending",      slot: "Heal",    type: "Heal",    professions: ["Warrior"], flags: [] }),
   14516: makeSkill(14516, { name: "Balanced Stance", slot: "Utility", type: "Utility", professions: ["Warrior"], flags: ["NoUnderwater"] }),
