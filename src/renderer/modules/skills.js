@@ -1042,18 +1042,18 @@ function _renderBoonCoverage(catalog, editor, weaponSkills = []) {
         tooltip.append(title);
 
         for (const src of item.sources) {
-          const row = document.createElement("div");
-          row.className = "boon-coverage__tooltip-row";
+          const sourceRow = document.createElement("div");
+          sourceRow.className = "boon-coverage__tooltip-row";
 
           const tag = document.createElement("span");
           tag.className = `boon-coverage__tooltip-tag boon-coverage__tooltip-tag--${src.type}`;
           tag.textContent = src.type === "skill" ? "Skill" : "Trait";
-          row.append(tag);
+          sourceRow.append(tag);
 
-          const name = document.createElement("span");
-          name.className = "boon-coverage__tooltip-name";
-          name.textContent = src.name;
-          row.append(name);
+          const srcName = document.createElement("span");
+          srcName.className = "boon-coverage__tooltip-name";
+          srcName.textContent = src.name;
+          sourceRow.append(srcName);
 
           const detail = document.createElement("span");
           detail.className = "boon-coverage__tooltip-detail";
@@ -1065,9 +1065,9 @@ function _renderBoonCoverage(catalog, editor, weaponSkills = []) {
           } else {
             detail.textContent = "passive";
           }
-          row.append(detail);
+          sourceRow.append(detail);
 
-          tooltip.append(row);
+          tooltip.append(sourceRow);
         }
 
         icon.append(tooltip);
