@@ -65,11 +65,11 @@ export function createEmptyEditor(profession = "", gameMode = "pve") {
       },
       infusions: {
         head: "", shoulders: "", chest: "", hands: "", legs: "", feet: "",
-        mainhand1: "", offhand1: "", mainhand2: "", offhand2: "",
+        mainhand1: ["", ""], offhand1: [""], mainhand2: ["", ""], offhand2: [""],
         back: ["", ""],
         ring1: ["", "", ""], ring2: ["", "", ""],
         accessory1: "", accessory2: "",
-        breather: "", aquatic1: "", aquatic2: "",
+        breather: [""], aquatic1: ["", ""], aquatic2: ["", ""],
       },
       enrichment: "",
     },

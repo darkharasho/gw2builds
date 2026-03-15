@@ -576,6 +576,9 @@ export function renderEquipmentPanel() {
       const sigilCount = slotDef.key.startsWith("offhand") ? 1 : (isAquaticSlot || isTwoHanded ? 2 : 1);
       const sigilArr = equip.sigils?.[slotDef.key] || [];
 
+      // Two-handed: stack SS / II in a 2×2 grid
+      if (isTwoHanded) upgradeContainer.classList.add("equip-upgrade-slots--stacked");
+
       for (let i = 0; i < sigilCount; i++) {
         const sigilVal = String(sigilArr[i] || "");
         const sigilBtn = makeUpgradeBtn("sigils", slotDef.key, sigilVal, (newVal) => {
@@ -590,15 +593,24 @@ export function renderEquipmentPanel() {
         if (sigilBtn) upgradeContainer.append(sigilBtn);
       }
 
-      // Infusion
-      const infVal = equip.infusions?.[slotDef.key] || "";
-      const weapInfBtn = makeUpgradeBtn("infusions", slotDef.key, infVal, (newVal) => {
-        if (!equip.infusions) equip.infusions = {};
-        equip.infusions[slotDef.key] = newVal || "";
-        _markEditorChanged();
-        renderEquipmentPanel();
-      });
-      if (weapInfBtn) upgradeContainer.append(weapInfBtn);
+      // Infusion — two-handed / aquatic = 2 slots; offhand = 1
+      const infusionCount = slotDef.key.startsWith("offhand") ? 1 : (isAquaticSlot || isTwoHanded ? 2 : 1);
+      const infArr = equip.infusions?.[slotDef.key] || [];
+      const infArrNorm = Array.isArray(infArr) ? infArr : [infArr];
+
+      for (let i = 0; i < infusionCount; i++) {
+        const infVal = String(infArrNorm[i] || "");
+        const weapInfBtn = makeUpgradeBtn("infusions", slotDef.key, infVal, (newVal) => {
+          if (!equip.infusions) equip.infusions = {};
+          if (!Array.isArray(equip.infusions[slotDef.key])) {
+            equip.infusions[slotDef.key] = slotDef.key.startsWith("offhand") ? [""] : ["", ""];
+          }
+          equip.infusions[slotDef.key][i] = newVal || "";
+          _markEditorChanged();
+          renderEquipmentPanel();
+        });
+        if (weapInfBtn) upgradeContainer.append(weapInfBtn);
+      }
 
       if (upgradeContainer.children.length > 0) {
         wrapper.append(upgradeContainer);

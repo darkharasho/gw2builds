@@ -707,6 +707,13 @@
   flex-shrink: 0;
 }
 
+/* Two-handed weapons: stack SS on top, II on bottom */
+.equip-upgrade-slots--stacked {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+}
+
 .equip-upgrade-btn {
   width: 24px;
   height: 24px;
