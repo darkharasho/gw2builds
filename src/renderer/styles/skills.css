@@ -682,8 +682,8 @@
 
 .boon-coverage__icon {
   position: relative;
-  width: 22px;
-  height: 22px;
+  width: 28px;
+  height: 28px;
   border-radius: 3px;
   background: rgba(2, 8, 16, 0.5);
   border: 1px solid rgba(180, 180, 180, 0.25);
@@ -699,8 +699,8 @@
 }
 
 .boon-coverage__icon img {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   border-radius: 2px;
   display: block;
 }

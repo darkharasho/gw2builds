@@ -1020,8 +1020,8 @@ function _renderBoonCoverage(catalog, editor, weaponSkills = []) {
       const img = document.createElement("img");
       img.src = item.icon;
       img.alt = item.name;
-      img.width = 18;
-      img.height = 18;
+      img.width = 24;
+      img.height = 24;
       icon.append(img);
 
       if (item.hasAllySource) {
