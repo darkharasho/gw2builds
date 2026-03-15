@@ -108,11 +108,14 @@ export function getSkillOptionsByType(catalog, specializationSelections, underwa
   const profMechanics = allSkills
     .filter((skill) => PROFESSION_SLOT_RE.test(skill.slot || ""))
     .filter((skill) => !exitLeavePattern.test(skill.name || ""))
-    // Exclude flip targets unless they are explicitly in the profession endpoint.
-    // Using inProfessionEndpoint (not flipParentIds) as the gate because mutual flip pairs
-    // like Deadeye's Mark (43390) ↔ Steal Time would both pass a flipParentIds check, yet
-    // "Steal Time" is a transient post-activation state that must not show as a permanent slot.
-    .filter((skill) => !flipSkillIds.has(skill.id) || skill.inProfessionEndpoint)
+    // Exclude flip targets unless they are explicitly in the profession endpoint OR they are
+    // elite-spec profession mechanics that themselves flip to another skill (i.e. a "base" state
+    // in a flip chain). Example: Dragonhunter's Spear of Justice (29887) is a flip target of
+    // Virtue of Justice AND flips to Hunter's Verdict — it's the permanent F1 mechanic.
+    // Hunter's Verdict (33134) is also a flip target but has flipSkill=0 — it's the transient
+    // "activated" state and should remain excluded.
+    .filter((skill) => !flipSkillIds.has(skill.id) || skill.inProfessionEndpoint
+      || (PROFESSION_SLOT_RE.test(skill.slot || "") && Number(skill.specialization) > 0 && skill.flipSkill > 0))
     // Exclude skills that are not tied to any profession, unless they are explicitly listed
     // in the profession endpoint (inProfessionEndpoint). Some legitimate F-slot mechanics
     // (e.g. Chant of Freedom 77155) have professions:[] in /v2/skills due to an API bug
